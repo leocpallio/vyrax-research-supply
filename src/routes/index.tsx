@@ -185,7 +185,6 @@ function Home() {
                 href={productPath(c.slug)}
                 className="bg-ink-panel border border-ink-line rounded-2xl p-5 hover:border-primary-soft transition-colors"
               >
-                <p className="text-xs text-ink-muted">{c.tags[0]}</p>
                 <p className="font-heading text-xl font-semibold mt-1">{c.name}</p>
                 <p className="text-sm text-ink-muted mt-1 font-mono">
                   {c.strengths.map((s) => s.label).join(" · ")}
@@ -212,7 +211,6 @@ function Home() {
                   className="category-tile group flex flex-col"
                 >
                   <h3 className="font-heading text-lg font-semibold">{c.name}</h3>
-                  <p className="text-muted-foreground text-sm mt-1 flex-1">{c.blurb}</p>
                   <div className="flex items-center justify-between mt-6 text-sm">
                     <span className="text-muted-foreground">
                       {n ? `${n} product${n === 1 ? "" : "s"}` : "Coming soon"}

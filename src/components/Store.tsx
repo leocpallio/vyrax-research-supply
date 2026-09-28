@@ -250,7 +250,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                     className="rounded-lg p-3 hover:bg-surface"
                   >
                     <span className="block font-semibold">{c.name}</span>
-                     <span className="block text-xs text-muted-foreground font-normal mt-0.5">{c.blurb}</span>
                   </Link>
                 ))}
                 <Link to="/shop" className="rounded-lg p-3 hover:bg-surface text-primary">
@@ -583,9 +582,6 @@ export function ProductCard({ product }: { product: Compound }) {
         )}
       </a>
       <div className="p-4 md:p-5 flex flex-col flex-1">
-        <div className="text-[11px] uppercase text-muted-foreground tracking-wide mb-1.5 truncate">
-          {product.tags.join(" · ")}
-        </div>
         <a
           href={href}
           className="font-heading font-semibold text-base md:text-lg leading-snug line-clamp-2 hover:text-primary"

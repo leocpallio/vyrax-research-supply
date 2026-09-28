@@ -14,7 +14,7 @@ export const Route = createFileRoute("/collections/$slug")({
     const section = shopSections.find((item) => item.slug === loaderData?.slug);
     if (!section) return {};
     const title = `${section.name} Peptides UK | Vyrax Labs`;
-    const desc = `${section.blurb} Browse the Vyrax Labs research catalogue. For research use only - not for human consumption.`;
+    const desc = `Browse ${section.name} peptides at Vyrax Labs. For research use only - not for human consumption.`;
     return {
       meta: [
         { title },
@@ -41,7 +41,6 @@ function CollectionPage() {
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: section.name }]} />
         <p className="eyebrow">SHOP BY SECTION</p>
         <h1 className="page-title">{section.name}</h1>
-        <p className="text-muted-foreground mt-4 max-w-3xl text-lg">{section.blurb}</p>
         <div className="flex flex-wrap gap-2 my-8">
           <Link to="/shop" className="chip">All</Link>
           {shopSections.map((item) => (
