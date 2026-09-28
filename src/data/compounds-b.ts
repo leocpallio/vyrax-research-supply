@@ -506,6 +506,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Skin research", "Tissue repair"],
     kind: "blend",
     composition: ["GHK-Cu 50mg", "BPC-157 10mg", "TB-500 10mg"],
+    appearance: "Pale blue lyophilised powder (from the GHK-Cu)",
     strengths: [{ label: "70mg", amount: 70, unit: "mg", price: 59.99 }],
     summary: "GLOW is a 70mg research blend of GHK-Cu, BPC-157 and TB-500 in a single vial.",
     overview: [
@@ -530,6 +531,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Inflammation research", "Tissue repair"],
     kind: "blend",
     composition: ["GHK-Cu 50mg", "BPC-157 10mg", "TB-500 10mg", "KPV 10mg"],
+    appearance: "Pale blue lyophilised powder (from the GHK-Cu)",
     strengths: [{ label: "80mg", amount: 80, unit: "mg", price: 67.99 }],
     summary: "KLOW is an 80mg research blend of GHK-Cu, BPC-157, TB-500 and KPV in a single vial.",
     overview: [

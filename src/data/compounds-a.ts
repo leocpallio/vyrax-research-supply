@@ -154,7 +154,7 @@ export const metabolicAndRegenerative: Compound[] = [
     tags: ["NNMT research", "NAD+ metabolism"],
     kind: "small-molecule",
     form: "Powder (iodide salt)",
-    appearance: "Off-white to yellow powder",
+    appearance: "Red-brown to dark brown solid",
     strengths: [{ label: "50mg", amount: 50, unit: "mg", price: 39.99 }],
     summary:
       "5-Amino-1MQ is a small-molecule, membrane-permeable inhibitor of nicotinamide N-methyltransferase (NNMT).",
