@@ -20,5 +20,13 @@ export const featured = ['Retatrutide','Tirzepatide','BPC-157','TB-500','GHK-Cu'
 export const gbp = (value:number) => '£'+value.toFixed(2);
 export type CartItem = {slug:string;name:string;strength:string;quantity:number;price:number};
 export const cartKey = 'vyrax-basket';
+export function priceBasket(items:CartItem[]) {
+ const subtotal=items.reduce((sum,item)=>sum+item.price*item.quantity,0);
+ const freeVials=items.reduce((sum,item)=>sum+(item.slug==='retatrutide'&&item.strength==='10mg'||item.slug==='tirzepatide'&&item.strength==='20mg'?Math.floor(item.quantity/3)*item.price:0),0);
+ const afterOffer=subtotal-freeVials;
+ const rate=afterOffer>400?.2:afterOffer>250?.15:afterOffer>150?.1:0;
+ const tierDiscount=Math.round(afterOffer*rate*100)/100;
+ return {subtotal,freeVials,tierDiscount,total:Math.round((afterOffer-tierDiscount)*100)/100,rate};
+}
 export function readCart():CartItem[] { try { return JSON.parse(localStorage.getItem(cartKey) || '[]'); } catch { return []; } }
 export function addCart(item:CartItem) { const items=readCart(); const existing=items.find(i=>i.slug===item.slug&&i.strength===item.strength); if(existing) existing.quantity+=item.quantity; else items.push(item); localStorage.setItem(cartKey,JSON.stringify(items)); window.dispatchEvent(new Event('vyrax-cart')); }
