@@ -13,17 +13,22 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as BasketRouteImport } from './routes/basket'
+import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FaqRouteImport } from './routes/faq'
-import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as LabReportsRouteImport } from './routes/lab-reports'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResearchUsePolicyRouteImport } from './routes/research-use-policy'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +51,11 @@ const BasketRoute = BasketRouteImport.update({
   path: '/basket',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
@@ -56,14 +66,14 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GuidesRoute = GuidesRouteImport.update({
-  id: '/guides',
-  path: '/guides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabReportsRoute = LabReportsRouteImport.update({
@@ -74,6 +84,11 @@ const LabReportsRoute = LabReportsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchUsePolicyRoute = ResearchUsePolicyRouteImport.update({
+  id: '/research-use-policy',
+  path: '/research-use-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReturnsRoute = ReturnsRouteImport.update({
@@ -91,6 +106,11 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -99,6 +119,16 @@ const TermsRoute = TermsRouteImport.update({
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesSlugRoute = GuidesSlugRouteImport.update({
+  id: '/guides/$slug',
+  path: '/guides/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
@@ -112,36 +142,46 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/basket': typeof BasketRoute
+  '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
-  '/guides': typeof GuidesRoute
   '/lab-reports': typeof LabReportsRoute
   '/privacy': typeof PrivacyRoute
+  '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/guides/': typeof GuidesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/basket': typeof BasketRoute
+  '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
-  '/guides': typeof GuidesRoute
   '/lab-reports': typeof LabReportsRoute
   '/privacy': typeof PrivacyRoute
+  '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/guides': typeof GuidesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -149,18 +189,23 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/basket': typeof BasketRoute
+  '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
-  '/guides': typeof GuidesRoute
   '/lab-reports': typeof LabReportsRoute
   '/privacy': typeof PrivacyRoute
+  '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/guides/': typeof GuidesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,54 +214,69 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/basket'
+    | '/calculator'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/faq'
-    | '/guides'
     | '/lab-reports'
     | '/privacy'
+    | '/research-use-policy'
     | '/returns'
     | '/shipping'
     | '/shop'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/guides/$slug'
     | '/product/$slug'
+    | '/guides/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/account'
     | '/basket'
+    | '/calculator'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/faq'
-    | '/guides'
     | '/lab-reports'
     | '/privacy'
+    | '/research-use-policy'
     | '/returns'
     | '/shipping'
     | '/shop'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/guides/$slug'
     | '/product/$slug'
+    | '/guides'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/account'
     | '/basket'
+    | '/calculator'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/faq'
-    | '/guides'
     | '/lab-reports'
     | '/privacy'
+    | '/research-use-policy'
     | '/returns'
     | '/shipping'
     | '/shop'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/guides/$slug'
     | '/product/$slug'
+    | '/guides/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,18 +284,23 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   BasketRoute: typeof BasketRoute
+  CalculatorRoute: typeof CalculatorRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
-  GuidesRoute: typeof GuidesRoute
   LabReportsRoute: typeof LabReportsRoute
   PrivacyRoute: typeof PrivacyRoute
+  ResearchUsePolicyRoute: typeof ResearchUsePolicyRoute
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
   ShopRoute: typeof ShopRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  GuidesSlugRoute: typeof GuidesSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -268,6 +333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BasketRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
@@ -282,18 +354,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faq': {
       id: '/faq'
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guides': {
-      id: '/guides'
-      path: '/guides'
-      fullPath: '/guides'
-      preLoaderRoute: typeof GuidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lab-reports': {
@@ -308,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research-use-policy': {
+      id: '/research-use-policy'
+      path: '/research-use-policy'
+      fullPath: '/research-use-policy'
+      preLoaderRoute: typeof ResearchUsePolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/returns': {
@@ -331,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -343,6 +429,20 @@ declare module '@tanstack/react-router' {
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/$slug': {
+      id: '/guides/$slug'
+      path: '/guides/$slug'
+      fullPath: '/guides/$slug'
+      preLoaderRoute: typeof GuidesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$slug': {
@@ -360,18 +460,23 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   BasketRoute: BasketRoute,
+  CalculatorRoute: CalculatorRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
-  GuidesRoute: GuidesRoute,
   LabReportsRoute: LabReportsRoute,
   PrivacyRoute: PrivacyRoute,
+  ResearchUsePolicyRoute: ResearchUsePolicyRoute,
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
   ShopRoute: ShopRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,
+  GuidesSlugRoute: GuidesSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
