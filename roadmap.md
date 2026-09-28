@@ -2,4 +2,5 @@
 - [x] Add account access, guest order enquiries, order history, reviews and email sign-up.
 - [x] Add supporting lab report, shipping, returns, guide, FAQ and legal pages.
 - [x] Add detailed product information and apply launch offers to the enquiry totals.
+- [x] Replace customer-facing shop sections with the research areas in the supplied example, without copying competitor listings or prices.
 - [ ] Publish genuine certificates, verified company details, courier contract and payment provider (blocked by missing business records and commercial setup).

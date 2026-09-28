@@ -27,6 +27,7 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -121,6 +122,11 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/collections/$slug',
+  path: '/collections/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuidesIndexRoute = GuidesIndexRouteImport.update({
   id: '/guides/',
   path: '/guides/',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/guides/': typeof GuidesIndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/guides': typeof GuidesIndexRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/guides/': typeof GuidesIndexRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/guides/'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/guides'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
+    | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/guides/'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guides/': {
       id: '/guides/'
       path: '/guides'
@@ -474,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,
+  CollectionsSlugRoute: CollectionsSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   GuidesIndexRoute: GuidesIndexRoute,

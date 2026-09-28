@@ -14,3 +14,4 @@
 - Shared shop chrome lives in `src/components/Store.tsx` and leaf pages retain their own metadata; this keeps navigation and research warnings consistent.
 
 - Promotional totals are calculated in `src/lib/catalog.ts`; the basket and enquiry must use the same calculation to prevent mismatched prices.
+- Customer-facing research sections are mapped in `src/data/shop-sections.ts` separately from legacy category URLs, so existing links survive the navigation change.

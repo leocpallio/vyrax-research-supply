@@ -23,9 +23,7 @@ import {
   DispatchCountdown,
 } from "@/components/Store";
 import {
-  categories,
   compounds,
-  compoundsIn,
   blends,
   getCompound,
   productPath,
@@ -37,6 +35,7 @@ import { guides } from "@/data/guides";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
 import hero from "@/assets/vyrax-hero.jpg";
+import { shopSections, productsInSection } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -201,14 +200,14 @@ function Home() {
       {/* Categories */}
       <section className="section">
         <div className="container-main">
-          <SectionTitle eyebrow="BROWSE BY RESEARCH AREA" title="Shop by category" />
+          <SectionTitle eyebrow="BROWSE BY RESEARCH AREA" title="Shop by section" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.map((c) => {
-              const n = compoundsIn(c.slug).length;
+            {shopSections.map((c) => {
+              const n = productsInSection(compounds, c.slug).length;
               return (
                 <Link
                   key={c.slug}
-                  to="/category/$slug"
+                  to="/collections/$slug"
                   params={{ slug: c.slug }}
                   className="category-tile group flex flex-col"
                 >
@@ -216,7 +215,7 @@ function Home() {
                   <p className="text-muted-foreground text-sm mt-1 flex-1">{c.blurb}</p>
                   <div className="flex items-center justify-between mt-6 text-sm">
                     <span className="text-muted-foreground">
-                      {n} compound{n === 1 ? "" : "s"}
+                      {n ? `${n} product${n === 1 ? "" : "s"}` : "Coming soon"}
                     </span>
                     <ArrowRight
                       className="text-primary group-hover:translate-x-1 transition-transform"
