@@ -1,3 +1,120 @@
-import {createFileRoute,Link,notFound} from '@tanstack/react-router';import {StoreShell,ProductGrid,Disclaimer} from '@/components/Store';import {categories,products} from '@/lib/catalog';import {ArrowLeft} from 'lucide-react';
-export const Route=createFileRoute('/category/$slug')({loader:({params})=>{const category=categories.find(c=>c.slug===params.slug);if(!category)throw notFound();return category},head:({loaderData})=>{const title=`Buy ${loaderData?.name||'Research Peptides'} UK | Lab-Tested Research Peptides | Vyrax Labs`;const desc=`Browse ${loaderData?.name||'research'} compounds for laboratory research at Vyrax Labs.`;return {meta:[{title},{name:'description',content:desc},{property:'og:title',content:title},{property:'og:description',content:desc},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}},component:Category});
-function Category(){const c=Route.useLoaderData();return <StoreShell><div className="container-main py-12 md:py-16"><Link to="/shop" className="text-sm text-muted-foreground inline-flex gap-2 items-center mb-10"><ArrowLeft size={16}/> All compounds</Link><p className="eyebrow">RESEARCH COLLECTION</p><h1 className="page-title">{c.name}</h1><p className="text-muted-foreground mt-4 mb-10">Explore {c.items.length} materials in this research category.</p><ProductGrid list={products.filter(p=>p.category===c.slug)}/></div><Disclaimer/></StoreShell>}
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import {
+  StoreShell,
+  ProductGrid,
+  Disclaimer,
+  FAQ,
+  SectionTitle,
+  Breadcrumbs,
+  TrustStrip,
+} from "@/components/Store";
+import { categories, getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/catalog";
+import { abs } from "@/data/site";
+import { coreFaqs, faqJsonLd } from "@/data/faq";
+
+export const Route = createFileRoute("/category/$slug")({
+  loader: ({ params }) => {
+    const category = getCategory(params.slug);
+    if (!category) throw notFound();
+    return { slug: category.slug };
+  },
+  head: ({ loaderData }) => {
+    const c = loaderData ? getCategory(loaderData.slug) : undefined;
+    if (!c) return {};
+    const url = abs(`/category/${c.slug}`);
+    const list = compoundsIn(c.slug);
+    const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
+    const title = `Buy ${c.seoName} UK | Lab-Tested | Vyrax Labs`;
+    const desc = `${c.blurb} ${list.length} compounds from ${gbp(low)}, batch certificates, same-day dispatch and free tracked UK delivery over £50.`;
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: c.seoName,
+      itemListElement: list.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: abs(productPath(p.slug)),
+        name: p.name,
+      })),
+    };
+    const crumbs = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: abs("/") },
+        { "@type": "ListItem", position: 2, name: "Shop", item: abs("/shop") },
+        { "@type": "ListItem", position: 3, name: c.name, item: url },
+      ],
+    };
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(itemList) },
+        { type: "application/ld+json", children: JSON.stringify(crumbs) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(coreFaqs)) },
+      ],
+    };
+  },
+  component: CategoryPage,
+});
+
+function CategoryPage() {
+  const { slug } = Route.useLoaderData();
+  const c = getCategory(slug);
+  if (!c) return null;
+  const list = compoundsIn(c.slug);
+  return (
+    <StoreShell>
+      <div className="container-main py-8 md:py-12">
+        <Breadcrumbs
+          items={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: c.name }]}
+        />
+        <p className="eyebrow">RESEARCH CATEGORY</p>
+        <h1 className="page-title">{c.seoName}</h1>
+        <p className="text-muted-foreground mt-4 max-w-3xl text-lg">{c.blurb}</p>
+        <div className="mt-6">
+          <TrustStrip />
+        </div>
+        <div className="flex flex-wrap gap-2 mt-8 mb-10">
+          {categories.map((x) => (
+            <a
+              key={x.slug}
+              href={`/category/${x.slug}`}
+              className="chip"
+              aria-current={x.slug === c.slug ? "page" : undefined}
+            >
+              {x.name}
+            </a>
+          ))}
+        </div>
+        <p className="text-sm text-muted-foreground mb-5">
+          {list.length} compound{list.length === 1 ? "" : "s"}
+        </p>
+        <ProductGrid list={list} />
+
+        <section className="max-w-3xl mt-20">
+          <SectionTitle title={`About our ${c.name.toLowerCase()} range`} />
+          <div className="space-y-4 text-muted-foreground leading-relaxed">
+            {c.intro.map((p) => (
+              <p key={p.slice(0, 40)}>{p}</p>
+            ))}
+          </div>
+        </section>
+        <section className="max-w-3xl mt-16 mb-20">
+          <SectionTitle title="Frequently asked questions" />
+          <FAQ items={coreFaqs} />
+        </section>
+      </div>
+      <Disclaimer />
+    </StoreShell>
+  );
+}

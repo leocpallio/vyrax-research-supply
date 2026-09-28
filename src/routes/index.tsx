@@ -1,25 +1,477 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
-import { ArrowRight, FileCheck2, FlaskConical, PackageCheck, Truck, Headphones, LockKeyhole, TestTube2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
-import { categories, products } from '@/lib/catalog';
-import { StoreShell, Disclaimer, FeaturedGrid, FAQ, SectionTitle, TrustStrip } from '@/components/Store';
-import hero from '@/assets/vyrax-hero.jpg'; import lab from '@/assets/vyrax-lab.jpg';
-export const Route=createFileRoute('/')({head:()=>({meta:[{title:'Buy Peptides UK · Lab-Tested Research | Vyrax Labs'},{name:'description',content:'Explore research peptides and laboratory supplies from Vyrax Labs. Browse the UK catalogue and review available batch documentation.'},{property:'og:title',content:'Buy Peptides UK · Lab-Tested Research | Vyrax Labs'},{property:'og:description',content:'Research peptides and laboratory supplies with batch documentation from Vyrax Labs.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'},{property:'og:url',content:'/'}],links:[{rel:'canonical',href:'/'}]}),component:Home});
-function Home(){const [email,setEmail]=useState('');const [message,setMessage]=useState('');return <StoreShell>
- <section className="relative min-h-[580px] md:min-h-[620px] flex items-center overflow-hidden"><img src={hero} alt="Laboratory vials on a clean research bench" width={1536} height={1024} className="absolute inset-0 w-full h-full object-cover object-[65%_center]"/><div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent"/><div className="container-main relative py-20"><div className="max-w-[670px]"><div className="eyebrow flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary"/> UK RESEARCH SUPPLIES</div><h1 className="font-heading text-[40px] md:text-[56px] font-semibold leading-[1.1] max-w-[670px]">Buy Peptides UK. Lab-Tested, Verified Research Supplier.</h1><p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[550px]">Research materials with HPLC and mass spectrometry verification where batch reports are available. Same-day dispatch aim for orders before 2pm.</p><div className="flex flex-wrap gap-3 mt-8"><Button asChild className="rounded-full h-12 px-7"><Link to="/shop">Browse peptides <ArrowRight/></Link></Button><Button asChild variant="outline" className="rounded-full h-12 px-7 bg-background/70"><Link to="/lab-reports">View CoA hub</Link></Button></div><div className="mt-12 pt-6 border-t border-border/70"><TrustStrip/></div></div></div></section>
- <Disclaimer/>
- <section className="section"><div className="container-main"><div className="flex items-end justify-between gap-4"><SectionTitle eyebrow="THE COLLECTION" title="Research essentials" body="A considered selection of compounds for laboratory work."/><Link to="/shop" className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10">Shop all <ArrowRight size={16}/></Link></div><FeaturedGrid/><Link to="/shop" className="md:hidden text-primary font-semibold flex items-center gap-2 mt-8">Shop all <ArrowRight size={16}/></Link></div></section>
- <section className="bg-tint py-14"><div className="container-main flex flex-col md:flex-row md:items-center gap-4 md:gap-12"><div className="font-heading text-5xl font-bold text-primary">{products.length}</div><div><h2 className="font-heading text-2xl font-semibold">Research compounds, one place.</h2><p className="text-muted-foreground mt-1">Browse the catalogue by compound or research category. Availability is confirmed at checkout.</p></div><Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full"><Link to="/shop">Explore catalogue <ArrowRight/></Link></Button></div></section>
- <section className="section"><div className="container-main"><SectionTitle eyebrow="OUR APPROACH" title="From synthesis to your laboratory"/><div className="grid md:grid-cols-4 gap-8">{[['01','Sourcing','Materials are selected for research supply.'],['02','Analysis','Batch records are reviewed for identity and purity.'],['03','Documentation','Available reports are linked to their relevant batches.'],['04','Dispatch','Orders are packed discreetly for UK delivery.']].map(([n,t,b])=><div key={n} className="border-t-2 border-primary pt-5"><span className="font-mono text-primary text-sm">{n}</span><h3 className="font-heading text-xl font-semibold mt-5">{t}</h3><p className="text-muted-foreground mt-2">{b}</p></div>)}</div></div></section>
- <section className="section bg-surface"><div className="container-main"><SectionTitle eyebrow="WHY VYRAX" title="Built around research standards"/><div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">{[[TestTube2,'Analytical focus','Review batch documentation before you order.'],[Truck,'UK dispatch','Orders before 2pm are prioritised on working days.'],[Headphones,'Helpful support','Clear answers about availability and documentation.'],[LockKeyhole,'Discreet service','Plain, securely packed parcels.']].map(([Icon,t,b])=>{const I=Icon as typeof Truck;return <div key={t as string}><I className="text-primary mb-5" size={27}/><h3 className="font-heading font-semibold text-lg">{t as string}</h3><p className="text-muted-foreground text-sm mt-2">{b as string}</p></div>})}</div></div></section>
- <section className="section"><div className="container-main"><SectionTitle eyebrow="FIND YOUR FIELD" title="Browse by research category"/><div className="grid md:grid-cols-3 gap-4">{categories.map((c,i)=><Link key={c.slug} to="/category/$slug" params={{slug:c.slug}} className={`category-tile group ${i===0?'md:col-span-2':''}`}><span className="text-primary/70 font-mono text-sm">0{i+1}</span><div className="flex items-end justify-between gap-3 mt-8"><div><h3 className="font-heading text-xl md:text-2xl font-semibold">{c.name}</h3><p className="text-muted-foreground text-sm mt-1">{c.items.length} compounds</p></div><ArrowRight className="text-primary group-hover:translate-x-1 transition-transform"/></div></Link>)}</div></div></section>
- <section className="section bg-surface"><div className="container-main grid lg:grid-cols-2 gap-16"><div><SectionTitle eyebrow="RESEARCH RESOURCES" title="Where to buy peptides in the UK"/><p className="leading-relaxed text-muted-foreground mb-4">Selecting a research supplier involves more than comparing prices. Check the identity of each compound, the relevance of batch-specific documentation and the supplier's delivery terms before ordering.</p><p className="leading-relaxed text-muted-foreground">Vyrax Labs presents compounds strictly as laboratory research materials. Nothing on this site is intended as medical advice or guidance for human use.</p><Link to="/guides" className="inline-flex items-center text-primary font-semibold gap-2 mt-7">Explore research guides <ArrowRight size={16}/></Link></div><div><h3 className="font-heading text-2xl font-semibold mb-5">Common questions</h3><FAQ/></div></div></section>
- <section className="bg-ink text-ink-foreground py-20"><div className="container-main grid lg:grid-cols-2 gap-12 items-center"><div><p className="eyebrow text-ink-muted">DOCUMENTATION MATTERS</p><h2 className="font-heading text-3xl md:text-4xl font-semibold">A closer look at every available report.</h2><p className="text-ink-muted mt-5 leading-relaxed max-w-lg">Inspect available batch certificates and analytical records in the public lab reports hub. A product is not independently verified unless its actual batch report is published.</p><Button asChild variant="secondary" className="rounded-full mt-7"><Link to="/lab-reports">Explore lab reports <ArrowRight/></Link></Button></div><div className="bg-ink-panel border border-ink-line rounded-lg p-7"><div className="flex items-center gap-3 border-b border-ink-line pb-5"><FileCheck2 className="text-ink-foreground"/><div><p className="font-semibold">CoA quick view</p><p className="text-xs text-ink-muted">Live batch records only</p></div></div><label className="block text-sm text-ink-muted mt-6 mb-2" htmlFor="coa-select">Select compound</label><select id="coa-select" className="w-full p-3 rounded bg-ink border border-ink-line text-ink-foreground">{['Retatrutide','Tirzepatide','BPC-157','TB-500'].map(n=><option key={n}>{n}</option>)}</select><div className="mt-6 border border-dashed border-ink-line p-7 text-center rounded"><FileCheck2 className="mx-auto text-ink-muted"/><p className="mt-3 font-semibold">Report pending publication</p><p className="text-sm text-ink-muted mt-2">No certificate has been uploaded for this selection. Batch purity cannot be confirmed here yet.</p></div></div></div></section>
- <section className="section"><div className="container-main"><SectionTitle eyebrow="CURATED TOGETHER" title="Research bundles" body="Pair complementary laboratory materials in one order."/><div className="grid md:grid-cols-2 gap-6">{[['Regenerative research set','BPC-157 + TB-500','Explore both compounds'],['Analytical essentials','Peptide + lab supplies','Explore the collection']].map(([t,s,a])=><div key={t} className="border border-border rounded-lg p-8 bg-surface"><FlaskConical className="text-primary mb-6"/><h3 className="font-heading text-2xl font-semibold">{t}</h3><p className="text-muted-foreground mt-2">{s}</p><p className="text-xs text-muted-foreground mt-5">Bundle pricing pending confirmation</p><Link to="/shop" className="text-primary font-semibold inline-flex items-center gap-2 mt-5">{a} <ArrowRight size={16}/></Link></div>)}</div></div></section>
- <section className="section bg-surface"><div className="container-main"><SectionTitle eyebrow="COMMUNITY" title="Researcher reviews" body="Customer ratings will appear here when submitted and approved. No testimonials have been published yet."/><Link to="/shop" className="text-primary font-semibold inline-flex gap-2 items-center">Browse the collection <ArrowRight size={16}/></Link></div></section>
- <section className="section"><div className="container-main"><SectionTitle eyebrow="FROM THE JOURNAL" title="Research notes & guides"/><div className="grid md:grid-cols-3 gap-5">{[['Storage and handling','How to protect research material integrity.'],['Reading a certificate of analysis','The key fields in a batch report.'],['Choosing laboratory supplies','Practical considerations for research procurement.']].map(([t,b])=><Link key={t} to="/guides" className="border-t-2 border-primary pt-6 group"><span className="text-xs text-primary font-semibold">GUIDE</span><h3 className="font-heading text-xl font-semibold mt-3 group-hover:text-primary">{t}</h3><p className="text-muted-foreground mt-2">{b}</p><ArrowRight className="mt-5 text-primary" size={17}/></Link>)}</div></div></section>
- <section className="bg-tint py-16"><div className="container-main flex flex-col lg:flex-row lg:items-center gap-10 justify-between"><div><h2 className="font-heading text-3xl font-semibold">Stay informed.</h2><p className="text-muted-foreground mt-2 max-w-xl">Get research updates and a free laboratory preparation and handling guide. No human-use instructions.</p></div><form className="flex flex-col sm:flex-row gap-2 w-full lg:max-w-md" onSubmit={async e=>{e.preventDefault();const {error}=await supabase.from('mailing_list').insert({email});setMessage(error?(error.code==='23505'?'Already subscribed.':'Please try again.'):'Thanks for subscribing.');if(!error)setEmail('')}}><Input type="email" required aria-label="Email address" placeholder="Your email address" className="h-11 bg-background" value={email} onChange={e=>setEmail(e.target.value)}/><Button className="h-11 rounded-lg">Subscribe</Button>{message&&<span className="text-sm" role="status">{message}</span>}</form></div></section>
- </StoreShell>}
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  FileCheck2,
+  FlaskConical,
+  PackageCheck,
+  Truck,
+  TestTube2,
+  RotateCcw,
+  Microscope,
+  BookOpen,
+  Calculator,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  StoreShell,
+  Disclaimer,
+  FeaturedGrid,
+  FAQ,
+  SectionTitle,
+  TrustStrip,
+  ProductGrid,
+  DispatchCountdown,
+} from "@/components/Store";
+import {
+  categories,
+  compounds,
+  compoundsIn,
+  blends,
+  getCompound,
+  productPath,
+  gbp,
+  fromPrice,
+} from "@/lib/catalog";
+import { coas } from "@/data/coa";
+import { guides } from "@/data/guides";
+import { coreFaqs, faqJsonLd } from "@/data/faq";
+import { site, abs } from "@/data/site";
+import hero from "@/assets/vyrax-hero.jpg";
+
+export const Route = createFileRoute("/")({
+  head: () => {
+    const title = "Buy Peptides UK · Lab-Tested Research Peptides | Vyrax Labs";
+    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more. HPLC and MS batch testing, same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
+    const org = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: site.legalName ?? site.name,
+      url: site.url,
+      logo: abs("/favicon.svg"),
+      ...(site.email ? { email: site.email } : {}),
+      ...(site.companyNumber ? { identifier: site.companyNumber } : {}),
+    };
+    const webSite = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: site.name,
+      url: site.url,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${site.url}/shop?q={search_term_string}` },
+        "query-input": "required name=search_term_string",
+      },
+    };
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: abs("/") },
+        { property: "og:image", content: abs(hero) },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: abs("/") }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(org) },
+        { type: "application/ld+json", children: JSON.stringify(webSite) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(coreFaqs)) },
+      ],
+    };
+  },
+  component: Home,
+});
+
+const glp = ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"]
+  .map(getCompound)
+  .filter((c) => c !== undefined);
+
+function Home() {
+  return (
+    <StoreShell>
+      {/* Hero */}
+      <section className="relative min-h-[560px] md:min-h-[620px] flex items-center overflow-hidden">
+        <img
+          src={hero}
+          alt="Research peptide vials on a laboratory bench"
+          width={1536}
+          height={1024}
+          fetchPriority="high"
+          className="absolute inset-0 w-full h-full object-cover object-[65%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
+        <div className="container-main relative py-16 md:py-20">
+          <div className="max-w-[680px]">
+            <div className="eyebrow flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-verify" /> UK STOCK · DISPATCHED FROM THE UK
+            </div>
+            <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
+              Buy research peptides UK. Lab tested, batch by batch.
+            </h1>
+            <p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[560px]">
+              {compounds.length} research compounds with HPLC and mass spectrometry batch testing,
+              published certificates, same-day dispatch and free tracked UK delivery over £
+              {site.freeDeliveryThreshold}.
+            </p>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <Button asChild className="rounded-full h-12 px-7 text-base">
+                <Link to="/shop">
+                  Shop all peptides <ArrowRight />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full h-12 px-7 bg-background/70 text-base"
+              >
+                <Link to="/lab-reports">View lab reports</Link>
+              </Button>
+            </div>
+            <p className="mt-6 text-sm flex items-center gap-2">
+              <Truck size={16} className="text-primary" />
+              <DispatchCountdown />
+            </p>
+            <div className="mt-10 pt-6 border-t border-border/70">
+              <TrustStrip />
+            </div>
+          </div>
+        </div>
+      </section>
+      <Disclaimer />
+
+      {/* Best sellers */}
+      <section className="section">
+        <div className="container-main">
+          <div className="flex items-end justify-between gap-4">
+            <SectionTitle eyebrow="MOST ORDERED" title="Best-selling research peptides" />
+            <Link
+              to="/shop"
+              className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
+            >
+              Shop all {compounds.length} <ArrowRight size={16} />
+            </Link>
+          </div>
+          <FeaturedGrid />
+        </div>
+      </section>
+
+      {/* Launch offer + GLP band */}
+      <section className="bg-ink text-ink-foreground">
+        <div className="container-main py-16 grid lg:grid-cols-[1fr_1.4fr] gap-10 items-center">
+          <div>
+            <span className="badge-promo">LAUNCH OFFER</span>
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold mt-4">
+              Buy 2, get the 3rd free
+            </h2>
+            <p className="text-ink-muted mt-4 leading-relaxed">
+              On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third comes off
+              automatically. Stacks with spend savings of 10% over £150, 15% over £250 and 20% over
+              £400.
+            </p>
+            <div className="flex gap-3 mt-7 flex-wrap">
+              <Button asChild variant="secondary" className="rounded-full">
+                <a href={productPath("retatrutide", "10mg")}>Retatrutide 10mg</a>
+              </Button>
+              <Button asChild variant="secondary" className="rounded-full">
+                <a href={productPath("tirzepatide", "20mg")}>Tirzepatide 20mg</a>
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {glp.map((c) => (
+              <a
+                key={c.slug}
+                href={productPath(c.slug)}
+                className="bg-ink-panel border border-ink-line rounded-2xl p-5 hover:border-primary-soft transition-colors"
+              >
+                <p className="text-xs text-ink-muted">{c.tags[0]}</p>
+                <p className="font-heading text-xl font-semibold mt-1">{c.name}</p>
+                <p className="text-sm text-ink-muted mt-1 font-mono">
+                  {c.strengths.map((s) => s.label).join(" · ")}
+                </p>
+                <p className="mt-3 font-semibold">from {gbp(fromPrice(c))}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="section">
+        <div className="container-main">
+          <SectionTitle eyebrow="BROWSE BY RESEARCH AREA" title="Shop by category" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {categories.map((c) => {
+              const n = compoundsIn(c.slug).length;
+              return (
+                <Link
+                  key={c.slug}
+                  to="/category/$slug"
+                  params={{ slug: c.slug }}
+                  className="category-tile group flex flex-col"
+                >
+                  <h3 className="font-heading text-lg font-semibold">{c.name}</h3>
+                  <p className="text-muted-foreground text-sm mt-1 flex-1">{c.blurb}</p>
+                  <div className="flex items-center justify-between mt-6 text-sm">
+                    <span className="text-muted-foreground">
+                      {n} compound{n === 1 ? "" : "s"}
+                    </span>
+                    <ArrowRight
+                      className="text-primary group-hover:translate-x-1 transition-transform"
+                      size={18}
+                    />
+                  </div>
+                </Link>
+              );
+            })}
+            <Link to="/calculator" className="category-tile group flex flex-col bg-tint">
+              <h3 className="font-heading text-lg font-semibold">Reconstitution calculator</h3>
+              <p className="text-muted-foreground text-sm mt-1 flex-1">
+                Stock concentration, molarity and working dilutions for any vial.
+              </p>
+              <Calculator className="text-primary mt-6" size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Process */}
+      <section className="section bg-surface">
+        <div className="container-main">
+          <SectionTitle eyebrow="HOW WE WORK" title="From synthesis to your bench" />
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              [
+                "01",
+                "Synthesis",
+                "Compounds are produced by solid-phase peptide synthesis and supplied lyophilised in sealed vials.",
+              ],
+              [
+                "02",
+                "Independent testing",
+                "Every batch is analysed by an independent laboratory using HPLC for purity and mass spectrometry for identity.",
+              ],
+              [
+                "03",
+                "Published certificates",
+                "Certificates go on our Lab Reports page, and the batch number on your vial matches its report.",
+              ],
+              [
+                "04",
+                "Tracked dispatch",
+                `Orders before ${site.dispatchCutoffHour - 12}pm on working days leave the same day with ${site.carrier}.`,
+              ],
+            ].map(([n, t, b]) => (
+              <div key={n} className="border-t-2 border-primary pt-5">
+                <span className="font-mono text-primary text-sm">{n}</span>
+                <h3 className="font-heading text-xl font-semibold mt-4">{t}</h3>
+                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why us */}
+      <section className="section">
+        <div className="container-main">
+          <SectionTitle eyebrow="WHY VYRAX LABS" title="What you can expect from every order" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(
+              [
+                [
+                  TestTube2,
+                  "HPLC and MS tested",
+                  "Purity by high-performance liquid chromatography, identity by mass spectrometry, batch by batch.",
+                ],
+                [
+                  FileCheck2,
+                  "Certificates you can read",
+                  "Full reports published on the Lab Reports page, not just a purity badge.",
+                ],
+                [
+                  Truck,
+                  "Same-day tracked dispatch",
+                  `${site.carrier}, free over £${site.freeDeliveryThreshold}. Order before ${site.dispatchCutoffHour - 12}pm on working days.`,
+                ],
+                [
+                  RotateCcw,
+                  "Free reship guarantee",
+                  "If a parcel is lost or arrives damaged, we send a replacement at no cost.",
+                ],
+                [
+                  PackageCheck,
+                  "Protective packaging",
+                  "Padded vials in a plain outer parcel with no product names on the outside.",
+                ],
+                [
+                  Microscope,
+                  "Real research data",
+                  "CAS numbers, molecular formulas, sequences and PubMed references on every compound page.",
+                ],
+              ] as const
+            ).map(([I, t, b]) => (
+              <div key={t} className="border border-border rounded-2xl p-6">
+                <I className="text-primary mb-4" size={26} />
+                <h3 className="font-heading font-semibold text-lg">{t}</h3>
+                <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Lab reports widget */}
+      <section className="bg-ink text-ink-foreground py-20">
+        <div className="container-main grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="eyebrow !text-primary-soft">TRANSPARENCY</p>
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold">
+              Read the lab report before you order.
+            </h2>
+            <p className="text-ink-muted mt-5 leading-relaxed max-w-lg">
+              Every certificate names the batch, the testing laboratory, the methods and the purity
+              result. Search by the batch number printed on your vial to confirm it matches.
+            </p>
+            <Button asChild variant="secondary" className="rounded-full mt-7">
+              <Link to="/lab-reports">
+                Open Lab Reports <ArrowRight />
+              </Link>
+            </Button>
+          </div>
+          <div className="bg-ink-panel border border-ink-line rounded-2xl p-7">
+            <div className="flex items-center gap-3 border-b border-ink-line pb-5">
+              <FileCheck2 className="text-primary-soft" />
+              <div>
+                <p className="font-semibold">Latest certificates</p>
+                <p className="text-xs text-ink-muted">Published as each batch is released</p>
+              </div>
+            </div>
+            {coas.length ? (
+              <ul className="divide-y divide-ink-line">
+                {coas.slice(0, 5).map((r) => (
+                  <li key={r.batch} className="py-3 flex justify-between text-sm">
+                    <span>
+                      {getCompound(r.compound)?.name} {r.strength}
+                    </span>
+                    <span className="font-mono">{r.purity}%</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-6 border border-dashed border-ink-line p-7 text-center rounded-xl">
+                <FileCheck2 className="mx-auto text-ink-muted" />
+                <p className="mt-3 font-semibold">First batch certificates publishing soon</p>
+                <p className="text-sm text-ink-muted mt-2">
+                  Certificates appear here as each launch batch clears independent testing.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Blends */}
+      <section className="section">
+        <div className="container-main">
+          <SectionTitle
+            eyebrow="PRE-FORMULATED"
+            title="Peptide blends"
+            body="Multi-peptide vials for combination research, each component listed on the product page."
+          />
+          <ProductGrid list={blends} />
+        </div>
+      </section>
+
+      {/* Guides */}
+      <section className="section bg-surface">
+        <div className="container-main">
+          <div className="flex items-end justify-between gap-4">
+            <SectionTitle eyebrow="LABORATORY NOTES" title="Research guides" />
+            <Link
+              to="/guides"
+              className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
+            >
+              All guides <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {guides.slice(0, 3).map((g) => (
+              <Link
+                key={g.slug}
+                to="/guides/$slug"
+                params={{ slug: g.slug }}
+                className="category-tile bg-background flex flex-col"
+              >
+                <BookOpen className="text-primary mb-4" size={20} />
+                <h3 className="font-heading text-lg font-semibold leading-snug">{g.title}</h3>
+                <p className="text-sm text-muted-foreground mt-2 flex-1">{g.description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEO copy + FAQ */}
+      <section className="section">
+        <div className="container-main grid lg:grid-cols-2 gap-16">
+          <div>
+            <SectionTitle eyebrow="BUYING GUIDE" title="Buying research peptides in the UK" />
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                When you buy peptides in the UK for research, the things that matter are identity,
+                purity and traceability. Vyrax Labs lists the CAS number, molecular formula and
+                molecular weight for each compound, links to the peer-reviewed literature, and has
+                every batch tested by an independent laboratory using HPLC and mass spectrometry.
+              </p>
+              <p>
+                Our catalogue covers metabolic research peptides such as retatrutide, tirzepatide
+                and semaglutide, regenerative research peptides such as BPC-157, TB-500 and GHK-Cu,
+                growth hormone secretagogues, longevity peptides and pre-formulated blends. Most
+                compounds come in more than one vial strength, and each product page shows the cost
+                per mg so you can compare.
+              </p>
+              <p>
+                Orders placed before {site.dispatchCutoffHour - 12}pm on a working day are
+                dispatched the same day with {site.carrier}, and delivery is free over £
+                {site.freeDeliveryThreshold}. All products are sold strictly for laboratory research
+                use only.
+              </p>
+            </div>
+            <Link
+              to="/faq"
+              className="inline-flex items-center text-primary font-semibold gap-2 mt-7"
+            >
+              Read all FAQs <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div>
+            <h3 className="font-heading text-2xl font-semibold mb-5">Common questions</h3>
+            <FAQ items={coreFaqs} />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-tint py-14">
+        <div className="container-main flex flex-col md:flex-row md:items-center gap-4 md:gap-12">
+          <FlaskConical className="text-primary" size={36} />
+          <div>
+            <h2 className="font-heading text-2xl font-semibold">
+              Buying for a lab or research group?
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Spend savings apply automatically: 10% over £150, 15% over £250, 20% over £400.
+            </p>
+          </div>
+          <Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full">
+            <Link to="/contact">
+              Contact us <ArrowRight />
+            </Link>
+          </Button>
+        </div>
+      </section>
+    </StoreShell>
+  );
+}
