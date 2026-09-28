@@ -200,7 +200,7 @@ function Home() {
       {/* Categories */}
       <section className="section">
         <div className="container-main">
-          <SectionTitle eyebrow="BROWSE BY RESEARCH AREA" title="Shop by section" />
+          <SectionTitle eyebrow="BROWSE BY SECTION" title="Shop by section" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {shopSections.map((c) => {
               const n = productsInSection(compounds, c.slug).length;

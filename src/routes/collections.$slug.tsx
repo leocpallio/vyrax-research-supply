@@ -13,7 +13,7 @@ export const Route = createFileRoute("/collections/$slug")({
   head: ({ loaderData }) => {
     const section = shopSections.find((item) => item.slug === loaderData?.slug);
     if (!section) return {};
-    const title = `${section.name} Research Products UK | Vyrax Labs`;
+    const title = `${section.name} Peptides UK | Vyrax Labs`;
     const desc = `${section.blurb} Browse the Vyrax Labs research catalogue. For research use only - not for human consumption.`;
     return {
       meta: [
@@ -39,7 +39,7 @@ function CollectionPage() {
     <StoreShell>
       <div className="container-main py-8 md:py-12">
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: section.name }]} />
-        <p className="eyebrow">RESEARCH SECTION</p>
+        <p className="eyebrow">SHOP BY SECTION</p>
         <h1 className="page-title">{section.name}</h1>
         <p className="text-muted-foreground mt-4 max-w-3xl text-lg">{section.blurb}</p>
         <div className="flex flex-wrap gap-2 my-8">
