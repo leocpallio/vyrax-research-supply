@@ -1,50 +1,254 @@
-import vial from '@/assets/vyrax-vial.jpg';
-export const categories = [
-  {slug:'metabolic-research', name:'Metabolic research', items:['Retatrutide','Tirzepatide','Semaglutide','AOD-9604','Tesamorelin','5-Amino-1MQ','MOTS-c']},
-  {slug:'regenerative-research', name:'Regenerative research', items:['BPC-157','TB-500','GHK-Cu','KPV','LL-37','Wolverine stack']},
-  {slug:'gh-secretagogues', name:'GH secretagogues', items:['CJC-1295 DAC','CJC-1295 no-DAC','Ipamorelin','GHRP-2','GHRP-6','IGF-1 LR3']},
-  {slug:'longevity-research', name:'Longevity research', items:['NAD+','Epithalon','DSIP','SS-31']},
-  {slug:'pigmentation-research', name:'Pigmentation research', items:['Melanotan-2','PT-141']},
-  {slug:'peptide-blends', name:'Peptide blends', items:['GLOW','KLOW','Hulk stack']},
-  {slug:'lab-supplies', name:'Lab supplies', items:['Bacteriostatic water','Syringes','Wipes','Pens']},
-];
-export const slugify = (s:string) => s.toLowerCase().replace(/\+/g,'-plus').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const priced: Record<string, {strength:string,price:number}[]> = {
- 'Retatrutide':[{strength:'10mg',price:59.99}], 'Tirzepatide':[{strength:'10mg',price:54.99}], 'Semaglutide':[{strength:'5mg',price:19.99}],
- 'BPC-157':[{strength:'5mg',price:15.99},{strength:'10mg',price:29.99}], 'TB-500':[{strength:'5mg',price:21.99},{strength:'10mg',price:37.99}],
- 'GHK-Cu':[{strength:'50mg',price:19.99},{strength:'100mg',price:37.99}], 'CJC-1295 no-DAC':[{strength:'5mg',price:24.99}], 'Ipamorelin':[{strength:'5mg',price:18.99}], 'GLOW':[{strength:'70mg',price:59.99}],
+import vial from "@/assets/vyrax-vial.jpg";
+import { metabolicAndRegenerative } from "@/data/compounds-a";
+import { secretagoguesToSupplies } from "@/data/compounds-b";
+import { categories } from "@/data/categories";
+import { chem, citations } from "@/data/research";
+import { latestCoa } from "@/data/coa";
+import { site } from "@/data/site";
+import type { Category, CategorySlug, Compound, Strength, StockState } from "@/data/types";
+
+export { categories, chem, citations };
+export type { Category, CategorySlug, Compound, Strength, StockState };
+
+export const compounds: Compound[] = [...metabolicAndRegenerative, ...secretagoguesToSupplies];
+const bySlug = new Map(compounds.map((c) => [c.slug, c]));
+export const getCompound = (slug: string) => bySlug.get(slug);
+export const getCategory = (slug: string) => categories.find((c) => c.slug === slug);
+export const compoundsIn = (category: string) => compounds.filter((c) => c.category === category);
+
+// ---------------------------------------------------------------- URLs
+// Hub page /product/<compound> shows the default (first) strength. Every other strength of a
+// multi-strength compound gets its own page /product/<compound>-<strength> with its own title,
+// H1 and canonical, matching the one-page-per-strength pattern of the top-ranking UK stores.
+export const strengthKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+export const variantSlug = (c: Compound, s: Strength) =>
+  c.strengths[0] === s ? c.slug : `${c.slug}-${strengthKey(s.label)}`;
+export const productPath = (slug: string, strength?: string) => {
+  const c = getCompound(slug);
+  const s = c?.strengths.find((x) => x.label === strength);
+  return "/product/" + (c && s ? variantSlug(c, s) : slug);
 };
-export type Product = {name:string;slug:string;category:string;variants:{strength:string;price:number}[];image:string};
+
+export type Resolved = {
+  compound: Compound;
+  strength: Strength;
+  isHub: boolean;
+  redirectTo?: string;
+};
+const variantIndex = new Map<string, { compound: Compound; strength: Strength }>();
+for (const c of compounds)
+  for (const s of c.strengths)
+    variantIndex.set(`${c.slug}-${strengthKey(s.label)}`, { compound: c, strength: s });
+
+export function resolveProductSlug(slug: string): Resolved | undefined {
+  const c = bySlug.get(slug);
+  if (c && c.strengths[0]) return { compound: c, strength: c.strengths[0], isHub: true };
+  const v = variantIndex.get(slug);
+  if (!v) return undefined;
+  // /product/retatrutide-10mg duplicates the hub: send it there.
+  if (v.compound.strengths[0] === v.strength)
+    return { ...v, isHub: true, redirectTo: v.compound.slug };
+  return { ...v, isHub: false };
+}
+
+/** Every indexable product URL (hub + non-default strengths), for the sitemap. */
+export const allProductSlugs = () =>
+  compounds.flatMap((c) => c.strengths.map((s) => variantSlug(c, s)));
+
+// ---------------------------------------------------------------- Images
 // Product renders (Blender, Vyrax label): src/assets/products/<product-slug>__<strength>.webp (1536px) plus
 // sm/<same file> (640px) for cards and thumbnails. Strength key = lower case, non-alphanumerics to '-' ("5+5mg" -> "5-5mg").
-// Products without a render fall back to the generic vial image.
-const renderLg = import.meta.glob('../assets/products/*.webp', {eager:true, import:'default'}) as Record<string,string>;
-const renderSm = import.meta.glob('../assets/products/sm/*.webp', {eager:true, import:'default'}) as Record<string,string>;
-const strengthKey = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-');
-const renders: Record<string,{strength:string;src:string;srcSet:string}[]> = {};
+// The label on each render prints its strength, so a strength with no render of its own falls back to the
+// plain generic vial rather than a render showing a different mg.
+const renderLg = import.meta.glob("../assets/products/*.webp", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+const renderSm = import.meta.glob("../assets/products/sm/*.webp", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+const renders: Record<
+  string,
+  { strength: string; src: string; small?: string | undefined; srcSet: string }[]
+> = {};
 for (const [path, src] of Object.entries(renderLg)) {
- const file = path.slice(path.lastIndexOf('/') + 1);
- const [slug = '', key = ''] = file.replace(/\.webp$/,'').split('__');
- const small = renderSm[`../assets/products/sm/${file}`];
- (renders[slug] ??= []).push({strength:key, src, srcSet: small ? `${small} 640w, ${src} 1536w` : `${src} 1536w`});
+  const file = path.slice(path.lastIndexOf("/") + 1);
+  const [slug = "", key = ""] = file.replace(/\.webp$/, "").split("__");
+  const small = renderSm[`../assets/products/sm/${file}`];
+  (renders[slug] ??= []).push({
+    strength: key,
+    src,
+    small,
+    srcSet: small ? `${small} 640w, ${src} 1536w` : `${src} 1536w`,
+  });
 }
-export function productImage(slug:string, strength?:string):{src:string;srcSet?:string} {
- const list = renders[slug] ?? [];
- const hit = (strength ? list.find(r=>r.strength===strengthKey(strength)) : undefined) ?? list[0];
- return hit ? {src:hit.src, srcSet:hit.srcSet} : {src:vial};
+export type Img = {
+  src: string;
+  srcSet?: string | undefined;
+  small?: string | undefined;
+  isRender: boolean;
+};
+export function productImage(slug: string, strength?: string): Img {
+  const c = getCompound(slug);
+  const want = strengthKey(strength ?? c?.strengths[0]?.label ?? "");
+  const hit = (renders[slug] ?? []).find((r) => r.strength === want);
+  return hit
+    ? { src: hit.src, srcSet: hit.srcSet, small: hit.small, isRender: true }
+    : { src: vial, isRender: false };
 }
-export const products:Product[] = categories.flatMap(c=>c.items.map(name=>{const slug=slugify(name);const variants=priced[name] ?? [];return {name,slug,category:c.slug,variants,image:productImage(slug,variants[0]?.strength).src}}));
-export const featured = ['Retatrutide','Tirzepatide','BPC-157','TB-500','GHK-Cu','GLOW'];
-export const gbp = (value:number) => '£'+value.toFixed(2);
-export type CartItem = {slug:string;name:string;strength:string;quantity:number;price:number};
-export const cartKey = 'vyrax-basket';
-export function priceBasket(items:CartItem[]) {
- const subtotal=items.reduce((sum,item)=>sum+item.price*item.quantity,0);
- const freeVials=items.reduce((sum,item)=>sum+(item.slug==='retatrutide'&&item.strength==='10mg'||item.slug==='tirzepatide'&&item.strength==='20mg'?Math.floor(item.quantity/3)*item.price:0),0);
- const afterOffer=subtotal-freeVials;
- const rate=afterOffer>400?.2:afterOffer>250?.15:afterOffer>150?.1:0;
- const tierDiscount=Math.round(afterOffer*rate*100)/100;
- return {subtotal,freeVials,tierDiscount,total:Math.round((afterOffer-tierDiscount)*100)/100,rate};
+
+// ---------------------------------------------------------------- Pricing helpers
+export const gbp = (value: number) => "£" + value.toFixed(2);
+const round2 = (n: number) => Math.round(n * 100) / 100;
+export const costPerUnit = (s: Strength) => (s.amount > 0 ? s.price / s.amount : 0);
+export const costPerUnitLabel = (s: Strength) => `${gbp(costPerUnit(s))}/${s.unit}`;
+export const fromPrice = (c: Compound) => Math.min(...c.strengths.map((s) => s.price));
+export const isB2G1 = (slug: string, strength: string) =>
+  site.b2g1.some((o) => o.slug === slug && o.strength === strength);
+export const hasB2G1 = (c: Compound) => c.strengths.some((s) => isB2G1(c.slug, s.label));
+
+export const stockOf = (s: Strength): StockState => s.stock ?? site.defaultStock;
+export const stockLabel: Record<StockState, string> = {
+  in: "In stock",
+  available: "Available to order",
+  low: "Low stock",
+  out: "Out of stock",
+  preorder: "Pre-order",
+};
+
+/** Purity-backed title modifier: only claims a tested purity once a real certificate is on file. */
+export function trustModifier(slug: string, strength?: string) {
+  const coa = latestCoa(slug, strength) ?? latestCoa(slug);
+  return coa && coa.purity >= 99 ? ">99% HPLC Tested" : "Research Grade";
 }
-export function readCart():CartItem[] { try { return JSON.parse(localStorage.getItem(cartKey) || '[]'); } catch { return []; } }
-export function addCart(item:CartItem) { const items=readCart(); const existing=items.find(i=>i.slug===item.slug&&i.strength===item.strength); if(existing) existing.quantity+=item.quantity; else items.push(item); localStorage.setItem(cartKey,JSON.stringify(items)); window.dispatchEvent(new Event('vyrax-cart')); }
+
+// ---------------------------------------------------------------- Search
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9+]+/g, "");
+export function searchCompounds(q: string, limit = 50) {
+  const n = norm(q);
+  if (n.length < 2) return [];
+  const score = (c: Compound) => {
+    const name = norm(c.name);
+    if (name.startsWith(n)) return 0;
+    if (name.includes(n)) return 1;
+    if (c.aliases.some((a) => norm(a).includes(n))) return 2;
+    if (
+      c.tags.some((t) => norm(t).includes(n)) ||
+      norm(getCategory(c.category)?.name ?? "").includes(n)
+    )
+      return 3;
+    return 9;
+  };
+  return compounds
+    .map((c) => [score(c), c] as const)
+    .filter(([s]) => s < 9)
+    .sort((a, b) => a[0] - b[0] || a[1].name.localeCompare(b[1].name))
+    .slice(0, limit)
+    .map(([, c]) => c);
+}
+
+// ---------------------------------------------------------------- Merchandising
+export const featuredSlugs = [
+  "retatrutide",
+  "tirzepatide",
+  "bpc-157",
+  "tb-500",
+  "ghk-cu",
+  "semaglutide",
+  "glow",
+  "mots-c",
+];
+export const featured = featuredSlugs
+  .map((s) => bySlug.get(s))
+  .filter((c): c is Compound => Boolean(c));
+export const blends = compoundsIn("peptide-blends");
+
+// Backwards-compatible shape used by older components.
+export type Product = Compound & { variants: { strength: string; price: number }[]; image: string };
+export const products: Product[] = compounds.map((c) => ({
+  ...c,
+  variants: c.strengths.map((s) => ({ strength: s.label, price: s.price })),
+  image: productImage(c.slug).src,
+}));
+export const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/\+/g, "-plus")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+// ---------------------------------------------------------------- Basket
+export type CartItem = {
+  slug: string;
+  name: string;
+  strength: string;
+  quantity: number;
+  price: number;
+};
+export const cartKey = "vyrax-basket";
+
+export function priceBasket(items: CartItem[]) {
+  const subtotal = round2(items.reduce((sum, i) => sum + i.price * i.quantity, 0));
+  const freeVials = round2(
+    items.reduce(
+      (sum, i) => sum + (isB2G1(i.slug, i.strength) ? Math.floor(i.quantity / 3) * i.price : 0),
+      0,
+    ),
+  );
+  const afterOffer = round2(subtotal - freeVials);
+  const tiers = [...site.spendTiers].sort((a, b) => b.over - a.over);
+  const rate = tiers.find((t) => afterOffer >= t.over)?.rate ?? 0;
+  const tierDiscount = round2(afterOffer * rate);
+  const goods = round2(afterOffer - tierDiscount);
+  const delivery =
+    items.length === 0 || goods >= site.freeDeliveryThreshold ? 0 : site.standardDeliveryFee;
+  const next = [...tiers].reverse().find((t) => afterOffer < t.over);
+  return {
+    subtotal,
+    freeVials,
+    rate,
+    tierDiscount,
+    goods,
+    delivery,
+    total: round2(goods + delivery),
+    freeDeliveryGap: items.length ? round2(Math.max(0, site.freeDeliveryThreshold - goods)) : 0,
+    nextTier: next
+      ? { over: next.over, rate: next.rate, gap: round2(next.over - afterOffer) }
+      : undefined,
+  };
+}
+
+export function readCart(): CartItem[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(cartKey) || "[]") as CartItem[];
+    // Drop lines for products or strengths that no longer exist and refresh prices from the catalogue.
+    return raw.flatMap((i) => {
+      const s = getCompound(i.slug)?.strengths.find((x) => x.label === i.strength);
+      return s
+        ? [{ ...i, price: s.price, quantity: Math.max(1, Math.min(99, i.quantity | 0)) }]
+        : [];
+    });
+  } catch {
+    return [];
+  }
+}
+export function writeCart(items: CartItem[]) {
+  localStorage.setItem(cartKey, JSON.stringify(items));
+  window.dispatchEvent(new Event("vyrax-cart"));
+}
+export function addCart(item: CartItem) {
+  const items = readCart();
+  const existing = items.find((i) => i.slug === item.slug && i.strength === item.strength);
+  if (existing) existing.quantity += item.quantity;
+  else items.push(item);
+  writeCart(items);
+  window.dispatchEvent(new CustomEvent("vyrax-added", { detail: item }));
+}
+export const cartLine = (c: Compound, s: Strength, quantity = 1): CartItem => ({
+  slug: c.slug,
+  name: c.name,
+  strength: s.label,
+  price: s.price,
+  quantity,
+});
