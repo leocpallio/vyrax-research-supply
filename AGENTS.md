@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Storefront catalogue and known launch prices live in `src/lib/catalog.ts`; one source keeps category, search, basket and product listings consistent.
+- Order checkout is an enquiry, not a paid sale; payment and trading claims require verified business, courier and batch documentation first.
+- Shared shop chrome lives in `src/components/Store.tsx` and leaf pages retain their own metadata; this keeps navigation and research warnings consistent.

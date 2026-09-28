@@ -1,0 +1,4 @@
+- [x] Build storefront, category and product browsing, basket and research safeguards.
+- [x] Add account access, guest order enquiries, order history, reviews and email sign-up.
+- [x] Add supporting lab report, shipping, returns, guide, FAQ and legal pages.
+- [ ] Publish genuine certificates, verified company details, courier contract and payment provider (blocked by missing business records and commercial setup).
