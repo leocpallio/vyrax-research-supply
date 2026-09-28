@@ -12,3 +12,5 @@
 - Storefront catalogue and known launch prices live in `src/lib/catalog.ts`; one source keeps category, search, basket and product listings consistent.
 - Order checkout is an enquiry, not a paid sale; payment and trading claims require verified business, courier and batch documentation first.
 - Shared shop chrome lives in `src/components/Store.tsx` and leaf pages retain their own metadata; this keeps navigation and research warnings consistent.
+
+- Promotional totals are calculated in `src/lib/catalog.ts`; the basket and enquiry must use the same calculation to prevent mismatched prices.
