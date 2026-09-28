@@ -35,6 +35,7 @@ import {
   type CartItem,
 } from "@/lib/catalog";
 import { site, dispatchInfo } from "@/data/site";
+import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
 import { supabase } from "@/integrations/supabase/client";
@@ -242,17 +243,15 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                 Shop peptides
               </Link>
               <div className="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:grid group-focus-within:grid grid-cols-2 gap-1 w-[520px] bg-background border border-border rounded-xl shadow-xl p-3">
-                {categories.map((c) => (
+                 {shopSections.map((c) => (
                   <Link
                     key={c.slug}
-                    to="/category/$slug"
+                     to="/collections/$slug"
                     params={{ slug: c.slug }}
                     className="rounded-lg p-3 hover:bg-surface"
                   >
                     <span className="block font-semibold">{c.name}</span>
-                    <span className="block text-xs text-muted-foreground font-normal mt-0.5">
-                      {c.blurb}
-                    </span>
+                     <span className="block text-xs text-muted-foreground font-normal mt-0.5">{c.blurb}</span>
                   </Link>
                 ))}
                 <Link to="/shop" className="rounded-lg p-3 hover:bg-surface text-primary">
@@ -323,11 +322,11 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                 {n}
               </Link>
             ))}
-            <p className="eyebrow mt-4 mb-1">Categories</p>
-            {categories.map((c) => (
+            <p className="eyebrow mt-4 mb-1">Sections</p>
+            {shopSections.map((c) => (
               <Link
                 key={c.slug}
-                to="/category/$slug"
+                to="/collections/$slug"
                 params={{ slug: c.slug }}
                 onClick={() => setMenu(false)}
                 className="py-2"
@@ -493,10 +492,10 @@ function Footer() {
         </div>
         <div>
           <h3 className="font-semibold mb-5">Shop</h3>
-          {categories.map((c) => (
+          {shopSections.map((c) => (
             <Link
               key={c.slug}
-              to="/category/$slug"
+              to="/collections/$slug"
               params={{ slug: c.slug }}
               className="block text-sm text-ink-muted mb-3 hover:text-ink-foreground"
             >
