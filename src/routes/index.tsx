@@ -23,9 +23,7 @@ import {
   DispatchCountdown,
 } from "@/components/Store";
 import {
-  categories,
   compounds,
-  compoundsIn,
   blends,
   getCompound,
   productPath,

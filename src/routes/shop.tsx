@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
-import { categories, compounds, searchCompounds, fromPrice } from "@/lib/catalog";
+import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
