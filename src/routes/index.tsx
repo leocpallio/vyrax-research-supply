@@ -10,6 +10,7 @@ import {
   Microscope,
   BookOpen,
   Calculator,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -139,6 +140,29 @@ function Home() {
         </div>
       </section>
       <Disclaimer />
+
+      <section className="bg-ink py-4" aria-label="WhatsApp customer support">
+        <div className="container-main">
+          <div className="mx-auto flex max-w-[756px] items-start gap-3 rounded-2xl border border-primary/60 bg-ink-panel px-4 py-3 text-ink-foreground sm:items-center sm:gap-4">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/20 text-primary-soft">
+              <MessageCircle size={18} aria-hidden="true" />
+            </span>
+            <div className="min-w-0 text-sm leading-snug">
+              <h2 className="font-heading font-semibold">WhatsApp customer support group</h2>
+              <p className="text-xs text-ink-muted sm:text-[13px]">
+                Group invitations are not available yet. For batch certificates, visit our{" "}
+                <Link to="/lab-reports" className="underline underline-offset-2 hover:text-ink-foreground">
+                  Lab Reports
+                </Link>{" "}
+                page. For order enquiries, use our{" "}
+                <Link to="/contact" className="underline underline-offset-2 hover:text-ink-foreground">
+                  contact page
+                </Link>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Best sellers */}
       <section className="section">
