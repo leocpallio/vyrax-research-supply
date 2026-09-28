@@ -4,4 +4,5 @@
 - [x] Add detailed product information and apply launch offers to the enquiry totals.
 - [x] Replace customer-facing shop sections with the research areas in the supplied example, without copying competitor listings or prices.
 - [x] Simplify shop-section labels and blurbs while retaining research-use safeguards.
+- [x] Remove technical research tags and descriptions from shop cards and section browsing.
 - [ ] Publish genuine certificates, verified company details, courier contract and payment provider (blocked by missing business records and commercial setup).

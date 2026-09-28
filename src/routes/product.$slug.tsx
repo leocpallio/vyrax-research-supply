@@ -335,7 +335,6 @@ function ProductPage() {
           </div>
 
           <div>
-            <p className="eyebrow">{c.tags.join(" · ").toUpperCase()}</p>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight">
               {heading}
             </h1>
