@@ -15,7 +15,25 @@ const priced: Record<string, {strength:string,price:number}[]> = {
  'GHK-Cu':[{strength:'50mg',price:19.99},{strength:'100mg',price:37.99}], 'CJC-1295 no-DAC':[{strength:'5mg',price:24.99}], 'Ipamorelin':[{strength:'5mg',price:18.99}], 'GLOW':[{strength:'70mg',price:59.99}],
 };
 export type Product = {name:string;slug:string;category:string;variants:{strength:string;price:number}[];image:string};
-export const products:Product[] = categories.flatMap(c=>c.items.map(name=>({name,slug:slugify(name),category:c.slug,variants:priced[name] ?? [],image:vial})));
+// Product renders (Blender, Vyrax label): src/assets/products/<product-slug>__<strength>.webp (1536px) plus
+// sm/<same file> (640px) for cards and thumbnails. Strength key = lower case, non-alphanumerics to '-' ("5+5mg" -> "5-5mg").
+// Products without a render fall back to the generic vial image.
+const renderLg = import.meta.glob('../assets/products/*.webp', {eager:true, import:'default'}) as Record<string,string>;
+const renderSm = import.meta.glob('../assets/products/sm/*.webp', {eager:true, import:'default'}) as Record<string,string>;
+const strengthKey = (s:string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+const renders: Record<string,{strength:string;src:string;srcSet:string}[]> = {};
+for (const [path, src] of Object.entries(renderLg)) {
+ const file = path.slice(path.lastIndexOf('/') + 1);
+ const [slug = '', key = ''] = file.replace(/\.webp$/,'').split('__');
+ const small = renderSm[`../assets/products/sm/${file}`];
+ (renders[slug] ??= []).push({strength:key, src, srcSet: small ? `${small} 640w, ${src} 1536w` : `${src} 1536w`});
+}
+export function productImage(slug:string, strength?:string):{src:string;srcSet?:string} {
+ const list = renders[slug] ?? [];
+ const hit = (strength ? list.find(r=>r.strength===strengthKey(strength)) : undefined) ?? list[0];
+ return hit ? {src:hit.src, srcSet:hit.srcSet} : {src:vial};
+}
+export const products:Product[] = categories.flatMap(c=>c.items.map(name=>{const slug=slugify(name);const variants=priced[name] ?? [];return {name,slug,category:c.slug,variants,image:productImage(slug,variants[0]?.strength).src}}));
 export const featured = ['Retatrutide','Tirzepatide','BPC-157','TB-500','GHK-Cu','GLOW'];
 export const gbp = (value:number) => '£'+value.toFixed(2);
 export type CartItem = {slug:string;name:string;strength:string;quantity:number;price:number};
