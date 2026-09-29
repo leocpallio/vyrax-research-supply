@@ -26,6 +26,7 @@ import {
 import {
   resolveProductSlug,
   productImage,
+  productGallery,
   productPath,
   gbp,
   addCart,
@@ -47,6 +48,7 @@ import { latestCoa, testingPublished } from "@/data/coa";
 import { site, abs } from "@/data/site";
 import { faqJsonLd, type QA } from "@/data/faq";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductGallery } from "@/components/ProductGallery";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -92,7 +94,7 @@ export const Route = createFileRoute("/product/$slug")({
       description: c.summary,
       sku: `VYX-${c.slug.toUpperCase()}-${s.label.toUpperCase().replace(/[^A-Z0-9]/g, "")}`,
       ...(ch.cas ? { mpn: ch.cas } : {}),
-      image: [imgUrl],
+      image: productGallery(c.slug, s.label).map((g) => abs(g.src)),
       brand: { "@type": "Brand", name: site.name },
       category: cat?.name,
       url,
@@ -238,6 +240,7 @@ function ProductPage() {
   const [qty, setQty] = useState(1);
   const cat = getCategory(c.category);
   const img = productImage(c.slug, s.label);
+  const gallery = productGallery(c.slug, s.label);
   const coa = latestCoa(c.slug, s.label);
   const ch = chem[c.slug] ?? {};
   const cites = citations[c.slug] ?? [];
@@ -294,27 +297,42 @@ function ProductPage() {
         />
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
           <div>
-            <div className="relative bg-surface aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden">
-              <img
-                src={img.src}
-                srcSet={img.srcSet}
-                sizes="(min-width: 1024px) 600px, 100vw"
-                alt={`${c.name} ${s.label} research vial, Vyrax Labs`}
-                width={1024}
-                height={1024}
-                className="w-full h-full object-contain sm:object-cover"
+            {gallery.length > 1 ? (
+              <ProductGallery
+                images={gallery}
+                name={`${c.name} ${s.label}`}
+                badges={
+                  (b2g1 || coa) && (
+                    <>
+                      {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
+                      {coa && <span className="badge-verify">{coa.purity}% HPLC</span>}
+                    </>
+                  )
+                }
               />
-              {!img.isRender && (
-                <span className="absolute inset-x-10 top-[46%] text-center font-heading font-semibold text-ink text-xl leading-tight pointer-events-none">
-                  {c.name}
-                  <span className="block font-mono text-sm text-primary mt-1">{s.label}</span>
+            ) : (
+              <div className="relative bg-surface aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden">
+                <img
+                  src={img.src}
+                  srcSet={img.srcSet}
+                  sizes="(min-width: 1024px) 600px, 100vw"
+                  alt={`${c.name} ${s.label} research vial, Vyrax Labs`}
+                  width={1024}
+                  height={1024}
+                  className="w-full h-full object-contain sm:object-cover"
+                />
+                {!img.isRender && (
+                  <span className="absolute inset-x-10 top-[46%] text-center font-heading font-semibold text-ink text-xl leading-tight pointer-events-none">
+                    {c.name}
+                    <span className="block font-mono text-sm text-primary mt-1">{s.label}</span>
+                  </span>
+                )}
+                <span className="absolute top-4 left-4 flex gap-2">
+                  {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
+                  {coa && <span className="badge-verify">{coa.purity}% HPLC</span>}
                 </span>
-              )}
-              <span className="absolute top-4 left-4 flex gap-2">
-                {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
-                {coa && <span className="badge-verify">{coa.purity}% HPLC</span>}
-              </span>
-            </div>
+              </div>
+            )}
             <div className="hidden sm:grid grid-cols-3 gap-3 mt-4 text-xs text-center">
               {(
                 [

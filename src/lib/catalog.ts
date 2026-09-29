@@ -60,6 +60,9 @@ export const allProductSlugs = () =>
 // sm/<same file> (640px) for cards and thumbnails. Strength key = lower case, non-alphanumerics to '-' ("5+5mg" -> "5-5mg").
 // The label on each render prints its strength, so a strength with no render of its own falls back to the
 // plain generic vial rather than a render showing a different mg.
+// Extra product-page views of the same vial: <product-slug>__<strength>__<view>.webp, e.g. __qr (turned to the
+// batch QR side panel) and __storage (turned to storage + expiry). productImage() only ever returns the front
+// (cards, basket, og:image); productGallery() returns the front first, then the views in VIEW_ORDER.
 const renderLg = import.meta.glob("../assets/products/*.webp", {
   eager: true,
   import: "default",
@@ -68,16 +71,21 @@ const renderSm = import.meta.glob("../assets/products/sm/*.webp", {
   eager: true,
   import: "default",
 }) as Record<string, string>;
-const renders: Record<
-  string,
-  { strength: string; src: string; small?: string | undefined; srcSet: string }[]
-> = {};
+type Render = {
+  strength: string;
+  view: string;
+  src: string;
+  small?: string | undefined;
+  srcSet: string;
+};
+const renders: Record<string, Render[]> = {};
 for (const [path, src] of Object.entries(renderLg)) {
   const file = path.slice(path.lastIndexOf("/") + 1);
-  const [slug = "", key = ""] = file.replace(/\.webp$/, "").split("__");
+  const [slug = "", key = "", view = "front"] = file.replace(/\.webp$/, "").split("__");
   const small = renderSm[`../assets/products/sm/${file}`];
   (renders[slug] ??= []).push({
     strength: key,
+    view,
     src,
     small,
     srcSet: small ? `${small} 640w, ${src} 1536w` : `${src} 1536w`,
@@ -88,14 +96,37 @@ export type Img = {
   srcSet?: string | undefined;
   small?: string | undefined;
   isRender: boolean;
+  view?: string | undefined;
 };
-export function productImage(slug: string, strength?: string): Img {
+const VIEW_ORDER = ["front", "qr", "storage"];
+const viewRank = (view: string) => {
+  const i = VIEW_ORDER.indexOf(view);
+  return i < 0 ? VIEW_ORDER.length : i;
+};
+const rendersOf = (slug: string, strength?: string) => {
   const c = getCompound(slug);
   const want = strengthKey(strength ?? c?.strengths[0]?.label ?? "");
-  const hit = (renders[slug] ?? []).find((r) => r.strength === want);
-  return hit
-    ? { src: hit.src, srcSet: hit.srcSet, small: hit.small, isRender: true }
-    : { src: vial, isRender: false };
+  return (renders[slug] ?? []).filter((r) => r.strength === want);
+};
+const toImg = (r: Render): Img => ({
+  src: r.src,
+  srcSet: r.srcSet,
+  small: r.small,
+  isRender: true,
+  view: r.view,
+});
+export function productImage(slug: string, strength?: string): Img {
+  const hit = rendersOf(slug, strength).find((r) => r.view === "front");
+  return hit ? toImg(hit) : { src: vial, isRender: false };
+}
+/** Every image of one strength for the product page gallery: the front first, then the turned views. */
+export function productGallery(slug: string, strength?: string): Img[] {
+  const front = productImage(slug, strength);
+  if (!front.isRender) return [front];
+  const views = rendersOf(slug, strength)
+    .filter((r) => r.view !== "front")
+    .sort((a, b) => viewRank(a.view) - viewRank(b.view));
+  return [front, ...views.map(toImg)];
 }
 
 // ---------------------------------------------------------------- Pricing helpers
