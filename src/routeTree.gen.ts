@@ -31,6 +31,8 @@ import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as VBatchRouteImport } from './routes/v.$batch'
+import { Route as VerifyBatchRouteImport } from './routes/verify.$batch'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -142,6 +144,16 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VBatchRoute = VBatchRouteImport.update({
+  id: '/v/$batch',
+  path: '/v/$batch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyBatchRoute = VerifyBatchRouteImport.update({
+  id: '/verify/$batch',
+  path: '/verify/$batch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,6 +177,8 @@ export interface FileRoutesByFullPath {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/v/$batch': typeof VBatchRoute
+  '/verify/$batch': typeof VerifyBatchRoute
   '/guides/': typeof GuidesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -189,6 +203,8 @@ export interface FileRoutesByTo {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/v/$batch': typeof VBatchRoute
+  '/verify/$batch': typeof VerifyBatchRoute
   '/guides': typeof GuidesIndexRoute
 }
 export interface FileRoutesById {
@@ -214,6 +230,8 @@ export interface FileRoutesById {
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/v/$batch': typeof VBatchRoute
+  '/verify/$batch': typeof VerifyBatchRoute
   '/guides/': typeof GuidesIndexRoute
 }
 export interface FileRouteTypes {
@@ -240,6 +258,8 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
+    | '/v/$batch'
+    | '/verify/$batch'
     | '/guides/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -264,6 +284,8 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
+    | '/v/$batch'
+    | '/verify/$batch'
     | '/guides'
   id:
     | '__root__'
@@ -288,6 +310,8 @@ export interface FileRouteTypes {
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
+    | '/v/$batch'
+    | '/verify/$batch'
     | '/guides/'
   fileRoutesById: FileRoutesById
 }
@@ -313,6 +337,8 @@ export interface RootRouteChildren {
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  VBatchRoute: typeof VBatchRoute
+  VerifyBatchRoute: typeof VerifyBatchRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
 }
 
@@ -472,6 +498,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/v/$batch': {
+      id: '/v/$batch'
+      path: '/v/$batch'
+      fullPath: '/v/$batch'
+      preLoaderRoute: typeof VBatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$batch': {
+      id: '/verify/$batch'
+      path: '/verify/$batch'
+      fullPath: '/verify/$batch'
+      preLoaderRoute: typeof VerifyBatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -497,6 +537,8 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsSlugRoute: CollectionsSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
+  VBatchRoute: VBatchRoute,
+  VerifyBatchRoute: VerifyBatchRoute,
   GuidesIndexRoute: GuidesIndexRoute,
 }
 export const routeTree = rootRouteImport

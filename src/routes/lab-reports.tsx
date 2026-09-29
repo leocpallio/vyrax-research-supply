@@ -4,7 +4,7 @@ import { FileCheck2, Search, FlaskConical, Microscope, Scale } from "lucide-reac
 import { StoreShell, Disclaimer, Breadcrumbs, SectionTitle } from "@/components/Store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { coas, findBatch } from "@/data/coa";
+import { coas, expiryFor, findBatch, monthLabel } from "@/data/coa";
 import { compounds, getCompound, productPath } from "@/lib/catalog";
 import { abs } from "@/data/site";
 
@@ -38,6 +38,7 @@ function Reports() {
     setResult(hit ? hit.batch : "none");
   };
   const hit = result !== "idle" && result !== "none" ? findBatch(result) : undefined;
+  const exp = hit ? expiryFor(hit) : undefined;
   const sorted = [...coas].sort((a, b) => b.tested.localeCompare(a.tested));
   const pending = compounds.filter(
     (c) => c.kind !== "supply" && !coas.some((r) => r.compound === c.slug),
@@ -88,6 +89,7 @@ function Reports() {
             <p className="mt-1">
               {getCompound(hit.compound)?.name} {hit.strength}, batch {hit.batch}: {hit.purity}%
               purity ({hit.method}), tested by {hit.lab}.
+              {exp && <> Expiry {monthLabel(exp)}.</>}
             </p>
             <a
               href={hit.file}
