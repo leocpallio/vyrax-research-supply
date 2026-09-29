@@ -214,19 +214,6 @@ body {
   line-height: 1.15;
   font-weight: 600;
 }
-.brand-symbol {
-  display: grid;
-  place-items: center;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  height: 36px;
-  width: 36px;
-  clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%);
-  font-family: "Sora", sans-serif;
-  font-weight: 700;
-  font-size: 23px;
-  line-height: 1;
-}
 .icon-link {
   width: 36px;
   height: 36px;

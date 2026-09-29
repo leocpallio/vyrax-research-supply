@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Wordmark } from "@/components/Wordmark";
 import {
   compounds,
   featured,
@@ -227,14 +228,8 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <AnnouncementBar />
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
         <div className="container-main flex h-[72px] items-center gap-5 justify-between">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0" aria-label="Vyrax Labs home">
-            <span className="brand-symbol">V</span>
-            <span className="font-heading font-bold text-xl tracking-normal leading-none">
-              VYRAX
-              <span className="block text-[9px] tracking-[.36em] font-medium text-muted-foreground mt-1">
-                LABS
-              </span>
-            </span>
+          <Link to="/" className="flex items-center shrink-0" aria-label="Vyrax Labs home">
+            <Wordmark className="h-[15px] sm:h-[18px] w-auto" />
           </Link>
           <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold">
             <div className="relative group">
@@ -478,9 +473,7 @@ function Footer() {
       </div>
       <div className="container-main py-14 grid md:grid-cols-2 lg:grid-cols-5 gap-10">
         <div className="lg:col-span-2">
-          <div className="font-heading text-2xl font-bold">
-            VYRAX <span className="font-normal">LABS</span>
-          </div>
+          <Wordmark tone="light" title="Vyrax Labs" className="h-[19px] w-auto" />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-sm">
             Research peptides for laboratory use, with batch documentation and tracked UK delivery.
           </p>

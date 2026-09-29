@@ -44,10 +44,10 @@ export const Route = createFileRoute("/")({
     const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more. HPLC and MS batch testing, same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
     const org = {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "OnlineStore",
       name: site.legalName ?? site.name,
       url: site.url,
-      logo: abs("/favicon.svg"),
+      logo: abs("/logo-512.png"),
       ...(site.email ? { email: site.email } : {}),
       ...(site.companyNumber ? { identifier: site.companyNumber } : {}),
     };
