@@ -39,6 +39,14 @@ export const site = {
 
 export const abs = (path: string) => SITE_URL + (path.startsWith("/") ? path : "/" + path);
 
+/** Human-readable multi-buy ladder, e.g. "10% over £150, 15% over £250, 20% over £400".
+ *  Any surface that restates the tiers must call this, never type the numbers. */
+export const spendTierLine = () =>
+  [...site.spendTiers]
+    .sort((a, b) => a.over - b.over)
+    .map((t) => `${Math.round(t.rate * 100)}% over £${t.over}`)
+    .join(", ");
+
 /** Working-day, UK-time dispatch helper used by the countdown and delivery copy. */
 export function dispatchInfo(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-GB", {

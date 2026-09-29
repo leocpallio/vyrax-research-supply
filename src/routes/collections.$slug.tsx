@@ -50,7 +50,7 @@ function CollectionPage() {
           ))}
         </div>
         <p className="text-sm text-muted-foreground mb-5">{list.length} product{list.length === 1 ? "" : "s"}</p>
-        {list.length ? <ProductGrid list={list} /> : <p className="py-20 text-center text-muted-foreground">Laboratory accessories are not listed yet. Check back soon.</p>}
+        {list.length ? <ProductGrid list={list} /> : <p className="py-20 text-center text-muted-foreground">Nothing in this section yet. Browse all research peptides on the shop page.</p>}
       </div>
       <Disclaimer />
     </StoreShell>

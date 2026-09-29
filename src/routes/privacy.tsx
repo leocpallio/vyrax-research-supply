@@ -46,8 +46,9 @@ function Privacy() {
       </ul>
       <h2>Who we share it with</h2>
       <p>
-        We share only what is necessary with our delivery carrier, payment provider, and website
-        hosting and database providers, who act on our instructions. We do not sell personal data.
+        We share only what is necessary with our delivery carrier and our website hosting and
+        database providers, who act on our instructions. If card payment goes live, our payment
+        provider is added to that list and named here. We do not sell personal data.
       </p>
       <h2>How long we keep it</h2>
       <p>

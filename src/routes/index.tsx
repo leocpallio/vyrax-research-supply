@@ -10,7 +10,7 @@ import {
   Microscope,
   BookOpen,
   Calculator,
-  MessageCircle,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,17 +31,17 @@ import {
   gbp,
   fromPrice,
 } from "@/lib/catalog";
-import { coas } from "@/data/coa";
+import { coas, testingPublished } from "@/data/coa";
 import { guides } from "@/data/guides";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
-import { site, abs } from "@/data/site";
+import { site, abs, spendTierLine } from "@/data/site";
 import hero from "@/assets/vyrax-hero.jpg";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/")({
   head: () => {
     const title = "Buy Peptides UK · Lab-Tested Research Peptides | Vyrax Labs";
-    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more. HPLC and MS batch testing, same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
+    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more.${testingPublished ? " HPLC and MS batch testing," : ""} same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -88,6 +88,58 @@ const glp = ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"]
   .map(getCompound)
   .filter((c) => c !== undefined);
 
+// Homepage trust tiles. Anything asserting that testing has happened, or that a certificate exists, is
+// gated on `testingPublished` so the page cannot claim a document we do not hold. The placeholder pair
+// describes commitments and packaging facts that are true today.
+type Tile = [LucideIcon, string, string];
+const expectations: Tile[] = [
+  ...(testingPublished
+    ? ([
+        [
+          TestTube2,
+          "HPLC and MS tested",
+          "Purity by high-performance liquid chromatography, identity by mass spectrometry, batch by batch.",
+        ],
+        [
+          FileCheck2,
+          "Certificates you can read",
+          "Full reports published on the Lab Reports page, not just a purity badge.",
+        ],
+      ] as Tile[])
+    : ([
+        [
+          FileCheck2,
+          "Batch documentation",
+          "Certificates are published on our Lab Reports page as each launch batch is released.",
+        ],
+        [
+          BookOpen,
+          "Handling guides",
+          "Storage, reconstitution and handling notes written for laboratory work.",
+        ],
+      ] as Tile[])),
+  [
+    Truck,
+    "Same-day tracked dispatch",
+    `${site.carrier}, free over £${site.freeDeliveryThreshold}. Order before ${site.dispatchCutoffHour - 12}pm on working days.`,
+  ],
+  [
+    RotateCcw,
+    "Free reship guarantee",
+    "If a parcel is lost or arrives damaged, we send a replacement at no cost.",
+  ],
+  [
+    PackageCheck,
+    "Protective packaging",
+    "Padded vials in a plain outer parcel with no product names on the outside.",
+  ],
+  [
+    Microscope,
+    "Real research data",
+    "CAS numbers, molecular formulas and PubMed references on our compound pages.",
+  ],
+];
+
 function Home() {
   return (
     <StoreShell>
@@ -108,12 +160,11 @@ function Home() {
               <span className="w-2 h-2 rounded-full bg-verify" /> UK STOCK · DISPATCHED FROM THE UK
             </div>
             <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
-              Buy research peptides UK. Lab tested, batch by batch.
+              Buy research peptides UK. Dispatched the same day.
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[560px]">
-              {compounds.length} research compounds with HPLC and mass spectrometry batch testing,
-              published certificates, same-day dispatch and free tracked UK delivery over £
-              {site.freeDeliveryThreshold}.
+              {compounds.length} research compounds in sealed vials, with same-day dispatch on
+              working days and free tracked UK delivery over £{site.freeDeliveryThreshold}.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button asChild className="rounded-full h-12 px-7 text-base">
@@ -141,34 +192,13 @@ function Home() {
       </section>
       <Disclaimer />
 
-      <section className="bg-ink py-4" aria-label="WhatsApp customer support">
-        <div className="container-main">
-          <div className="mx-auto flex max-w-[756px] items-start gap-3 rounded-2xl border border-primary/60 bg-ink-panel px-4 py-3 text-ink-foreground sm:items-center sm:gap-4">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/20 text-primary-soft">
-              <MessageCircle size={18} aria-hidden="true" />
-            </span>
-            <div className="min-w-0 text-sm leading-snug">
-              <h2 className="font-heading font-semibold">WhatsApp customer support group</h2>
-              <p className="text-xs text-ink-muted sm:text-[13px]">
-                Group invitations are not available yet. For batch certificates, visit our{" "}
-                <Link to="/lab-reports" className="underline underline-offset-2 hover:text-ink-foreground">
-                  Lab Reports
-                </Link>{" "}
-                page. For order enquiries, use our{" "}
-                <Link to="/contact" className="underline underline-offset-2 hover:text-ink-foreground">
-                  contact page
-                </Link>.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Best sellers */}
       <section className="section">
         <div className="container-main">
           <div className="flex items-end justify-between gap-4">
-            <SectionTitle eyebrow="MOST ORDERED" title="Best-selling research peptides" />
+            {/* A curated selection, not a sales ranking: the shop has no order history yet, so a
+                "most ordered" label would be a claim there is no data behind. */}
+            <SectionTitle eyebrow="START HERE" title="Widely studied research compounds" />
             <Link
               to="/shop"
               className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
@@ -190,8 +220,7 @@ function Home() {
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
               On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third comes off
-              automatically. Stacks with spend savings of 10% over £150, 15% over £250 and 20% over
-              £400.
+              automatically. Multi-buy pricing applies on top: {spendTierLine()}.
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
               <Button asChild variant="secondary" className="rounded-full">
@@ -272,12 +301,12 @@ function Home() {
               [
                 "02",
                 "Independent testing",
-                "Every batch is analysed by an independent laboratory using HPLC for purity and mass spectrometry for identity.",
+                "Batches are sent to an independent laboratory for HPLC purity and mass spectrometry identity testing.",
               ],
               [
                 "03",
-                "Published certificates",
-                "Certificates go on our Lab Reports page, and the batch number on your vial matches its report.",
+                "Batch documentation",
+                "Each batch is documented with a certificate naming the batch, the testing laboratory and the result, published on our Lab Reports page.",
               ],
               [
                 "04",
@@ -300,40 +329,7 @@ function Home() {
         <div className="container-main">
           <SectionTitle eyebrow="WHY VYRAX LABS" title="What you can expect from every order" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(
-              [
-                [
-                  TestTube2,
-                  "HPLC and MS tested",
-                  "Purity by high-performance liquid chromatography, identity by mass spectrometry, batch by batch.",
-                ],
-                [
-                  FileCheck2,
-                  "Certificates you can read",
-                  "Full reports published on the Lab Reports page, not just a purity badge.",
-                ],
-                [
-                  Truck,
-                  "Same-day tracked dispatch",
-                  `${site.carrier}, free over £${site.freeDeliveryThreshold}. Order before ${site.dispatchCutoffHour - 12}pm on working days.`,
-                ],
-                [
-                  RotateCcw,
-                  "Free reship guarantee",
-                  "If a parcel is lost or arrives damaged, we send a replacement at no cost.",
-                ],
-                [
-                  PackageCheck,
-                  "Protective packaging",
-                  "Padded vials in a plain outer parcel with no product names on the outside.",
-                ],
-                [
-                  Microscope,
-                  "Real research data",
-                  "CAS numbers, molecular formulas, sequences and PubMed references on every compound page.",
-                ],
-              ] as const
-            ).map(([I, t, b]) => (
+            {expectations.map(([I, t, b]) => (
               <div key={t} className="border border-border rounded-2xl p-6">
                 <I className="text-primary mb-4" size={26} />
                 <h3 className="font-heading font-semibold text-lg">{t}</h3>
@@ -350,11 +346,14 @@ function Home() {
           <div>
             <p className="eyebrow !text-primary-soft">TRANSPARENCY</p>
             <h2 className="font-heading text-3xl md:text-4xl font-semibold">
-              Read the lab report before you order.
+              {testingPublished
+                ? "Read the lab report before you order."
+                : "Lab reports, published batch by batch."}
             </h2>
             <p className="text-ink-muted mt-5 leading-relaxed max-w-lg">
-              Every certificate names the batch, the testing laboratory, the methods and the purity
-              result. Search by the batch number printed on your vial to confirm it matches.
+              {testingPublished
+                ? "Every certificate names the batch, the testing laboratory, the methods and the purity result. Search by the batch number printed on your vial to confirm it matches."
+                : "Each certificate names the batch, the testing laboratory, the methods and the result. Certificates appear on this page as each launch batch clears independent testing."}
             </p>
             <Button asChild variant="secondary" className="rounded-full mt-7">
               <Link to="/lab-reports">

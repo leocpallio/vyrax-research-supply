@@ -23,6 +23,11 @@ export const SHELF_LIFE_MONTHS = 24;
 
 export const coas: Coa[] = [];
 
+// True once at least one real certificate exists. Copy that asserts testing has happened, or that
+// certificates are published, is switched on this flag so the site can never claim a report it does
+// not hold. Adding the first real entry flips every gated string at once.
+export const testingPublished = coas.length > 0;
+
 export const coaFor = (compound: string, strength?: string) =>
   coas
     .filter((c) => c.compound === compound && (!strength || c.strength === strength))

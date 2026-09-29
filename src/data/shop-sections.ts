@@ -12,8 +12,11 @@ export const shopSections = [
   { slug: "tanning-libido", name: "Tanning & Libido", products: ["melanotan-1", "melanotan-2", "pt-141"] },
   { slug: "sleep", name: "Sleep", products: ["dsip"] },
   { slug: "bacteriostatic-water", name: "Bacteriostatic Water", products: ["bacteriostatic-water"] },
-  { slug: "accessories", name: "Accessories", products: [] },
 ] as const;
+
+// Sections listed above are the only ones browsable. An empty section (e.g. laboratory accessories,
+// left out on purpose because syringes and wipes undercut the research-only positioning) must not be
+// published: a tile that opens "not listed yet" reads as an unfinished shop on every page it appears.
 
 export const sectionFor = (compound: Compound) =>
   shopSections.find((section) => (section.products as readonly string[]).includes(compound.slug));

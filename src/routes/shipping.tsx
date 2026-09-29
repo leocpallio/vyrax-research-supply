@@ -49,14 +49,13 @@ function Shipping() {
       </p>
       <h2>Tracking</h2>
       <p>
-        Every order is sent tracked. Your tracking number is emailed as soon as your parcel is
-        dispatched.
+        Every order is sent tracked. We give you the tracking number when your parcel is dispatched.
       </p>
       <h2>Packaging</h2>
       <p>
-        Vials are packed in secure protective packaging to prevent breakage in transit.
-        Temperature-sensitive items are packed to limit heat exposure during delivery. Lyophilised
-        peptides are stable at ambient temperature for the duration of normal UK transit.
+        Vials are packed in secure protective packaging to prevent breakage in transit, and
+        heat-sensitive items are packed to limit exposure during delivery. Store everything as
+        directed as soon as your parcel arrives.
       </p>
       <h2>Lost or damaged parcels</h2>
       <p>

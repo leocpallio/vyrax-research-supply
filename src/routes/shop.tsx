@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
@@ -6,6 +6,7 @@ import { shopSections, sectionFor } from "@/data/shop-sections";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { abs } from "@/data/site";
+import { testingPublished } from "@/data/coa";
 
 type Sort = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/shop")({
   }),
   head: () => {
     const title = "Buy Research Peptides UK | Full Catalogue, Lab-Tested | Vyrax Labs";
-    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds: GLP-1 research peptides, BPC-157, TB-500, GHK-Cu, GH secretagogues, longevity peptides and blends. Batch certificates, tracked UK delivery.`;
+    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds: GLP-1 research peptides, BPC-157, TB-500, GHK-Cu, GH secretagogues, longevity peptides and blends.${testingPublished ? " Batch certificates," : ""} Tracked UK delivery.`;
     return {
       meta: [
         { title },
@@ -109,9 +110,11 @@ function Shop() {
         <ProductGrid list={list} />
         {list.length === 0 && (
           <p className="py-20 text-center text-muted-foreground">
-            {cat === "accessories" && !text.trim()
-              ? "Laboratory accessories are not listed yet. Check back soon."
-              : "No matching compounds. Try another name or section."}
+            No matching compounds. Try another name or section, or{" "}
+            <Link to="/shop" className="text-primary underline">
+              browse everything
+            </Link>
+            .
           </p>
         )}
       </div>

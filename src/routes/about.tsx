@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileCheck2, FlaskConical, Truck, ShieldCheck } from "lucide-react";
+import { FileCheck2, FlaskConical, Truck, ShieldCheck, type LucideIcon } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
 import { compounds } from "@/lib/catalog";
+import { shopSections } from "@/data/shop-sections";
+import { testingPublished } from "@/data/coa";
 import lab from "@/assets/vyrax-lab.jpg";
 
 export const Route = createFileRoute("/about")({
@@ -10,13 +12,29 @@ export const Route = createFileRoute("/about")({
     pageHead(
       "/about",
       "About Vyrax Labs | UK Research Peptide Supplier",
-      "Vyrax Labs supplies independently tested research peptides from the UK. Batch certificates, clear specifications and fast tracked dispatch for laboratory research.",
+      "Vyrax Labs supplies research peptides from the UK with clear specifications and fast tracked dispatch for laboratory research.",
     ),
   component: About,
 });
 
 function About() {
   const count = compounds.filter((c) => c.kind !== "supply").length;
+  const tiles: [LucideIcon, string, string][] = [
+    testingPublished
+      ? [
+          FileCheck2,
+          "Public certificates",
+          "Batch certificates of analysis are published in our lab reports hub.",
+        ]
+      : [
+          FileCheck2,
+          "Batch documentation",
+          "Certificates are published in our lab reports hub as each batch is released.",
+        ],
+    [FlaskConical, "Independent testing", "Purity and identity testing by third-party laboratories."],
+    [Truck, "Fast UK dispatch", "Same-day dispatch on working days before 2pm, tracked delivery."],
+    [ShieldCheck, "Research only", "Supplied strictly for laboratory research, never for human use."],
+  ];
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">
@@ -31,10 +49,11 @@ function About() {
               see exactly what they are buying before they buy it.
             </p>
             <p>
-              That means every compound page carries its CAS number, molecular formula, molecular
-              weight and peer-reviewed references, every batch is independently tested for purity
-              and identity, and the certificate for that batch is public. It also means clear
-              pricing with cost per mg shown, so vial sizes are easy to compare.
+              That means compound pages carry the CAS number, molecular formula, molecular weight and
+              peer-reviewed references where those are published for the molecule, every batch is
+              submitted for independent purity and identity testing, and the certificate for that
+              batch is published as soon as it is issued. It also means clear pricing with cost per mg
+              shown, so vial sizes are easy to compare.
             </p>
             <p>
               Our catalogue covers {count} research compounds across metabolic, regenerative, growth
@@ -52,30 +71,7 @@ function About() {
           />
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-16">
-          {(
-            [
-              [
-                FileCheck2,
-                "Public certificates",
-                "Batch certificates of analysis are published in our lab reports hub.",
-              ],
-              [
-                FlaskConical,
-                "Independent testing",
-                "HPLC purity and mass spectrometry identity by third-party laboratories.",
-              ],
-              [
-                Truck,
-                "Fast UK dispatch",
-                "Same-day dispatch on working days before 2pm, tracked delivery.",
-              ],
-              [
-                ShieldCheck,
-                "Research only",
-                "Supplied strictly for laboratory research, never for human use.",
-              ],
-            ] as const
-          ).map(([I, t, b]) => (
+          {tiles.map(([I, t, b]) => (
             <div key={t} className="border border-border rounded-2xl p-6">
               <I className="text-primary mb-4" size={24} />
               <h2 className="font-heading font-semibold">{t}</h2>

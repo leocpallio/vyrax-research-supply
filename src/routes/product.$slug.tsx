@@ -43,7 +43,7 @@ import {
   type Compound,
   type Strength,
 } from "@/lib/catalog";
-import { latestCoa } from "@/data/coa";
+import { latestCoa, testingPublished } from "@/data/coa";
 import { site, abs } from "@/data/site";
 import { faqJsonLd, type QA } from "@/data/faq";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,7 +75,7 @@ export const Route = createFileRoute("/product/$slug")({
     const desc =
       c.kind === "supply"
         ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}, same-day dispatch before ${cutoff}, free tracked UK delivery over £${site.freeDeliveryThreshold}.`
-        : `Buy ${c.name} ${s.label} UK for research: ${gbp(s.price)} (${costPerUnitLabel(s)}), batch certificates, same-day dispatch before ${cutoff}, free tracked delivery over £${site.freeDeliveryThreshold}. For research use only.`;
+        : `Buy ${c.name} ${s.label} UK for research: ${gbp(s.price)} (${costPerUnitLabel(s)}),${testingPublished ? " batch certificates," : ""} same-day dispatch before ${cutoff}, free tracked delivery over £${site.freeDeliveryThreshold}. For research use only.`;
     const coa = latestCoa(c.slug, s.label);
     const ch = chem[c.slug] ?? {};
     const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`;
@@ -204,7 +204,7 @@ function productFaqs(c: Compound, s: Strength): QA[] {
       `How is ${c.name} tested?`,
       coa
         ? `Batch ${coa.batch} was tested by ${coa.lab} using ${coa.method}, with a purity result of ${coa.purity}%. The full certificate is published on this page and on our Lab Reports page.`
-        : "Each batch is tested for identity and purity by an independent laboratory using HPLC and mass spectrometry. Certificates are published on our Lab Reports page as each batch is released, and you can request the report for your batch at any time.",
+        : "Each batch is tested for identity and purity by an independent laboratory using HPLC and mass spectrometry. Certificates are published on our Lab Reports page as each batch is released.",
     ],
     [
       `How should ${c.name} be stored?`,
@@ -271,7 +271,7 @@ function ProductPage() {
         ? `${coa.purity}% (${coa.method})`
         : c.kind === "supply"
           ? "Sterile water with 0.9% benzyl alcohol"
-          : "Each batch tested by HPLC and MS; certificate on release",
+          : "Certificate of analysis published with each batch",
     ],
     [
       "Storage",
@@ -318,7 +318,7 @@ function ProductPage() {
             <div className="hidden sm:grid grid-cols-3 gap-3 mt-4 text-xs text-center">
               {(
                 [
-                  [FileCheck2, "HPLC and MS tested"],
+                  [FileCheck2, testingPublished ? "HPLC and MS tested" : "Batch documentation"],
                   [Snowflake, "Protective packing"],
                   [ShieldCheck, "Sealed, labelled vials"],
                 ] as const
@@ -392,7 +392,7 @@ function ProductPage() {
                   </a>
                 ) : (
                   <Link to="/lab-reports" className="underline">
-                    Batch certificate published on release
+                    Batch certificates publishing soon
                   </Link>
                 )}
               </p>
@@ -605,12 +605,11 @@ function ProductPage() {
                   <Link to="/lab-reports" className="text-primary underline">
                     Lab Reports
                   </Link>{" "}
-                  page as each batch is released, and the batch number on your vial matches its
-                  certificate.
+                  page as each batch is released.
                 </p>
                 <p className="mt-3">
-                  Want the report for a specific batch before ordering? Contact us and we will send
-                  it.
+                  Certificates for the current launch batches are in progress. This page and the Lab
+                  Reports page are updated the moment a batch clears testing.
                 </p>
               </div>
             )}
@@ -772,7 +771,8 @@ function Reviews({ slug }: { slug: string }) {
         ))
       ) : (
         <p className="text-muted-foreground">
-          No reviews yet. Bought this compound? Share your experience below.
+          No reviews yet. Reviews are open to signed-in customers and published after moderation, so
+          nothing on this page is written by us.
         </p>
       )}
       <form className="mt-8 space-y-4" onSubmit={submit}>

@@ -23,7 +23,7 @@ export const faqGroups: FaqGroup[] = [
       ],
       [
         "Which payment methods do you accept?",
-        "Available payment methods are shown at checkout and confirmed with your order. We never ask for card details by email or message.",
+        "Card payment is being set up. Nothing is charged at checkout: your order is confirmed with payment details before dispatch. We never ask for card details by email or message.",
       ],
     ],
   },
@@ -54,11 +54,11 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How is quality documented?",
-        "Batches are sent to an independent laboratory for HPLC purity analysis and mass spectrometry identity confirmation. Certificates of analysis are published on our Lab Reports page and linked from each product page as they are issued.",
+        "Batches are sent to an independent laboratory for HPLC purity analysis and mass spectrometry identity confirmation. Certificates of analysis are published on our Lab Reports page and linked from each product page as they are issued. Certificates for the current launch batches are still being issued.",
       ],
       [
         "How do I check the certificate for my vial?",
-        "Enter the batch number printed on your vial into the batch search on the Lab Reports page. If a certificate is not listed for your batch, contact us and we will send it or confirm its status.",
+        "Every vial carries a batch number. Batch lookup on the Lab Reports page opens as certificates are published, so the number on your vial will resolve to its own certificate. Until the first certificates are live, that page shows the current status of each batch.",
       ],
       [
         "What does HPLC purity mean?",
@@ -75,7 +75,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How should I store lyophilised peptides?",
-        "For long-term storage keep sealed vials frozen at -20°C, away from light and moisture. For short periods, 2 to 8°C refrigeration is suitable. Lyophilised peptides tolerate room temperature during transit.",
+        "For long-term storage keep sealed vials frozen at -20°C, away from light and moisture. For short periods, 2 to 8°C refrigeration is suitable. Lyophilised material tolerates brief ambient exposure during transit, but store it as directed as soon as your parcel arrives.",
       ],
       [
         "How should I store reconstituted peptides?",

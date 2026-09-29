@@ -28,24 +28,29 @@ import {
   productPath,
   searchCompounds,
   fromPrice,
-  hasB2G1,
+  isB2G1,
   cartLine,
   getCategory,
   type Compound,
   type CartItem,
 } from "@/lib/catalog";
-import { site, dispatchInfo } from "@/data/site";
+import { site, dispatchInfo, spendTierLine } from "@/data/site";
 import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
-import { latestCoa } from "@/data/coa";
+import { latestCoa, testingPublished } from "@/data/coa";
 import { supabase } from "@/integrations/supabase/client";
 
 // ---------------------------------------------------------------- Announcement bar
 const announcements = [
   `Free tracked UK delivery over £${site.freeDeliveryThreshold}`,
   `Same-day dispatch on orders before ${site.dispatchCutoffHour - 12}pm`,
-  "Buy 2, get the 3rd free: Retatrutide 10mg and Tirzepatide 20mg",
-  "Save 10% over £150, 15% over £250, 20% over £400",
+  `Buy 2, get the 3rd free: ${site.b2g1
+    .map((b) => {
+      const c = compounds.find((x) => x.slug === b.slug);
+      return c ? `${c.name} ${b.strength}` : b.slug;
+    })
+    .join(" and ")}`,
+  `Multi-buy pricing: ${spendTierLine()}`,
 ];
 
 function AnnouncementBar() {
@@ -433,11 +438,12 @@ function Newsletter() {
 }
 
 function Footer() {
+  // Unknown company facts render as an honest absence, never as an invented value.
   const company = [
     site.legalName ?? "Vyrax Labs",
     site.companyNumber
       ? `Registered in England and Wales, company no. ${site.companyNumber}`
-      : null,
+      : "Company registration details are being finalised and will be published here.",
     site.registeredOffice ? `Registered office: ${site.registeredOffice}` : null,
   ].filter(Boolean);
   return (
@@ -445,11 +451,17 @@ function Footer() {
       <div className="border-b border-ink-line">
         <div className="container-main py-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
           {[
-            [
-              FileCheck2,
-              "Batch certificates",
-              "HPLC and mass spectrometry, published on Lab Reports",
-            ],
+            testingPublished
+              ? [
+                  FileCheck2,
+                  "Batch certificates",
+                  "HPLC and mass spectrometry, published on Lab Reports",
+                ]
+              : [
+                  FileCheck2,
+                  "Batch documentation",
+                  "Certificates published on Lab Reports as each batch clears testing",
+                ],
             [
               Truck,
               "Tracked UK delivery",
@@ -564,7 +576,10 @@ export function ProductCard({ product }: { product: Compound }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <span className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-          {hasB2G1(product) && <span className="badge-promo">Buy 2 get 1 free</span>}
+          {/* Scoped to the strength displayed on the card: the B2G1 offer only applies to specific
+              strengths (e.g. Tirzepatide 20mg), so a compound-level badge would advertise a deal the
+              shown strength does not qualify for. */}
+          {isB2G1(product.slug, s.label) && <span className="badge-promo">Buy 2 get 1 free</span>}
           {coa && <span className="badge-verify">{coa.purity.toFixed(2)}% HPLC</span>}
         </span>
         {!img.isRender && (
@@ -626,9 +641,15 @@ export function FeaturedGrid() {
 export function TrustStrip() {
   return (
     <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-foreground">
-      <span className="flex items-center gap-2">
-        <FileCheck2 size={18} className="text-verify" /> HPLC and MS batch testing
-      </span>
+      {testingPublished ? (
+        <span className="flex items-center gap-2">
+          <FileCheck2 size={18} className="text-verify" /> HPLC and MS batch testing
+        </span>
+      ) : (
+        <span className="flex items-center gap-2">
+          <PackageCheck size={18} className="text-verify" /> Plain, protective packaging
+        </span>
+      )}
       <span className="flex items-center gap-2">
         <Truck size={18} className="text-primary" /> Tracked UK delivery
       </span>

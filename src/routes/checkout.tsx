@@ -80,9 +80,23 @@ function Checkout() {
             <CheckCircle2 className="text-verify mb-4" size={32} />
             <h2 className="font-heading text-2xl font-semibold">Order received. Thank you.</h2>
             <p className="mt-3 text-muted-foreground">
-              We have your order and will email {done} with payment details and confirmation. Orders
-              are dispatched once payment clears, the same day if cleared before{" "}
-              {site.dispatchCutoffHour - 12}pm on a working day.
+              We have your order. Orders are confirmed manually: we check stock, then send payment
+              details and your dispatch confirmation to <strong>{done}</strong> within one working
+              day.
+            </p>
+            <ol className="mt-5 space-y-2 text-sm text-muted-foreground list-decimal pl-5">
+              <li>We check every line against current stock.</li>
+              <li>
+                You receive payment details at {done}. Nothing is charged from this page.
+              </li>
+              <li>
+                Once payment clears, orders placed before {site.dispatchCutoffHour - 12}pm on a
+                working day are dispatched the same day with {site.carrier}.
+              </li>
+            </ol>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Keep this page or note your email address. If you have not heard from us within one
+              working day, contact us before ordering elsewhere and we will prioritise your order.
             </p>
             <Button asChild className="mt-6 rounded-full">
               <Link to="/shop">Continue shopping</Link>
@@ -216,7 +230,7 @@ function Checkout() {
               <p className="text-xs text-muted-foreground">
                 {payLive
                   ? `Payment methods: ${site.paymentMethods.join(", ")}.`
-                  : "No payment is taken on this page. We email secure payment details to confirm your order."}
+                  : "No payment is taken on this page. We check stock, then send secure payment details by email."}
               </p>
               {state && (
                 <p role="status" className="text-sm">

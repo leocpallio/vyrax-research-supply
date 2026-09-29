@@ -11,6 +11,7 @@ import {
 import { categories, getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/catalog";
 import { abs } from "@/data/site";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
+import { testingPublished } from "@/data/coa";
 
 export const Route = createFileRoute("/category/$slug")({
   loader: ({ params }) => {
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/category/$slug")({
     const list = compoundsIn(c.slug);
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const title = `Buy ${c.seoName} UK | Lab-Tested | Vyrax Labs`;
-    const desc = `${c.blurb} ${list.length} compounds from ${gbp(low)}, batch certificates, same-day dispatch and free tracked UK delivery over £50.`;
+    const desc = `${c.blurb} ${list.length} compounds from ${gbp(low)},${testingPublished ? " batch certificates," : ""} same-day dispatch and free tracked UK delivery over £50.`;
     const itemList = {
       "@context": "https://schema.org",
       "@type": "ItemList",

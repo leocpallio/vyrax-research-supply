@@ -3,6 +3,7 @@ import { compounds, allProductSlugs, productPath } from "@/lib/catalog";
 import { categories } from "@/data/categories";
 import { guides } from "@/data/guides";
 import { SITE_URL } from "@/data/site";
+import { shopSections } from "@/data/shop-sections";
 
 // XML sitemap: every indexable URL. Product hubs and per-strength pages are listed separately
 // because each has its own title, H1 and canonical.
@@ -32,6 +33,15 @@ function build() {
     urls.push({
       loc: `/category/${c.slug}`,
       priority: "0.8",
+      changefreq: "weekly",
+      lastmod: today,
+    });
+  // Collection pages are the listing pages the site links to from the nav, footer and product
+  // pages, so they belong in the sitemap alongside the category hubs.
+  for (const s of shopSections)
+    urls.push({
+      loc: `/collections/${s.slug}`,
+      priority: "0.7",
       changefreq: "weekly",
       lastmod: today,
     });

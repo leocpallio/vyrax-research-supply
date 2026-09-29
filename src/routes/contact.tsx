@@ -50,6 +50,7 @@ function Contact() {
         <p className="eyebrow">GET IN TOUCH</p>
         <h1 className="page-title">Contact us</h1>
         <div className="grid lg:grid-cols-[1fr_360px] gap-12 mt-10">
+          {site.email ? (
           <form onSubmit={submit} className="space-y-5 max-w-2xl">
             <div className="grid sm:grid-cols-2 gap-4">
               <label className="block text-sm font-semibold">
@@ -105,20 +106,42 @@ function Contact() {
                 onChange={(e) => setF({ ...f, message: e.target.value })}
               />
             </label>
-            <Button disabled={!site.email} className="rounded-full h-11 px-7">
-              Send message
-            </Button>
-            {!site.email && (
-              <p className="text-sm text-muted-foreground">
-                Our support inbox is being set up. Please check back shortly.
-              </p>
-            )}
+            <Button className="rounded-full h-11 px-7">Send message</Button>
             {sent && (
               <p role="status" className="text-sm">
                 Your email app should now open with the message ready to send.
               </p>
             )}
           </form>
+          ) : (
+            <div className="border border-dashed border-border rounded-2xl p-7 max-w-2xl">
+              <Mail className="text-primary" />
+              <h2 className="font-heading font-semibold mt-3">
+                Our support inbox is being set up
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                This form is switched off rather than collecting messages nobody can read, and it
+                turns on automatically the moment our support address is live. In the meantime,
+                everything we get asked most is answered on the{" "}
+                <Link to="/shipping" className="text-primary underline">
+                  delivery
+                </Link>
+                ,{" "}
+                <Link to="/returns" className="text-primary underline">
+                  returns
+                </Link>
+                ,{" "}
+                <Link to="/lab-reports" className="text-primary underline">
+                  lab reports
+                </Link>{" "}
+                and{" "}
+                <Link to="/faq" className="text-primary underline">
+                  FAQ
+                </Link>{" "}
+                pages.
+              </p>
+            </div>
+          )}
           <aside className="space-y-4">
             {site.email && (
               <a
@@ -149,7 +172,10 @@ function Contact() {
               <div>
                 <p className="font-semibold">Support hours</p>
                 <p className="text-sm text-muted-foreground">
-                  {site.supportHours}. We aim to reply within one working day.
+                  {site.supportHours}.
+                  {site.email
+                    ? " We aim to reply within one working day."
+                    : " Our support inbox is being set up, so replies are not yet available."}
                 </p>
               </div>
             </div>

@@ -48,8 +48,8 @@ function Returns() {
       </p>
       <h2>How to report a problem</h2>
       <p>
-        <Link to="/contact">Contact us</Link> with your order number and a short description. We aim
-        to reply within one working day.
+        <Link to="/contact">Contact us</Link> with your order number and a short description.
+        {site.email ? " We aim to reply within one working day." : ""}
       </p>
     </InfoPage>
   );

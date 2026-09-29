@@ -5,6 +5,7 @@ import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { expiryFor, findBatch, monthLabel } from "@/data/coa";
 import { getCompound, productPath } from "@/lib/catalog";
+import { site } from "@/data/site";
 
 // Batch verification: the page the QR code on every Vyrax vial opens (via the short /v/<batch> link).
 // Reads the published certificates in src/data/coa.ts. An unknown batch gets an honest "not found"
@@ -116,13 +117,25 @@ function Verify() {
               No certificate found
             </h1>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              We couldn't find a published certificate for batch{" "}
-              <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>. Check the
-              number printed on the vial label, or{" "}
-              <Link to="/contact" className="text-primary underline">
-                contact us
-              </Link>{" "}
-              and we will confirm it.
+              {site.email ? (
+                <>
+                  We couldn't find a published certificate for batch{" "}
+                  <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>.
+                  Check the number printed on the vial label, or{" "}
+                  <Link to="/contact" className="text-primary underline">
+                    contact us
+                  </Link>{" "}
+                  and we will confirm it.
+                </>
+              ) : (
+                <>
+                  No published certificate matches batch{" "}
+                  <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>. No
+                  certificates are published yet, so no batch number resolves. The Lab Reports page shows
+                  the current testing status, and the number printed on your vial will be the one to check
+                  here once certificates go live.
+                </>
+              )}
             </p>
             <p className="mt-6">
               <Link to="/lab-reports" className="text-primary underline">
