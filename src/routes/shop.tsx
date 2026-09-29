@@ -6,7 +6,7 @@ import { shopSections, sectionFor } from "@/data/shop-sections";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { abs } from "@/data/site";
-import { testingPublished } from "@/data/coa";
+import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 
 type Sort = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -16,8 +16,12 @@ export const Route = createFileRoute("/shop")({
     ...(typeof s["cat"] === "string" && s["cat"] ? { cat: s["cat"] } : {}),
   }),
   head: () => {
-    const title = "Buy Research Peptides UK | Full Catalogue, Lab-Tested | Vyrax Labs";
-    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds: GLP-1 research peptides, BPC-157, TB-500, GHK-Cu, GH secretagogues, longevity peptides and blends.${testingPublished ? " Batch certificates," : ""} Tracked UK delivery.`;
+    const titleTag = isClaimAllowed("testing.page-title")
+      ? `, ${claimGate("testing.page-title")}`
+      : "";
+    const title = `Buy Research Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
+    const batchCerts = claimText("testing.batch-certificates");
+    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds: GLP-1 research peptides, BPC-157, TB-500, GHK-Cu, GH secretagogues, longevity peptides and blends.${batchCerts ? ` ${batchCerts},` : ""} Tracked UK delivery.`;
     return {
       meta: [
         { title },
@@ -110,9 +114,10 @@ function Shop() {
         <ProductGrid list={list} />
         {list.length === 0 && (
           <p className="py-20 text-center text-muted-foreground">
-            No matching compounds. Try another name or section, or{" "}
+            No compounds match that search. Check the spelling, try an alternative name such as
+            GLP-3, or{" "}
             <Link to="/shop" className="text-primary underline">
-              browse everything
+              browse the full catalogue
             </Link>
             .
           </p>

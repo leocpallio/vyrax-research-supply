@@ -4,7 +4,7 @@ import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
 import { compounds } from "@/lib/catalog";
 import { shopSections } from "@/data/shop-sections";
-import { testingPublished } from "@/data/coa";
+import { claimGate } from "@/lib/claims";
 import lab from "@/assets/vyrax-lab.jpg";
 
 export const Route = createFileRoute("/about")({
@@ -20,18 +20,16 @@ export const Route = createFileRoute("/about")({
 function About() {
   const count = compounds.filter((c) => c.kind !== "supply").length;
   const tiles: [LucideIcon, string, string][] = [
-    testingPublished
-      ? [
-          FileCheck2,
-          "Public certificates",
-          "Batch certificates of analysis are published in our lab reports hub.",
-        ]
-      : [
-          FileCheck2,
-          "Batch documentation",
-          "Certificates are published in our lab reports hub as each batch is released.",
-        ],
-    [FlaskConical, "Independent testing", "Purity and identity testing by third-party laboratories."],
+    [
+      FileCheck2,
+      claimGate("testing.certificates-published"),
+      claimGate("testing.public-certificates-body"),
+    ],
+    [
+      FlaskConical,
+      claimGate("testing.independent-lab"),
+      claimGate("testing.third-party-labs"),
+    ],
     [Truck, "Fast UK dispatch", "Same-day dispatch on working days before 2pm, tracked delivery."],
     [ShieldCheck, "Research only", "Supplied strictly for laboratory research, never for human use."],
   ];
@@ -50,10 +48,8 @@ function About() {
             </p>
             <p>
               That means compound pages carry the CAS number, molecular formula, molecular weight and
-              peer-reviewed references where those are published for the molecule, every batch is
-              submitted for independent purity and identity testing, and the certificate for that
-              batch is published as soon as it is issued. It also means clear pricing with cost per mg
-              shown, so vial sizes are easy to compare.
+              peer-reviewed references where those are published for the molecule. {claimGate("testing.batches-sent-for-testing")}{" "}
+              It also means clear pricing with cost per mg shown, so vial sizes are easy to compare.
             </p>
             <p>
               Our catalogue covers {count} research compounds across metabolic, regenerative, growth

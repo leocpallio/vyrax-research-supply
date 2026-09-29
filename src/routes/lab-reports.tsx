@@ -6,14 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { coas, expiryFor, findBatch, monthLabel, testingPublished } from "@/data/coa";
 import { compounds, getCompound, productPath } from "@/lib/catalog";
+import { claimText } from "@/lib/claims";
 import { abs } from "@/data/site";
 
 export const Route = createFileRoute("/lab-reports")({
   head: () => {
     const title = "Peptide Lab Reports & Certificates of Analysis (CoA) | Vyrax Labs";
-    const desc = testingPublished
-      ? "Public certificates of analysis for Vyrax Labs research peptides. HPLC purity and mass spectrometry identity results by batch, with batch number lookup."
-      : "Vyrax Labs publishes certificates of analysis for each research peptide batch as independent testing is completed: HPLC purity and mass spectrometry identity results, by batch number.";
+    const desc = claimText("testing.lab-reports-meta") ?? "Quality documentation for Vyrax Labs research peptides.";
     return {
       meta: [
         { title },
@@ -51,9 +50,7 @@ function Reports() {
         <p className="eyebrow">TRANSPARENCY</p>
         <h1 className="page-title">Lab reports and certificates of analysis</h1>
         <p className="text-muted-foreground max-w-2xl mt-4">
-          {testingPublished
-            ? "Every Vyrax Labs batch is tested by an independent laboratory. Each certificate names the batch, the laboratory, the methods and the purity result. The batch number printed on your vial matches its certificate here."
-            : "Every Vyrax Labs batch goes to an independent laboratory for HPLC purity and mass spectrometry identity testing. Each certificate names the batch, the laboratory, the methods and the result, and is published here as soon as it is issued. No certificate is listed until we hold it."}
+          {claimText("testing.lab-reports-hub-body")}
         </p>
 
         <form onSubmit={lookup} className="mt-8 max-w-xl flex gap-2">
@@ -99,7 +96,7 @@ function Reports() {
             role="status"
             className="mt-4 max-w-xl border border-verify/50 bg-verify/5 rounded-2xl p-5 text-sm"
           >
-            <p className="font-semibold text-verify">Batch verified</p>
+            <p className="font-semibold text-verify">{claimText("testing.batch-verified")}</p>
             <p className="mt-1">
               {getCompound(hit.compound)?.name} {hit.strength}, batch {hit.batch}: {hit.purity}%
               purity ({hit.method}), tested by {hit.lab}.
@@ -166,10 +163,9 @@ function Reports() {
           ) : (
             <div className="border border-dashed border-border rounded-2xl p-8 text-center">
               <FileCheck2 className="mx-auto text-muted-foreground" />
-              <p className="font-semibold mt-3">Launch batch certificates are being published</p>
+              <p className="font-semibold mt-3">No certificates published yet</p>
               <p className="text-sm text-muted-foreground mt-1 max-w-lg mx-auto">
-                Certificates appear here as each batch clears independent testing. The lookup above
-                starts returning results with the first published certificate.
+                {claimText("testing.pending-status")}
               </p>
             </div>
           )}

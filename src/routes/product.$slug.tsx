@@ -44,7 +44,8 @@ import {
   type Compound,
   type Strength,
 } from "@/lib/catalog";
-import { latestCoa, testingPublished } from "@/data/coa";
+import { latestCoa } from "@/data/coa";
+import { claimFilled, claimGate, claimText } from "@/lib/claims";
 import { site, abs } from "@/data/site";
 import { faqJsonLd, type QA } from "@/data/faq";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,10 +75,11 @@ export const Route = createFileRoute("/product/$slug")({
     const kw = c.kind === "supply" ? c.name : `${c.name} ${s.label}`;
     const title = `Buy ${kw} UK | ${trustModifier(c.slug, s.label)} | Vyrax Labs`;
     const cutoff = `${site.dispatchCutoffHour - 12}pm`;
+    const batchCerts = claimText("testing.batch-certificates");
     const desc =
       c.kind === "supply"
         ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}, same-day dispatch before ${cutoff}, free tracked UK delivery over £${site.freeDeliveryThreshold}.`
-        : `Buy ${c.name} ${s.label} UK for research: ${gbp(s.price)} (${costPerUnitLabel(s)}),${testingPublished ? " batch certificates," : ""} same-day dispatch before ${cutoff}, free tracked delivery over £${site.freeDeliveryThreshold}. For research use only.`;
+        : `Buy ${c.name} ${s.label} UK for research: ${gbp(s.price)} (${costPerUnitLabel(s)}),${batchCerts ? ` ${batchCerts.toLowerCase()},` : ""} same-day dispatch before ${cutoff}, free tracked delivery over £${site.freeDeliveryThreshold}. For research use only.`;
     const coa = latestCoa(c.slug, s.label);
     const ch = chem[c.slug] ?? {};
     const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`;
@@ -206,7 +208,7 @@ function productFaqs(c: Compound, s: Strength): QA[] {
       `How is ${c.name} tested?`,
       coa
         ? `Batch ${coa.batch} was tested by ${coa.lab} using ${coa.method}, with a purity result of ${coa.purity}%. The full certificate is published on this page and on our Lab Reports page.`
-        : "Each batch is tested for identity and purity by an independent laboratory using HPLC and mass spectrometry. Certificates are published on our Lab Reports page as each batch is released.",
+        : claimGate("testing.each-batch-tested-pdp"),
     ],
     [
       `How should ${c.name} be stored?`,
@@ -274,7 +276,7 @@ function ProductPage() {
         ? `${coa.purity}% (${coa.method})`
         : c.kind === "supply"
           ? "Sterile water with 0.9% benzyl alcohol"
-          : "Certificate of analysis published with each batch",
+          : "Not shown until the batch certificate is published",
     ],
     [
       "Storage",
@@ -328,15 +330,19 @@ function ProductPage() {
                   </span>
                 )}
                 <span className="absolute top-4 left-4 flex gap-2">
-                  {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
-                  {coa && <span className="badge-verify">{coa.purity}% HPLC</span>}
+                  {b2g1 && <span className="badge-promo">{claimText("offer.b2g1")}</span>}
+                  {coa && (
+                    <span className="badge-verify">
+                      {claimFilled("testing.purity-badge", { purity: String(coa.purity) })}
+                    </span>
+                  )}
                 </span>
               </div>
             )}
             <div className="hidden sm:grid grid-cols-3 gap-3 mt-4 text-xs text-center">
               {(
                 [
-                  [FileCheck2, testingPublished ? "HPLC and MS tested" : "Batch documentation"],
+                  [FileCheck2, claimGate("testing.hplc-ms-tested")],
                   [Snowflake, "Protective packing"],
                   [ShieldCheck, "Sealed, labelled vials"],
                 ] as const
@@ -410,7 +416,7 @@ function ProductPage() {
                   </a>
                 ) : (
                   <Link to="/lab-reports" className="underline">
-                    Batch certificates publishing soon
+                    {claimText("testing.batch-certificates") ?? "Certificate publication status"}
                   </Link>
                 )}
               </p>
@@ -455,6 +461,12 @@ function ProductPage() {
                 {stock === "out" ? "Out of stock" : `Add to basket · ${gbp(s.price * qty)}`}
               </Button>
             </div>
+            {stock === "out" && (
+              <p className="mt-4 rounded-xl border border-border p-4 text-sm text-muted-foreground">
+                This strength is not available to order. The other strengths of this product remain
+                available, or check back later. Nothing is charged while an item is out of stock.
+              </p>
+            )}
             <p className="text-xs text-muted-foreground mt-3">
               Spend £150 for 10% off, £250 for 15%, £400 for 20%. Applied automatically in your
               basket.
@@ -582,7 +594,13 @@ function ProductPage() {
           <section>
             <SectionTitle title="Purity and testing" />
             {coa ? (
-              <div className="border border-verify/40 bg-verify/5 rounded-2xl p-6 grid sm:grid-cols-4 gap-4 text-sm">
+              <>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  The card below names the batch, testing laboratory, method, purity result and test
+                  date. The batch number printed on your vial matches the batch shown. The full
+                  certificate is available as a PDF from this page and from our Lab Reports page.
+                </p>
+                <div className="border border-verify/40 bg-verify/5 rounded-2xl p-6 grid sm:grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground text-xs">Batch</p>
                   <p className="font-mono font-semibold">{coa.batch}</p>
@@ -613,21 +631,19 @@ function ProductPage() {
                 >
                   Download the full certificate (PDF)
                 </a>
-              </div>
+                </div>
+              </>
             ) : (
               <div className="border border-border rounded-2xl p-6 text-sm leading-relaxed text-muted-foreground">
-                <p>
-                  Every batch is sent to an independent laboratory for identity and purity analysis
-                  by high-performance liquid chromatography (HPLC) and mass spectrometry (MS).
-                  Certificates are published on our{" "}
+                <p>{claimGate("testing.every-batch-sent-pdp")}</p>
+                <p className="mt-3">
+                  No certificate is published for this product yet. Certificates appear on our{" "}
                   <Link to="/lab-reports" className="text-primary underline">
                     Lab Reports
                   </Link>{" "}
-                  page as each batch is released.
-                </p>
-                <p className="mt-3">
-                  Certificates for the current launch batches are in progress. This page and the Lab
-                  Reports page are updated the moment a batch clears testing.
+                  page as each launch batch is released, and this page updates the moment a result
+                  is issued. We do not display a purity figure until we hold the certificate behind
+                  it.
                 </p>
               </div>
             )}

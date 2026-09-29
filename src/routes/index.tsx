@@ -31,7 +31,8 @@ import {
   gbp,
   fromPrice,
 } from "@/lib/catalog";
-import { coas, testingPublished } from "@/data/coa";
+import { coas } from "@/data/coa";
+import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { guides } from "@/data/guides";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs, spendTierLine } from "@/data/site";
@@ -40,8 +41,12 @@ import { shopSections, productsInSection } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Buy Peptides UK · Lab-Tested Research Peptides | Vyrax Labs";
-    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more.${testingPublished ? " HPLC and MS batch testing," : ""} same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
+    const modifier = isClaimAllowed("testing.page-title")
+      ? `${claimGate("testing.page-title")} `
+      : "";
+    const title = `Buy Peptides UK · ${modifier}Research Peptides | Vyrax Labs`;
+    const batchTesting = claimText("testing.hplc-ms-batch-testing");
+    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more.${batchTesting ? ` ${batchTesting},` : ""} same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -88,36 +93,39 @@ const glp = ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"]
   .map(getCompound)
   .filter((c) => c !== undefined);
 
-// Homepage trust tiles. Anything asserting that testing has happened, or that a certificate exists, is
-// gated on `testingPublished` so the page cannot claim a document we do not hold. The placeholder pair
-// describes commitments and packaging facts that are true today.
+// Homepage trust tiles. Every string that asserts testing has happened, or that a certificate
+// exists, comes from the claim registry (src/lib/claims.ts) and is switched on by real evidence
+// (src/lib/evidence.ts). The registry supplies the honest placeholder while nothing is on file,
+// so the page can never claim a document we do not hold.
 type Tile = [LucideIcon, string, string];
+const testingTiles: Tile[] = isClaimAllowed("testing.hplc-ms-tested")
+  ? [
+      [
+        TestTube2,
+        claimGate("testing.hplc-ms-tested"),
+        claimGate("testing.hplc-ms-tested-body"),
+      ],
+      [
+        FileCheck2,
+        claimGate("testing.certificates-you-can-read"),
+        claimGate("testing.full-reports-body"),
+      ],
+    ]
+  : [
+      [
+        FileCheck2,
+        claimGate("testing.certificates-you-can-read"),
+        claimGate("testing.full-reports-body"),
+      ],
+      [
+        BookOpen,
+        "Handling guides",
+        "Storage, reconstitution and handling notes written for laboratory work.",
+      ],
+    ];
+
 const expectations: Tile[] = [
-  ...(testingPublished
-    ? ([
-        [
-          TestTube2,
-          "HPLC and MS tested",
-          "Purity by high-performance liquid chromatography, identity by mass spectrometry, batch by batch.",
-        ],
-        [
-          FileCheck2,
-          "Certificates you can read",
-          "Full reports published on the Lab Reports page, not just a purity badge.",
-        ],
-      ] as Tile[])
-    : ([
-        [
-          FileCheck2,
-          "Batch documentation",
-          "Certificates are published on our Lab Reports page as each launch batch is released.",
-        ],
-        [
-          BookOpen,
-          "Handling guides",
-          "Storage, reconstitution and handling notes written for laboratory work.",
-        ],
-      ] as Tile[])),
+  ...testingTiles,
   [
     Truck,
     "Same-day tracked dispatch",
@@ -300,13 +308,13 @@ function Home() {
               ],
               [
                 "02",
-                "Independent testing",
-                "Batches are sent to an independent laboratory for HPLC purity and mass spectrometry identity testing.",
+                claimGate("testing.independent-lab"),
+                claimGate("testing.batches-sent-for-testing"),
               ],
               [
                 "03",
                 "Batch documentation",
-                "Each batch is documented with a certificate naming the batch, the testing laboratory and the result, published on our Lab Reports page.",
+                claimGate("testing.batch-documented"),
               ],
               [
                 "04",
@@ -346,14 +354,10 @@ function Home() {
           <div>
             <p className="eyebrow !text-primary-soft">TRANSPARENCY</p>
             <h2 className="font-heading text-3xl md:text-4xl font-semibold">
-              {testingPublished
-                ? "Read the lab report before you order."
-                : "Lab reports, published batch by batch."}
+              {claimGate("testing.lab-report-before-order")}
             </h2>
             <p className="text-ink-muted mt-5 leading-relaxed max-w-lg">
-              {testingPublished
-                ? "Every certificate names the batch, the testing laboratory, the methods and the purity result. Search by the batch number printed on your vial to confirm it matches."
-                : "Each certificate names the batch, the testing laboratory, the methods and the result. Certificates appear on this page as each launch batch clears independent testing."}
+              {claimGate("testing.certificate-detail-body")}
             </p>
             <Button asChild variant="secondary" className="rounded-full mt-7">
               <Link to="/lab-reports">
@@ -365,7 +369,7 @@ function Home() {
             <div className="flex items-center gap-3 border-b border-ink-line pb-5">
               <FileCheck2 className="text-primary-soft" />
               <div>
-                <p className="font-semibold">Latest certificates</p>
+                <p className="font-semibold">{claimText("testing.home-certs-heading")}</p>
                 <p className="text-xs text-ink-muted">Published as each batch is released</p>
               </div>
             </div>
@@ -383,9 +387,9 @@ function Home() {
             ) : (
               <div className="mt-6 border border-dashed border-ink-line p-7 text-center rounded-xl">
                 <FileCheck2 className="mx-auto text-ink-muted" />
-                <p className="mt-3 font-semibold">First batch certificates publishing soon</p>
+                <p className="mt-3 font-semibold">{claimText("testing.home-certs-heading")}</p>
                 <p className="text-sm text-ink-muted mt-2">
-                  Certificates appear here as each launch batch clears independent testing.
+                  {claimText("testing.home-certs-empty")}
                 </p>
               </div>
             )}
@@ -443,9 +447,9 @@ function Home() {
               <p>
                 When you buy peptides in the UK for research, the things that matter are identity,
                 purity and traceability. Vyrax Labs lists the CAS number, molecular formula and
-                molecular weight for each compound, links to the peer-reviewed literature, and has
-                every batch tested by an independent laboratory using HPLC and mass spectrometry.
+                molecular weight for each compound and links to the peer-reviewed literature.
               </p>
+              <p>{claimGate("testing.every-batch-analysed")}</p>
               <p>
                 Our catalogue covers metabolic research peptides such as retatrutide, tirzepatide
                 and semaglutide, regenerative research peptides such as BPC-157, TB-500 and GHK-Cu,

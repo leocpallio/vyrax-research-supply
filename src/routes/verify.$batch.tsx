@@ -130,10 +130,10 @@ function Verify() {
               ) : (
                 <>
                   No published certificate matches batch{" "}
-                  <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>. No
-                  certificates are published yet, so no batch number resolves. The Lab Reports page shows
-                  the current testing status, and the number printed on your vial will be the one to check
-                  here once certificates go live.
+                  <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>.
+                  Until the first certificates are published, no batch number will resolve. The Lab
+                  Reports page shows the current testing status of each batch, and the number printed on
+                  your vial will be the one to check here once certificates go live.
                 </>
               )}
             </p>

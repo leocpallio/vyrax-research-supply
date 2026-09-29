@@ -5,6 +5,7 @@ import { categories } from "@/data/categories";
 import { chem, citations } from "@/data/research";
 import { latestCoa } from "@/data/coa";
 import { site } from "@/data/site";
+import { claimGate, isClaimAllowed } from "@/lib/claims";
 import type { Category, CategorySlug, Compound, Strength, StockState } from "@/data/types";
 
 export { categories, chem, citations };
@@ -148,10 +149,14 @@ export const stockLabel: Record<StockState, string> = {
   preorder: "Pre-order",
 };
 
-/** Purity-backed title modifier: only claims a tested purity once a real certificate is on file. */
+/** Purity-backed title modifier. The wording comes from the claim registry, so the title can only
+ * claim a tested purity when the shop holds a certificate for this strength AND the registry's
+ * testing claims are switched on by evidence (src/lib/evidence.ts). */
 export function trustModifier(slug: string, strength?: string) {
   const coa = latestCoa(slug, strength) ?? latestCoa(slug);
-  return coa && coa.purity >= 99 ? ">99% HPLC Tested" : "Research Grade";
+  return coa && coa.purity >= 99 && isClaimAllowed("testing.purity-title")
+    ? claimGate("testing.purity-title")
+    : claimGate("testing.page-title");
 }
 
 // ---------------------------------------------------------------- Search

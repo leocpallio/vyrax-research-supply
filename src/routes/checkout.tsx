@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readCart, cartKey, gbp, priceBasket, type CartItem } from "@/lib/catalog";
+import { claimText } from "@/lib/claims";
 import { site } from "@/data/site";
 
 export const Route = createFileRoute("/checkout")({
@@ -78,16 +79,18 @@ function Checkout() {
         {done ? (
           <div className="mt-10 bg-tint p-8 rounded-2xl">
             <CheckCircle2 className="text-verify mb-4" size={32} />
-            <h2 className="font-heading text-2xl font-semibold">Order received. Thank you.</h2>
+            <h2 className="font-heading text-2xl font-semibold">
+              {claimText("checkout.enquiry-received")}
+            </h2>
             <p className="mt-3 text-muted-foreground">
-              We have your order. Orders are confirmed manually: we check stock, then send payment
-              details and your dispatch confirmation to <strong>{done}</strong> within one working
-              day.
+              We have your enquiry against <strong>{done}</strong>, and nothing has been charged from
+              this page.
             </p>
+            <p className="mt-3 text-muted-foreground">{claimText("checkout.confirmation-email")}</p>
             <ol className="mt-5 space-y-2 text-sm text-muted-foreground list-decimal pl-5">
               <li>We check every line against current stock.</li>
               <li>
-                You receive payment details at {done}. Nothing is charged from this page.
+                {claimText("checkout.payment-details-by-email")} Nothing is charged from this page.
               </li>
               <li>
                 Once payment clears, orders placed before {site.dispatchCutoffHour - 12}pm on a
@@ -95,8 +98,9 @@ function Checkout() {
               </li>
             </ol>
             <p className="mt-4 text-xs text-muted-foreground">
-              Keep this page or note your email address. If you have not heard from us within one
-              working day, contact us before ordering elsewhere and we will prioritise your order.
+              Keep this page or note your email address. {claimText("support.reply-time")} If you have
+              not heard from us by then, contact us before ordering elsewhere and we will prioritise
+              your enquiry.
             </p>
             <Button asChild className="mt-6 rounded-full">
               <Link to="/shop">Continue shopping</Link>

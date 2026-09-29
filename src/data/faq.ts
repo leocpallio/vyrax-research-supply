@@ -1,29 +1,30 @@
+import { claimText } from "@/lib/claims";
 import { site } from "./site";
 
 export type QA = [question: string, answer: string];
 export type FaqGroup = { title: string; items: QA[] };
 
 const threshold = `£${site.freeDeliveryThreshold}`;
+const fee = `£${site.standardDeliveryFee.toFixed(2)}`;
+const cutoff = `${site.dispatchCutoffHour - 12}pm`;
 
+// The 12 questions a first-time buyer actually asks. Every answer is true on the site today: no
+// certificate, review, payment provider or registration number is claimed before it exists.
 export const faqGroups: FaqGroup[] = [
   {
     title: "Ordering",
     items: [
       [
         "Who can order from Vyrax Labs?",
-        "Orders are accepted from adults aged 18 or over who are buying for legitimate laboratory, analytical or educational research. Every order includes a confirmation that the materials will not be used in humans or animals.",
+        "Orders are accepted from adults aged 18 or over who are buying for legitimate laboratory, analytical or educational research. Every order includes a confirmation that the materials will not be used in humans or animals. All products are for in-vitro laboratory research, and are not medicines, foods or cosmetics.",
       ],
       [
-        "Do I need an account to order?",
-        "No. Guest checkout is available. An account lets you see your order history and leave product reviews.",
+        "Why is payment an enquiry rather than an instant card payment?",
+        "Card payment is being set up, so nothing is charged on this site. When you place an order it reaches us as an enquiry: we check every line against stock, then send payment details to your email address within one working day. We never ask for card details by email or message.",
       ],
       [
-        "Do you offer multi-buy or volume discounts?",
-        "Yes. Orders over £150 receive 10% off, over £250 receive 15% off and over £400 receive 20% off, applied automatically in the basket. Retatrutide 10mg and Tirzepatide 20mg are also on a buy two, get a third free offer. Research institutions and trade buyers can contact us about larger volumes.",
-      ],
-      [
-        "Which payment methods do you accept?",
-        "Card payment is being set up. Nothing is charged at checkout: your order is confirmed with payment details before dispatch. We never ask for card details by email or message.",
+        "Do you offer multi-buy or volume pricing?",
+        "Orders over £150 receive 10% off, over £250 receive 15% off and over £400 receive 20% off, applied automatically in the basket. Retatrutide 10mg and Tirzepatide 20mg are also on a buy two, get the third free offer. Research institutions and trade buyers can contact us about larger volumes.",
       ],
     ],
   },
@@ -32,20 +33,15 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How quickly do you dispatch?",
-        `Orders confirmed before ${site.dispatchCutoffHour > 12 ? site.dispatchCutoffHour - 12 : site.dispatchCutoffHour}pm on a working day are dispatched the same day. Orders confirmed after the cut-off, at weekends or on bank holidays are dispatched on the next working day.`,
+        `Orders confirmed before ${cutoff} on a working day are dispatched the same day. Orders confirmed after ${cutoff}, at weekends or on bank holidays are dispatched on the next working day. Dispatch is by ${site.carrier}.`,
       ],
       [
-        "How much is delivery?",
-        `UK delivery is free on orders over ${threshold}. Below that, a flat fee of £${site.standardDeliveryFee.toFixed(2)} applies. Every parcel is sent with tracking.`,
+        "How much is delivery, and how is it tracked?",
+        `UK delivery is free on orders over ${threshold}; below that a flat fee of ${fee} applies. Every parcel is tracked, and the tracking number is sent on dispatch. Vials travel padded inside a plain outer parcel with no product names on the outside.`,
       ],
       [
-        "How is my order packaged?",
-        "Vials are packed in protective packaging with padding, inside a plain outer parcel with no product names on the outside.",
-      ],
-      ["Do you ship outside the UK?", "We currently ship to UK addresses only."],
-      [
-        "What if my parcel is lost or arrives damaged?",
-        "Contact us with your order number. If tracking confirms a parcel is lost, or a vial arrives damaged, we reship it free of charge.",
+        "What happens if my parcel is lost or arrives damaged?",
+        `Contact us within ${site.returnWindowDays} days of the expected delivery date with your order number. If the carrier confirms the parcel is lost, or a vial arrives damaged, we reship it free of charge. For damage, a photograph of the parcel and its contents helps us resolve it quickly.`,
       ],
     ],
   },
@@ -53,20 +49,16 @@ export const faqGroups: FaqGroup[] = [
     title: "Quality and testing",
     items: [
       [
-        "How is quality documented?",
-        "Batches are sent to an independent laboratory for HPLC purity analysis and mass spectrometry identity confirmation. Certificates of analysis are published on our Lab Reports page and linked from each product page as they are issued. Certificates for the current launch batches are still being issued.",
+        "How is purity verified right now?",
+        `${claimText("testing.batches-sent-for-testing")} Results appear on our Lab Reports page as each launch batch clears testing, and nothing is listed until we hold it. Until then, that page shows the testing status of each batch.`,
       ],
       [
         "How do I check the certificate for my vial?",
-        "Every vial carries a batch number. Batch lookup on the Lab Reports page opens as certificates are published, so the number on your vial will resolve to its own certificate. Until the first certificates are live, that page shows the current status of each batch.",
+        "Every vial carries a batch number. Batch lookup on our Lab Reports page opens as certificates are published, so the number printed on your vial will resolve to its own certificate. Until the first certificates are live, that page shows each batch status and the lookup says no certificate is published yet.",
       ],
       [
-        "What does HPLC purity mean?",
-        "High-performance liquid chromatography separates a sample into its components. Purity is the peak area of the target peptide as a percentage of the total peak area detected. Mass spectrometry is used alongside it to confirm the molecular identity.",
-      ],
-      [
-        "What form are the peptides supplied in?",
-        "Peptides are supplied as a lyophilised (freeze-dried) powder in sealed glass vials. Bacteriostatic water for reconstitution is sold separately.",
+        "What form are the peptides supplied in, and can they be used in humans?",
+        "Peptides are supplied as a lyophilised (freeze-dried) powder in sealed glass vials. Bacteriostatic water for reconstitution is sold separately. They are not medicines and must not be used in humans or animals.",
       ],
     ],
   },
@@ -75,32 +67,20 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How should I store lyophilised peptides?",
-        "For long-term storage keep sealed vials frozen at -20°C, away from light and moisture. For short periods, 2 to 8°C refrigeration is suitable. Lyophilised material tolerates brief ambient exposure during transit, but store it as directed as soon as your parcel arrives.",
-      ],
-      [
-        "How should I store reconstituted peptides?",
-        "Once reconstituted, keep the solution refrigerated at 2 to 8°C and protected from light. Avoid repeated freeze-thaw cycles. Stability after reconstitution varies by compound, so establish it for your own protocol.",
-      ],
-      [
-        "How do I reconstitute a peptide?",
-        "See our step-by-step reconstitution guide and use the reconstitution calculator to work out the diluent volume for your target concentration.",
+        "For long-term storage keep sealed vials frozen at -20°C, away from light and moisture. For shorter periods, 2 to 8°C refrigeration is suitable. Store it as directed as soon as your parcel arrives. Once reconstituted, keep the solution refrigerated at 2 to 8°C and avoid repeated freeze-thaw cycles.",
       ],
     ],
   },
   {
-    title: "Returns and legal",
+    title: "Returns and company",
     items: [
       [
         "Can I return an order?",
-        `Unopened items in their original condition can be returned within ${site.returnWindowDays} days of delivery. If a product has a quality problem, contact us and we will replace it or refund you. See the Returns page for full details.`,
+        `Unopened items in their original condition can be returned within ${site.returnWindowDays} days of delivery. If a product has a quality problem, contact us and we will replace it or refund you. We cannot accept opened vials. See the Returns page for full details.`,
       ],
       [
-        "Are research peptides legal to buy in the UK?",
-        "Many research peptides are not licensed medicines and may be sold for laboratory research, provided they are not marketed or supplied for human use. The regulatory status of individual substances can change, so buyers are responsible for checking the rules that apply to their own work.",
-      ],
-      [
-        "Can these products be used in humans or animals?",
-        "No. All products are sold strictly for in-vitro laboratory research. They are not medicines, food or cosmetics and are not for human or veterinary use.",
+        "Is Vyrax Labs a real company?",
+        "Vyrax Labs is a UK-based supplier of research materials, operating through this website. Company registration details are being finalised and will be published in the site footer once confirmed. We would rather show an empty space than invent a registration number, so where a fact is not yet confirmed, the site says so.",
       ],
     ],
   },
@@ -111,12 +91,12 @@ export const allFaqs: QA[] = faqGroups.flatMap((g) => g.items);
 /** Short set shown on the homepage and category pages. */
 export const coreFaqs: QA[] = (
   [
-    [1, 0],
-    [1, 1],
-    [2, 0],
-    [3, 0],
-    [4, 1],
     [0, 0],
+    [0, 1],
+    [1, 0],
+    [2, 0],
+    [4, 0],
+    [4, 1],
   ] as const
 )
   .map(([g, i]) => faqGroups[g]?.items[i])

@@ -51,7 +51,10 @@ function Basket() {
         <h1 className="page-title">Your basket</h1>
         {!items.length ? (
           <div className="py-20 text-center">
-            <p className="text-muted-foreground mb-6">Your basket is empty.</p>
+            <h2 className="font-heading text-2xl font-semibold">Your basket is empty</h2>
+            <p className="text-muted-foreground mb-6 mt-3">
+              Nothing has been added yet. Browse the catalogue to add a compound.
+            </p>
             <Button asChild className="rounded-full">
               <Link to="/shop">
                 Browse research peptides <ArrowRight />

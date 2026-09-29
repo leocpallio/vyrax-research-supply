@@ -6,6 +6,7 @@ import { pageHead } from "@/components/InfoPage";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { claimText } from "@/lib/claims";
 import { site } from "@/data/site";
 
 export const Route = createFileRoute("/contact")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/contact")({
     pageHead(
       "/contact",
       "Contact Vyrax Labs | UK Research Peptide Support",
-      "Contact the Vyrax Labs team about orders, batch certificates, delivery or wholesale research supply. UK-based support, Monday to Friday.",
+      "Contact the Vyrax Labs team about orders, testing documentation, delivery or wholesale research supply. UK-based support, Monday to Friday.",
     ),
   component: Contact,
 });
@@ -172,10 +173,7 @@ function Contact() {
               <div>
                 <p className="font-semibold">Support hours</p>
                 <p className="text-sm text-muted-foreground">
-                  {site.supportHours}.
-                  {site.email
-                    ? " We aim to reply within one working day."
-                    : " Our support inbox is being set up, so replies are not yet available."}
+                  {site.supportHours}. {claimText("support.reply-time")}
                 </p>
               </div>
             </div>

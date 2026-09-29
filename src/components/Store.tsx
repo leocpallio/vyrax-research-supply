@@ -37,7 +37,8 @@ import {
 import { site, dispatchInfo, spendTierLine } from "@/data/site";
 import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
-import { latestCoa, testingPublished } from "@/data/coa";
+import { latestCoa } from "@/data/coa";
+import { claimFilled, claimGate, claimText } from "@/lib/claims";
 import { supabase } from "@/integrations/supabase/client";
 
 // ---------------------------------------------------------------- Announcement bar
@@ -438,30 +439,29 @@ function Newsletter() {
 }
 
 function Footer() {
-  // Unknown company facts render as an honest absence, never as an invented value.
+  // Unknown company facts render as an honest absence, never as an invented value. Every line here
+  // comes from the claim registry, so a fact appearing in the footer means the evidence manifest
+  // (src/lib/evidence.ts) holds it.
   const company = [
     site.legalName ?? "Vyrax Labs",
-    site.companyNumber
-      ? `Registered in England and Wales, company no. ${site.companyNumber}`
-      : "Company registration details are being finalised and will be published here.",
-    site.registeredOffice ? `Registered office: ${site.registeredOffice}` : null,
+    claimGate("identity.company-number"),
+    claimGate("identity.vat-number"),
+    claimText("identity.registered-office"),
   ].filter(Boolean);
+  // Only lists payment methods the evidence manifest says are actually live at checkout.
+  const paymentLine = claimFilled("payment.methods-live", {
+    paymentMethods: site.paymentMethods.join(", "),
+  });
   return (
     <footer className="bg-ink text-ink-foreground">
       <div className="border-b border-ink-line">
         <div className="container-main py-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
           {[
-            testingPublished
-              ? [
-                  FileCheck2,
-                  "Batch certificates",
-                  "HPLC and mass spectrometry, published on Lab Reports",
-                ]
-              : [
-                  FileCheck2,
-                  "Batch documentation",
-                  "Certificates published on Lab Reports as each batch clears testing",
-                ],
+            [
+              FileCheck2,
+              claimGate("testing.certificates-published"),
+              claimGate("testing.hplc-mass-spec-published"),
+            ],
             [
               Truck,
               "Tracked UK delivery",
@@ -536,7 +536,7 @@ function Footer() {
             <p>© {new Date().getFullYear()} Vyrax Labs. All rights reserved.</p>
           </div>
           <div className="md:text-right space-y-1 max-w-md">
-            {site.paymentMethods.length > 0 && <p>We accept: {site.paymentMethods.join(", ")}</p>}
+            {paymentLine && <p>{paymentLine}</p>}
             <p>
               All products are sold strictly for laboratory research use only. Not for human or
               veterinary use. Not a medicine, food or cosmetic.
@@ -561,6 +561,11 @@ export function ProductCard({ product }: { product: Compound }) {
   const img = productImage(product.slug);
   const href = productPath(product.slug);
   const coa = latestCoa(product.slug);
+  // ">99% HPLC" only renders when a certificate for this compound is on file: the wording comes
+  // from the registry, which is gated on evidence.labReportsPublished.
+  const purityBadge = coa
+    ? claimFilled("testing.purity-badge", { purity: coa.purity.toFixed(2) })
+    : null;
   if (!s) return null;
   return (
     <div className="product-card group flex flex-col">
@@ -579,8 +584,10 @@ export function ProductCard({ product }: { product: Compound }) {
           {/* Scoped to the strength displayed on the card: the B2G1 offer only applies to specific
               strengths (e.g. Tirzepatide 20mg), so a compound-level badge would advertise a deal the
               shown strength does not qualify for. */}
-          {isB2G1(product.slug, s.label) && <span className="badge-promo">Buy 2 get 1 free</span>}
-          {coa && <span className="badge-verify">{coa.purity.toFixed(2)}% HPLC</span>}
+          {isB2G1(product.slug, s.label) && (
+            <span className="badge-promo">{claimText("offer.b2g1")}</span>
+          )}
+          {purityBadge && <span className="badge-verify">{purityBadge}</span>}
         </span>
         {!img.isRender && (
           <span className="absolute inset-x-6 top-[46%] text-center font-heading font-semibold text-ink text-sm md:text-base leading-tight pointer-events-none">
@@ -639,15 +646,16 @@ export function FeaturedGrid() {
 
 // ---------------------------------------------------------------- Trust + misc blocks
 export function TrustStrip() {
+  const batchTesting = claimText("testing.hplc-ms-batch-testing");
   return (
     <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-foreground">
-      {testingPublished ? (
+      {batchTesting ? (
         <span className="flex items-center gap-2">
-          <FileCheck2 size={18} className="text-verify" /> HPLC and MS batch testing
+          <FileCheck2 size={18} className="text-verify" /> {batchTesting}
         </span>
       ) : (
         <span className="flex items-center gap-2">
-          <PackageCheck size={18} className="text-verify" /> Plain, protective packaging
+          <PackageCheck size={18} className="text-verify" /> {claimText("trust.packaging")}
         </span>
       )}
       <span className="flex items-center gap-2">

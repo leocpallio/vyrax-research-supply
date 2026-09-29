@@ -5,12 +5,17 @@ export const SITE_URL = "https://vyraxlabs.co.uk";
 export const site = {
   name: "Vyrax Labs",
   url: SITE_URL,
-  tagline: "Lab-tested research peptides, dispatched from the UK",
+  tagline: "Research peptides dispatched from the UK",
   // Business details: fill these in before launch. Null values are shown as pending.
   legalName: null as string | null, // e.g. 'Vyrax Labs Ltd'
   companyNumber: null as string | null, // Companies House number
+  vatNumber: null as string | null, // VAT registration number
   registeredOffice: null as string | null,
+  // Physical address a return can be sent to. Null means returns are handled by arrangement only;
+  // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
+  returnsAddress: null as string | null,
   email: null as string | null, // e.g. 'support@vyraxlabs.co.uk'
+  phone: null as string | null, // e.g. '+44 20 7946 0000'
   whatsapp: null as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
   // Fulfilment
