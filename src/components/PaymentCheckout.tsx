@@ -4,6 +4,7 @@ import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
+import { capture } from "@/lib/analytics";
 
 export function PaymentCheckout() {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -52,6 +53,7 @@ export function PaymentCheckout() {
       )
         throw new Error(data.error || "Checkout unavailable");
       sessionStorage.setItem(`vyrax-order-${data.order_id}`, data.guest_token);
+      capture("hosted_payment_opened", { test_mode: data.test_mode === true });
       window.location.assign(data.checkout_url);
     } catch {
       setError(

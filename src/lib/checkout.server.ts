@@ -77,7 +77,15 @@ export async function createCheckout(request: Request): Promise<Response> {
       return fail("Invalid request", 413);
     const raw = await request.text();
     if (raw.length > 16384) return fail("Invalid request", 413);
-    const body = JSON.parse(raw) as Record<string, unknown>;
+    let body: Record<string, unknown>;
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+        return fail("Invalid request", 400);
+      body = parsed as Record<string, unknown>;
+    } catch {
+      return fail("Invalid request", 400);
+    }
     const name = validText(body["name"], 120);
     const email = validText(body["email"], 254)?.toLowerCase();
     const phone = validText(body["phone"], 40);
@@ -148,6 +156,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       typeof payment["payment_id"] !== "string" ||
       !/^[a-zA-Z0-9_-]{3,128}$/.test(payment["payment_id"]) ||
       payment["merchant_id"] !== c.merchant ||
+      (payment["profile_id"] !== undefined && payment["profile_id"] !== c.profile) ||
       (payment["amount"] !== undefined && payment["amount"] !== quote.totalPence) ||
       (payment["currency"] !== undefined && payment["currency"] !== "GBP") ||
       (payment["test_mode"] !== undefined && payment["test_mode"] !== c.testMode)

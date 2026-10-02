@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { StoreShell, Disclaimer } from "@/components/Store";
+import { capture } from "@/lib/analytics";
 
 export const Route = createFileRoute("/checkout_/return")({
   head: () => ({
@@ -27,7 +28,11 @@ function PaymentReturn() {
     }
     let active = true;
     let count = 0;
+    let paid = false;
+    let checking = false;
     const check = async () => {
+      if (checking || paid || !active) return;
+      checking = true;
       try {
         const res = await fetch(
           `/api/order-status?order=${encodeURIComponent(order)}&token=${encodeURIComponent(token)}`,
@@ -43,10 +48,16 @@ function PaymentReturn() {
                 : "Payment confirmed. Your order is awaiting review."
               : "Payment not yet confirmed. Do not repay solely because of this message. The webhook may still be processing.",
           );
-        if (result.status === "paid") count = 99;
+        if (active && result.status === "paid") {
+          paid = true;
+          clearInterval(interval);
+          capture("payment_confirmed", { test_mode: result.test_mode === true });
+        }
       } catch {
         if (active)
           setStatus("Unable to check status. Contact support before attempting another payment.");
+      } finally {
+        checking = false;
       }
     };
     void check();

@@ -51,6 +51,8 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
   const orderId = "11111111-1111-4111-8111-111111111111";
   let inserted: Record<string, unknown> = {};
   let payment: Record<string, unknown> = {};
+  let responseProfile: string | undefined;
+  let bindings = 0;
   let state = "pending";
   const events = new Set<string>();
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -66,6 +68,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
       return result({
         payment_id: "pay_vyrax",
         merchant_id: "merchant_vyrax",
+        ...(responseProfile ? { profile_id: responseProfile } : {}),
         amount: payload["amount"],
         currency: "GBP",
         test_mode: true,
@@ -76,7 +79,10 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         inserted = payload;
         return result({ id: orderId }, 201);
       }
-      if (init?.method === "PATCH") return result({ id: orderId });
+      if (init?.method === "PATCH") {
+        bindings++;
+        return result({ id: orderId });
+      }
       const token = new URL(url).searchParams.get("guest_token")?.replace(/^eq\./, "");
       if (token && token !== inserted["guest_token"]) return result(null);
       return result(
@@ -183,6 +189,36 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
       ),
     );
     expect((await status.json()).status).toBe("paid");
+    for (const invalid of ["null", "[]", "{"]) {
+      const bad = await createCheckout(
+        new Request("https://vyraxlabs.co.uk/api/checkout", {
+          method: "POST",
+          headers: { origin: "https://vyraxlabs.co.uk", "content-type": "application/json" },
+          body: invalid,
+        }),
+      );
+      expect(bad.status).toBe(400);
+    }
+    responseProfile = "other_shop";
+    const previousBindings = bindings;
+    const wrongProfile = await createCheckout(
+      new Request("https://vyraxlabs.co.uk/api/checkout", {
+        method: "POST",
+        headers: { origin: "https://vyraxlabs.co.uk", "content-type": "application/json" },
+        body: JSON.stringify({
+          items: [{ slug: "bpc-157", strength: "5mg", quantity: 1 }],
+          name: "Researcher",
+          email: "researcher@example.org",
+          address: "1 Lab Road",
+          address2: "",
+          city: "London",
+          postcode: "SW1A 1AA",
+          researchAgreement: true,
+        }),
+      }),
+    );
+    expect(wrongProfile.status).toBe(502);
+    expect(bindings).toBe(previousBindings);
   } finally {
     globalThis.fetch = originalFetch;
     for (const [k, v] of Object.entries(previous)) {
