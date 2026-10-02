@@ -35,12 +35,13 @@ function Account() {
   }, []);
   useEffect(() => {
     if (user)
-      supabase
+      // Tables are not yet recreated in the linked database; loosen typing until types regenerate.
+      (supabase as any)
         .from("orders")
         .select("id,created_at,total,status")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .then(({ data }) => setOrders(data || []));
+        .then(({ data }: { data: any[] | null }) => setOrders(data || []));
   }, [user]);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
