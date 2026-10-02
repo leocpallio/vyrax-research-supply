@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
 import { site } from "@/data/site";
+import { capture } from "@/lib/analytics";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -54,9 +55,15 @@ function Checkout() {
         status: "enquiry",
       });
       if (insertError) throw insertError;
+      capture("enquiry_submitted", {
+        item_count: items.reduce((n, i) => n + i.quantity, 0),
+        currency: "GBP",
+        indicative_total: p.total,
+      });
       // Leave the basket available: there is no confirmed order or automated follow-up.
       setDone(form.email.trim().toLowerCase());
     } catch {
+      capture("enquiry_error", { stage: "submission" });
       setError("Your enquiry could not be recorded. Please try again; no payment was taken.");
     } finally {
       setSubmitting(false);

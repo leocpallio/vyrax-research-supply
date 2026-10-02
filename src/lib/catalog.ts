@@ -7,6 +7,7 @@ import { chem, citations } from "@/data/research";
 import { latestCoa } from "@/data/coa";
 import { site } from "@/data/site";
 import { claimGate, isClaimAllowed } from "@/lib/claims";
+import { trackBasketChange } from "@/lib/analytics";
 import type { Category, CategorySlug, Compound, Strength, StockState } from "@/data/types";
 
 export { categories, chem, citations };
@@ -275,7 +276,9 @@ export function readCart(): CartItem[] {
   }
 }
 export function writeCart(items: CartItem[]) {
+  const before = readCart();
   localStorage.setItem(cartKey, JSON.stringify(items));
+  trackBasketChange(before, items);
   window.dispatchEvent(new Event("vyrax-cart"));
 }
 export function addCart(item: CartItem) {

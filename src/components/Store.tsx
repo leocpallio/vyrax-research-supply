@@ -38,6 +38,8 @@ import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
 import { claimFilled, claimGate, claimText } from "@/lib/claims";
+import { AnalyticsConsentBanner } from "@/components/AnalyticsConsent";
+import { capture } from "@/lib/analytics";
 
 // ---------------------------------------------------------------- Announcement bar
 const announcements =
@@ -76,6 +78,7 @@ function SearchBox({ onDone, autoFocus = false }: { onDone?: () => void; autoFoc
   const matches = searchCompounds(q, 7);
   const open = focused && q.trim().length >= 2;
   const go = (c?: Compound) => {
+    if (q.trim().length >= 2) capture("search", { source: "header", result_count: matches.length });
     if (c) navigate({ to: productPath(c.slug) });
     else navigate({ to: "/shop", search: { q } });
     setQ("");
@@ -136,6 +139,7 @@ function SearchBox({ onDone, autoFocus = false }: { onDone?: () => void; autoFoc
                   href={productPath(c.slug)}
                   onMouseEnter={() => setActive(n)}
                   onClick={() => {
+                    capture("search", { source: "header", result_count: matches.length });
                     setQ("");
                     onDone?.();
                   }}
@@ -357,6 +361,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <main id="main">{children}</main>
       <Footer />
       <AddedToast />
+      <AnalyticsConsentBanner />
       {age && (
         <div className="fixed inset-0 z-[100] bg-ink/80 flex items-center justify-center p-4">
           <div

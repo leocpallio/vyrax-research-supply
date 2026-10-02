@@ -80,7 +80,10 @@ function Privacy() {
       </p>
       <h2>Cookies</h2>
       <p>
-        See our <Link to="/cookies">cookie policy</Link>.
+        Optional PostHog website analytics run only if you allow them. They use an anonymous
+        session-only identifier and do not receive enquiry contact details or search text. PostHog
+        may process technical connection data. Manage your choice in our{" "}
+        <Link to="/cookies">cookie policy</Link>.
       </p>
     </InfoPage>
   );
