@@ -13,6 +13,8 @@ describe("Vyrax transactional emails", () => {
     });
     expect(mail.html).toContain("&lt;Admin &amp; &quot;Co&quot;&gt;");
     expect(mail.html).toContain("BPC-157 &lt;x&gt;");
+    expect(mail.html).toContain('<table role="presentation" width="100%"');
+    expect(mail.html).toContain("Indicative total");
     expect(mail.html).not.toContain("<x>");
     expect(mail.text).toContain("No payment has been taken");
     expect(mail.text.toLowerCase()).toContain("indicative");

@@ -52,8 +52,9 @@ function wrap(
   preheader: string,
   blocks: string[],
   textLines: string[],
+  detailHtml = "",
 ): { html: string; text: string } {
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f4f6fa;color:#172238;font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:32px 14px"><table role="presentation" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #dfe5ed;border-radius:12px" cellspacing="0" cellpadding="0"><tr><td style="background:#203eab;color:#ffffff;padding:24px 28px;font-size:22px;font-weight:bold">Vyrax Labs</td></tr><tr><td style="padding:28px;line-height:1.6;font-size:16px"><h1 style="margin:0 0 16px;font-size:24px;color:#172238">${escapeHtml(heading)}</h1>${blocks.map((b) => `<p style="margin:0 0 16px">${b}</p>`).join("")}</td></tr><tr><td style="padding:20px 28px;border-top:1px solid #dfe5ed;font-size:13px;color:#4b5563">${escapeHtml(researchNotice)}<br>Vyrax Labs &bull; <a href="${siteUrl}" style="color:#203eab">vyraxlabs.co.uk</a></td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f4f6fa;color:#172238;font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:32px 14px"><table role="presentation" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #dfe5ed;border-radius:12px" cellspacing="0" cellpadding="0"><tr><td style="background:#203eab;color:#ffffff;padding:24px 28px;font-size:22px;font-weight:bold">Vyrax Labs</td></tr><tr><td style="padding:28px;line-height:1.6;font-size:16px"><h1 style="margin:0 0 16px;font-size:24px;color:#172238">${escapeHtml(heading)}</h1>${blocks.map((b) => `<p style="margin:0 0 16px">${b}</p>`).join("")}${detailHtml}</td></tr><tr><td style="padding:20px 28px;border-top:1px solid #dfe5ed;font-size:13px;color:#4b5563">${escapeHtml(researchNotice)}<br>Vyrax Labs &bull; <a href="${siteUrl}" style="color:#203eab">vyraxlabs.co.uk</a></td></tr></table></td></tr></table></body></html>`;
   return {
     html,
     text: [heading, "", ...textLines, "", researchNotice, "Vyrax Labs | vyraxlabs.co.uk"].join(
@@ -64,12 +65,22 @@ function wrap(
 const p = (value: unknown) => escapeHtml(value);
 const linesOf = (lines: readonly Line[]) =>
   lines.map((line) => `${line.name} ${line.strength} x ${line.quantity}: ${gbp(line.lineTotal)}`);
+const enquiryTable = (lines: readonly Line[], total: number) =>
+  `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:20px 0;font-size:14px"><thead><tr style="background:#f4f6fa"><th align="left" style="padding:10px;border-bottom:1px solid #dfe5ed">Item</th><th align="center" style="padding:10px;border-bottom:1px solid #dfe5ed">Qty</th><th align="right" style="padding:10px;border-bottom:1px solid #dfe5ed">Estimate</th></tr></thead><tbody>${lines
+    .map(
+      (line) =>
+        `<tr><td style="padding:10px;border-bottom:1px solid #dfe5ed">${p(line.name)}<br><span style="color:#4b5563">${p(line.strength)}</span></td><td align="center" style="padding:10px;border-bottom:1px solid #dfe5ed">${p(line.quantity)}</td><td align="right" style="padding:10px;border-bottom:1px solid #dfe5ed">${p(gbp(line.lineTotal))}</td></tr>`,
+    )
+    .join(
+      "",
+    )}<tr><td colspan="2" style="padding:12px 10px;font-weight:bold">Indicative total</td><td align="right" style="padding:12px 10px;font-weight:bold">${p(gbp(total))}</td></tr></tbody></table><p style="padding:12px;background:#f4f6fa;border-left:3px solid #203eab;margin:0">No payment has been taken. This is an enquiry, not a confirmed order. Availability, final pricing and any next steps must be agreed separately. No dispatch is scheduled or response time guaranteed.</p>`;
 
 export function renderEmail(event: EmailEvent): RenderedEmail {
   let subject: string;
   let heading: string;
   let copy: string[];
   let htmlCopy: string[] | undefined;
+  let detailHtml = "";
   switch (event.kind) {
     case "enquiry":
     case "ownerAlert": {
@@ -85,6 +96,8 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
         `Indicative total: ${gbp(event.indicativeTotal)}.`,
         "No payment has been taken. This is an enquiry, not a confirmed order. Availability, final pricing and any next steps must be agreed separately. No dispatch is scheduled or response time guaranteed.",
       ];
+      htmlCopy = [copy[0] ?? "", copy[1] ?? ""];
+      detailHtml = enquiryTable(event.lines, event.indicativeTotal);
       break;
     }
     case "paymentPending":
@@ -181,6 +194,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
       htmlCopy?.includes(line) && line.startsWith("<a ") ? line : p(line),
     ),
     copy,
+    detailHtml,
   );
   return { subject, ...rendered };
 }
