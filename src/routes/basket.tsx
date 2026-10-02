@@ -49,6 +49,13 @@ function Basket() {
     <StoreShell>
       <div className="container-main py-10 md:py-12 min-h-[55vh]">
         <h1 className="page-title">Your basket</h1>
+        <p className="mt-3 text-sm text-muted-foreground max-w-2xl">
+          Saved in this browser for comparison only. No items are reserved, no enquiry is sent and
+          no payment is taken.{" "}
+          {site.enquiriesLive && site.email
+            ? "Final terms must be agreed separately."
+            : "Enquiries are currently closed."}
+        </p>
         {!items.length ? (
           <div className="py-20 text-center">
             <h2 className="font-heading text-2xl font-semibold">Your basket is empty</h2>
@@ -68,9 +75,12 @@ function Basket() {
                 <p className="text-sm font-semibold flex items-center gap-2">
                   <Truck size={16} className="text-primary" />
                   {p.freeDeliveryGap > 0 ? (
-                    <>Add {gbp(p.freeDeliveryGap)} more to reach the free UK delivery threshold</>
+                    <>
+                      Add {gbp(p.freeDeliveryGap)} more to reach the proposed free UK delivery
+                      threshold
+                    </>
                   ) : (
-                    <>Basket meets the free UK delivery threshold</>
+                    <>Estimate meets the proposed free UK delivery threshold</>
                   )}
                 </p>
                 <div className="h-2 bg-surface rounded-full mt-3 overflow-hidden">
@@ -96,7 +106,10 @@ function Basket() {
                       ),
                     );
                   return (
-                    <div key={i.slug + i.strength} className="flex items-center gap-4 py-5">
+                    <div
+                      key={i.slug + i.strength}
+                      className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 py-5"
+                    >
                       <img
                         src={img.small ?? img.src}
                         alt=""
@@ -104,7 +117,7 @@ function Basket() {
                         height={64}
                         className="size-16 object-cover bg-surface rounded-xl"
                       />
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-[calc(100%-8rem)] sm:min-w-0">
                         <a
                           href={productPath(i.slug, i.strength)}
                           className="font-heading font-semibold hover:text-primary"
@@ -113,20 +126,26 @@ function Basket() {
                         </a>
                         <p className="text-muted-foreground text-sm">{gbp(i.price)} each</p>
                       </div>
-                      <div className="flex items-center border border-border rounded-full">
+                      <div
+                        className="flex items-center border border-border rounded-full ml-auto sm:ml-0"
+                        role="group"
+                        aria-label={`Quantity for ${i.name} ${i.strength}`}
+                      >
                         <button
                           type="button"
-                          aria-label={`Decrease ${i.name}`}
-                          className="size-9 grid place-items-center"
+                          aria-label={`Decrease ${i.name} ${i.strength} quantity`}
+                          className="size-11 grid place-items-center"
                           onClick={() => setQty(i.quantity - 1)}
                         >
                           <Minus size={14} />
                         </button>
-                        <span className="w-7 text-center font-mono text-sm">{i.quantity}</span>
+                        <span className="w-7 text-center font-mono text-sm" aria-live="polite">
+                          {i.quantity}
+                        </span>
                         <button
                           type="button"
-                          aria-label={`Increase ${i.name}`}
-                          className="size-9 grid place-items-center"
+                          aria-label={`Increase ${i.name} ${i.strength} quantity`}
+                          className="size-11 grid place-items-center"
                           onClick={() => setQty(i.quantity + 1)}
                         >
                           <Plus size={14} />
@@ -138,7 +157,7 @@ function Basket() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={`Remove ${i.name}`}
+                        aria-label={`Remove ${i.name} ${i.strength} from basket`}
                         onClick={() => update(items.filter((_, j) => j !== index))}
                       >
                         <Trash2 size={18} />
@@ -150,7 +169,7 @@ function Basket() {
               {!hasBac && bac && bacS && (
                 <div className="mt-6 flex items-center gap-4 border border-border rounded-2xl p-4">
                   <div className="flex-1 text-sm">
-                    <p className="font-semibold">Add bacteriostatic water?</p>
+                    <p className="font-semibold">Compare bacteriostatic water?</p>
                     <p className="text-muted-foreground">
                       {bacS.label} diluent for reconstitution, {gbp(bacS.price)}
                     </p>
@@ -161,7 +180,7 @@ function Basket() {
                     className="rounded-full"
                     onClick={() => addCart(cartLine(bac, bacS))}
                   >
-                    Add
+                    Save
                   </Button>
                 </div>
               )}
@@ -196,7 +215,7 @@ function Basket() {
                 <Link to="/checkout">
                   {site.enquiriesLive && site.email
                     ? "Continue to enquiry"
-                    : "Check enquiry availability"}{" "}
+                    : "See why enquiries are closed"}{" "}
                   <ArrowRight />
                 </Link>
               </Button>

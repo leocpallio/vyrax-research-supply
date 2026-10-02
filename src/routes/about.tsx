@@ -45,6 +45,24 @@ function About() {
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "About us" }]} />
         <p className="eyebrow">ABOUT VYRAX LABS</p>
         <h1 className="page-title max-w-3xl">Research compounds for laboratory use.</h1>
+        <p className="mt-4 max-w-2xl text-muted-foreground">
+          Check the specifications and the current report register before deciding what to compare.
+          Browsing or saving a basket does not reserve a vial or start an order.
+        </p>
+        <div className="flex flex-wrap gap-4 mt-6 text-sm font-semibold">
+          <Link
+            to="/shop"
+            className="inline-flex min-h-11 items-center text-primary underline underline-offset-2"
+          >
+            Browse the catalogue
+          </Link>
+          <Link
+            to="/lab-reports"
+            className="inline-flex min-h-11 items-center text-primary underline underline-offset-2"
+          >
+            Check report status
+          </Link>
+        </div>
         <div className="grid md:grid-cols-2 gap-12 mt-10 items-center">
           <div className="text-muted-foreground leading-relaxed space-y-4">
             <p>
@@ -53,8 +71,8 @@ function About() {
               not currently available.
             </p>
             <p>
-              Product pages show available specifications and indicative prices. Those details are
-              not a certificate of analysis. Check the{" "}
+              Product pages show listed specifications and indicative prices. Those details are not
+              a certificate of analysis. Check the{" "}
               <Link to="/lab-reports" className="text-primary underline">
                 lab reports register
               </Link>{" "}
