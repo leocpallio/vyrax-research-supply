@@ -29,6 +29,7 @@ export const Route = createFileRoute("/basket")({
 });
 
 function Basket() {
+  const paymentEnabled = import.meta.env["VITE_SPICEPAY_CHECKOUT_ENABLED"] === "true";
   const [items, setItems] = useState<CartItem[]>([]);
   useEffect(() => {
     const sync = () => setItems(readCart());
@@ -50,11 +51,12 @@ function Basket() {
       <div className="container-main py-10 md:py-12 min-h-[55vh]">
         <h1 className="page-title">Your basket</h1>
         <p className="mt-3 text-sm text-muted-foreground max-w-2xl">
-          Saved in this browser for comparison only. No items are reserved, no enquiry is sent and
-          no payment is taken.{" "}
-          {site.enquiriesLive && site.email
-            ? "Final terms must be agreed separately."
-            : "Enquiries are currently closed."}
+          Saved in this browser. No items are reserved and no payment is taken on this page.{" "}
+          {paymentEnabled
+            ? "Hosted payment is available at checkout; inventory is not reserved."
+            : site.enquiriesLive && site.email
+              ? "Final terms must be agreed separately."
+              : "Enquiries are currently closed."}
         </p>
         {!items.length ? (
           <div className="py-20 text-center">
@@ -186,7 +188,9 @@ function Basket() {
               )}
             </div>
             <aside className="bg-surface p-7 rounded-2xl h-fit">
-              <h2 className="font-heading text-xl font-semibold">Enquiry estimate</h2>
+              <h2 className="font-heading text-xl font-semibold">
+                {paymentEnabled ? "Basket estimate" : "Enquiry estimate"}
+              </h2>
               <div className="flex justify-between mt-6">
                 <span>Subtotal</span>
                 <strong>{gbp(p.subtotal)}</strong>
@@ -213,18 +217,21 @@ function Basket() {
               </div>
               <Button asChild className="w-full mt-6 rounded-full h-12 text-base">
                 <Link to="/checkout">
-                  {site.enquiriesLive && site.email
-                    ? "Continue to enquiry"
-                    : "See why enquiries are closed"}{" "}
+                  {paymentEnabled
+                    ? "Continue to checkout"
+                    : site.enquiriesLive && site.email
+                      ? "Continue to enquiry"
+                      : "See why enquiries are closed"}{" "}
                   <ArrowRight />
                 </Link>
               </Button>
               <p className="text-xs text-muted-foreground mt-4">
-                No charge or confirmed order. Availability and final price must be agreed
-                separately.{" "}
-                {site.enquiriesLive && site.email
-                  ? "No automated email or dispatch is triggered by an enquiry."
-                  : "Enquiries are closed while the support inbox is being set up; no contact details are collected."}
+                No charge or confirmed order on this page. Availability is not reserved.{" "}
+                {paymentEnabled
+                  ? "The server confirms the final price before hosted payment."
+                  : site.enquiriesLive && site.email
+                    ? "No automated email or dispatch is triggered by an enquiry."
+                    : "Enquiries are closed while the support inbox is being set up; no contact details are collected."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
                 For research use only. Not for human consumption.

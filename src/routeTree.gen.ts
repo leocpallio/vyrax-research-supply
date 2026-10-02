@@ -26,7 +26,11 @@ import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
+import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
+import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout_.return'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
@@ -119,9 +123,29 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
+  id: '/api/checkout',
+  path: '/api/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
+  id: '/api/order-status',
+  path: '/api/order-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSpicepayWebhookRoute = ApiSpicepayWebhookRouteImport.update({
+  id: '/api/spicepay-webhook',
+  path: '/api/spicepay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout_/return',
+  path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
@@ -173,7 +197,11 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
+  '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -199,7 +227,11 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
+  '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -226,7 +258,11 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
+  '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/checkout_/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -254,7 +290,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/checkout'
+    | '/api/order-status'
+    | '/api/spicepay-webhook'
     | '/category/$slug'
+    | '/checkout/return'
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
@@ -280,7 +320,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/checkout'
+    | '/api/order-status'
+    | '/api/spicepay-webhook'
     | '/category/$slug'
+    | '/checkout/return'
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
@@ -306,7 +350,11 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/checkout'
+    | '/api/order-status'
+    | '/api/spicepay-webhook'
     | '/category/$slug'
+    | '/checkout_/return'
     | '/collections/$slug'
     | '/guides/$slug'
     | '/product/$slug'
@@ -333,7 +381,11 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiCheckoutRoute: typeof ApiCheckoutRoute
+  ApiOrderStatusRoute: typeof ApiOrderStatusRoute
+  ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -463,11 +515,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/checkout': {
+      id: '/api/checkout'
+      path: '/api/checkout'
+      fullPath: '/api/checkout'
+      preLoaderRoute: typeof ApiCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/order-status': {
+      id: '/api/order-status'
+      path: '/api/order-status'
+      fullPath: '/api/order-status'
+      preLoaderRoute: typeof ApiOrderStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/spicepay-webhook': {
+      id: '/api/spicepay-webhook'
+      path: '/api/spicepay-webhook'
+      fullPath: '/api/spicepay-webhook'
+      preLoaderRoute: typeof ApiSpicepayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout_/return': {
+      id: '/checkout_/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections/$slug': {
@@ -533,7 +613,11 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiCheckoutRoute: ApiCheckoutRoute,
+  ApiOrderStatusRoute: ApiOrderStatusRoute,
+  ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   CategorySlugRoute: CategorySlugRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
