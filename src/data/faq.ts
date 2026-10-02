@@ -1,30 +1,27 @@
-import { claimText } from "@/lib/claims";
-import { site } from "./site";
+import { coas } from "./coa";
+import { site, spendTierLine } from "./site";
 
 export type QA = [question: string, answer: string];
 export type FaqGroup = { title: string; items: QA[] };
 
 const threshold = `£${site.freeDeliveryThreshold}`;
 const fee = `£${site.standardDeliveryFee.toFixed(2)}`;
-const cutoff = `${site.dispatchCutoffHour - 12}pm`;
-
-// The 12 questions a first-time buyer actually asks. Every answer is true on the site today: no
-// certificate, review, payment provider or registration number is claimed before it exists.
+// Answers appear both in visible markup and FAQPage JSON-LD. Keep them accurate for an enquiry-only site.
 export const faqGroups: FaqGroup[] = [
   {
     title: "Ordering",
     items: [
       [
         "Who can order from Vyrax Labs?",
-        "Orders are accepted from adults aged 18 or over who are buying for legitimate laboratory, analytical or educational research. Every order includes a confirmation that the materials will not be used in humans or animals. All products are for in-vitro laboratory research, and are not medicines, foods or cosmetics.",
+        "Adults aged 18 or over may submit enquiries for legitimate laboratory, analytical or educational research. You must confirm research-only use when enquiring. These products are not medicines, foods or cosmetics and are not for human or veterinary use. See the Research use policy.",
       ],
       [
         "Why is payment an enquiry rather than an instant card payment?",
-        "Card payment is being set up, so nothing is charged on this site. When you place an order it reaches us as an enquiry: we check every line against stock, then send payment details to your email address within one working day. We never ask for card details by email or message.",
+        `${site.enquiriesLive && site.email ? "This site records an enquiry only. It does not take payment, confirm stock, place an order or send an automated receipt." : "Enquiries are currently closed while a monitored support inbox and reliable reply path are being set up. You can browse and save a basket, but the site does not collect contact details or take payment."} Availability, final price, delivery and payment would need to be agreed separately before an order could proceed. Do not send payment based on a basket.`,
       ],
       [
         "Do you offer multi-buy or volume pricing?",
-        "Orders over £150 receive 10% off, over £250 receive 15% off and over £400 receive 20% off, applied automatically in the basket. Retatrutide 10mg and Tirzepatide 20mg are also on a buy two, get the third free offer. Research institutions and trade buyers can contact us about larger volumes.",
+        `The basket shows indicative multi-buy pricing: ${spendTierLine()}. Eligible lines also show a buy two, get one free offer. No price or order is final until separately agreed. See the basket for the current calculation.`,
       ],
     ],
   },
@@ -32,16 +29,16 @@ export const faqGroups: FaqGroup[] = [
     title: "Delivery",
     items: [
       [
-        "How quickly do you dispatch?",
-        `Orders confirmed before ${cutoff} on a working day are dispatched the same day. Orders confirmed after ${cutoff}, at weekends or on bank holidays are dispatched on the next working day. Dispatch is by ${site.carrier}.`,
+        "When will my enquiry be dispatched?",
+        "An enquiry is not an order and is not scheduled for dispatch. If an order can proceed, availability, delivery and timing must first be agreed separately. See the Delivery page for indicative UK delivery information; no same-day dispatch is promised.",
       ],
       [
         "How much is delivery, and how is it tracked?",
-        `UK delivery is free on orders over ${threshold}; below that a flat fee of ${fee} applies. Every parcel is tracked, and the tracking number is sent on dispatch. Vials travel padded inside a plain outer parcel with no product names on the outside.`,
+        `The basket shows indicative UK delivery of ${fee}, or free from ${threshold} after discounts, subject to confirmation before any order. No parcel is sent when you submit an enquiry. See the Delivery page for the proposed service and coverage.`,
       ],
       [
         "What happens if my parcel is lost or arrives damaged?",
-        `Contact us within ${site.returnWindowDays} days of the expected delivery date with your order number. If the carrier confirms the parcel is lost, or a vial arrives damaged, we reship it free of charge. For damage, a photograph of the parcel and its contents helps us resolve it quickly.`,
+        `No parcel is dispatched from an enquiry. If you later place an order and delivery goes wrong, see the Returns page for reporting a loss, damage or an incorrect item and for your statutory rights. ${site.email ? "Check Contact for the available channel." : "The support inbox is not live yet."}`,
       ],
     ],
   },
@@ -49,16 +46,20 @@ export const faqGroups: FaqGroup[] = [
     title: "Quality and testing",
     items: [
       [
-        "How is purity verified right now?",
-        `${claimText("testing.batches-sent-for-testing")} Results appear on our Lab Reports page as each launch batch clears testing, and nothing is listed until we hold it. Until then, that page shows the testing status of each batch.`,
+        "Are purity results available?",
+        coas.length
+          ? "Only published certificates listed on the Lab Reports page have documented batch results. Check the specific product and batch; a certificate for one batch does not verify another."
+          : "No certificates are published yet, so no batch-specific purity or identity result can be checked here. The Lab Reports page shows the published register when reports become available; it does not track unpublished batches.",
       ],
       [
         "How do I check the certificate for my vial?",
-        "Every vial carries a batch number. Batch lookup on our Lab Reports page opens as certificates are published, so the number printed on your vial will resolve to its own certificate. Until the first certificates are live, that page shows each batch status and the lookup says no certificate is published yet.",
+        coas.length
+          ? "Use the batch lookup on the Lab Reports page to check whether a matching certificate is published. A lookup miss does not confirm the identity or status of a vial."
+          : "There is no published certificate to look up yet. The Lab Reports page lists available reports and currently has none; a number on packaging or a product image is not evidence of a verified batch.",
       ],
       [
         "What form are the peptides supplied in, and can they be used in humans?",
-        "Peptides are supplied as a lyophilised (freeze-dried) powder in sealed glass vials. Bacteriostatic water for reconstitution is sold separately. They are not medicines and must not be used in humans or animals.",
+        "Check each product page for its stated form and contents. These materials are supplied for research only, not for human or veterinary use. They are not medicines.",
       ],
     ],
   },
@@ -67,7 +68,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How should I store lyophilised peptides?",
-        "For long-term storage keep sealed vials frozen at -20°C, away from light and moisture. For shorter periods, 2 to 8°C refrigeration is suitable. Store it as directed as soon as your parcel arrives. Once reconstituted, keep the solution refrigerated at 2 to 8°C and avoid repeated freeze-thaw cycles.",
+        "Follow the product-specific label or documentation for storage conditions. Do not assume one temperature or shelf life applies to every compound. If the required handling information is unavailable, do not treat a generic guide as batch-specific evidence.",
       ],
     ],
   },
@@ -76,11 +77,13 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "Can I return an order?",
-        `Unopened items in their original condition can be returned within ${site.returnWindowDays} days of delivery. If a product has a quality problem, contact us and we will replace it or refund you. We cannot accept opened vials. See the Returns page for full details.`,
+        `An enquiry cannot be returned because no order is placed or payment taken. If an order is agreed later, the Returns page explains the ${site.returnWindowDays}-day change-of-mind process for eligible items and how to report faulty, damaged or incorrect goods. Opening an item does not remove statutory rights.`,
       ],
       [
-        "Is Vyrax Labs a real company?",
-        "Vyrax Labs is a UK-based supplier of research materials, operating through this website. Company registration details are being finalised and will be published in the site footer once confirmed. We would rather show an empty space than invent a registration number, so where a fact is not yet confirmed, the site says so.",
+        "Where can I find the trading and contact details?",
+        site.companyNumber
+          ? `The company number is ${site.companyNumber}. See About and Terms for the published identity and Contact for available channels.`
+          : `The legal trading identity and company number have not been published. ${site.email ? "Check Contact for the available channel." : "The support inbox is not live yet."} Check the About, Terms and Contact pages for current details before agreeing a separate order.`,
       ],
     ],
   },

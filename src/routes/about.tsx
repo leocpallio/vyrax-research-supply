@@ -3,8 +3,8 @@ import { FileCheck2, FlaskConical, Truck, ShieldCheck, type LucideIcon } from "l
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
 import { compounds } from "@/lib/catalog";
-import { shopSections } from "@/data/shop-sections";
-import { claimGate } from "@/lib/claims";
+import { coas } from "@/data/coa";
+import { site } from "@/data/site";
 import lab from "@/assets/vyrax-lab.jpg";
 
 export const Route = createFileRoute("/about")({
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/about")({
     pageHead(
       "/about",
       "About Vyrax Labs | UK Research Peptide Supplier",
-      "Vyrax Labs supplies research peptides from the UK with clear specifications and fast tracked dispatch for laboratory research.",
+      "Learn about Vyrax Labs research products, published documentation and enquiry-only ordering.",
     ),
   component: About,
 });
@@ -22,39 +22,48 @@ function About() {
   const tiles: [LucideIcon, string, string][] = [
     [
       FileCheck2,
-      claimGate("testing.certificates-published"),
-      claimGate("testing.public-certificates-body"),
+      "Published reports",
+      coas.length
+        ? `${coas.length} certificate entries in the lab reports register.`
+        : "No certificates published yet. Check the live register before relying on a batch claim.",
     ],
     [
       FlaskConical,
-      claimGate("testing.independent-lab"),
-      claimGate("testing.third-party-labs"),
+      "Specifications",
+      "Review each product page for available compound information; a specification is not a batch test result.",
     ],
-    [Truck, "Fast UK dispatch", "Same-day dispatch on working days before 2pm, tracked delivery."],
-    [ShieldCheck, "Research only", "Supplied strictly for laboratory research, never for human use."],
+    [Truck, "Enquiry first", "No payment, confirmed order or dispatch is created by an enquiry."],
+    [
+      ShieldCheck,
+      "Research only",
+      "Supplied strictly for laboratory research, never for human use.",
+    ],
   ];
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "About us" }]} />
         <p className="eyebrow">ABOUT VYRAX LABS</p>
-        <h1 className="page-title max-w-3xl">Research peptides, documented properly.</h1>
+        <h1 className="page-title max-w-3xl">Research compounds for laboratory use.</h1>
         <div className="grid md:grid-cols-2 gap-12 mt-10 items-center">
           <div className="text-muted-foreground leading-relaxed space-y-4">
             <p>
-              Vyrax Labs is a UK supplier of research peptides for laboratory, analytical and
-              educational research. We started with a simple view: a researcher should be able to
-              see exactly what they are buying before they buy it.
+              Vyrax Labs lists research peptides for laboratory, analytical and educational
+              research. The catalogue is open for browsing, but enquiry intake and paid orders are
+              not currently available.
             </p>
             <p>
-              That means compound pages carry the CAS number, molecular formula, molecular weight and
-              peer-reviewed references where those are published for the molecule. {claimGate("testing.batches-sent-for-testing")}{" "}
-              It also means clear pricing with cost per mg shown, so vial sizes are easy to compare.
+              Product pages show available specifications and indicative prices. Those details are
+              not a certificate of analysis. Check the{" "}
+              <Link to="/lab-reports" className="text-primary underline">
+                lab reports register
+              </Link>{" "}
+              for published batch documents; none are listed until an actual report is available.
             </p>
             <p>
-              Our catalogue covers {count} research compounds across metabolic, regenerative, growth
-              hormone secretagogue, longevity and pigmentation research, plus the supplies needed to
-              prepare them.
+              Browse {count} listed research compounds and the accompanying catalogue supplies.
+              Availability and final terms require separate confirmation before an order can
+              proceed.
             </p>
           </div>
           <img
@@ -74,6 +83,30 @@ function About() {
               <p className="text-sm text-muted-foreground mt-2">{b}</p>
             </div>
           ))}
+        </div>
+        <div className="mt-12 border border-border rounded-2xl p-6 space-y-3 text-sm text-muted-foreground">
+          <h2 className="font-heading font-semibold text-foreground text-lg">Trading details</h2>
+          <p>
+            Trading name: {site.name}. Legal entity: {site.legalName ?? "not yet published"}.
+          </p>
+          <p>
+            Company number: {site.companyNumber ?? "not yet published"}. Registered office:{" "}
+            {site.registeredOffice ?? "not yet published"}.
+          </p>
+          <p>
+            Support contact: {site.email ?? "inbox not live yet"}. Do not send parcels to an
+            unconfirmed address.
+          </p>
+          <p>
+            <Link to="/terms" className="text-primary underline">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link to="/contact" className="text-primary underline">
+              contact options
+            </Link>{" "}
+            show the current position.
+          </p>
         </div>
         <p className="mt-12">
           <Link to="/research-use-policy" className="text-primary underline">

@@ -21,16 +21,8 @@ import {
   SectionTitle,
   TrustStrip,
   ProductGrid,
-  DispatchCountdown,
 } from "@/components/Store";
-import {
-  compounds,
-  blends,
-  getCompound,
-  productPath,
-  gbp,
-  fromPrice,
-} from "@/lib/catalog";
+import { compounds, blends, getCompound, productPath, gbp, fromPrice } from "@/lib/catalog";
 import { coas } from "@/data/coa";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { guides } from "@/data/guides";
@@ -44,9 +36,9 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `Buy Peptides UK · ${modifier}Research Peptides | Vyrax Labs`;
+    const title = `${site.enquiriesLive && site.email ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Buy research peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500, GHK-Cu and ${compounds.length - 5}+ more.${batchTesting ? ` ${batchTesting},` : ""} same-day dispatch before ${site.dispatchCutoffHour - 12}pm, free tracked delivery over £${site.freeDeliveryThreshold}.`;
+    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.enquiriesLive && site.email ? "See delivery options before enquiring." : "Enquiries are not open yet; no payment is taken."}`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -100,11 +92,7 @@ const glp = ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"]
 type Tile = [LucideIcon, string, string];
 const testingTiles: Tile[] = isClaimAllowed("testing.hplc-ms-tested")
   ? [
-      [
-        TestTube2,
-        claimGate("testing.hplc-ms-tested"),
-        claimGate("testing.hplc-ms-tested-body"),
-      ],
+      [TestTube2, claimGate("testing.hplc-ms-tested"), claimGate("testing.hplc-ms-tested-body")],
       [
         FileCheck2,
         claimGate("testing.certificates-you-can-read"),
@@ -128,13 +116,13 @@ const expectations: Tile[] = [
   ...testingTiles,
   [
     Truck,
-    "Same-day tracked dispatch",
-    `${site.carrier}, free over £${site.freeDeliveryThreshold}. Order before ${site.dispatchCutoffHour - 12}pm on working days.`,
+    "Delivery information",
+    `See our delivery policy for terms and timing. Free tracked delivery over £${site.freeDeliveryThreshold}.`,
   ],
   [
     RotateCcw,
-    "Free reship guarantee",
-    "If a parcel is lost or arrives damaged, we send a replacement at no cost.",
+    "Parcel issue policy",
+    `Read the conditions for lost or damaged parcels in our returns policy; an enquiry does not schedule a shipment.`,
   ],
   [
     PackageCheck,
@@ -165,14 +153,17 @@ function Home() {
         <div className="container-main relative py-16 md:py-20">
           <div className="max-w-[680px]">
             <div className="eyebrow flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-verify" /> UK STOCK · DISPATCHED FROM THE UK
+              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · UK DELIVERY
             </div>
             <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
-              Buy research peptides UK. Dispatched the same day.
+              Research peptides for laboratory work.
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[560px]">
-              {compounds.length} research compounds in sealed vials, with same-day dispatch on
-              working days and free tracked UK delivery over £{site.freeDeliveryThreshold}.
+              Browse {compounds.length} research compounds, compare vial strengths and read the
+              available specifications.{" "}
+              {site.enquiriesLive && site.email
+                ? "Enquiries can be submitted online; no payment is taken."
+                : "Enquiries are not open yet; no payment is taken on this site."}
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button asChild className="rounded-full h-12 px-7 text-base">
@@ -190,7 +181,9 @@ function Home() {
             </div>
             <p className="mt-6 text-sm flex items-center gap-2">
               <Truck size={16} className="text-primary" />
-              <DispatchCountdown />
+              <Link to="/shipping" className="underline underline-offset-2">
+                Read delivery information
+              </Link>
             </p>
             <div className="mt-10 pt-6 border-t border-border/70">
               <TrustStrip />
@@ -206,7 +199,7 @@ function Home() {
           <div className="flex items-end justify-between gap-4">
             {/* A curated selection, not a sales ranking: the shop has no order history yet, so a
                 "most ordered" label would be a claim there is no data behind. */}
-            <SectionTitle eyebrow="START HERE" title="Widely studied research compounds" />
+            <SectionTitle eyebrow="START HERE" title="Explore research compounds" />
             <Link
               to="/shop"
               className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
@@ -222,13 +215,18 @@ function Home() {
       <section className="bg-ink text-ink-foreground">
         <div className="container-main py-16 grid lg:grid-cols-[1fr_1.4fr] gap-10 items-center">
           <div>
-            <span className="badge-promo">LAUNCH OFFER</span>
+            <span className="badge-promo">
+              {site.enquiriesLive && site.email ? "MULTI-BUY PRICING" : "INDICATIVE PRICING"}
+            </span>
             <h2 className="font-heading text-3xl md:text-4xl font-semibold mt-4">
-              Buy 2, get the 3rd free
+              {site.enquiriesLive && site.email
+                ? "Buy 2, get the 3rd free"
+                : "Compare research vial strengths"}
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
-              On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third comes off
-              automatically. Multi-buy pricing applies on top: {spendTierLine()}.
+              {site.enquiriesLive && site.email
+                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is included in the indicative estimate. Multi-buy pricing applies on top: ${spendTierLine()}.`
+                : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. Enquiries are not open until a monitored support channel is in place."}
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
               <Button asChild variant="secondary" className="rounded-full">
@@ -262,28 +260,30 @@ function Home() {
         <div className="container-main">
           <SectionTitle eyebrow="BROWSE BY SECTION" title="Shop by section" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {shopSections.map((c) => {
-              const n = productsInSection(compounds, c.slug).length;
-              return (
-                <Link
-                  key={c.slug}
-                  to="/collections/$slug"
-                  params={{ slug: c.slug }}
-                  className="category-tile group flex flex-col"
-                >
-                  <h3 className="font-heading text-lg font-semibold">{c.name}</h3>
-                  <div className="flex items-center justify-between mt-6 text-sm">
-                    <span className="text-muted-foreground">
-                      {n ? `${n} product${n === 1 ? "" : "s"}` : "Coming soon"}
-                    </span>
-                    <ArrowRight
-                      className="text-primary group-hover:translate-x-1 transition-transform"
-                      size={18}
-                    />
-                  </div>
-                </Link>
-              );
-            })}
+            {shopSections
+              .filter((c) => productsInSection(compounds, c.slug).length > 0)
+              .map((c) => {
+                const n = productsInSection(compounds, c.slug).length;
+                return (
+                  <Link
+                    key={c.slug}
+                    to="/collections/$slug"
+                    params={{ slug: c.slug }}
+                    className="category-tile group flex flex-col"
+                  >
+                    <h3 className="font-heading text-lg font-semibold">{c.name}</h3>
+                    <div className="flex items-center justify-between mt-6 text-sm">
+                      <span className="text-muted-foreground">
+                        {n} product{n === 1 ? "" : "s"}
+                      </span>
+                      <ArrowRight
+                        className="text-primary group-hover:translate-x-1 transition-transform"
+                        size={18}
+                      />
+                    </div>
+                  </Link>
+                );
+              })}
             <Link to="/calculator" className="category-tile group flex flex-col bg-tint">
               <h3 className="font-heading text-lg font-semibold">Reconstitution calculator</h3>
               <p className="text-muted-foreground text-sm mt-1 flex-1">
@@ -311,15 +311,11 @@ function Home() {
                 claimGate("testing.independent-lab"),
                 claimGate("testing.batches-sent-for-testing"),
               ],
-              [
-                "03",
-                "Batch documentation",
-                claimGate("testing.batch-documented"),
-              ],
+              ["03", "Batch documentation", claimGate("testing.batch-documented")],
               [
                 "04",
-                "Tracked dispatch",
-                `Orders before ${site.dispatchCutoffHour - 12}pm on working days leave the same day with ${site.carrier}.`,
+                "Delivery information",
+                `Review our shipping policy before enquiring. Free tracked UK delivery over £${site.freeDeliveryThreshold}.`,
               ],
             ].map(([n, t, b]) => (
               <div key={n} className="border-t-2 border-primary pt-5">
@@ -458,8 +454,7 @@ function Home() {
                 per mg so you can compare.
               </p>
               <p>
-                Orders placed before {site.dispatchCutoffHour - 12}pm on a working day are
-                dispatched the same day with {site.carrier}, and delivery is free over £
+                See our delivery policy for terms and timing. Delivery is free over £
                 {site.freeDeliveryThreshold}. All products are sold strictly for laboratory research
                 use only.
               </p>
@@ -485,9 +480,7 @@ function Home() {
             <h2 className="font-heading text-2xl font-semibold">
               Buying for a lab or research group?
             </h2>
-            <p className="text-muted-foreground mt-1">
-              Spend savings apply automatically: 10% over £150, 15% over £250, 20% over £400.
-            </p>
+            <p className="text-muted-foreground mt-1">Multi-buy pricing: {spendTierLine()}.</p>
           </div>
           <Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full">
             <Link to="/contact">

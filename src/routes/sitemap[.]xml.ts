@@ -25,16 +25,14 @@ const STATIC = [
 ] as const;
 
 function build() {
-  const today = new Date().toISOString().slice(0, 10);
-  const urls: { loc: string; priority: string; changefreq: string; lastmod: string }[] = [];
-  for (const [path, priority, changefreq] of STATIC)
-    urls.push({ loc: path, priority, changefreq, lastmod: today });
+  // A request date is not a content change date. Only dated source content gets lastmod.
+  const urls: { loc: string; priority: string; changefreq: string; lastmod?: string }[] = [];
+  for (const [path, priority, changefreq] of STATIC) urls.push({ loc: path, priority, changefreq });
   for (const c of categories)
     urls.push({
       loc: `/category/${c.slug}`,
       priority: "0.8",
       changefreq: "weekly",
-      lastmod: today,
     });
   // Collection pages are the listing pages the site links to from the nav, footer and product
   // pages, so they belong in the sitemap alongside the category hubs.
@@ -43,7 +41,6 @@ function build() {
       loc: `/collections/${s.slug}`,
       priority: "0.7",
       changefreq: "weekly",
-      lastmod: today,
     });
   const hubs = new Set(compounds.map((c) => productPath(c.slug)));
   for (const slug of allProductSlugs()) {
@@ -52,7 +49,6 @@ function build() {
       loc,
       priority: hubs.has(loc) ? "0.9" : "0.7",
       changefreq: "weekly",
-      lastmod: today,
     });
   }
   for (const g of guides)
@@ -67,7 +63,7 @@ function build() {
     .filter((u) => (seen.has(u.loc) ? false : (seen.add(u.loc), true)))
     .map(
       (u) =>
-        `  <url><loc>${SITE_URL}${u.loc === "/" ? "/" : u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
+        `  <url><loc>${SITE_URL}${u.loc === "/" ? "/" : u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
     )
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;

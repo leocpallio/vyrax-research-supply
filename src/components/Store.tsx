@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   Search,
   ShoppingBag,
@@ -22,50 +22,37 @@ import {
   compounds,
   featured,
   gbp,
-  addCart,
   readCart,
   productImage,
   productPath,
   searchCompounds,
   fromPrice,
+  costPerUnitLabel,
   isB2G1,
-  cartLine,
   getCategory,
   type Compound,
   type CartItem,
 } from "@/lib/catalog";
-import { site, dispatchInfo, spendTierLine } from "@/data/site";
+import { site, spendTierLine } from "@/data/site";
 import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
 import { claimFilled, claimGate, claimText } from "@/lib/claims";
-import { supabase } from "@/integrations/supabase/client";
 
 // ---------------------------------------------------------------- Announcement bar
-const announcements = [
-  `Free tracked UK delivery over £${site.freeDeliveryThreshold}`,
-  `Same-day dispatch on orders before ${site.dispatchCutoffHour - 12}pm`,
-  `Buy 2, get the 3rd free: ${site.b2g1
-    .map((b) => {
-      const c = compounds.find((x) => x.slug === b.slug);
-      return c ? `${c.name} ${b.strength}` : b.slug;
-    })
-    .join(" and ")}`,
-  `Multi-buy pricing: ${spendTierLine()}`,
-];
+const announcements =
+  site.enquiriesLive && site.email
+    ? [
+        `Indicative free UK delivery over £${site.freeDeliveryThreshold}`,
+        `Multi-buy pricing: ${spendTierLine()}`,
+      ]
+    : ["Research compounds for laboratory use only", "Enquiries are not open yet"];
 
 function AnnouncementBar() {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setI((n) => (n + 1) % announcements.length), 4500);
-    return () => clearInterval(t);
-  }, []);
   return (
     <div className="bg-ink text-ink-foreground text-xs md:text-sm font-medium">
       <div className="container-main h-9 flex items-center justify-center gap-8">
-        <span className="md:hidden truncate" aria-live="polite">
-          {announcements[i]}
-        </span>
+        <span className="md:hidden truncate">{announcements[0]}</span>
         <div className="hidden md:flex items-center gap-6">
           {announcements.map((a, n) => (
             <span key={a} className="flex items-center gap-6">
@@ -83,24 +70,36 @@ function AnnouncementBar() {
 function SearchBox({ onDone, autoFocus = false }: { onDone?: () => void; autoFocus?: boolean }) {
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
+  const [focused, setFocused] = useState(false);
+  const resultsId = useId();
   const navigate = useNavigate();
   const matches = searchCompounds(q, 7);
+  const open = focused && q.trim().length >= 2;
   const go = (c?: Compound) => {
-    if (c) window.location.assign(productPath(c.slug));
+    if (c) navigate({ to: productPath(c.slug) });
     else navigate({ to: "/shop", search: { q } });
     setQ("");
+    setFocused(false);
     onDone?.();
   };
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full"
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
+    >
       <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
       <Input
         aria-label="Search peptides"
         role="combobox"
-        aria-expanded={matches.length > 0}
-        aria-controls="search-results"
+        aria-autocomplete="list"
+        aria-expanded={open}
+        aria-controls={open ? resultsId : undefined}
+        aria-activedescendant={open && matches[active] ? `${resultsId}-${active}` : undefined}
         autoFocus={autoFocus}
         value={q}
+        onFocus={() => setFocused(true)}
         onChange={(e) => {
           setQ(e.target.value);
           setActive(0);
@@ -108,56 +107,62 @@ function SearchBox({ onDone, autoFocus = false }: { onDone?: () => void; autoFoc
         onKeyDown={(e) => {
           if (e.key === "ArrowDown") {
             e.preventDefault();
-            setActive((a) => Math.min(a + 1, matches.length - 1));
+            setActive((a) => Math.min(a + 1, Math.max(0, matches.length - 1)));
           } else if (e.key === "ArrowUp") {
             e.preventDefault();
             setActive((a) => Math.max(a - 1, 0));
           } else if (e.key === "Enter") {
             e.preventDefault();
-            go(matches[active]);
-          } else if (e.key === "Escape") setQ("");
+            go(open ? matches[active] : undefined);
+          } else if (e.key === "Escape") {
+            setQ("");
+            setFocused(false);
+          }
         }}
         placeholder="Search peptides, e.g. BPC-157"
         className="w-full pl-9 rounded-full bg-surface border-border"
       />
-      {matches.length > 0 && (
-        <div
-          id="search-results"
-          role="listbox"
-          className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-xl rounded-xl overflow-hidden z-50 min-w-[300px]"
-        >
-          {matches.map((c, n) => {
-            const img = productImage(c.slug);
-            return (
-              <a
-                key={c.slug}
-                role="option"
-                aria-selected={n === active}
-                href={productPath(c.slug)}
-                onMouseEnter={() => setActive(n)}
-                onClick={() => {
-                  setQ("");
-                  onDone?.();
-                }}
-                className={`flex items-center gap-3 px-3 py-2.5 text-sm ${n === active ? "bg-surface" : ""}`}
-              >
-                <img
-                  src={img.small ?? img.src}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="size-10 rounded-md object-cover bg-surface"
-                />
-                <span className="flex-1 min-w-0">
-                  <span className="block font-semibold truncate">{c.name}</span>
-                  <span className="block text-xs text-muted-foreground truncate">
-                    {c.strengths.map((s) => s.label).join(" · ")} · {getCategory(c.category)?.name}
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border shadow-xl rounded-xl overflow-hidden z-50 min-w-[300px]">
+          <div id={resultsId} role="listbox" aria-label="Matching compounds">
+            {matches.map((c, n) => {
+              const img = productImage(c.slug);
+              return (
+                <a
+                  key={c.slug}
+                  id={`${resultsId}-${n}`}
+                  role="option"
+                  aria-selected={n === active}
+                  href={productPath(c.slug)}
+                  onMouseEnter={() => setActive(n)}
+                  onClick={() => {
+                    setQ("");
+                    onDone?.();
+                  }}
+                  className={`flex items-center gap-3 px-3 py-2.5 text-sm ${n === active ? "bg-surface" : ""}`}
+                >
+                  <img
+                    src={img.small ?? img.src}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="size-10 rounded-md object-cover bg-surface"
+                  />
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-semibold truncate">{c.name}</span>
+                    <span className="block text-xs text-muted-foreground truncate">
+                      {c.strengths.map((s) => s.label).join(" · ")} ·{" "}
+                      {getCategory(c.category)?.name}
+                    </span>
                   </span>
-                </span>
-                <span className="font-mono text-xs">from {gbp(fromPrice(c))}</span>
-              </a>
-            );
-          })}
+                  <span className="font-mono text-xs">from {gbp(fromPrice(c))}</span>
+                </a>
+              );
+            })}
+          </div>
+          {matches.length === 0 && (
+            <p className="px-3 py-2 text-sm text-muted-foreground">No matching compounds</p>
+          )}
           <button
             type="button"
             onClick={() => go()}
@@ -214,6 +219,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   const [adult, setAdult] = useState(false);
   const [research, setResearch] = useState(false);
   const [count, setCount] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Remember the confirmation for 30 days so returning researchers are not asked on every visit.
     const stamp = Number(localStorage.getItem("vyrax-age") || 0);
@@ -223,6 +229,18 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("vyrax-cart", sync);
     return () => window.removeEventListener("vyrax-cart", sync);
   }, []);
+  useEffect(() => {
+    if (!age) return;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [age]);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <a
@@ -243,10 +261,10 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                 Shop peptides
               </Link>
               <div className="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:grid group-focus-within:grid grid-cols-2 gap-1 w-[520px] bg-background border border-border rounded-xl shadow-xl p-3">
-                 {shopSections.map((c) => (
+                {shopSections.map((c) => (
                   <Link
                     key={c.slug}
-                     to="/collections/$slug"
+                    to="/collections/$slug"
                     params={{ slug: c.slug }}
                     className="rounded-lg p-3 hover:bg-surface"
                   >
@@ -342,14 +360,34 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       {age && (
         <div className="fixed inset-0 z-[100] bg-ink/80 flex items-center justify-center p-4">
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Research access confirmation"
+            aria-labelledby="research-access-title"
+            aria-describedby="research-access-description"
+            onKeyDown={(e) => {
+              if (e.key !== "Tab") return;
+              const nodes = dialogRef.current?.querySelectorAll<HTMLElement>(
+                "input:not(:disabled), button:not(:disabled), a[href]",
+              );
+              if (!nodes?.length) return;
+              const first = nodes[0];
+              const last = nodes[nodes.length - 1];
+              if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last?.focus();
+              } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first?.focus();
+              }
+            }}
             className="bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl"
           >
             <FlaskConical className="text-primary mb-5" size={30} />
-            <h2 className="font-heading text-2xl font-semibold">Research access</h2>
-            <p className="text-muted-foreground mt-3 mb-6">
+            <h2 id="research-access-title" className="font-heading text-2xl font-semibold">
+              Research access
+            </h2>
+            <p id="research-access-description" className="text-muted-foreground mt-3 mb-6">
               Vyrax Labs supplies materials for laboratory research only. Please confirm the
               following before continuing.
             </p>
@@ -384,7 +422,12 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
             </Button>
             <p className="text-xs text-muted-foreground mt-4 text-center">
               Read our{" "}
-              <Link to="/research-use-policy" className="underline" onClick={() => setAge(false)}>
+              <Link
+                to="/research-use-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
                 research use policy
               </Link>
               .
@@ -397,47 +440,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------- Footer
-function Newsletter() {
-  const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
-  return (
-    <form
-      className="flex gap-2 mt-4"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setState("busy");
-        const { error } = await supabase
-          .from("mailing_list")
-          .insert({ email: email.trim().toLowerCase() });
-        // A duplicate address is still a successful subscribe from the visitor's point of view.
-        setState(!error || error.code === "23505" ? "done" : "error");
-      }}
-    >
-      {state === "done" ? (
-        <p className="text-sm text-ink-foreground">Subscribed. Thank you.</p>
-      ) : (
-        <>
-          <Input
-            type="email"
-            required
-            aria-label="Email address"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-ink-panel border-ink-line text-ink-foreground placeholder:text-ink-muted rounded-full"
-          />
-          <Button disabled={state === "busy"} className="rounded-full shrink-0">
-            Subscribe
-          </Button>
-        </>
-      )}
-      {state === "error" && (
-        <p className="text-xs text-ink-muted">Could not subscribe. Please try again.</p>
-      )}
-    </form>
-  );
-}
-
 function Footer() {
   // Unknown company facts render as an honest absence, never as an invented value. Every line here
   // comes from the claim registry, so a fact appearing in the footer means the evidence manifest
@@ -464,11 +466,15 @@ function Footer() {
             ],
             [
               Truck,
-              "Tracked UK delivery",
-              `Free over £${site.freeDeliveryThreshold}, dispatched same day before ${site.dispatchCutoffHour - 12}pm`,
+              "Indicative UK delivery",
+              `If ordering opens, see delivery details and the proposed £${site.freeDeliveryThreshold} free-shipping threshold`,
             ],
             [PackageCheck, "Protective packaging", "Plain outer parcel, padded vials"],
-            [RotateCcw, "Free reship guarantee", "Lost or damaged in transit? We send it again"],
+            [
+              RotateCcw,
+              "Returns policy",
+              `Unopened items: ${site.returnWindowDays} days from delivery`,
+            ],
           ].map(([Icon, t, d]) => {
             const I = Icon as typeof Truck;
             return (
@@ -487,11 +493,8 @@ function Footer() {
         <div className="lg:col-span-2">
           <Wordmark tone="light" title="Vyrax Labs" className="h-[19px] w-auto" />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-sm">
-            Research peptides for laboratory use, with batch documentation and tracked UK delivery.
+            Research peptides for laboratory use. Read compound specifications before enquiring.
           </p>
-          <p className="mt-6 font-semibold text-sm">Batch releases and restocks</p>
-          <Newsletter />
-          <p className="mt-2 text-[11px] text-ink-muted">No spam. Unsubscribe any time.</p>
         </div>
         <div>
           <h3 className="font-semibold mb-5">Shop</h3>
@@ -574,7 +577,7 @@ export function ProductCard({ product }: { product: Compound }) {
           src={img.src}
           srcSet={img.srcSet}
           sizes="(min-width: 1024px) 300px, 50vw"
-          alt={`${product.name} ${s.label} research vial`}
+          alt={`${product.name} ${s.label} ${img.isRender ? "illustrative vial render" : "vial illustration"}`}
           loading="lazy"
           width={1024}
           height={1024}
@@ -603,28 +606,51 @@ export function ProductCard({ product }: { product: Compound }) {
         >
           {product.name}
         </a>
-        <p className="text-xs text-muted-foreground mt-1 font-mono">
-          {product.strengths.map((x) => x.label).join(" · ")}
-        </p>
-        <div className="flex items-end justify-between gap-2 mt-3 mt-auto pt-3">
+        <div className="flex flex-wrap gap-1.5 mt-2" aria-label={`${product.name} strengths`}>
+          {product.strengths.map((x) => (
+            <a
+              key={x.label}
+              href={productPath(product.slug, x.label)}
+              className="rounded-full border border-border px-2 py-1 text-xs font-mono hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+              aria-label={`${product.name} ${x.label} specifications`}
+            >
+              {x.label}
+            </a>
+          ))}
+        </div>
+        <div className="flex items-end justify-between gap-2 mt-auto pt-3">
           <div>
             <span className="text-xs text-muted-foreground">
               {product.strengths.length > 1 ? "From" : "Price"}
             </span>
             <p className="font-heading text-xl font-bold">{gbp(fromPrice(product))}</p>
+            {product.category !== "peptide-blends" &&
+              product.category !== "lab-supplies" &&
+              s.unit === "mg" && (
+                <p className="text-xs text-muted-foreground">
+                  {costPerUnitLabel(
+                    product.strengths.find((x) => x.price === fromPrice(product)) ?? s,
+                  )}
+                </p>
+              )}
           </div>
-          <Link
-            to="/lab-reports"
-            title={coa ? "View certificate" : "Lab reports"}
-            aria-label={`Lab reports for ${product.name}`}
-            className={coa ? "text-verify" : "text-muted-foreground hover:text-primary"}
-          >
-            <FileCheck2 size={19} />
-          </Link>
+          {coa && (
+            <Link
+              to="/lab-reports"
+              title="View certificate"
+              aria-label={`Lab reports for ${product.name}`}
+              className="text-verify"
+            >
+              <FileCheck2 size={19} />
+            </Link>
+          )}
         </div>
-        <Button className="w-full mt-4 rounded-full" onClick={() => addCart(cartLine(product, s))}>
-          Add {s.label} to basket
-        </Button>
+        <a
+          href={href}
+          className="mt-4 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-sm min-h-10 hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          View specifications <ArrowRight size={16} className="ml-2" />
+        </a>
       </div>
     </div>
   );
@@ -659,45 +685,17 @@ export function TrustStrip() {
         </span>
       )}
       <span className="flex items-center gap-2">
-        <Truck size={18} className="text-primary" /> Tracked UK delivery
+        <Truck size={18} className="text-primary" /> Delivery information
       </span>
       <span className="flex items-center gap-2">
-        <PackageCheck size={18} className="text-primary" /> Same-day dispatch before{" "}
-        {site.dispatchCutoffHour - 12}pm
-      </span>
-      <span className="flex items-center gap-2">
-        <ShieldCheck size={18} className="text-primary" /> Free reship guarantee
+        <ShieldCheck size={18} className="text-primary" /> Research use only
       </span>
     </div>
   );
 }
 
 export function DispatchCountdown({ className = "" }: { className?: string }) {
-  const [info, setInfo] = useState<ReturnType<typeof dispatchInfo> | null>(null);
-  useEffect(() => {
-    setInfo(dispatchInfo());
-    const t = setInterval(() => setInfo(dispatchInfo()), 30000);
-    return () => clearInterval(t);
-  }, []);
-  if (!info)
-    return (
-      <span className={className}>
-        Same-day dispatch on working days before {site.dispatchCutoffHour - 12}pm
-      </span>
-    );
-  return (
-    <span className={className}>
-      {info.today ? (
-        <>
-          Order within <strong className="font-mono">{info.label}</strong> for dispatch today
-        </>
-      ) : (
-        <>
-          Order now for dispatch <strong>{info.label}</strong>
-        </>
-      )}
-    </span>
-  );
+  return <span className={className}>Delivery times are detailed in our shipping policy.</span>;
 }
 
 export function Disclaimer() {

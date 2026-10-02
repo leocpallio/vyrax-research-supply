@@ -12,7 +12,9 @@ import { abs } from "@/data/site";
 export const Route = createFileRoute("/lab-reports")({
   head: () => {
     const title = "Peptide Lab Reports & Certificates of Analysis (CoA) | Vyrax Labs";
-    const desc = claimText("testing.lab-reports-meta") ?? "Quality documentation for Vyrax Labs research peptides.";
+    const desc = coas.length
+      ? (claimText("testing.lab-reports-meta") ?? "Available documents for listed batches.")
+      : "No certificates of analysis are currently published. Check this register for actual batch documents, not an unpublished testing status.";
     return {
       meta: [
         { title },
@@ -50,7 +52,9 @@ function Reports() {
         <p className="eyebrow">TRANSPARENCY</p>
         <h1 className="page-title">Lab reports and certificates of analysis</h1>
         <p className="text-muted-foreground max-w-2xl mt-4">
-          {claimText("testing.lab-reports-hub-body")}
+          {coas.length
+            ? "This register lists the certificates currently published. A report applies only to the batch it names; compare its methods and results with the PDF."
+            : "No certificates are published yet. This register shows published documents only, not the status of unpublished testing or a promise that any batch will be certified."}
         </p>
 
         <form onSubmit={lookup} className="mt-8 max-w-xl flex gap-2">
@@ -58,7 +62,7 @@ function Reports() {
             <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
             <Input
               aria-label="Batch number"
-              placeholder="Enter the batch number from your vial"
+              placeholder="Enter a batch number to search published reports"
               value={q}
               onChange={(e) => {
                 setQ(e.target.value);
@@ -67,7 +71,7 @@ function Reports() {
               className="pl-9 rounded-full"
             />
           </div>
-          <Button className="rounded-full">Verify batch</Button>
+          <Button className="rounded-full">Search reports</Button>
         </form>
         {result === "none" && (
           <p role="status" className="mt-4 text-sm">
@@ -77,16 +81,16 @@ function Reports() {
                 <Link to="/contact" className="text-primary underline">
                   contact us
                 </Link>{" "}
-                and we will confirm it.
+                to ask about documentation if a support channel is available.
               </>
             ) : (
               <>
-                Batch lookup is not live yet: no certificates are published, so no batch number will
-                resolve. Check back here, or look at the{" "}
+                No certificates are published, so no batch number can resolve here yet. The register
+                below is the complete list of published documents. Browse the{" "}
                 <Link to="/shop" className="text-primary underline">
                   compound pages
                 </Link>{" "}
-                for the current testing status.
+                for product specifications, not for an unpublished batch status.
               </>
             )}
           </p>
@@ -99,8 +103,7 @@ function Reports() {
             <p className="font-semibold text-verify">{claimText("testing.batch-verified")}</p>
             <p className="mt-1">
               {getCompound(hit.compound)?.name} {hit.strength}, batch {hit.batch}: {hit.purity}%
-              purity ({hit.method}), tested by {hit.lab}.
-              {exp && <> Expiry {monthLabel(exp)}.</>}
+              purity ({hit.method}), tested by {hit.lab}.{exp && <> Expiry {monthLabel(exp)}.</>}
             </p>
             <a
               href={hit.file}
@@ -165,7 +168,8 @@ function Reports() {
               <FileCheck2 className="mx-auto text-muted-foreground" />
               <p className="font-semibold mt-3">No certificates published yet</p>
               <p className="text-sm text-muted-foreground mt-1 max-w-lg mx-auto">
-                {claimText("testing.pending-status")}
+                No report is listed in the register. We cannot verify purity or identity from a
+                product description, packaging image or an unpublished batch number.
               </p>
             </div>
           )}
@@ -173,7 +177,12 @@ function Reports() {
 
         {pending.length > 0 && coas.length > 0 && (
           <section className="mt-12">
-            <h2 className="font-heading text-xl font-semibold mb-4">Awaiting publication</h2>
+            <h2 className="font-heading text-xl font-semibold mb-4">
+              Products without a published report
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              This is not a testing queue or a promise that a report is in progress.
+            </p>
             <div className="flex flex-wrap gap-2">
               {pending.map((c) => (
                 <a key={c.slug} href={productPath(c.slug)} className="chip">
@@ -184,7 +193,12 @@ function Reports() {
           </section>
         )}
 
-        <section className="mt-16 grid md:grid-cols-3 gap-5">
+        <p className="mt-12 text-sm text-muted-foreground">
+          The methods below explain terminology you may encounter in a certificate. They do not mean
+          these tests have been performed on any listed product. Only a published batch report can
+          establish which methods and results apply.
+        </p>
+        <section className="mt-6 grid md:grid-cols-3 gap-5">
           {(
             [
               [
@@ -195,12 +209,12 @@ function Reports() {
               [
                 Microscope,
                 "Mass spectrometry identity",
-                "Mass spectrometry measures molecular mass and confirms the material is the stated compound, not a related sequence.",
+                "Mass spectrometry measures molecular mass and can support an identity assessment when the method and results are documented. It is not, by itself, proof of a particular sequence.",
               ],
               [
                 Scale,
                 "Net content",
-                "Where reported, quantitative analysis confirms the amount of peptide in the vial against the labelled strength.",
+                "Where a report includes a validated quantitative result, compare the reported net content with the labelled strength.",
               ],
             ] as const
           ).map(([I, t, b]) => (

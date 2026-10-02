@@ -25,8 +25,10 @@ export const site = {
   carrier: "Royal Mail Tracked 24",
   // Payments: list only methods that are actually live at checkout.
   paymentMethods: [] as string[], // e.g. ['Visa', 'Mastercard', 'Apple Pay', 'Bank transfer']
+  // Enable only after enquiries notify a monitored inbox and a real reply path has been tested.
+  enquiriesLive: false,
   returnWindowDays: 14,
-  // No live inventory feed yet: every strength shows "Available to order" unless it sets its own stock state.
+  // No live inventory feed yet: strength availability must be confirmed before any order.
   // Switch to 'in' only once stock levels are actually tracked.
   defaultStock: "available" as import("./types").StockState,
   // Offers (mirrored in priceBasket)

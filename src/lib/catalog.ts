@@ -143,7 +143,7 @@ export const hasB2G1 = (c: Compound) => c.strengths.some((s) => isB2G1(c.slug, s
 export const stockOf = (s: Strength): StockState => s.stock ?? site.defaultStock;
 export const stockLabel: Record<StockState, string> = {
   in: "In stock",
-  available: "Available to order",
+  available: "Availability to be confirmed",
   low: "Low stock",
   out: "Out of stock",
   preorder: "Pre-order",

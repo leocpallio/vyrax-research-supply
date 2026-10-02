@@ -7,8 +7,7 @@ import { expiryFor, findBatch, monthLabel } from "@/data/coa";
 import { getCompound, productPath } from "@/lib/catalog";
 import { site } from "@/data/site";
 
-// Batch verification: the page the QR code on every Vyrax vial opens (via the short /v/<batch> link).
-// Reads the published certificates in src/data/coa.ts. An unknown batch gets an honest "not found"
+// Reads published certificates in src/data/coa.ts. An unknown batch gets an honest "not found"
 // page rather than a 404, because the batch was typed in or scanned by a customer.
 export const Route = createFileRoute("/verify/$batch")({
   // params arrive decoded; batch codes are letters, digits and hyphens, so anything longer is junk
@@ -76,8 +75,8 @@ function Verify() {
               </span>
             </h1>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              This batch number matches a published certificate of analysis from an independent
-              laboratory.
+              This batch number matches a certificate in the published register. Compare the
+              laboratory, method and document itself before relying on the reported result.
             </p>
             <div className="mt-8 max-w-xl border border-verify/50 bg-verify/5 rounded-2xl overflow-hidden">
               <table className="w-full text-sm">
@@ -87,11 +86,7 @@ function Verify() {
                       <th scope="row" className="p-4 text-left font-semibold w-44">
                         {k}
                       </th>
-                      <td
-                        className={
-                          k === "Batch" || k === "Purity" ? "p-4 font-mono" : "p-4"
-                        }
-                      >
+                      <td className={k === "Batch" || k === "Purity" ? "p-4 font-mono" : "p-4"}>
                         {v}
                       </td>
                     </tr>
@@ -125,15 +120,15 @@ function Verify() {
                   <Link to="/contact" className="text-primary underline">
                     contact us
                   </Link>{" "}
-                  and we will confirm it.
+                  to ask what documentation is available.
                 </>
               ) : (
                 <>
                   No published certificate matches batch{" "}
                   <span className="font-mono text-foreground break-all">{batch || "(blank)"}</span>.
-                  Until the first certificates are published, no batch number will resolve. The Lab
-                  Reports page shows the current testing status of each batch, and the number printed on
-                  your vial will be the one to check here once certificates go live.
+                  No certificates are published yet, so no batch number can resolve. The Lab Reports
+                  page lists published documents only; it does not track unpublished testing. A code
+                  printed on a product render or vial is not proof of a tested batch.
                 </>
               )}
             </p>

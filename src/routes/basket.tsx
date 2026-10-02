@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Trash2, ArrowRight, Truck, Tag, Minus, Plus } from "lucide-react";
-import { StoreShell, Disclaimer, DispatchCountdown } from "@/components/Store";
+import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import {
   readCart,
@@ -68,9 +68,9 @@ function Basket() {
                 <p className="text-sm font-semibold flex items-center gap-2">
                   <Truck size={16} className="text-primary" />
                   {p.freeDeliveryGap > 0 ? (
-                    <>Add {gbp(p.freeDeliveryGap)} more for free tracked delivery</>
+                    <>Add {gbp(p.freeDeliveryGap)} more to reach the free UK delivery threshold</>
                   ) : (
-                    <>Your order qualifies for free tracked delivery</>
+                    <>Basket meets the free UK delivery threshold</>
                   )}
                 </p>
                 <div className="h-2 bg-surface rounded-full mt-3 overflow-hidden">
@@ -81,8 +81,8 @@ function Basket() {
                 </div>
                 {p.nextTier && (
                   <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
-                    <Tag size={13} /> Spend {gbp(p.nextTier.gap)} more to save{" "}
-                    {Math.round(p.nextTier.rate * 100)}% on your order
+                    <Tag size={13} /> Add {gbp(p.nextTier.gap)} more for a{" "}
+                    {Math.round(p.nextTier.rate * 100)}% spend tier
                   </p>
                 )}
               </div>
@@ -167,14 +167,14 @@ function Basket() {
               )}
             </div>
             <aside className="bg-surface p-7 rounded-2xl h-fit">
-              <h2 className="font-heading text-xl font-semibold">Order summary</h2>
+              <h2 className="font-heading text-xl font-semibold">Enquiry estimate</h2>
               <div className="flex justify-between mt-6">
                 <span>Subtotal</span>
                 <strong>{gbp(p.subtotal)}</strong>
               </div>
               {p.freeVials > 0 && (
                 <div className="flex justify-between mt-3 text-sm text-verify">
-                  <span>Buy 2 get 1 free</span>
+                  <span>Multi-buy discount (buy 2, get 1 free)</span>
                   <span>-{gbp(p.freeVials)}</span>
                 </div>
               )}
@@ -185,21 +185,27 @@ function Basket() {
                 </div>
               )}
               <div className="flex justify-between mt-3 text-sm">
-                <span>Tracked delivery</span>
+                <span>Indicative UK delivery</span>
                 <span>{p.delivery === 0 ? "Free" : gbp(p.delivery)}</span>
               </div>
               <div className="flex justify-between mt-4 pt-4 border-t border-border font-semibold text-lg">
-                <span>Total</span>
+                <span>Indicative total</span>
                 <span>{gbp(p.total)}</span>
               </div>
               <Button asChild className="w-full mt-6 rounded-full h-12 text-base">
                 <Link to="/checkout">
-                  Checkout <ArrowRight />
+                  {site.enquiriesLive && site.email
+                    ? "Continue to enquiry"
+                    : "Check enquiry availability"}{" "}
+                  <ArrowRight />
                 </Link>
               </Button>
-              <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1.5">
-                <Truck size={13} />
-                <DispatchCountdown />
+              <p className="text-xs text-muted-foreground mt-4">
+                No charge or confirmed order. Availability and final price must be agreed
+                separately.{" "}
+                {site.enquiriesLive && site.email
+                  ? "No automated email or dispatch is triggered by an enquiry."
+                  : "Enquiries are closed while the support inbox is being set up; no contact details are collected."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
                 For research use only. Not for human consumption.

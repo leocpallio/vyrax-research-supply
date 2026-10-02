@@ -6,12 +6,12 @@ import {
   FAQ,
   SectionTitle,
   Breadcrumbs,
-  TrustStrip,
 } from "@/components/Store";
 import { categories, getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/catalog";
-import { abs } from "@/data/site";
+import { shopSections, sectionFor } from "@/data/shop-sections";
+import { abs, site } from "@/data/site";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
-import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
+import { claimGate, isClaimAllowed } from "@/lib/claims";
 
 export const Route = createFileRoute("/category/$slug")({
   loader: ({ params }) => {
@@ -28,18 +28,17 @@ export const Route = createFileRoute("/category/$slug")({
     const titleTag = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} | `
       : "";
-    const title = `Buy ${c.seoName} UK | ${titleTag}Vyrax Labs`;
-    const batchCerts = claimText("testing.batch-certificates");
-    const desc = `${c.blurb} ${list.length} compounds from ${gbp(low)},${batchCerts ? ` ${batchCerts.toLowerCase()},` : ""} same-day dispatch and free tracked UK delivery over £50.`;
+    const title = `${c.seoName} UK | ${titleTag}Vyrax Labs`;
+    const desc = `${c.blurb} Browse ${list.length} research compounds from ${gbp(low)}. ${site.paymentMethods.length ? "For research use only." : "Enquiry only; no payment is taken online."}`;
+    const entries = list.map((p) => ({ name: p.name, path: productPath(p.slug) }));
     const itemList = {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: c.seoName,
-      itemListElement: list.map((p, i) => ({
+      itemListElement: entries.map((entry, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: abs(productPath(p.slug)),
-        name: p.name,
+        item: { "@type": "Product", name: entry.name, url: abs(entry.path) },
       })),
     };
     const crumbs = {
@@ -86,9 +85,7 @@ function CategoryPage() {
         <p className="eyebrow">RESEARCH CATEGORY</p>
         <h1 className="page-title">{c.seoName}</h1>
         <p className="text-muted-foreground mt-4 max-w-3xl text-lg">{c.blurb}</p>
-        <div className="mt-6">
-          <TrustStrip />
-        </div>
+
         <div className="flex flex-wrap gap-2 mt-8 mb-10">
           {categories.map((x) => (
             <a
@@ -105,6 +102,24 @@ function CategoryPage() {
           {list.length} compound{list.length === 1 ? "" : "s"}
         </p>
         <ProductGrid list={list} />
+        {shopSections.some((section) =>
+          list.some((product) => sectionFor(product)?.slug === section.slug),
+        ) && (
+          <nav aria-label="Related collections" className="mt-10">
+            <h2 className="font-heading font-semibold mb-3">Related collections</h2>
+            <div className="flex flex-wrap gap-2">
+              {shopSections
+                .filter((section) =>
+                  list.some((product) => sectionFor(product)?.slug === section.slug),
+                )
+                .map((section) => (
+                  <a className="chip" href={`/collections/${section.slug}`} key={section.slug}>
+                    {section.name}
+                  </a>
+                ))}
+            </div>
+          </nav>
+        )}
 
         <section className="max-w-3xl mt-20">
           <SectionTitle title={`About our ${c.name.toLowerCase()} range`} />

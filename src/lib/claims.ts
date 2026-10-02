@@ -15,11 +15,10 @@
  * `scripts/check-claims.mjs` enforces the rules this file depends on; see the header there.
  */
 
-import {
-  meets,
-  type EvidenceKey,
-  type Requirement,
-} from "./evidence.ts";
+import { meets, type EvidenceKey, type Requirement } from "./evidence.ts";
+import { coas } from "../data/coa.ts";
+import { metabolicAndRegenerative } from "../data/compounds-a.ts";
+import { secretagoguesToSupplies } from "../data/compounds-b.ts";
 
 /** Where a claim's evidence stands. */
 export type ClaimState = "allowed" | "honest-empty" | "hidden";
@@ -29,6 +28,8 @@ export type ClaimDef = {
   readonly text: string;
   /** Evidence that must be on file before `text` may render. */
   readonly requires: readonly Requirement[];
+  /** Site-wide testing language needs reports for every offered strength, not one PDF. */
+  readonly coverage?: "catalogue" | "hplc-ms";
   /**
    * Copy shown instead of `text` while the evidence is missing. An assertion whose fallback would
    * itself assert something (for example a testing promise) must have NO fallback and be hidden.
@@ -48,35 +49,69 @@ const CERT_REQUIRED = [
   { key: "labName", kind: "present" },
 ] as const;
 
+const offeredStrengths = [...metabolicAndRegenerative, ...secretagoguesToSupplies].flatMap(
+  (compound) =>
+    compound.strengths
+      .filter((strength) => strength.stock !== "out")
+      .map((strength) => `${compound.slug}\u0000${strength.label}`),
+);
+const completeReport = (report: (typeof coas)[number]) =>
+  Boolean(
+    report.file &&
+    report.batch &&
+    report.lab &&
+    report.method &&
+    report.tested &&
+    Number.isFinite(report.purity),
+  );
+const methodHplcMs = (method: string) =>
+  /\bHPLC\b/i.test(method) && /\b(?:MS|LC-MS|mass spectrometry)\b/i.test(method);
+const coverageSatisfied = (coverage: "catalogue" | "hplc-ms") =>
+  offeredStrengths.length > 0 &&
+  offeredStrengths.every((key) => {
+    const reports = coas.filter((report) => `${report.compound}\u0000${report.strength}` === key);
+    return (
+      reports.length > 0 &&
+      reports.every(
+        (report) =>
+          completeReport(report) && (coverage !== "hplc-ms" || methodHplcMs(report.method)),
+      )
+    );
+  });
+
 const DEFS = {
   // -------------------------------------------------------------------------------------------
   // Testing and certificates: the heart of the gate. Nothing about testing renders without a
   // certificate of analysis on file (evidence.labReportsPublished) AND a named laboratory.
   // -------------------------------------------------------------------------------------------
   "testing.hplc-ms-tested": {
-    text: "HPLC and MS tested",
+    text: "HPLC and MS reports",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty: "Batch documentation",
     assertion: true,
     surfaces: ["src/routes/product.$slug.tsx", "src/routes/index.tsx"],
   },
   "testing.hplc-ms-batch-testing": {
-    text: "HPLC and MS batch testing",
+    text: "HPLC and MS reports by strength",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     assertion: true,
     surfaces: ["src/components/Store.tsx"],
   },
   "testing.hplc-ms-tested-body": {
-    text: "Purity by high-performance liquid chromatography, identity by mass spectrometry, batch by batch.",
+    text: "The published reports for listed strengths give HPLC purity and mass spectrometry identity results.",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty:
       "Certificates are published on our Lab Reports page as each launch batch is released.",
     assertion: true,
     surfaces: ["src/routes/index.tsx"],
   },
   "testing.certificate-detail-body": {
-    text: "Every certificate names the batch, the testing laboratory, the methods and the purity result. Search by the batch number printed on your vial to confirm it matches.",
+    text: "Published certificates name their batch, laboratory, methods and reported results. Compare the batch number on your vial with the report.",
     requires: CERT_REQUIRED,
+    coverage: "catalogue",
     honestEmpty:
       "Each certificate names the batch, the laboratory, the methods and the result. Certificates appear on this page as each launch batch is released.",
     assertion: true,
@@ -85,13 +120,15 @@ const DEFS = {
   "testing.hplc-mass-spec-published": {
     text: "HPLC and mass spectrometry, published on Lab Reports",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty: "Certificates published on Lab Reports as each batch clears testing",
     assertion: true,
     surfaces: ["src/components/Store.tsx"],
   },
   "testing.independent-lab": {
-    text: "Independent testing",
+    text: "Published laboratory results",
     requires: CERT_REQUIRED,
+    coverage: "catalogue",
     honestEmpty: "Purity and identity analysis",
     assertion: true,
     surfaces: ["src/routes/about.tsx", "src/routes/index.tsx"],
@@ -113,6 +150,7 @@ const DEFS = {
   "testing.batch-certificates": {
     text: "Batch certificates",
     requires: [{ key: "labReportsPublished", kind: "true" }],
+    coverage: "catalogue",
     assertion: true,
     surfaces: ["src/routes/shop.tsx", "src/routes/category.$slug.tsx"],
   },
@@ -138,7 +176,8 @@ const DEFS = {
   "testing.full-reports-body": {
     text: "Full reports published on the Lab Reports page, not just a purity badge.",
     requires: [{ key: "labReportsPublished", kind: "true" }],
-    honestEmpty: "Certificates are published on our Lab Reports page as each launch batch is released.",
+    honestEmpty:
+      "Certificates are published on our Lab Reports page as each launch batch is released.",
     assertion: true,
     surfaces: ["src/routes/index.tsx"],
   },
@@ -150,47 +189,54 @@ const DEFS = {
     surfaces: ["src/routes/index.tsx"],
   },
   "testing.every-batch-analysed": {
-    text: "Every batch is analysed by an independent laboratory using HPLC and mass spectrometry.",
+    text: "Published reports document HPLC and mass spectrometry results for the listed strengths.",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty:
       "Certificates of analysis are published on our Lab Reports page as each batch is released.",
     assertion: true,
     surfaces: ["src/routes/index.tsx"],
   },
   "testing.batches-sent-for-testing": {
-    text: "Batches are sent to an independent laboratory for HPLC purity and mass spectrometry identity testing.",
+    text: "Published reports document HPLC purity and mass spectrometry identity results for the listed strengths.",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty:
       "No certificate has been issued yet, so no testing result is claimed for any batch. Testing is documented on our Lab Reports page as each batch completes, and nothing is listed until we hold the report.",
     assertion: true,
     surfaces: ["src/routes/index.tsx", "src/data/faq.ts"],
   },
   "testing.batch-documented": {
-    text: "Each batch is documented with a certificate naming the batch, the testing laboratory and the result.",
+    text: "Published certificates name their batch, laboratory and reported result.",
     requires: CERT_REQUIRED,
+    coverage: "catalogue",
     honestEmpty:
       "Certificates naming the batch, the laboratory and the result are published on our Lab Reports page as each batch is released.",
     assertion: true,
     surfaces: ["src/routes/index.tsx"],
   },
   "testing.each-batch-tested-pdp": {
-    text: "Each batch is tested for identity and purity by an independent laboratory using HPLC and mass spectrometry.",
+    text: "Published certificates document identity and purity results using HPLC and mass spectrometry for the listed strengths.",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty:
       "No certificate has been issued yet, so no purity or identity result is claimed for any batch. Certificates are published on our Lab Reports page as each batch is released.",
     assertion: true,
     surfaces: ["src/routes/product.$slug.tsx"],
   },
   "testing.every-batch-sent-pdp": {
-    text: "Every batch is sent to an independent laboratory for identity and purity analysis by high-performance liquid chromatography (HPLC) and mass spectrometry (MS).",
+    text: "Published certificates document reported HPLC and mass spectrometry methods for the listed strengths.",
     requires: CERT_REQUIRED,
-    honestEmpty: "Certificates of analysis are published on our Lab Reports page as each batch is released.",
+    coverage: "hplc-ms",
+    honestEmpty:
+      "Certificates of analysis are published on our Lab Reports page as each batch is released.",
     assertion: true,
     surfaces: ["src/routes/product.$slug.tsx"],
   },
   "testing.lab-reports-hub-body": {
-    text: "Every Vyrax Labs batch is tested by an independent laboratory. Each certificate names the batch, the laboratory, the methods and the purity result. The batch number printed on your vial matches its certificate here.",
+    text: "Published certificates name their batch, laboratory, methods and reported result. Compare the batch number on your vial with its certificate.",
     requires: CERT_REQUIRED,
+    coverage: "catalogue",
     honestEmpty:
       "Certificates name the batch, the laboratory, the methods and the result. Each one is published here as soon as it is issued, and no certificate is listed until we hold it.",
     assertion: true,
@@ -199,6 +245,7 @@ const DEFS = {
   "testing.lab-reports-meta": {
     text: "Public certificates of analysis for Vyrax Labs research peptides. HPLC purity and mass spectrometry identity results by batch, with batch number lookup.",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty:
       "Quality documentation for Vyrax Labs research peptides: how each batch is documented, the current status of every batch, and batch number lookup.",
     assertion: true,
@@ -230,6 +277,7 @@ const DEFS = {
   "testing.purity-title": {
     text: ">99% HPLC Tested",
     requires: CERT_REQUIRED,
+    coverage: "hplc-ms",
     honestEmpty: "Research Grade",
     assertion: true,
     surfaces: ["src/lib/catalog.ts"],
@@ -237,17 +285,15 @@ const DEFS = {
   "testing.page-title": {
     text: "Lab-Tested",
     requires: CERT_REQUIRED,
+    coverage: "catalogue",
     honestEmpty: "Research Grade",
     assertion: true,
-    surfaces: [
-      "src/routes/index.tsx",
-      "src/routes/shop.tsx",
-      "src/routes/category.$slug.tsx",
-    ],
+    surfaces: ["src/routes/index.tsx", "src/routes/shop.tsx", "src/routes/category.$slug.tsx"],
   },
   "testing.purity-badge": {
     text: "{{purity}}% HPLC",
     requires: [{ key: "labReportsPublished", kind: "true" }],
+    coverage: "hplc-ms",
     assertion: true,
     surfaces: ["src/components/Store.tsx", "src/routes/product.$slug.tsx"],
   },
@@ -360,7 +406,8 @@ const DEFS = {
   "payment.checkout-disclosure": {
     text: "Payment methods: {{paymentMethods}}.",
     requires: [{ key: "paymentMethodsLive", kind: "nonEmpty" }],
-    honestEmpty: "No payment is taken on this page. Your enquiry is recorded and nothing is charged.",
+    honestEmpty:
+      "No payment is taken on this page. Your enquiry is recorded and nothing is charged.",
     assertion: true,
     surfaces: ["src/routes/checkout.tsx"],
   },
@@ -422,7 +469,7 @@ const DEFS = {
     surfaces: ["src/components/Store.tsx", "src/routes/index.tsx"],
   },
   "stock.availability": {
-    text: "Available to order",
+    text: "Availability to be confirmed",
     requires: [],
     assertion: false,
     surfaces: ["src/components/Store.tsx", "src/routes/shop.tsx"],
@@ -483,7 +530,7 @@ export type ResolvedClaim = {
   /** Text to render: the claim when allowed, the honest-empty copy when honest-empty, null when hidden. */
   readonly text: string | null;
   /** Evidence still missing. Empty when the claim is allowed. */
-  readonly missing: readonly EvidenceKey[];
+  readonly missing: readonly (EvidenceKey | "catalogueCoverage" | "hplcMsCoverage")[];
 };
 
 const isClaimId = (id: string): id is ClaimId => Object.prototype.hasOwnProperty.call(DEFS, id);
@@ -496,8 +543,16 @@ export const claimRegistry: readonly ({ readonly id: ClaimId } & ClaimDef)[] = (
 /** How many customer-facing claim strings the registry knows about. */
 export const claimCount = claimRegistry.length;
 
-const missingEvidence = (def: ClaimDef): EvidenceKey[] =>
-  def.requires.filter((requirement) => !meets(requirement)).map((requirement) => requirement.key);
+const missingEvidence = (
+  def: ClaimDef,
+): (EvidenceKey | "catalogueCoverage" | "hplcMsCoverage")[] => [
+  ...def.requires
+    .filter((requirement) => !meets(requirement))
+    .map((requirement) => requirement.key),
+  ...(def.coverage && !coverageSatisfied(def.coverage)
+    ? [def.coverage === "hplc-ms" ? ("hplcMsCoverage" as const) : ("catalogueCoverage" as const)]
+    : []),
+];
 
 /** Resolve one claim against the evidence manifest. */
 export function resolveClaim(id: ClaimId): ResolvedClaim {
@@ -538,10 +593,7 @@ export function isClaimAllowed(id: ClaimId): boolean {
  * `We accept: {{paymentMethods}}`. Returns null when the claim must not render, so a caller can
  * gate on the result directly.
  */
-export function claimFilled(
-  id: ClaimId,
-  values: Readonly<Record<string, string>>,
-): string | null {
+export function claimFilled(id: ClaimId, values: Readonly<Record<string, string>>): string | null {
   const text = claimText(id);
   if (text === null) return null;
   return text.replace(/\{\{(\w+)\}\}/g, (_match, key: string) => values[key] ?? "");
@@ -550,7 +602,7 @@ export function claimFilled(
 /** Worst-case state across several claims: hidden beats honest-empty beats allowed. */
 export function resolveAll(ids: readonly ClaimId[]): {
   readonly state: ClaimState;
-  readonly missing: readonly EvidenceKey[];
+  readonly missing: readonly (EvidenceKey | "catalogueCoverage" | "hplcMsCoverage")[];
 } {
   const states = ids.map((id) => resolveClaim(id));
   const missing = [...new Set(states.flatMap((s) => s.missing))];

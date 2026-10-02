@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FileCheck2,
   Truck,
@@ -21,12 +21,10 @@ import {
   ProductGrid,
   SectionTitle,
   Breadcrumbs,
-  DispatchCountdown,
 } from "@/components/Store";
 import {
   resolveProductSlug,
   productImage,
-  productGallery,
   productPath,
   gbp,
   addCart,
@@ -46,10 +44,11 @@ import {
 } from "@/lib/catalog";
 import { latestCoa } from "@/data/coa";
 import { claimFilled, claimGate, claimText } from "@/lib/claims";
-import { site, abs } from "@/data/site";
+import { site, abs, spendTierLine } from "@/data/site";
 import { faqJsonLd, type QA } from "@/data/faq";
-import { supabase } from "@/integrations/supabase/client";
+
 import { ProductGallery } from "@/components/ProductGallery";
+import { sectionFor } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -73,22 +72,20 @@ export const Route = createFileRoute("/product/$slug")({
     const cat = getCategory(c.category);
     const imgUrl = abs(productImage(c.slug, s.label).src);
     const kw = c.kind === "supply" ? c.name : `${c.name} ${s.label}`;
-    const title = `Buy ${kw} UK | ${trustModifier(c.slug, s.label)} | Vyrax Labs`;
-    const cutoff = `${site.dispatchCutoffHour - 12}pm`;
-    const batchCerts = claimText("testing.batch-certificates");
+    const title = `${kw} UK | ${trustModifier(c.slug, s.label)} | Vyrax Labs`;
+    const coa = latestCoa(c.slug, s.label);
+    const batchCerts = coa ? "Batch certificate available" : null;
+    const orderingNote = site.paymentMethods.length
+      ? "For laboratory research use only."
+      : "Enquiry only; no payment is taken online.";
     const desc =
       c.kind === "supply"
-        ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}, same-day dispatch before ${cutoff}, free tracked UK delivery over £${site.freeDeliveryThreshold}.`
-        : `Buy ${c.name} ${s.label} UK for research: ${gbp(s.price)} (${costPerUnitLabel(s)}),${batchCerts ? ` ${batchCerts.toLowerCase()},` : ""} same-day dispatch before ${cutoff}, free tracked delivery over £${site.freeDeliveryThreshold}. For research use only.`;
-    const coa = latestCoa(c.slug, s.label);
+        ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}. ${orderingNote}`
+        : `Browse ${c.name} ${s.label} for laboratory research: ${gbp(s.price)} (${costPerUnitLabel(s)}).${batchCerts ? ` ${batchCerts}.` : ""} ${orderingNote}`;
     const ch = chem[c.slug] ?? {};
-    const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`;
-    const availability =
-      stockOf(s) === "out"
-        ? "https://schema.org/OutOfStock"
-        : stockOf(s) === "preorder"
-          ? "https://schema.org/PreOrder"
-          : "https://schema.org/InStock";
+
+    const section = sectionFor(c);
+    const listingPath = section ? `/collections/${section.slug}` : `/category/${c.category}`;
     const productLd = {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -96,7 +93,9 @@ export const Route = createFileRoute("/product/$slug")({
       description: c.summary,
       sku: `VYX-${c.slug.toUpperCase()}-${s.label.toUpperCase().replace(/[^A-Z0-9]/g, "")}`,
       ...(ch.cas ? { mpn: ch.cas } : {}),
-      image: productGallery(c.slug, s.label).map((g) => abs(g.src)),
+      // QR and storage-side artwork carries unverified batch identifiers. Publish only
+      // the cleaned front render until those views are regenerated from actual batches.
+      image: [imgUrl],
       brand: { "@type": "Brand", name: site.name },
       category: cat?.name,
       url,
@@ -106,51 +105,22 @@ export const Route = createFileRoute("/product/$slug")({
         ...(ch.formula
           ? [{ "@type": "PropertyValue", name: "Molecular Formula", value: ch.formula }]
           : []),
-        ...(coa
+        ...(coa && /\bHPLC\b/i.test(coa.method)
           ? [{ "@type": "PropertyValue", name: "Purity (HPLC)", value: `${coa.purity}%` }]
           : []),
       ],
-      offers: {
-        "@type": "Offer",
-        url,
-        priceCurrency: "GBP",
-        price: s.price.toFixed(2),
-        priceValidUntil,
-        itemCondition: "https://schema.org/NewCondition",
-        availability,
-        seller: { "@type": "Organization", name: site.name },
-        shippingDetails: {
-          "@type": "OfferShippingDetails",
-          shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
-          shippingRate: {
-            "@type": "MonetaryAmount",
-            value: s.price >= site.freeDeliveryThreshold ? 0 : site.standardDeliveryFee,
-            currency: "GBP",
-          },
-          deliveryTime: {
-            "@type": "ShippingDeliveryTime",
-            handlingTime: {
-              "@type": "QuantitativeValue",
-              minValue: 0,
-              maxValue: 1,
-              unitCode: "DAY",
+      ...(site.paymentMethods.length
+        ? {
+            offers: {
+              "@type": "Offer",
+              url,
+              priceCurrency: "GBP",
+              price: s.price.toFixed(2),
+              itemCondition: "https://schema.org/NewCondition",
+              seller: { "@type": "Organization", name: site.name },
             },
-            transitTime: {
-              "@type": "QuantitativeValue",
-              minValue: 1,
-              maxValue: 2,
-              unitCode: "DAY",
-            },
-          },
-        },
-        hasMerchantReturnPolicy: {
-          "@type": "MerchantReturnPolicy",
-          applicableCountry: "GB",
-          returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-          merchantReturnDays: site.returnWindowDays,
-          returnMethod: "https://schema.org/ReturnByMail",
-        },
-      },
+          }
+        : {}),
     };
     const crumbs = {
       "@context": "https://schema.org",
@@ -160,8 +130,8 @@ export const Route = createFileRoute("/product/$slug")({
         {
           "@type": "ListItem",
           position: 2,
-          name: cat?.name ?? "Shop",
-          item: abs(`/category/${c.category}`),
+          name: section?.name ?? cat?.name ?? "Shop",
+          item: abs(listingPath),
         },
         {
           "@type": "ListItem",
@@ -198,7 +168,7 @@ export const Route = createFileRoute("/product/$slug")({
 // ---------------------------------------------------------------- Per-product FAQ (also emitted as FAQPage JSON-LD)
 function productFaqs(c: Compound, s: Strength): QA[] {
   const coa = latestCoa(c.slug, s.label);
-  const cutoff = `${site.dispatchCutoffHour - 12}pm`;
+
   const list: QA[] = [
     [
       `Is ${c.name} for human use?`,
@@ -207,7 +177,7 @@ function productFaqs(c: Compound, s: Strength): QA[] {
     [
       `How is ${c.name} tested?`,
       coa
-        ? `Batch ${coa.batch} was tested by ${coa.lab} using ${coa.method}, with a purity result of ${coa.purity}%. The full certificate is published on this page and on our Lab Reports page.`
+        ? `The published report for batch ${coa.batch} names ${coa.lab}, ${coa.method}, and a result of ${coa.purity}%. Read the certificate linked on this page.`
         : claimGate("testing.each-batch-tested-pdp"),
     ],
     [
@@ -218,7 +188,11 @@ function productFaqs(c: Compound, s: Strength): QA[] {
     ],
     [
       `How quickly will my ${c.name} order arrive?`,
-      `Orders placed before ${cutoff} on a working day are dispatched the same day by ${site.carrier}. Delivery is free over £${site.freeDeliveryThreshold}, otherwise £${site.standardDeliveryFee.toFixed(2)}.`,
+      site.paymentMethods.length
+        ? `See our shipping policy for dispatch times, carrier and delivery charges.`
+        : site.enquiriesLive && site.email
+          ? "This page leads to an enquiry, not a paid order. See our shipping policy for indicative delivery charges; dispatch is agreed separately."
+          : "Enquiries are currently closed. No order or delivery is scheduled from this site. See our shipping policy for indicative delivery information.",
     ],
   ];
   if (c.strengths.length > 1)
@@ -241,8 +215,9 @@ function ProductPage() {
   const s = c.strengths.find((x) => x.label === data.strengthLabel) as Strength;
   const [qty, setQty] = useState(1);
   const cat = getCategory(c.category);
+  const section = sectionFor(c);
   const img = productImage(c.slug, s.label);
-  const gallery = productGallery(c.slug, s.label);
+  const gallery = [img]; // Side views are withheld until their batch/QR artwork is verifiable.
   const coa = latestCoa(c.slug, s.label);
   const ch = chem[c.slug] ?? {};
   const cites = citations[c.slug] ?? [];
@@ -293,7 +268,10 @@ function ProductPage() {
         <Breadcrumbs
           items={[
             { name: "Home", to: "/" },
-            { name: cat?.name ?? "Shop", to: `/category/${c.category}` },
+            {
+              name: section?.name ?? cat?.name ?? "Shop",
+              to: section ? `/collections/${section.slug}` : `/category/${c.category}`,
+            },
             { name: heading },
           ]}
         />
@@ -307,7 +285,9 @@ function ProductPage() {
                   (b2g1 || coa) && (
                     <>
                       {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
-                      {coa && <span className="badge-verify">{coa.purity}% HPLC</span>}
+                      {coa && /\bHPLC\b/i.test(coa.method) && (
+                        <span className="badge-verify">{coa.purity}% HPLC</span>
+                      )}
                     </>
                   )
                 }
@@ -331,7 +311,7 @@ function ProductPage() {
                 )}
                 <span className="absolute top-4 left-4 flex gap-2">
                   {b2g1 && <span className="badge-promo">{claimText("offer.b2g1")}</span>}
-                  {coa && (
+                  {coa && /\bHPLC\b/i.test(coa.method) && (
                     <span className="badge-verify">
                       {claimFilled("testing.purity-badge", { purity: String(coa.purity) })}
                     </span>
@@ -343,8 +323,8 @@ function ProductPage() {
               {(
                 [
                   [FileCheck2, claimGate("testing.hplc-ms-tested")],
-                  [Snowflake, "Protective packing"],
-                  [ShieldCheck, "Sealed, labelled vials"],
+                  [Snowflake, "Storage guidance"],
+                  [ShieldCheck, "Research use only"],
                 ] as const
               ).map(([Icon, t]) => (
                 <div
@@ -406,7 +386,12 @@ function ProductPage() {
               </p>
               <p className="flex items-center gap-2">
                 <Truck size={17} className="text-primary" />
-                <DispatchCountdown />
+                <span>
+                  Dispatch times are subject to an accepted order.{" "}
+                  <Link to="/shipping" className="underline">
+                    Shipping information
+                  </Link>
+                </span>
               </p>
               <p className="flex items-center gap-2">
                 <FileCheck2 size={17} className="text-primary" />
@@ -468,18 +453,20 @@ function ProductPage() {
               </p>
             )}
             <p className="text-xs text-muted-foreground mt-3">
-              Spend £150 for 10% off, £250 for 15%, £400 for 20%. Applied automatically in your
-              basket.
+              Multi-buy tiers: {spendTierLine()}. Applied automatically in your basket.
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 text-xs">
-              <div className="flex gap-2 items-start border border-border rounded-xl p-3">
+              <Link
+                to="/returns"
+                className="flex gap-2 items-start border border-border rounded-xl p-3"
+              >
                 <RotateCcw size={16} className="text-primary shrink-0" />
                 <span>
-                  <strong className="block text-sm">Free reship guarantee</strong>Lost or damaged in
-                  transit, we resend
+                  <strong className="block text-sm">Returns information</strong>Read the published
+                  policy
                 </span>
-              </div>
+              </Link>
               <div className="flex gap-2 items-start border border-border rounded-xl p-3">
                 <Truck size={16} className="text-primary shrink-0" />
                 <span>
@@ -596,41 +583,41 @@ function ProductPage() {
             {coa ? (
               <>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  The card below names the batch, testing laboratory, method, purity result and test
-                  date. The batch number printed on your vial matches the batch shown. The full
-                  certificate is available as a PDF from this page and from our Lab Reports page.
+                  The report below names its batch, testing laboratory, method, result and test
+                  date. Check the batch number on the certificate against the vial before relying on
+                  it.
                 </p>
                 <div className="border border-verify/40 bg-verify/5 rounded-2xl p-6 grid sm:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground text-xs">Batch</p>
-                  <p className="font-mono font-semibold">{coa.batch}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">Purity</p>
-                  <p className="font-mono font-semibold">{coa.purity}%</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">Laboratory</p>
-                  <p className="font-semibold">{coa.lab}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">Tested</p>
-                  <p className="font-semibold">
-                    {new Date(coa.tested).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
-                <a
-                  href={coa.file}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="sm:col-span-4 text-primary font-semibold underline"
-                >
-                  Download the full certificate (PDF)
-                </a>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Batch</p>
+                    <p className="font-mono font-semibold">{coa.batch}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Purity</p>
+                    <p className="font-mono font-semibold">{coa.purity}%</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Laboratory</p>
+                    <p className="font-semibold">{coa.lab}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Tested</p>
+                    <p className="font-semibold">
+                      {new Date(coa.tested).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <a
+                    href={coa.file}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="sm:col-span-4 text-primary font-semibold underline"
+                  >
+                    Download the full certificate (PDF)
+                  </a>
                 </div>
               </>
             ) : (
@@ -713,8 +700,6 @@ function ProductPage() {
             <ProductGrid list={related} />
           </section>
         )}
-
-        <Reviews slug={c.slug} />
       </div>
       <div className="mt-20 lg:mt-0" />
       {/* Mobile sticky buy bar: keeps price and add-to-basket reachable without scrolling back up. */}
@@ -738,116 +723,5 @@ function ProductPage() {
       </div>
       <div className="h-20 lg:hidden" aria-hidden="true" />
     </StoreShell>
-  );
-}
-
-// ---------------------------------------------------------------- Reviews (real, moderated only)
-function Reviews({ slug }: { slug: string }) {
-  const [reviews, setReviews] = useState<
-    { id: string; rating: number; comment: string; created_at: string }[]
-  >([]);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [status, setStatus] = useState("");
-  useEffect(() => {
-    supabase
-      .from("reviews")
-      .select("id,rating,comment,created_at")
-      .eq("product_slug", slug)
-      .eq("approved", true)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => setReviews(data || []));
-  }, [slug]);
-  const avg = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) {
-      setStatus("Sign in to submit a review.");
-      return;
-    }
-    const { error } = await supabase
-      .from("reviews")
-      .insert({ user_id: data.user.id, product_slug: slug, rating, comment });
-    setStatus(
-      error ? "Unable to submit your review." : "Thank you. Your review is awaiting moderation.",
-    );
-    if (!error) setComment("");
-  };
-  return (
-    <section className="mt-20 max-w-3xl">
-      <SectionTitle
-        title="Researcher reviews"
-        body="Reviews come from signed-in customers and are moderated before publication."
-      />
-      {reviews.length > 0 && (
-        <p className="mb-4 font-semibold">
-          <span className="text-promo">{"★".repeat(Math.round(avg))}</span> {avg.toFixed(1)} out of
-          5 from {reviews.length} review
-          {reviews.length === 1 ? "" : "s"}
-        </p>
-      )}
-      {reviews.length ? (
-        reviews.map((r) => (
-          <div className="border-b border-border py-5" key={r.id}>
-            <p className="text-promo">
-              {"★".repeat(r.rating)}
-              <span className="text-border">{"★".repeat(5 - r.rating)}</span>
-            </p>
-            <p className="mt-2">{r.comment}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {new Date(r.created_at).toLocaleDateString("en-GB", {
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-          </div>
-        ))
-      ) : (
-        <p className="text-muted-foreground">
-          No reviews yet. Reviews are open to signed-in customers and published after moderation, so
-          nothing on this page is written by us.
-        </p>
-      )}
-      <form className="mt-8 space-y-4" onSubmit={submit}>
-        <label className="block text-sm font-semibold">
-          Your rating
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            className="block mt-2 border border-border rounded-md p-2 bg-background"
-          >
-            {[5, 4, 3, 2, 1].map((n) => (
-              <option key={n} value={n}>
-                {n} stars
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm font-semibold">
-          Your review
-          <textarea
-            required
-            minLength={10}
-            maxLength={1000}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="block w-full border border-border rounded-md p-3 mt-2"
-            rows={4}
-          />
-        </label>
-        <Button className="rounded-full">Submit review</Button>
-        {status && (
-          <p role="status" className="text-sm">
-            {status}{" "}
-            {status.startsWith("Sign") && (
-              <Link to="/account" className="underline">
-                Go to account
-              </Link>
-            )}
-          </p>
-        )}
-      </form>
-    </section>
   );
 }

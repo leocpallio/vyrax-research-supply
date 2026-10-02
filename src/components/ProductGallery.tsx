@@ -10,11 +10,11 @@ import {
 import { cn } from "@/lib/utils";
 import type { Img } from "@/lib/catalog";
 
-// What each render shows (file suffix __<view>), for alt text and the thumbnail buttons.
+// Renders are illustrative, not evidence of a verified batch or expiry date.
 const VIEW_TEXT: Record<string, string> = {
-  front: "front of the vial",
-  qr: "side panel with the batch QR code",
-  storage: "side panel with storage and expiry",
+  front: "front render",
+  qr: "side render",
+  storage: "alternate side render",
 };
 const viewText = (im: Img) => VIEW_TEXT[im.view ?? "front"] ?? "vial";
 
@@ -66,11 +66,7 @@ export function ProductGallery({
                     src={im.src}
                     srcSet={im.srcSet}
                     sizes="(min-width: 1024px) 600px, 100vw"
-                    alt={
-                      i === 0
-                        ? `${name} research vial, Vyrax Labs`
-                        : `${name} vial, ${viewText(im)}`
-                    }
+                    alt={`${name} illustrative vial ${viewText(im)}`}
                     width={1024}
                     height={1024}
                     fetchPriority={i === 0 ? "auto" : "low"}
