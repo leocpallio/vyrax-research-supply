@@ -17,7 +17,6 @@ export const metabolicAndRegenerative: Compound[] = [
       { label: "10mg", amount: 10, unit: "mg", price: 59.99 },
       { label: "20mg", amount: 20, unit: "mg", price: 79.99 },
       { label: "30mg", amount: 30, unit: "mg", price: 109.99 },
-      { label: "60mg", amount: 60, unit: "mg", price: 159.99 },
     ],
     summary:
       "Retatrutide (LY3437943) is a synthetic peptide with agonist activity at the GIP, GLP-1 and glucagon receptors, studied in metabolic and incretin research.",
@@ -46,6 +45,7 @@ export const metabolicAndRegenerative: Compound[] = [
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 54.99 },
       { label: "20mg", amount: 20, unit: "mg", price: 64.99 },
+      { label: "30mg", amount: 30, unit: "mg", price: 84.99 },
       { label: "40mg", amount: 40, unit: "mg", price: 99.99 },
       { label: "60mg", amount: 60, unit: "mg", price: 139.99 },
     ],
@@ -74,8 +74,9 @@ export const metabolicAndRegenerative: Compound[] = [
     tags: ["Incretin research", "Appetite signalling"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 19.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 34.99 },
+      { label: "20mg", amount: 20, unit: "mg", price: 59.99 },
+      { label: "30mg", amount: 30, unit: "mg", price: 79.99 },
     ],
     summary:
       "Semaglutide is a long-acting GLP-1 receptor agonist peptide with 94% sequence homology to native human GLP-1.",
@@ -155,7 +156,10 @@ export const metabolicAndRegenerative: Compound[] = [
     kind: "small-molecule",
     form: "Powder (iodide salt)",
     appearance: "Red-brown to dark brown solid",
-    strengths: [{ label: "50mg", amount: 50, unit: "mg", price: 39.99 }],
+    strengths: [
+      { label: "50mg", amount: 50, unit: "mg", price: 39.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 29.99 },
+    ],
     summary:
       "5-Amino-1MQ is a small-molecule, membrane-permeable inhibitor of nicotinamide N-methyltransferase (NNMT).",
     overview: [

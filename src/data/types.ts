@@ -22,6 +22,8 @@ export type Strength = {
   /** GBP per vial. */
   price: number;
   stock?: StockState;
+  /** Overrides compound-level composition when a blend has multiple ratios/strengths. */
+  composition?: string[];
 };
 
 export type Compound = {

@@ -192,7 +192,11 @@ export const secretagoguesToSupplies: Compound[] = [
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Pituitary research"],
     kind: "peptide",
-    strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 12.99 }],
+    strengths: [
+      { label: "2mg", amount: 2, unit: "mg", price: 12.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 39.99 },
+    ],
     summary:
       "Sermorelin is the 29-amino-acid N-terminal fragment of human growth hormone-releasing hormone (GHRH 1-29 amide).",
     overview: [
@@ -239,7 +243,10 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Cellular energy", "Sirtuin research"],
     kind: "coenzyme",
     appearance: "White to off-white lyophilised powder",
-    strengths: [{ label: "500mg", amount: 500, unit: "mg", price: 39.99 }],
+    strengths: [
+      { label: "500mg", amount: 500, unit: "mg", price: 39.99 },
+      { label: "1000mg", amount: 1000, unit: "mg", price: 84.99 },
+    ],
     summary:
       "NAD+ (nicotinamide adenine dinucleotide) is a coenzyme central to redox reactions and a substrate for sirtuins and PARP enzymes.",
     overview: [
@@ -337,7 +344,10 @@ export const secretagoguesToSupplies: Compound[] = [
     category: "longevity-research",
     tags: ["Immune research", "Thymic peptides"],
     kind: "peptide",
-    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 21.99 }],
+    strengths: [
+      { label: "5mg", amount: 5, unit: "mg", price: 21.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 44.99 },
+    ],
     summary:
       "Thymosin Alpha-1 (thymalfasin) is a 28-amino-acid N-acetylated peptide originally isolated from thymus tissue.",
     overview: [
@@ -385,7 +395,10 @@ export const secretagoguesToSupplies: Compound[] = [
     category: "longevity-research",
     tags: ["Neuropeptide research", "BDNF signalling"],
     kind: "peptide",
-    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 24.99 }],
+    strengths: [
+      { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 19.99 },
+    ],
     summary:
       "Semax is a synthetic heptapeptide analogue of the ACTH (4-7) fragment, extended with a Pro-Gly-Pro sequence for stability.",
     overview: [
@@ -409,7 +422,10 @@ export const secretagoguesToSupplies: Compound[] = [
     category: "longevity-research",
     tags: ["Neuropeptide research", "GABAergic signalling"],
     kind: "peptide",
-    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 24.99 }],
+    strengths: [
+      { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 18.99 },
+    ],
     summary:
       "Selank is a synthetic heptapeptide analogue of tuftsin (Thr-Lys-Pro-Arg) extended with Pro-Gly-Pro.",
     overview: [
@@ -553,8 +569,18 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Tissue repair", "Combination research"],
     kind: "blend",
     composition: ["BPC-157 5mg", "TB-500 5mg"],
-    strengths: [{ label: "5+5mg", amount: 10, unit: "mg", price: 36.99 }],
-    summary: "The Wolverine Stack combines BPC-157 5mg and TB-500 5mg in a single research vial.",
+    strengths: [
+      { label: "5+5mg", amount: 10, unit: "mg", price: 36.99 },
+      {
+        label: "10+10mg",
+        amount: 20,
+        unit: "mg",
+        price: 54.99,
+        composition: ["BPC-157 10mg", "TB-500 10mg"],
+      },
+    ],
+    summary:
+      "The Wolverine Stack combines BPC-157 and TB-500 in one research vial; check the selected strength for the amount of each.",
     overview: [
       "This blend pairs BPC-157 and TB-500, the two peptides most often compared in tissue repair research, in one lyophilised vial.",
       "It suits combination studies where both compounds are needed from the same batch and preparation.",

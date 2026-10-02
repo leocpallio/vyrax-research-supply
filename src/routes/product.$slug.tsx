@@ -231,6 +231,7 @@ function ProductPage() {
   const bacStrength = bac?.strengths[0];
   const heading = c.kind === "supply" ? c.name : `${c.name} ${s.label}`;
   const faqs = productFaqs(c, s);
+  const composition = s.composition ?? c.composition;
 
   const specs: [string, string][] = [
     ["Product", c.name],
@@ -238,7 +239,7 @@ function ProductPage() {
       ? ([["Also known as", c.aliases.slice(0, 3).join(", ")]] as [string, string][])
       : []),
     [c.kind === "supply" ? "Volume" : "Quantity per vial", s.label],
-    ...(c.composition ? ([["Composition", c.composition.join(" + ")]] as [string, string][]) : []),
+    ...(composition ? ([["Composition", composition.join(" + ")]] as [string, string][]) : []),
     ...(ch.cas ? ([["CAS number", ch.cas]] as [string, string][]) : []),
     ...(ch.formula ? ([["Molecular formula", ch.formula]] as [string, string][]) : []),
     ...(ch.mw ? ([["Molecular weight", `${ch.mw} g/mol`]] as [string, string][]) : []),

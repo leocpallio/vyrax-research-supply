@@ -1,6 +1,7 @@
 import vial from "@/assets/vyrax-vial.jpg";
 import { metabolicAndRegenerative } from "@/data/compounds-a";
 import { secretagoguesToSupplies } from "@/data/compounds-b";
+import { ukplAdditions } from "@/data/ukpl-additions";
 import { categories } from "@/data/categories";
 import { chem, citations } from "@/data/research";
 import { latestCoa } from "@/data/coa";
@@ -11,7 +12,11 @@ import type { Category, CategorySlug, Compound, Strength, StockState } from "@/d
 export { categories, chem, citations };
 export type { Category, CategorySlug, Compound, Strength, StockState };
 
-export const compounds: Compound[] = [...metabolicAndRegenerative, ...secretagoguesToSupplies];
+export const compounds: Compound[] = [
+  ...metabolicAndRegenerative,
+  ...secretagoguesToSupplies,
+  ...ukplAdditions,
+];
 const bySlug = new Map(compounds.map((c) => [c.slug, c]));
 export const getCompound = (slug: string) => bySlug.get(slug);
 export const getCategory = (slug: string) => categories.find((c) => c.slug === slug);

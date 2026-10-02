@@ -1,6 +1,6 @@
 # Vyrax Labs pricing basis
 
-Every catalogue price, next to the UK competitor listings it was benchmarked against.
+Catalogue price history and benchmarks for the original range. Removed variants remain below for audit history, but are no longer in `src/data/compounds-*.ts`. New SKUs and proposed prices are recorded in the appendix.
 Source: live scrapes of 12 UK storefronts on 28 Sep 2026 (astralabs, ukpeptidelab, oplabs, proformapeptides,
 midshirelabs, crownpeptides, imperialpeptides, peptideslabuk, uk-peptides, pharmalabglobal, rndpeptides, my-peptides).
 Raw data: `peptide-intel/vyrax/raw/*.html` and `extracted_pairs.json` on the ops box.
@@ -70,3 +70,35 @@ compound or its closest analogue, and should be checked against supplier cost be
 | Bacteriostatic Water | 10ml | £5.99 | £0.60/ml | oplabs £5.90, peptideslabuk £6.99 | £5.90 | £6.45 | £6.99 | 7% below median |
 
 3 strengths had no direct competitor observation at that exact size.
+
+## Catalogue alignment, 2 Oct 2026
+
+UKPL `public.products` was used to identify currently sellable variants, excluding RT3 retained for reships, bundles, inactive, out-of-stock and test rows. Vyrax availability remains "to be confirmed": this is not a live inventory sync, and stock must not be advertised as present without Vyrax allocation. Newly added UKPL-reference prices below are indicative for Vyrax and require margin approval before enquiries open; they are not fresh competitor benchmarks. The three newly requested GLP strengths are not in the UKPL sellable list, so their prices were interpolated from adjacent Vyrax strengths and likewise need approval.
+
+| Variant added | Indicative Vyrax price | Source |
+|---|---:|---|
+| 5-Amino-1MQ 10mg | £29.99 | UKPL current price |
+| Adamax 5mg | £39.99 | UKPL current price |
+| CJC-1295 + Ipamorelin 5+5mg | £42.99 | UKPL current price; confirm CJC form |
+| Glutathione 1500mg | £38.99 | UKPL current price |
+| HGH Fragment 176-191 5mg | £29.99 | UKPL current price; distinct from AOD-9604 |
+| Kisspeptin-10 10mg | £34.99 | UKPL current price |
+| L-Carnitine 600mg/ml, 10ml | £29.99 | UKPL current price |
+| MGF 2mg | £17.99 | UKPL current price |
+| NAD+ 1000mg | £84.99 | UKPL current price |
+| Oxytocin 5mg | £24.99 | UKPL current price |
+| PEG-MGF 2mg | £24.99 | UKPL current price |
+| Pinealon 10mg | £29.99 | UKPL current price |
+| Selank 5mg | £18.99 | UKPL current price |
+| Selank + Semax 10+10mg | £34.99 | UKPL current price |
+| Semax 5mg | £19.99 | UKPL current price (not Semaglutide 5mg) |
+| Sermorelin 5mg | £27.99 | UKPL current price |
+| Sermorelin 10mg | £39.99 | UKPL current price |
+| SNAP-8 10mg | £19.99 | UKPL current price |
+| Thymosin Alpha-1 10mg | £44.99 | UKPL current price |
+| Wolverine Stack 10+10mg | £54.99 | UKPL BPC-157 + TB-500 current price |
+| Tirzepatide 30mg | £84.99 | Proposed interpolation between Vyrax 20mg and 40mg |
+| Semaglutide 20mg | £59.99 | Proposed interpolation from Vyrax 10mg |
+| Semaglutide 30mg | £79.99 | Proposed interpolation from Vyrax 10mg |
+
+Removed at the owner's direction: Retatrutide 60mg and Semaglutide 5mg. Old rows above are retained only as historical pricing context; do not re-enable them from this document. Existing Vyrax variants outside UKPL sellable stock are not assumed unavailable or approved for deletion; they require a separate owner decision.
