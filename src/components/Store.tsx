@@ -46,7 +46,7 @@ const announcements =
         `Indicative free UK delivery over £${site.freeDeliveryThreshold}`,
         `Multi-buy pricing: ${spendTierLine()}`,
       ]
-    : ["Research compounds for laboratory use only", "Enquiries are not open yet"];
+    : ["Enquiries are not open yet"];
 
 function AnnouncementBar() {
   return (
@@ -446,8 +446,8 @@ function Footer() {
   // (src/lib/evidence.ts) holds it.
   const company = [
     site.legalName ?? "Vyrax Labs",
-    claimGate("identity.company-number"),
-    claimGate("identity.vat-number"),
+    claimText("identity.company-number"),
+    claimText("identity.vat-number"),
     claimText("identity.registered-office"),
   ].filter(Boolean);
   // Only lists payment methods the evidence manifest says are actually live at checkout.
