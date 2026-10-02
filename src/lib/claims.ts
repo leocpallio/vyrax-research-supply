@@ -333,14 +333,12 @@ const DEFS = {
   "identity.company-number": {
     text: "Registered in England and Wales, company no. {{companyNumber}}",
     requires: [{ key: "companyNumber", kind: "present" }],
-    honestEmpty: "Company registration details are being finalised and will be published here.",
     assertion: true,
     surfaces: ["src/components/Store.tsx", "src/routes/terms.tsx"],
   },
   "identity.vat-number": {
     text: "VAT registration number {{vatNumber}}",
     requires: [{ key: "vatNumber", kind: "present" }],
-    honestEmpty: "VAT registration details are being finalised and will be published here.",
     assertion: true,
     surfaces: ["src/components/Store.tsx", "src/routes/terms.tsx"],
   },

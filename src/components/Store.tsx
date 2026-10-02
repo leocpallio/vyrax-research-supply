@@ -48,7 +48,7 @@ const announcements =
         `Indicative free UK delivery over £${site.freeDeliveryThreshold}`,
         `Multi-buy pricing: ${spendTierLine()}`,
       ]
-    : ["Research compounds for laboratory use only", "Enquiries are not open yet"];
+    : ["Enquiries are not open yet"];
 
 function AnnouncementBar() {
   return (
@@ -451,8 +451,8 @@ function Footer() {
   // (src/lib/evidence.ts) holds it.
   const company = [
     site.legalName ?? "Vyrax Labs",
-    claimGate("identity.company-number"),
-    claimGate("identity.vat-number"),
+    claimText("identity.company-number"),
+    claimText("identity.vat-number"),
     claimText("identity.registered-office"),
   ].filter(Boolean);
   // Only lists payment methods the evidence manifest says are actually live at checkout.
@@ -753,7 +753,7 @@ export function Breadcrumbs({ items }: { items: { name: string; to?: string }[] 
     <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground mb-6">
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((it, i) => (
-          <li key={it.name} className="flex items-center gap-1.5">
+          <li key={`${it.name}-${i}`} className="flex items-center gap-1.5">
             {i > 0 && <span aria-hidden>/</span>}
             {it.to ? (
               <a href={it.to} className="hover:text-primary">
