@@ -4,13 +4,12 @@ import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import type { User } from "@supabase/supabase-js";
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
       { title: "My Account | Vyrax Labs" },
-      { name: "description", content: "Sign in to Vyrax Labs and view your order enquiries." },
+      { name: "description", content: "Sign in to Vyrax Labs and view linked orders." },
       { property: "og:title", content: "My Account | Vyrax Labs" },
       { property: "og:description", content: "Manage your Vyrax Labs research orders." },
       { property: "og:type", content: "website" },
@@ -35,13 +34,12 @@ function Account() {
   }, []);
   useEffect(() => {
     if (user)
-      // Tables are not yet recreated in the linked database; loosen typing until types regenerate.
-      (supabase as any)
+      supabase
         .from("orders")
         .select("id,created_at,total,status")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .then(({ data }: { data: any[] | null }) => setOrders(data || []));
+        .then(({ data }) => setOrders(data || []));
   }, [user]);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,12 +50,6 @@ function Account() {
       result.error?.message ||
         (signup ? "Check your email to confirm your account." : "Signed in."),
     );
-  }
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/account",
-    });
-    if (result.error) setMessage(result.error.message);
   }
   return (
     <StoreShell>
@@ -75,8 +67,8 @@ function Account() {
             </div>
             <h2 className="font-heading text-2xl font-semibold mt-12">Order history</h2>
             <p className="text-sm text-muted-foreground mt-2">
-              Signed-in enquiries appear here when enquiry intake is open. No automated email is
-              sent to guest enquiries.
+              Orders linked to your account appear here. Guest checkout orders are tracked by their
+              order reference and will not appear in this list.
             </p>
             {orders.length ? (
               orders.map((o) => (
@@ -95,7 +87,7 @@ function Account() {
                 </div>
               ))
             ) : (
-              <p className="text-muted-foreground mt-8">No order enquiries yet.</p>
+              <p className="text-muted-foreground mt-8">No linked orders yet.</p>
             )}
           </div>
         ) : (
@@ -146,10 +138,6 @@ function Account() {
               </label>
               <Button className="w-full h-11">{signup ? "Create account" : "Sign in"}</Button>
             </form>
-            <div className="text-center text-muted-foreground text-sm my-4">or</div>
-            <Button variant="outline" className="w-full h-11" onClick={google}>
-              Continue with Google
-            </Button>
             {message && (
               <p role="status" className="text-sm mt-4">
                 {message}

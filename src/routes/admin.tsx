@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -246,17 +245,6 @@ function Admin() {
                 Sign in
               </button>
             </form>
-            <button
-              className="mt-5 underline text-sm"
-              onClick={async () => {
-                const result = await lovable.auth.signInWithOAuth("google", {
-                  redirect_uri: window.location.origin + "/admin",
-                });
-                if (result.error) setAuthError(result.error.message);
-              }}
-            >
-              Continue with Google
-            </button>
             {authError && (
               <p role="alert" className="mt-4 text-destructive">
                 {authError}
