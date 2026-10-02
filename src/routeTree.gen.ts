@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BasketRouteImport } from './routes/basket'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -37,6 +38,7 @@ import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as VBatchRouteImport } from './routes/v.$batch'
 import { Route as VerifyBatchRouteImport } from './routes/verify.$batch'
+import { Route as ApiAdminOrdersRouteImport } from './routes/api.admin.orders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +53,11 @@ const AboutRoute = AboutRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BasketRoute = BasketRouteImport.update({
@@ -178,11 +185,17 @@ const VerifyBatchRoute = VerifyBatchRouteImport.update({
   path: '/verify/$batch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminOrdersRoute = ApiAdminOrdersRouteImport.update({
+  id: '/api/admin/orders',
+  path: '/api/admin/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/basket': typeof BasketRoute
   '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
@@ -208,11 +221,13 @@ export interface FileRoutesByFullPath {
   '/v/$batch': typeof VBatchRoute
   '/verify/$batch': typeof VerifyBatchRoute
   '/guides/': typeof GuidesIndexRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/basket': typeof BasketRoute
   '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
@@ -238,12 +253,14 @@ export interface FileRoutesByTo {
   '/v/$batch': typeof VBatchRoute
   '/verify/$batch': typeof VerifyBatchRoute
   '/guides': typeof GuidesIndexRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/basket': typeof BasketRoute
   '/calculator': typeof CalculatorRoute
   '/checkout': typeof CheckoutRoute
@@ -269,6 +286,7 @@ export interface FileRoutesById {
   '/v/$batch': typeof VBatchRoute
   '/verify/$batch': typeof VerifyBatchRoute
   '/guides/': typeof GuidesIndexRoute
+  '/api/admin/orders': typeof ApiAdminOrdersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -276,6 +294,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/basket'
     | '/calculator'
     | '/checkout'
@@ -301,11 +320,13 @@ export interface FileRouteTypes {
     | '/v/$batch'
     | '/verify/$batch'
     | '/guides/'
+    | '/api/admin/orders'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/basket'
     | '/calculator'
     | '/checkout'
@@ -331,11 +352,13 @@ export interface FileRouteTypes {
     | '/v/$batch'
     | '/verify/$batch'
     | '/guides'
+    | '/api/admin/orders'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/basket'
     | '/calculator'
     | '/checkout'
@@ -361,12 +384,14 @@ export interface FileRouteTypes {
     | '/v/$batch'
     | '/verify/$batch'
     | '/guides/'
+    | '/api/admin/orders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRoute
   BasketRoute: typeof BasketRoute
   CalculatorRoute: typeof CalculatorRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -392,6 +417,7 @@ export interface RootRouteChildren {
   VBatchRoute: typeof VBatchRoute
   VerifyBatchRoute: typeof VerifyBatchRoute
   GuidesIndexRoute: typeof GuidesIndexRoute
+  ApiAdminOrdersRoute: typeof ApiAdminOrdersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -415,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/basket': {
@@ -592,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyBatchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/orders': {
+      id: '/api/admin/orders'
+      path: '/api/admin/orders'
+      fullPath: '/api/admin/orders'
+      preLoaderRoute: typeof ApiAdminOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -599,6 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  AdminRoute: AdminRoute,
   BasketRoute: BasketRoute,
   CalculatorRoute: CalculatorRoute,
   CheckoutRoute: CheckoutRoute,
@@ -624,6 +665,7 @@ const rootRouteChildren: RootRouteChildren = {
   VBatchRoute: VBatchRoute,
   VerifyBatchRoute: VerifyBatchRoute,
   GuidesIndexRoute: GuidesIndexRoute,
+  ApiAdminOrdersRoute: ApiAdminOrdersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
