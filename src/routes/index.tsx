@@ -27,7 +27,8 @@ import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { guides } from "@/data/guides";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs, spendTierLine } from "@/data/site";
-import hero from "@/assets/vyrax-hero.jpg";
+import hero from "@/assets/vyrax-hero-wide.webp";
+import social from "@/assets/vyrax-social.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/")({
@@ -66,7 +67,9 @@ export const Route = createFileRoute("/")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: abs("/") },
-        { property: "og:image", content: abs(hero) },
+        { property: "og:image", content: abs(social) },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: abs("/") }],
@@ -143,10 +146,10 @@ function Home() {
         <img
           src={hero}
           alt="Research peptide vials on a laboratory bench"
-          width={1536}
-          height={1024}
+          width={1920}
+          height={1080}
           fetchPriority="high"
-          className="absolute inset-0 w-full h-full object-cover object-[65%_center]"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
         <div className="container-main relative py-16 md:py-20">
