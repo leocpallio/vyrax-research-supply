@@ -748,7 +748,7 @@ export function Breadcrumbs({ items }: { items: { name: string; to?: string }[] 
     <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground mb-6">
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((it, i) => (
-          <li key={it.name} className="flex items-center gap-1.5">
+          <li key={`${it.name}-${i}`} className="flex items-center gap-1.5">
             {i > 0 && <span aria-hidden>/</span>}
             {it.to ? (
               <a href={it.to} className="hover:text-primary">
