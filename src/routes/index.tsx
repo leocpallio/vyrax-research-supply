@@ -3,7 +3,6 @@ import {
   ArrowRight,
   FileCheck2,
   FlaskConical,
-  PackageCheck,
   Truck,
   TestTube2,
   RotateCcw,
@@ -117,7 +116,7 @@ const expectations: Tile[] = [
   [
     Truck,
     "Delivery information",
-    `See our delivery policy for terms and timing. Free tracked delivery over £${site.freeDeliveryThreshold}.`,
+    `Indicative UK delivery terms, including a proposed free-delivery threshold of £${site.freeDeliveryThreshold}. No shipment follows a basket or enquiry.`,
   ],
   [
     RotateCcw,
@@ -125,9 +124,9 @@ const expectations: Tile[] = [
     `Read the conditions for lost or damaged parcels in our returns policy; an enquiry does not schedule a shipment.`,
   ],
   [
-    PackageCheck,
-    "Protective packaging",
-    "Padded vials in a plain outer parcel with no product names on the outside.",
+    FileCheck2,
+    "Check the evidence",
+    "See whether a batch certificate is published before relying on a test result.",
   ],
   [
     Microscope,
@@ -153,7 +152,7 @@ function Home() {
         <div className="container-main relative py-16 md:py-20">
           <div className="max-w-[680px]">
             <div className="eyebrow flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · UK DELIVERY
+              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · ENQUIRY ONLY
             </div>
             <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
               Research peptides for laboratory work.
@@ -168,7 +167,7 @@ function Home() {
             <div className="flex flex-wrap gap-3 mt-8">
               <Button asChild className="rounded-full h-12 px-7 text-base">
                 <Link to="/shop">
-                  Shop all peptides <ArrowRight />
+                  Browse all compounds <ArrowRight />
                 </Link>
               </Button>
               <Button
@@ -176,7 +175,7 @@ function Home() {
                 variant="outline"
                 className="rounded-full h-12 px-7 bg-background/70 text-base"
               >
-                <Link to="/lab-reports">View lab reports</Link>
+                <Link to="/lab-reports">Check report status</Link>
               </Button>
             </div>
             <p className="mt-6 text-sm flex items-center gap-2">
@@ -204,7 +203,7 @@ function Home() {
               to="/shop"
               className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
             >
-              Shop all {compounds.length} <ArrowRight size={16} />
+              Browse all {compounds.length} <ArrowRight size={16} />
             </Link>
           </div>
           <FeaturedGrid />
@@ -225,7 +224,7 @@ function Home() {
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
               {site.enquiriesLive && site.email
-                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is included in the indicative estimate. Multi-buy pricing applies on top: ${spendTierLine()}.`
+                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is included in the indicative estimate. Multi-buy pricing applies on top: ${spendTierLine()}. No order is placed until terms are agreed.`
                 : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. Enquiries are not open until a monitored support channel is in place."}
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
@@ -298,24 +297,30 @@ function Home() {
       {/* Process */}
       <section className="section bg-surface">
         <div className="container-main">
-          <SectionTitle eyebrow="HOW WE WORK" title="From synthesis to your bench" />
+          <SectionTitle eyebrow="HOW IT WORKS" title="Compare before you enquire" />
           <div className="grid md:grid-cols-4 gap-8">
             {[
               [
                 "01",
-                "Synthesis",
-                "Compounds are produced by solid-phase peptide synthesis and supplied lyophilised in sealed vials.",
+                "Choose a specification",
+                "Compare listed vial strengths and indicative prices. Availability is not confirmed by a listing.",
               ],
               [
                 "02",
-                claimGate("testing.independent-lab"),
-                claimGate("testing.batches-sent-for-testing"),
+                "Check the documentation",
+                "The Lab Reports register shows published certificates. No purity result is claimed without a report.",
               ],
-              ["03", "Batch documentation", claimGate("testing.batch-documented")],
+              [
+                "03",
+                "Save a basket",
+                "A basket is saved in this browser; it does not reserve goods or send a request.",
+              ],
               [
                 "04",
-                "Delivery information",
-                `Review our shipping policy before enquiring. Free tracked UK delivery over £${site.freeDeliveryThreshold}.`,
+                "Agree terms separately",
+                site.enquiriesLive && site.email
+                  ? "An enquiry does not take payment, confirm an order or schedule dispatch. Final terms must be agreed separately."
+                  : "Enquiries are closed for now. No payment, confirmed order or dispatch follows from this site.",
               ],
             ].map(([n, t, b]) => (
               <div key={n} className="border-t-2 border-primary pt-5">
@@ -331,7 +336,7 @@ function Home() {
       {/* Why us */}
       <section className="section">
         <div className="container-main">
-          <SectionTitle eyebrow="WHY VYRAX LABS" title="What you can expect from every order" />
+          <SectionTitle eyebrow="BEFORE YOU DECIDE" title="Information you can check" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {expectations.map(([I, t, b]) => (
               <div key={t} className="border border-border rounded-2xl p-6">
@@ -454,9 +459,9 @@ function Home() {
                 per mg so you can compare.
               </p>
               <p>
-                See our delivery policy for terms and timing. Delivery is free over £
-                {site.freeDeliveryThreshold}. All products are sold strictly for laboratory research
-                use only.
+                See the delivery policy for indicative charges and the proposed free-delivery
+                threshold of £{site.freeDeliveryThreshold}. No delivery is booked here. All products
+                are listed strictly for laboratory research use only.
               </p>
             </div>
             <Link
@@ -478,13 +483,18 @@ function Home() {
           <FlaskConical className="text-primary" size={36} />
           <div>
             <h2 className="font-heading text-2xl font-semibold">
-              Buying for a lab or research group?
+              Comparing materials for a lab or research group?
             </h2>
-            <p className="text-muted-foreground mt-1">Multi-buy pricing: {spendTierLine()}.</p>
+            <p className="text-muted-foreground mt-1">
+              Indicative multi-buy tiers: {spendTierLine()}.{" "}
+              {site.enquiriesLive && site.email
+                ? "Final terms are agreed separately."
+                : "Enquiries are currently closed."}
+            </p>
           </div>
           <Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full">
             <Link to="/contact">
-              Contact us <ArrowRight />
+              Check contact availability <ArrowRight />
             </Link>
           </Button>
         </div>

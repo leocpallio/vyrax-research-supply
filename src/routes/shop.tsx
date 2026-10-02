@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
@@ -70,7 +70,12 @@ function Shop() {
         <h1 className="page-title">All peptides</h1>
         <p className="text-muted-foreground mt-2 mb-4 md:mt-3 md:mb-8 max-w-2xl text-sm md:text-base">
           Research compounds and laboratory supplies from Vyrax Labs. {compounds.length} products
-          across {shopSections.length} sections. For research use only - not for human consumption.
+          across {shopSections.length} sections. Prices are indicative; availability is unconfirmed
+          and{" "}
+          {site.enquiriesLive && site.email
+            ? "enquiries do not confirm an order."
+            : "enquiries are currently closed."}{" "}
+          For laboratory research only, not for human use.
         </p>
         <div
           className="flex gap-2 mb-4 md:mb-6 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible"
@@ -100,13 +105,13 @@ function Shop() {
             </Button>
           ))}
         </div>
-        <div className="flex flex-row gap-2 md:gap-3 mb-3 md:mb-6 items-center">
+        <div className="flex flex-wrap gap-2 md:gap-3 mb-3 md:mb-6 items-center">
           <Input
             aria-label="Filter compounds"
             placeholder="Search by name or alias, e.g. GLP-3"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="min-w-0 flex-1 md:max-w-sm rounded-full"
+            className="min-w-0 basis-full sm:basis-auto flex-1 md:max-w-sm rounded-full"
           />
           <label className="text-sm flex items-center gap-2 md:ml-auto">
             <span className="sr-only md:not-sr-only">Sort</span>
@@ -122,18 +127,29 @@ function Shop() {
             </select>
           </label>
         </div>
-        <p className="text-sm text-muted-foreground mb-3 md:mb-5" role="status" aria-live="polite">
-          {list.length} result{list.length === 1 ? "" : "s"}
-        </p>
+        <div className="flex items-center justify-between gap-3 mb-3 md:mb-5">
+          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+            {list.length} result{list.length === 1 ? "" : "s"}
+          </p>
+          {(text || cat !== "all") && (
+            <Button
+              type="button"
+              variant="link"
+              className="h-11 px-2"
+              onClick={() => {
+                setText("");
+                setCat("all");
+              }}
+            >
+              Clear filters
+            </Button>
+          )}
+        </div>
         <ProductGrid list={list} />
         {list.length === 0 && (
           <p className="py-20 text-center text-muted-foreground">
             No compounds match that search. Check the spelling, try an alternative name such as
-            GLP-3, or{" "}
-            <Link to="/shop" className="text-primary underline">
-              browse the full catalogue
-            </Link>
-            .
+            GLP-3, or clear the filters above to browse the full catalogue.
           </p>
         )}
       </div>

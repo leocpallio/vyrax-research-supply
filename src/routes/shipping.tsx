@@ -27,9 +27,15 @@ function Shipping() {
         <table className="w-full text-sm">
           <thead className="bg-surface text-left">
             <tr>
-              <th className="p-4">Service</th>
-              <th className="p-4">Indicative transit</th>
-              <th className="p-4">Cost</th>
+              <th scope="col" className="p-4">
+                Service
+              </th>
+              <th scope="col" className="p-4">
+                Indicative transit
+              </th>
+              <th scope="col" className="p-4">
+                Cost
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

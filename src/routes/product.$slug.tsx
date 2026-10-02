@@ -32,7 +32,6 @@ import {
   costPerUnitLabel,
   isB2G1,
   stockOf,
-  stockLabel,
   trustModifier,
   getCategory,
   getCompound,
@@ -197,13 +196,13 @@ function productFaqs(c: Compound, s: Strength): QA[] {
   ];
   if (c.strengths.length > 1)
     list.push([
-      `Which ${c.name} strengths are available?`,
-      `${c.name} is available in ${c.strengths.map((x) => `${x.label} (${gbp(x.price)})`).join(", ")}. Larger vials cost less per ${s.unit}.`,
+      `Which ${c.name} strengths are listed?`,
+      `${c.name} is listed in ${c.strengths.map((x) => `${x.label} (${gbp(x.price)})`).join(", ")}. Prices are indicative and availability must be confirmed before any order.`,
     ]);
   if (c.kind !== "supply")
     list.push([
       `Do I need bacteriostatic water for ${c.name}?`,
-      "Lyophilised peptides are supplied as dry powder. Laboratories reconstitute them with a suitable diluent such as bacteriostatic water, which we stock separately. Our reconstitution calculator works out the resulting concentration.",
+      "The listed form is lyophilised powder. Laboratories may use a suitable diluent according to their own protocols. Bacteriostatic water is listed separately, subject to availability. Our calculator works out a resulting concentration from your inputs.",
     ]);
   return list;
 }
@@ -276,8 +275,8 @@ function ProductPage() {
             { name: heading },
           ]}
         />
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
-          <div>
+        <div className="grid min-w-0 lg:grid-cols-2 gap-8 lg:gap-14">
+          <div className="min-w-0">
             {gallery.length > 1 ? (
               <ProductGallery
                 images={gallery}
@@ -339,7 +338,7 @@ function ProductPage() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight">
               {heading}
             </h1>
@@ -358,6 +357,9 @@ function ProductPage() {
                 </p>
               )}
             </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Indicative price per vial. Availability and final terms are not confirmed here.
+            </p>
 
             {c.strengths.length > 1 && (
               <div className="mt-6">
@@ -382,13 +384,17 @@ function ProductPage() {
 
             <div className="mt-6 space-y-2.5 text-sm">
               <p className="flex items-center gap-2">
-                <CheckCircle2 size={17} className="text-verify" />
-                <span className="font-semibold">{stockLabel[stock]}</span>
+                <CheckCircle2 size={17} className="text-primary shrink-0" />
+                <span className="font-semibold">
+                  {stock === "out"
+                    ? "Not currently listed for enquiry"
+                    : "Availability to be confirmed"}
+                </span>
               </p>
               <p className="flex items-center gap-2">
                 <Truck size={17} className="text-primary" />
                 <span>
-                  Dispatch times are subject to an accepted order.{" "}
+                  No dispatch follows from saving a basket.{" "}
                   <Link to="/shipping" className="underline">
                     Shipping information
                   </Link>
@@ -410,9 +416,10 @@ function ProductPage() {
 
             {b2g1 && (
               <div className="mt-6 rounded-xl border border-promo/60 bg-promo/10 p-4 text-sm">
-                <p className="font-semibold">Buy 2, get the 3rd free</p>
+                <p className="font-semibold">Indicative buy 2, get the 3rd free</p>
                 <p className="text-muted-foreground mt-1">
-                  Add 3 vials and the third is deducted automatically in your basket.
+                  Add 3 eligible vials to see the saving in your basket estimate. This is not a
+                  confirmed offer or order.
                 </p>
               </div>
             )}
@@ -440,21 +447,21 @@ function ProductPage() {
                 </button>
               </div>
               <Button
-                className="flex-1 h-11 rounded-full text-base"
+                className="flex-1 min-w-0 h-auto min-h-11 rounded-full whitespace-normal text-center text-sm sm:text-base"
                 disabled={stock === "out"}
                 onClick={() => addCart(cartLine(c, s, qty))}
               >
-                {stock === "out" ? "Out of stock" : `Add to basket · ${gbp(s.price * qty)}`}
+                {stock === "out" ? "Not listed" : `Save to basket · ${gbp(s.price * qty)}`}
               </Button>
             </div>
             {stock === "out" && (
               <p className="mt-4 rounded-xl border border-border p-4 text-sm text-muted-foreground">
-                This strength is not available to order. The other strengths of this product remain
-                available, or check back later. Nothing is charged while an item is out of stock.
+                This strength is not listed for an enquiry. You can compare other listed strengths,
+                but none are reserved and nothing is charged on this site.
               </p>
             )}
             <p className="text-xs text-muted-foreground mt-3">
-              Multi-buy tiers: {spendTierLine()}. Applied automatically in your basket.
+              Indicative multi-buy tiers: {spendTierLine()}. Reflected in your basket estimate.
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 text-xs">
@@ -471,8 +478,8 @@ function ProductPage() {
               <div className="flex gap-2 items-start border border-border rounded-xl p-3">
                 <Truck size={16} className="text-primary shrink-0" />
                 <span>
-                  <strong className="block text-sm">{site.carrier}</strong>Free over £
-                  {site.freeDeliveryThreshold}
+                  <strong className="block text-sm">Indicative delivery</strong>Proposed free
+                  threshold £{site.freeDeliveryThreshold}
                 </span>
               </div>
             </div>
@@ -481,7 +488,7 @@ function ProductPage() {
               <div className="mt-6 flex items-center gap-4 border border-border rounded-xl p-4">
                 <FlaskConical className="text-primary shrink-0" />
                 <div className="flex-1 text-sm">
-                  <p className="font-semibold">Need a diluent?</p>
+                  <p className="font-semibold">Compare a diluent?</p>
                   <p className="text-muted-foreground">
                     Bacteriostatic water {bacStrength.label}, {gbp(bacStrength.price)}
                   </p>
@@ -492,7 +499,7 @@ function ProductPage() {
                   className="rounded-full"
                   onClick={() => addCart(cartLine(bac, bacStrength))}
                 >
-                  Add
+                  Save
                 </Button>
               </div>
             )}
@@ -629,9 +636,8 @@ function ProductPage() {
                   <Link to="/lab-reports" className="text-primary underline">
                     Lab Reports
                   </Link>{" "}
-                  page as each launch batch is released, and this page updates the moment a result
-                  is issued. We do not display a purity figure until we hold the certificate behind
-                  it.
+                  page when we hold a report. No publication date is promised. We do not display a
+                  purity figure until we hold the certificate behind it.
                 </p>
               </div>
             )}
@@ -703,12 +709,12 @@ function ProductPage() {
         )}
       </div>
       <div className="mt-20 lg:mt-0" />
-      {/* Mobile sticky buy bar: keeps price and add-to-basket reachable without scrolling back up. */}
+      {/* Mobile sticky basket bar: remains an estimate, never an order. */}
       <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3 shadow-[0_-8px_24px_-16px_rgba(11,27,51,.35)]">
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground truncate">{heading}</p>
           <p className="font-heading font-bold text-lg leading-tight">
-            {gbp(s.price)}{" "}
+            {gbp(s.price * qty)}{" "}
             <span className="font-mono text-xs font-normal text-muted-foreground">
               {costPerUnitLabel(s)}
             </span>
@@ -719,7 +725,7 @@ function ProductPage() {
           disabled={stock === "out"}
           onClick={() => addCart(cartLine(c, s, qty))}
         >
-          {stock === "out" ? "Out of stock" : "Add to basket"}
+          {stock === "out" ? "Not listed" : `Save ${qty} to basket`}
         </Button>
       </div>
       <div className="h-20 lg:hidden" aria-hidden="true" />
