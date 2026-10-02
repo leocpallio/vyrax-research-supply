@@ -1,13 +1,8 @@
 # Vyrax analytics activation
 
-No authorized Vyrax PostHog project token or capture host is configured in this repository. Tracking is **disabled** unless both build-time variables are set:
+Vyrax has its own EU PostHog project, ID `291775`. Its public project token and capture host (`https://eu.i.posthog.com`) are pinned in the tracked `.env.production`, so Lovable's production Vite build gets both values without a dashboard secret. Do not copy another brand's token. The personal API key is not committed or embedded. Build-time environment overrides must not point at a different project; check the built bundle after publishing. If either variable is removed or the host is invalid, analytics fails closed with no consent prompt or request.
 
-```text
-VITE_POSTHOG_KEY=<Vyrax project's public project token>
-VITE_POSTHOG_HOST=https://<Vyrax project's PostHog ingestion host>
-```
-
-Obtain both from the **Vyrax** PostHog project settings (use its region-specific ingestion host, e.g. `https://eu.i.posthog.com` only if that is the actual Vyrax region). Configure them in the Vyrax deployment's Vite build environment, then rebuild/redeploy. Do not copy another brand's project token. Both values are public in the browser bundle. An invalid/missing host or missing key fails closed: no consent prompt or analytics request. Review PostHog project's IP retention and data-processing settings before enabling. This implementation sets `$ip: null`, `$process_person_profile: false`, and never creates PostHog cookies; the ingestion provider still handles connection IPs transiently.
+The project has `anonymize_ips: true`, `autocapture_opt_out: true`, session recording and heatmaps disabled. This implementation sets `$ip: null`, `$process_person_profile: false`, and never creates PostHog cookies; the ingestion provider still handles connection IPs transiently. These are public build values, not credentials. Press Publish in Lovable after the GitHub sync: a commit alone does not update the production domain.
 
 Explicit browser consent is required. Unknown and declined choices send no events. The preference is stored under `vyrax-analytics-consent`, and can be changed at `/cookies`. Revocation discards the ephemeral in-memory identifier; no SDK, replay, identify, autocapture, or persistent tracking ID is used. Each page-load session gets a different ID, so cross-session attribution is deliberately unavailable. Reloading the page does not require a new choice but does create a new anonymous ID. Events are not retroactively replayed on consent.
 
