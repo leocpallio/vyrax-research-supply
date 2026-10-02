@@ -4,13 +4,15 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { analyticsConsent, capture, trackPage } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -39,6 +41,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    capture("page_error", { stage: "route_render" });
   }, [error]);
 
   return (
@@ -128,8 +131,30 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AnalyticsRouteListener />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+function AnalyticsRouteListener() {
+  const path = useRouterState({ select: (state) => state.location.pathname });
+  const [consent, setConsent] = useState(() => analyticsConsent());
+  const lastPath = useRef<string | null>(null);
+  useEffect(() => {
+    const onConsent = () => setConsent(analyticsConsent());
+    window.addEventListener("vyrax-analytics-consent", onConsent);
+    return () => window.removeEventListener("vyrax-analytics-consent", onConsent);
+  }, []);
+  useEffect(() => {
+    if (consent !== "accepted") {
+      lastPath.current = null;
+      return;
+    }
+    if (lastPath.current === path) return;
+    lastPath.current = path;
+    trackPage(path);
+  }, [consent, path]);
+  return null;
 }

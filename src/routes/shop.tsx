@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { abs, site } from "@/data/site";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
+import { capture } from "@/lib/analytics";
 
 type Sort = "price-asc" | "price-desc" | "name";
 
@@ -43,6 +44,7 @@ function Shop() {
   const [text, setText] = useState(search.q ?? "");
   const [cat, setCat] = useState(search.cat ?? "all");
   const [sort, setSort] = useState<Sort>("name");
+  const lastSearch = useRef<string | null>(null);
   useEffect(() => setText(search.q ?? ""), [search.q]);
   useEffect(() => setCat(search.cat ?? "all"), [search.cat]);
   const list = useMemo(() => {
@@ -60,6 +62,15 @@ function Shop() {
     if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
     return sorted;
   }, [text, cat, sort]);
+  useEffect(() => {
+    if (text.trim().length < 2 || text === (search.q ?? "")) return;
+    const timer = setTimeout(() => {
+      if (lastSearch.current === text.trim()) return;
+      lastSearch.current = text.trim();
+      capture("search", { source: "shop", result_count: list.length });
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [text, search.q, list.length]);
   return (
     <StoreShell>
       <div className="container-main py-4 md:py-12">
@@ -99,7 +110,14 @@ function Shop() {
               className="chip h-auto shrink-0"
               data-active={cat === c.slug}
               aria-pressed={cat === c.slug}
-              onClick={() => setCat(c.slug)}
+              onClick={() => {
+                if (cat !== c.slug)
+                  capture("collection_viewed", {
+                    collection_slug: c.slug,
+                    listing_type: "shop_filter",
+                  });
+                setCat(c.slug);
+              }}
             >
               {c.name}
             </Button>
