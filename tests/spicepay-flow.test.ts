@@ -1,6 +1,38 @@
 import { test, expect } from "bun:test";
 import { createCheckout, orderStatus, spicepayWebhook } from "../src/lib/checkout.server";
 
+test("checkout stays closed when webhook signing is not configured", async () => {
+  const previous = {
+    enabled: process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"],
+    secret: process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"],
+  };
+  const originalFetch = globalThis.fetch;
+  process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"] = "true";
+  delete process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"];
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls++;
+    throw new Error("Should not reach the database or processor");
+  }) as typeof fetch;
+  try {
+    const response = await createCheckout(
+      new Request("https://vyraxlabs.co.uk/api/checkout", {
+        method: "POST",
+        headers: { origin: "https://vyraxlabs.co.uk", "content-type": "application/json" },
+        body: "{}",
+      }),
+    );
+    expect(response.status).toBe(502);
+    expect(calls).toBe(0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (previous.enabled === undefined) delete process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"];
+    else process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"] = previous.enabled;
+    if (previous.secret === undefined) delete process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"];
+    else process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"] = previous.secret;
+  }
+});
+
 test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", async () => {
   const originalFetch = globalThis.fetch;
   const vars: Record<string, string> = {

@@ -20,12 +20,14 @@ const config = () => {
   const merchant = process.env["VYRAX_SPICEPAY_MERCHANT_ID"];
   const mode = process.env["VYRAX_SPICEPAY_MODE"];
   const origin = process.env["VYRAX_CHECKOUT_ORIGIN"];
+  const webhookSecret = process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"];
   if (
     !url ||
     !key ||
     !apiKey ||
     !profile ||
     !merchant ||
+    !webhookSecret ||
     !origin ||
     !["test", "live"].includes(mode ?? "")
   )

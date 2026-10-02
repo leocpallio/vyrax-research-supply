@@ -1,6 +1,6 @@
 # Vyrax SpicePay checkout (OFF by default)
 
-This is **Vyrax-only** code. Do not copy the Peptide Pro/UKPL merchant, keys, profile, webhook secret, domain or fulfilment settings. No credentials are checked in. The catalogue-only checkout screen remains the default and server checkout rejects requests unless explicitly enabled. The former browser-side enquiry INSERT was removed because the restricted orders table cannot accept untrusted client-created orders; enquiry intake remains closed. No automatic email, stock reservation or dispatch exists here; payment success alone is **not** authorisation to fulfil an unavailable product.
+This is **Vyrax-only** code. The SpicePay dashboard shop labelled "Peptide Pro" is the Vyrax shop per the owner; confirm its actual merchant ID, profile and payment routing before enabling. Do not copy UKPL credentials, domain or fulfilment settings. No credentials are checked in. The catalogue-only checkout screen remains the default and server checkout rejects requests unless explicitly enabled. The former browser-side enquiry INSERT was removed because the restricted orders table cannot accept untrusted client-created orders; enquiry intake remains closed. No automatic email, stock reservation or dispatch exists here; payment success alone is **not** authorisation to fulfil an unavailable product.
 
 ## Before enabling
 
