@@ -6,4 +6,6 @@
 - [x] Simplify shop-section labels and blurbs while retaining research-use safeguards.
 - [x] Remove technical research tags and descriptions from shop cards and section browsing.
 - [x] Add a WhatsApp support notice without claiming that unconfigured invitations are live.
-- [ ] Publish genuine certificates, verified company details, courier contract and payment provider (blocked by missing business records and commercial setup).
+- [ ] Open paid checkout only after genuine certificates, verified business details, confirmed stock and courier/returns arrangements, a working support inbox, and an approved Vyrax payment account are supplied and checked (blocked by business records and commercial setup).
+- [ ] Test the existing SpicePay checkout end to end in test mode, including the signed payment notification and order status, before enabling public payments (blocked by Vyrax merchant credentials and webhook setup).
+- [ ] Confirm the customer support address: the supplied support@vryaxlabs.co.uk domain currently has no DNS or mail records, whereas the live site is vyraxlabs.co.uk (blocked by address confirmation and a monitored inbox).
