@@ -31,7 +31,7 @@ export const coas: Coa[] = [
     lab: "",
     method: "HPLC",
     tested: "2026-09-21",
-    file: "",
+    file: "/coa/retatrutide-10mg-RTA-6448.pdf",
   },
 ];
 

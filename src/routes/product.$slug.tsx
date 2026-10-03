@@ -405,7 +405,12 @@ function ProductPage() {
               <p className="flex items-center gap-2">
                 <FileCheck2 size={17} className="text-primary" />
                 {coa ? (
-                  <a href={coa.file} target="_blank" rel="noreferrer" className="underline">
+                  <a
+                    href={coa.file || `/verify/${coa.batch}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
                     Batch {coa.batch}: {coa.purity}% purity, view certificate
                   </a>
                 ) : (
@@ -621,7 +626,7 @@ function ProductPage() {
                     </p>
                   </div>
                   <a
-                    href={coa.file}
+                    href={coa.file || `/verify/${coa.batch}`}
                     target="_blank"
                     rel="noreferrer"
                     className="sm:col-span-4 text-primary font-semibold underline"
