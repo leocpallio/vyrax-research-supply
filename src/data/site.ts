@@ -14,7 +14,7 @@ export const site = {
   // Physical address a return can be sent to. Null means returns are handled by arrangement only;
   // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
   returnsAddress: null as string | null,
-  email: null as string | null, // e.g. 'support@vyraxlabs.co.uk'
+  email: "support@vyraxlabs.co.uk",
   phone: null as string | null, // e.g. '+44 20 7946 0000'
   whatsapp: null as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
