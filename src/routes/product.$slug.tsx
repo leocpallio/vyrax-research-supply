@@ -191,7 +191,7 @@ function productFaqs(c: Compound, s: Strength): QA[] {
         ? `See our shipping policy for dispatch times, carrier and delivery charges.`
         : site.enquiriesLive && site.email
           ? "This page leads to an enquiry, not a paid order. See our shipping policy for indicative delivery charges; dispatch is agreed separately."
-          : "Enquiries are currently closed. No order or delivery is scheduled from this site. See our shipping policy for indicative delivery information.",
+          : "The site opens in 3-4 days. No order or delivery is scheduled from this site yet. See our shipping policy for indicative delivery information.",
     ],
   ];
   if (c.strengths.length > 1)
