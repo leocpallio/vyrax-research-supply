@@ -26,7 +26,7 @@ function Privacy() {
         <li>
           {site.enquiriesLive && site.email
             ? "Enquiry details: name, email, selected items and indicative basket total. The form requires a research-use checkbox, but the current enquiry record does not store a separate consent timestamp. No delivery address or card number is requested by the form."
-            : "Enquiries are currently closed. The basket stays in your browser; no name, delivery address, card number or enquiry details are collected through checkout."}
+            : "The site opens in 3-4 days. The basket stays in your browser; no name, delivery address, card number or enquiry details are collected through checkout."}
         </li>
         <li>Account data, if you choose to register or sign in, such as email address.</li>
         <li>Data you submit through any other live site feature, if applicable.</li>

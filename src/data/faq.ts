@@ -17,7 +17,7 @@ export const faqGroups: FaqGroup[] = [
       ],
       [
         "Why is payment an enquiry rather than an instant card payment?",
-        `${site.enquiriesLive && site.email ? "This site records an enquiry only. It does not take payment, confirm stock, place an order or send an automated receipt." : "Enquiries are currently closed while a monitored support inbox and reliable reply path are being set up. You can browse and save a basket, but the site does not collect contact details or take payment."} Availability, final price, delivery and payment would need to be agreed separately before an order could proceed. Do not send payment based on a basket.`,
+        `${site.enquiriesLive && site.email ? "This site records an enquiry only. It does not take payment, confirm stock, place an order or send an automated receipt." : "The site opens in 3-4 days. You can browse and save a basket, but the site does not collect contact details or take payment yet."} Availability, final price, delivery and payment would need to be agreed separately before an order could proceed. Do not send payment based on a basket.`,
       ],
       [
         "Do you offer multi-buy or volume pricing?",

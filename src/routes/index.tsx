@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
       : "";
     const title = `${site.enquiriesLive && site.email ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.enquiriesLive && site.email ? "See delivery options before enquiring." : "Enquiries are not open yet; no payment is taken."}`;
+    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.enquiriesLive && site.email ? "See delivery options before enquiring." : "Site opening in 3-4 days; no payment is taken yet."}`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -165,7 +165,7 @@ function Home() {
               available specifications.{" "}
               {site.enquiriesLive && site.email
                 ? "Enquiries can be submitted online; no payment is taken."
-                : "Enquiries are not open yet; no payment is taken on this site."}
+                : "Site opening in 3-4 days; no payment is taken on this site yet."}
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Button asChild className="rounded-full h-12 px-7 text-base">
@@ -228,7 +228,7 @@ function Home() {
             <p className="text-ink-muted mt-4 leading-relaxed">
               {site.enquiriesLive && site.email
                 ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is included in the indicative estimate. Multi-buy pricing applies on top: ${spendTierLine()}. No order is placed until terms are agreed.`
-                : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. Enquiries are not open until a monitored support channel is in place."}
+                : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. The site opens in 3-4 days."}
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
               <Button asChild variant="secondary" className="rounded-full">
@@ -323,7 +323,7 @@ function Home() {
                 "Agree terms separately",
                 site.enquiriesLive && site.email
                   ? "An enquiry does not take payment, confirm an order or schedule dispatch. Final terms must be agreed separately."
-                  : "Enquiries are closed for now. No payment, confirmed order or dispatch follows from this site.",
+                  : "The site opens in 3-4 days. No payment, confirmed order or dispatch follows from this site yet.",
               ],
             ].map(([n, t, b]) => (
               <div key={n} className="border-t-2 border-primary pt-5">
@@ -492,7 +492,7 @@ function Home() {
               Indicative multi-buy tiers: {spendTierLine()}.{" "}
               {site.enquiriesLive && site.email
                 ? "Final terms are agreed separately."
-                : "Enquiries are currently closed."}
+                : "The site opens in 3-4 days."}
             </p>
           </div>
           <Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full">

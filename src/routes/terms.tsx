@@ -25,7 +25,7 @@ function Terms() {
         )}
         {site.registeredOffice && <>, registered office {site.registeredOffice}</>}. Do not assume a
         company registration exists until the details are published. No paid sale is concluded
-        through this site while enquiry intake is closed; check the legal identity before agreeing
+        through this site before the site opens; check the legal identity before agreeing
         any separate order.
       </p>
       <h2>2. Research use only</h2>
@@ -41,7 +41,7 @@ function Terms() {
       <p>
         {site.enquiriesLive && site.email
           ? "The website records an enquiry, not an order. It does not confirm stock, take payment, arrange delivery or send an automated confirmation email."
-          : "Enquiry intake is currently closed. The site does not collect contact details, take payment, confirm stock or arrange delivery."}{" "}
+          : "The site opens in 3-4 days. It does not collect contact details, take payment, confirm stock or arrange delivery yet."}{" "}
         No contract is formed by saving a basket. An order could proceed only after the parties
         separately agree the legal seller, availability, final price, payment and delivery terms. Do
         not send payment based on a basket.
