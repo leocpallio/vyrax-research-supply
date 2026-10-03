@@ -103,16 +103,19 @@ function Reports() {
             <p className="font-semibold text-verify">{claimText("testing.batch-verified")}</p>
             <p className="mt-1">
               {getCompound(hit.compound)?.name} {hit.strength}, batch {hit.batch}: {hit.purity}%
-              purity ({hit.method}), tested by {hit.lab}.{exp && <> Expiry {monthLabel(exp)}.</>}
+              purity{hit.method ? ` (${hit.method})` : ""}{hit.lab ? `, tested by ${hit.lab}` : ""}.
+              {exp && <> Expiry {monthLabel(exp)}.</>}
             </p>
-            <a
-              href={hit.file}
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary underline mt-2 inline-block"
-            >
-              Open certificate (PDF)
-            </a>
+            {hit.file && (
+              <a
+                href={hit.file}
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary underline mt-2 inline-block"
+              >
+                Open certificate (PDF)
+              </a>
+            )}
           </div>
         )}
 
@@ -123,7 +126,7 @@ function Reports() {
               <table className="w-full text-sm">
                 <thead className="bg-surface text-left">
                   <tr>
-                    {["Compound", "Batch", "Purity", "Method", "Laboratory", "Tested", ""].map(
+                    {["Compound", "Batch", "Purity", "Method", "Tested", ""].map(
                       (h) => (
                         <th key={h} className="p-4 font-semibold">
                           {h}
@@ -146,17 +149,18 @@ function Reports() {
                       <td className="p-4 font-mono">{r.batch}</td>
                       <td className="p-4 font-mono text-verify font-semibold">{r.purity}%</td>
                       <td className="p-4">{r.method}</td>
-                      <td className="p-4">{r.lab}</td>
                       <td className="p-4">{new Date(r.tested).toLocaleDateString("en-GB")}</td>
                       <td className="p-4">
-                        <a
-                          href={r.file}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-primary underline"
-                        >
-                          PDF
-                        </a>
+                        {r.file && (
+                          <a
+                            href={r.file}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-primary underline"
+                          >
+                            PDF
+                          </a>
+                        )}
                       </td>
                     </tr>
                   ))}

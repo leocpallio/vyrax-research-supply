@@ -311,11 +311,13 @@ function ProductPage() {
                 )}
                 <span className="absolute top-4 left-4 flex gap-2">
                   {b2g1 && <span className="badge-promo">{claimText("offer.b2g1")}</span>}
-                  {coa && /\bHPLC\b/i.test(coa.method) && (
-                    <span className="badge-verify">
-                      {claimFilled("testing.purity-badge", { purity: String(coa.purity) })}
-                    </span>
-                  )}
+                  {coa &&
+                    /\bHPLC\b/i.test(coa.method) &&
+                    claimFilled("testing.purity-badge", { purity: String(coa.purity) }) != null && (
+                      <span className="badge-verify">
+                        {claimFilled("testing.purity-badge", { purity: String(coa.purity) })}
+                      </span>
+                    )}
                 </span>
               </div>
             )}

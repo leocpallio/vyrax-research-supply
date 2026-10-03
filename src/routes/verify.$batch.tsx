@@ -37,11 +37,11 @@ function Verify() {
         ["Product", `${compound?.name ?? hit.compound} ${hit.strength}`],
         ["Batch", hit.batch],
         ["Purity", `${hit.purity}%`],
-        ["Method", hit.method],
+        ...(hit.method ? ([["Method", hit.method]] as [string, string][]) : []),
         ...(hit.measuredMg != null
           ? ([["Net content found", `${hit.measuredMg} mg`]] as [string, string][])
           : []),
-        ["Laboratory", hit.lab],
+        ...(hit.lab ? ([["Laboratory", hit.lab]] as [string, string][]) : []),
         [
           "Tested",
           new Date(`${hit.tested}T00:00:00Z`).toLocaleDateString("en-GB", {
@@ -95,11 +95,13 @@ function Verify() {
               </table>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="rounded-full">
-                <a href={hit.file} target="_blank" rel="noreferrer">
-                  Open certificate (PDF)
-                </a>
-              </Button>
+              {hit.file && (
+                <Button asChild className="rounded-full">
+                  <a href={hit.file} target="_blank" rel="noreferrer">
+                    Open certificate (PDF)
+                  </a>
+                </Button>
+              )}
               <Button asChild variant="outline" className="rounded-full">
                 <a href={productPath(hit.compound, hit.strength)}>View product</a>
               </Button>

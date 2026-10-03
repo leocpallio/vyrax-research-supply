@@ -21,7 +21,19 @@ export type Coa = {
 // so the vial and /verify/<batch> always show the same date.
 export const SHELF_LIFE_MONTHS = 24;
 
-export const coas: Coa[] = [];
+export const coas: Coa[] = [
+  {
+    compound: "retatrutide",
+    strength: "10mg",
+    batch: "RTA-6448",
+    purity: 99.85,
+    measuredMg: 10.31,
+    lab: "",
+    method: "HPLC",
+    tested: "2026-09-21",
+    file: "",
+  },
+];
 
 // True once at least one real certificate exists. Copy that asserts testing has happened, or that
 // certificates are published, is switched on this flag so the site can never claim a report it does
