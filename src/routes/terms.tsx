@@ -25,7 +25,7 @@ function Terms() {
         )}
         {site.registeredOffice && <>, registered office {site.registeredOffice}</>}. Do not assume a
         company registration exists until the details are published. No paid sale is concluded
-        through this site while enquiry intake is closed; check the legal identity before agreeing
+        through this site before the site opens; check the legal identity before agreeing
         any separate order.
       </p>
       <h2>2. Research use only</h2>

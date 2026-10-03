@@ -10,7 +10,7 @@ const paymentEnabled = import.meta.env["VITE_SPICEPAY_CHECKOUT_ENABLED"] === "tr
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: `${paymentEnabled ? "Checkout" : "Checkout closed"} | Vyrax Labs` },
+      { title: `${paymentEnabled ? "Checkout" : "Opening soon"} | Vyrax Labs` },
       {
         name: "description",
         content: paymentEnabled
@@ -29,12 +29,12 @@ function CheckoutClosed() {
   return (
     <StoreShell>
       <div className="container-main py-10 md:py-12 min-h-[60vh] max-w-5xl">
-        <h1 className="page-title">Checkout is not open yet</h1>
+        <h1 className="page-title">Site opening in 3-4 days</h1>
         <div className="mt-10 grid md:grid-cols-[1fr_340px] gap-10">
           <div className="rounded-2xl border border-border p-7 h-fit">
             <p className="text-muted-foreground leading-relaxed">
-              You can browse the catalogue and save a basket in this browser. We cannot take an
-              order or enquiry yet. No contact details are collected and no payment is taken.
+              The site opens in 3-4 days. You can browse the catalogue and save a basket in this
+              browser until then. No contact details are collected and no payment is taken yet.
             </p>
             <Button asChild className="mt-6 rounded-full">
               <Link to="/shop">Continue browsing</Link>
