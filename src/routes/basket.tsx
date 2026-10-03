@@ -56,7 +56,7 @@ function Basket() {
             ? "Hosted payment is available at checkout; inventory is not reserved."
             : site.enquiriesLive && site.email
               ? "Final terms must be agreed separately."
-              : "Enquiries are currently closed."}
+              : "The site opens in 3-4 days. Baskets are saved in this browser until then."}
         </p>
         {!items.length ? (
           <div className="py-20 text-center">
@@ -221,7 +221,7 @@ function Basket() {
                     ? "Continue to checkout"
                     : site.enquiriesLive && site.email
                       ? "Continue to enquiry"
-                      : "See why enquiries are closed"}{" "}
+                      : "Site opening in 3-4 days"}{" "}
                   <ArrowRight />
                 </Link>
               </Button>
@@ -231,7 +231,7 @@ function Basket() {
                   ? "The server confirms the final price before hosted payment."
                   : site.enquiriesLive && site.email
                     ? "No automated email or dispatch is triggered by an enquiry."
-                    : "Enquiries are closed while the support inbox is being set up; no contact details are collected."}
+                    : "The site opens in 3-4 days; no contact details are collected yet."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
                 For research use only. Not for human consumption.

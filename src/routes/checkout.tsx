@@ -15,7 +15,7 @@ export const Route = createFileRoute("/checkout")({
         name: "description",
         content: paymentEnabled
           ? "Review your research order before continuing to hosted payment."
-          : "Vyrax Labs checkout is not open. No payment or enquiry is taken.",
+          : "Vyrax Labs opens in 3-4 days. No payment or enquiry is taken yet.",
       },
       { name: "robots", content: "noindex" },
     ],

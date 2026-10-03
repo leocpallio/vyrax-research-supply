@@ -48,7 +48,7 @@ const announcements =
         `Indicative free UK delivery over £${site.freeDeliveryThreshold}`,
         `Multi-buy pricing: ${spendTierLine()}`,
       ]
-    : ["Enquiries are not open yet"];
+    : ["Site opening in 3-4 days"];
 
 function AnnouncementBar() {
   return (
