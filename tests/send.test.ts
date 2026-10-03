@@ -30,6 +30,25 @@ describe("server-only Resend transport", () => {
       ),
     ).rejects.toThrow("Vyrax sender");
   });
+  it("rejects malformed sender headers before network access", async () => {
+    for (const from of [
+      "Vyrax <mail@vyraxlabs.co.uk",
+      "mail@vyraxlabs.co.uk>",
+      "Vyrax <mail@vyraxlabs.co.uk>\r\nBcc: attacker@example.com",
+    ]) {
+      await expect(
+        sendTransactional(
+          { to: "user@example.com", mail, key: "support:123" },
+          {
+            env: { RESEND_API_KEY: "placeholder", VYRAX_EMAIL_FROM: from },
+            fetcher: async () => {
+              throw new Error("network must not run");
+            },
+          },
+        ),
+      ).rejects.toThrow("Vyrax sender");
+    }
+  });
   it("posts only rendered HTML/text with a deterministic idempotency key", async () => {
     let request: Request | undefined;
     await sendTransactional(
