@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { priceBasket } from "./catalog";
+import { priceBasket } from "./basket-pricing";
 import { quoteCheckout } from "./checkout-pricing";
 
 test("basket total matches server quote", () => {
