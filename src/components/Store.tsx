@@ -458,9 +458,6 @@ function Footer() {
     claimFilled("payment.methods-live", {
       paymentMethods: `${site.paymentMethods.join(", ")}. Card details are entered on our payment provider's secure page`,
     }) ?? "Card checkout is not open yet.";
-  const pending = [!site.registeredOffice && "Registered office address: being finalised."].filter(
-    Boolean,
-  );
   return (
     <footer className="bg-ink text-ink-foreground">
       <div className="border-b border-ink-line">
@@ -550,9 +547,6 @@ function Footer() {
         <div className="container-main py-6 text-xs text-ink-muted grid gap-3 md:flex md:justify-between md:items-start">
           <div className="space-y-1">
             {company.map((line) => (
-              <p key={line as string}>{line}</p>
-            ))}
-            {pending.map((line) => (
               <p key={line as string}>{line}</p>
             ))}
             <p>
