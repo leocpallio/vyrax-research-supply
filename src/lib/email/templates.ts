@@ -1,200 +1,135 @@
 // Pure email rendering: no secrets, network calls or customer data access.
-// These messages are templates, not evidence that a payment or fulfilment integration exists.
+// Messages describe a PAID checkout: confirmation after payment, payment failed/expired, dispatch.
 export type Line = { name: string; strength: string; quantity: number; lineTotal: number };
-type Named = { name: string };
-type Referenced = Named & { reference: string };
+export type Summary = {
+  lines: readonly Line[];
+  /** Optional breakdown. Omit when it cannot be reproduced exactly. */
+  discount?: number;
+  delivery?: number;
+  total: number;
+};
+type Referenced = { name: string; reference: string };
 export type EmailEvent =
-  | ({
-      kind: "enquiry" | "ownerAlert";
-      lines: readonly Line[];
-      indicativeTotal: number;
-    } & Referenced & { email?: string })
-  | ({ kind: "paymentPending" | "paymentConfirmed" | "refunded"; amount: number } & Referenced)
-  | ({ kind: "packed" | "cancelled" } & Referenced)
-  | ({
-      kind: "dispatched";
-      carrier?: string;
-      trackingNumber?: string;
-      trackingUrl?: string;
-    } & Referenced)
-  | ({ kind: "support" } & Named)
-  | { kind: "authConfirm" | "authReset"; actionUrl: string };
+  | ({ kind: "orderConfirmation" } & Referenced & Summary)
+  | ({ kind: "paymentFailed" | "paymentExpired" } & Referenced)
+  | ({ kind: "dispatched"; trackingNumber?: string } & Referenced);
 export type RenderedEmail = { subject: string; html: string; text: string };
+
+export const SUPPORT_EMAIL = "support@vyraxlabs.co.uk";
+export const LEGAL_FOOTER =
+  "Vyrax Labs is a trading name of Oraxis Research Ltd, company number 17157816";
+export const RESEARCH_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
+const CARRIER = "Royal Mail Tracked 24";
 
 export const escapeHtml = (value: unknown) =>
   String(value ?? "").replace(
     /[&<>"']/g,
-    (character) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      })[character] ?? character,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
   );
 const gbp = (value: number) =>
   new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
-const researchNotice = "For laboratory research use only. Not for human or veterinary use.";
-const siteUrl = "https://vyraxlabs.co.uk";
-const safeSiteUrl = (raw: string) => {
-  try {
-    const url = new URL(raw);
-    return url.origin === siteUrl && url.protocol === "https:" ? url.href : null;
-  } catch {
-    return null;
-  }
-};
+const oneLine = (value: unknown) => String(value ?? "").replace(/[\r\n\t]+/g, " ").trim();
+const e = escapeHtml;
 
-/** All dynamic content enters via escaped text nodes or allowlisted URLs. */
+const css = {
+  body: "margin:0;padding:0;background:#f4f6fa;color:#172238;font-family:Arial,Helvetica,sans-serif",
+  card: "max-width:600px;width:100%;background:#ffffff;border:1px solid #dfe5ed;border-radius:12px",
+  head: "background:#203eab;color:#ffffff;padding:22px 28px;font-size:22px;font-weight:bold",
+  main: "padding:28px;line-height:1.6;font-size:16px;color:#172238",
+  p: "margin:0 0 16px",
+  foot: "padding:20px 28px;border-top:1px solid #dfe5ed;font-size:13px;line-height:1.5;color:#4b5563",
+  cell: "padding:10px;border-bottom:1px solid #dfe5ed",
+};
+// Dark-mode safe: light palette is inline (works everywhere); clients that honour the media query get a dark one.
+const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#0f1626!important}.card{background:#172238!important;border-color:#2b3a57!important}.tx{color:#e8edf7!important}.mute{color:#a9b4c8!important}.rule{border-color:#2b3a57!important}.hd{background:#203eab!important}}@media (max-width:620px){.pad{padding:20px!important}}</style>`;
+
+function table(s: Summary): string {
+  const rows = s.lines
+    .map(
+      (l) =>
+        `<tr><td class="rule tx" style="${css.cell}">${e(l.name)}<br><span class="mute" style="color:#4b5563">${e(l.strength)}</span></td><td class="rule tx" align="center" style="${css.cell}">${e(l.quantity)}</td><td class="rule tx" align="right" style="${css.cell}">${e(gbp(l.lineTotal))}</td></tr>`,
+    )
+    .join("");
+  const extra = (label: string, v: string) =>
+    `<tr><td colspan="2" class="tx" style="padding:6px 10px">${e(label)}</td><td class="tx" align="right" style="padding:6px 10px">${e(v)}</td></tr>`;
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 16px;font-size:14px"><thead><tr><th class="tx" align="left" style="${css.cell}">Item</th><th class="tx" align="center" style="${css.cell}">Qty</th><th class="tx" align="right" style="${css.cell}">Price</th></tr></thead><tbody>${rows}${s.discount ? extra("Discounts", `-${gbp(s.discount)}`) : ""}${s.delivery !== undefined ? extra(`Delivery (${CARRIER})`, s.delivery === 0 ? "Free" : gbp(s.delivery)) : ""}<tr><td colspan="2" class="tx" style="padding:12px 10px;font-weight:bold">Total paid</td><td class="tx" align="right" style="padding:12px 10px;font-weight:bold">${e(gbp(s.total))}</td></tr></tbody></table>`;
+}
+function textSummary(s: Summary): string[] {
+  return [
+    ...s.lines.map((l) => `${oneLine(l.name)} ${oneLine(l.strength)} x ${l.quantity}: ${gbp(l.lineTotal)}`),
+    ...(s.discount ? [`Discounts: -${gbp(s.discount)}`] : []),
+    ...(s.delivery !== undefined
+      ? [`Delivery (${CARRIER}): ${s.delivery === 0 ? "Free" : gbp(s.delivery)}`]
+      : []),
+    `Total paid: ${gbp(s.total)}`,
+  ];
+}
+
 function wrap(
   heading: string,
-  preheader: string,
-  blocks: string[],
+  paras: string[],
   textLines: string[],
   detailHtml = "",
-): { html: string; text: string } {
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#f4f6fa;color:#172238;font-family:Arial,Helvetica,sans-serif"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:32px 14px"><table role="presentation" width="600" style="max-width:600px;width:100%;background:#ffffff;border:1px solid #dfe5ed;border-radius:12px" cellspacing="0" cellpadding="0"><tr><td style="background:#203eab;color:#ffffff;padding:24px 28px;font-size:22px;font-weight:bold">Vyrax Labs</td></tr><tr><td style="padding:28px;line-height:1.6;font-size:16px"><h1 style="margin:0 0 16px;font-size:24px;color:#172238">${escapeHtml(heading)}</h1>${blocks.map((b) => `<p style="margin:0 0 16px">${b}</p>`).join("")}${detailHtml}</td></tr><tr><td style="padding:20px 28px;border-top:1px solid #dfe5ed;font-size:13px;color:#4b5563">${escapeHtml(researchNotice)}<br>Vyrax Labs &bull; <a href="${siteUrl}" style="color:#203eab">vyraxlabs.co.uk</a></td></tr></table></td></tr></table></body></html>`;
-  return {
-    html,
-    text: [heading, "", ...textLines, "", researchNotice, "Vyrax Labs | vyraxlabs.co.uk"].join(
-      "\n",
-    ),
-  };
+  tail: string[] = [],
+) {
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(heading)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6fa"><tr><td align="center" style="padding:24px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="hd" style="${css.head}">Vyrax Labs</td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 16px;font-size:24px;color:#172238">${e(heading)}</h1>${paras.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}${detailHtml}${tail.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}<p style="${css.p}">Questions: <a href="mailto:${SUPPORT_EMAIL}" style="color:#203eab">${SUPPORT_EMAIL}</a></p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${e(LEGAL_FOOTER)}</td></tr></table></td></tr></table></body></html>`;
+  const text = [
+    heading,
+    "",
+    ...textLines,
+    "",
+    `Questions: ${SUPPORT_EMAIL}`,
+    "",
+    RESEARCH_NOTICE,
+    LEGAL_FOOTER,
+  ].join("\n");
+  return { html, text };
 }
-const p = (value: unknown) => escapeHtml(value);
-const linesOf = (lines: readonly Line[]) =>
-  lines.map((line) => `${line.name} ${line.strength} x ${line.quantity}: ${gbp(line.lineTotal)}`);
-const enquiryTable = (lines: readonly Line[], total: number) =>
-  `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:20px 0;font-size:14px"><thead><tr style="background:#f4f6fa"><th align="left" style="padding:10px;border-bottom:1px solid #dfe5ed">Item</th><th align="center" style="padding:10px;border-bottom:1px solid #dfe5ed">Qty</th><th align="right" style="padding:10px;border-bottom:1px solid #dfe5ed">Estimate</th></tr></thead><tbody>${lines
-    .map(
-      (line) =>
-        `<tr><td style="padding:10px;border-bottom:1px solid #dfe5ed">${p(line.name)}<br><span style="color:#4b5563">${p(line.strength)}</span></td><td align="center" style="padding:10px;border-bottom:1px solid #dfe5ed">${p(line.quantity)}</td><td align="right" style="padding:10px;border-bottom:1px solid #dfe5ed">${p(gbp(line.lineTotal))}</td></tr>`,
-    )
-    .join(
-      "",
-    )}<tr><td colspan="2" style="padding:12px 10px;font-weight:bold">Indicative total</td><td align="right" style="padding:12px 10px;font-weight:bold">${p(gbp(total))}</td></tr></tbody></table><p style="padding:12px;background:#f4f6fa;border-left:3px solid #203eab;margin:0">No payment has been taken. This is an enquiry, not a confirmed order. Availability, final pricing and any next steps must be agreed separately. No dispatch is scheduled or response time guaranteed.</p>`;
 
 export function renderEmail(event: EmailEvent): RenderedEmail {
-  let subject: string;
-  let heading: string;
-  let copy: string[];
-  let htmlCopy: string[] | undefined;
-  let detailHtml = "";
+  const hello = `Hello ${oneLine(event.name)},`;
+  const ref = `Order reference: ${oneLine(event.reference)}`;
+  const base = [hello, ref];
   switch (event.kind) {
-    case "enquiry":
-    case "ownerAlert": {
-      const owner = event.kind === "ownerAlert";
-      heading = owner ? "New research product enquiry" : "Your enquiry was recorded";
-      subject = `${heading} | Vyrax Labs`;
-      copy = [
-        owner
-          ? `Enquiry from ${event.name}${event.email ? ` (${event.email})` : ""}.`
-          : `Hello ${event.name},`,
-        `Enquiry reference: ${event.reference}.`,
-        ...linesOf(event.lines),
-        `Indicative total: ${gbp(event.indicativeTotal)}.`,
-        "No payment has been taken. This is an enquiry, not a confirmed order. Availability, final pricing and any next steps must be agreed separately. No dispatch is scheduled or response time guaranteed.",
+    case "orderConfirmation": {
+      const heading = "Payment received, thank you";
+      const intro = [
+        hello,
+        ref,
+        "We have received your payment and your order is awaiting review.",
       ];
-      htmlCopy = [copy[0] ?? "", copy[1] ?? ""];
-      detailHtml = enquiryTable(event.lines, event.indicativeTotal);
-      break;
+      const after = `Orders ship by ${CARRIER}. We will email you again when your order is dispatched. No delivery date is promised.`;
+      const { html, text } = wrap(
+        heading,
+        intro,
+        [...intro, "", ...textSummary(event), "", after],
+        table(event),
+        [after],
+      );
+      return { subject: `Order ${oneLine(event.reference)} confirmed | Vyrax Labs`, html, text };
     }
-    case "paymentPending":
-      heading = "Payment is pending";
-      subject = `Payment pending | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        `Amount: ${gbp(event.amount)}.`,
-        "Payment has not been confirmed. Do not treat this message as a receipt. We will confirm separately if payment completes.",
+    case "paymentFailed":
+    case "paymentExpired": {
+      const failed = event.kind === "paymentFailed";
+      const heading = failed ? "Your payment did not complete" : "Your payment session expired";
+      const body = [
+        ...base,
+        failed
+          ? "Your payment was not completed and your order has not been placed. Check with your bank or card provider before trying again."
+          : "The payment session expired before payment was completed, so your order has not been placed.",
+        `If you were charged, email ${SUPPORT_EMAIL} quoting the reference above and do not pay again.`,
       ];
-      break;
-    case "paymentConfirmed":
-      heading = "Payment confirmed";
-      subject = `Payment confirmed | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        `Amount received: ${gbp(event.amount)}.`,
-        "This confirms payment only. We will update you separately if your order is packed or dispatched.",
-      ];
-      break;
-    case "packed":
-      heading = "Your order is packed";
-      subject = `Order packed | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        "Your order is packed but has not been dispatched. We will send dispatch details when available.",
-      ];
-      break;
-    case "dispatched":
-      heading = "Your order has been dispatched";
-      subject = `Order dispatched | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        "Your order has been dispatched.",
-        ...(event.carrier ? [`Carrier: ${event.carrier}.`] : []),
-        ...(event.trackingNumber ? [`Tracking number: ${event.trackingNumber}.`] : []),
-      ];
-      // External tracking links are not inserted blindly; only the reference is shown.
-      break;
-    case "cancelled":
-      heading = "Your order was cancelled";
-      subject = `Order cancelled | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        "Your order was cancelled. If a payment was taken, any refund will be communicated separately after it is processed.",
-      ];
-      break;
-    case "refunded":
-      heading = "Your refund was processed";
-      subject = `Refund processed | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        `Reference: ${event.reference}.`,
-        `Refund amount: ${gbp(event.amount)}.`,
-        "Your payment provider determines when the funds appear in your account.",
-      ];
-      break;
-    case "support":
-      heading = "We received your message";
-      subject = `Message received | Vyrax Labs`;
-      copy = [
-        `Hello ${event.name},`,
-        "Your message has been recorded. This is an automatic acknowledgement, not an answer. We cannot guarantee a response time.",
-      ];
-      break;
-    case "authConfirm":
-    case "authReset": {
-      const url = safeSiteUrl(event.actionUrl);
-      if (!url) throw new Error("Auth action URL must use the Vyrax site origin");
-      heading = event.kind === "authConfirm" ? "Confirm your account" : "Reset your password";
-      subject = `${heading} | Vyrax Labs`;
-      copy = [
-        "Use this link only if you requested it:",
-        url,
-        "If you did not request this, you can ignore this message. No order or payment was created.",
-      ];
-      htmlCopy = [
-        `Use this link only if you requested it:`,
-        `<a href="${p(url)}" style="color:#203eab">${p(url)}</a>`,
-        copy[2] ?? "",
-      ];
-      break;
+      const { html, text } = wrap(heading, body, body);
+      return { subject: `${heading} | Vyrax Labs`, html, text };
+    }
+    case "dispatched": {
+      const heading = "Your order has been dispatched";
+      const tracking = event.trackingNumber
+        ? [`Tracking number: ${oneLine(event.trackingNumber)}`]
+        : [];
+      const body = [...base, `Carrier: ${CARRIER}.`, ...tracking];
+      const { html, text } = wrap(heading, body, body);
+      return { subject: `Order ${oneLine(event.reference)} dispatched | Vyrax Labs`, html, text };
     }
   }
-  const rendered = wrap(
-    heading,
-    copy[0] ?? heading,
-    (htmlCopy ?? copy).map((line) =>
-      htmlCopy?.includes(line) && line.startsWith("<a ") ? line : p(line),
-    ),
-    copy,
-    detailHtml,
-  );
-  return { subject, ...rendered };
 }

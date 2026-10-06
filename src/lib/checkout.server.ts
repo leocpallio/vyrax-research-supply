@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { quoteCheckout } from "./checkout-pricing";
+import { sendOrderEmail } from "./email/order-email.server";
 import { validatePaymentEvent, verifySignature } from "./spicepay";
 
 const json = (value: unknown, status = 200) =>
@@ -244,7 +245,7 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     const store = db(c.url, c.key);
     const { data: order, error } = await store
       .from("orders")
-      .select("payment_id,merchant_id,total_pence,currency,test_mode")
+      .select("id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode")
       .eq("payment_id", paymentId)
       .maybeSingle();
     if (error) throw error;
@@ -255,7 +256,7 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     } catch {
       return fail("Payment mismatch", 409);
     }
-    const { error: rpcError } = await store.rpc("apply_spicepay_event", {
+    const { data: applied, error: rpcError } = await store.rpc("apply_spicepay_event", {
       p_event_id: event["event_id"],
       p_event_type: event["event_type"],
       p_payment_id: paymentId,
@@ -266,6 +267,17 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
       p_status: object?.["status"],
     });
     if (rpcError) throw rpcError;
+    // Best effort, never throws: the order stays paid whatever happens to the email.
+    const type = String(event["event_type"]);
+    const mailKind =
+      applied === "paid"
+        ? "orderConfirmation"
+        : applied === "ignored" && /expir/i.test(type)
+          ? "paymentExpired"
+          : applied === "ignored" && /fail|declin/i.test(type)
+            ? "paymentFailed"
+            : null;
+    if (mailKind) await sendOrderEmail(mailKind, order, String(event["event_id"]));
     return json({ received: true, decision });
   } catch (error) {
     console.error("[vyrax webhook]", error instanceof Error ? error.message : "unknown error");
