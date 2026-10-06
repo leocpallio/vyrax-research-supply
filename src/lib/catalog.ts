@@ -138,7 +138,6 @@ export function productGallery(slug: string, strength?: string): Img[] {
 
 // ---------------------------------------------------------------- Pricing helpers
 export const gbp = (value: number) => "£" + value.toFixed(2);
-const round2 = (n: number) => Math.round(n * 100) / 100;
 export const costPerUnit = (s: Strength) => (s.amount > 0 ? s.price / s.amount : 0);
 export const costPerUnitLabel = (s: Strength) => `${gbp(costPerUnit(s))}/${s.unit}`;
 export const fromPrice = (c: Compound) => Math.min(...c.strengths.map((s) => s.price));
@@ -221,45 +220,17 @@ export const slugify = (s: string) =>
     .replace(/^-|-$/g, "");
 
 // ---------------------------------------------------------------- Basket
-export type CartItem = {
-  slug: string;
-  name: string;
-  strength: string;
-  quantity: number;
-  price: number;
-};
+import { priceBasket, type CartItem } from "./basket-pricing";
+export type { CartItem };
 export const cartKey = "vyrax-basket";
 
-export function priceBasket(items: CartItem[]) {
-  const subtotal = round2(items.reduce((sum, i) => sum + i.price * i.quantity, 0));
-  const freeVials = round2(
-    items.reduce(
-      (sum, i) => sum + (isB2G1(i.slug, i.strength) ? Math.floor(i.quantity / 3) * i.price : 0),
-      0,
-    ),
-  );
-  const afterOffer = round2(subtotal - freeVials);
-  const tiers = [...site.spendTiers].sort((a, b) => b.over - a.over);
-  const rate = tiers.find((t) => afterOffer >= t.over)?.rate ?? 0;
-  const tierDiscount = round2(afterOffer * rate);
-  const goods = round2(afterOffer - tierDiscount);
-  const delivery =
-    items.length === 0 || goods >= site.freeDeliveryThreshold ? 0 : site.standardDeliveryFee;
-  const next = [...tiers].reverse().find((t) => afterOffer < t.over);
-  return {
-    subtotal,
-    freeVials,
-    rate,
-    tierDiscount,
-    goods,
-    delivery,
-    total: round2(goods + delivery),
-    freeDeliveryGap: items.length ? round2(Math.max(0, site.freeDeliveryThreshold - goods)) : 0,
-    nextTier: next
-      ? { over: next.over, rate: next.rate, gap: round2(next.over - afterOffer) }
-      : undefined,
-  };
-}
+export { priceBasket };
+
+/** Lines the server will reject at checkout (out of stock / preorder). */
+export const isLineUnavailable = (i: CartItem) => {
+  const st = getCompound(i.slug)?.strengths.find((x) => x.label === i.strength);
+  return !st || stockOf(st) === "out" || stockOf(st) === "preorder";
+};
 
 export function readCart(): CartItem[] {
   try {
