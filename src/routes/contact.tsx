@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, Clock, FileCheck2, MessageCircle } from "lucide-react";
+import { Mail, Clock, FileCheck2, MessageCircle, Phone } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
 import { Input } from "@/components/ui/input";
@@ -176,6 +176,15 @@ function Contact() {
                 <div>
                   <p className="font-semibold">Email</p>
                   <p className="text-sm text-muted-foreground">{site.email}</p>
+                </div>
+              </a>
+            )}
+            {site.phone && (
+              <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="flex gap-4 border border-border rounded-2xl p-5 hover:border-primary">
+                <Phone className="text-primary shrink-0" />
+                <div>
+                  <p className="font-semibold">Customer support phone</p>
+                  <p className="text-sm text-muted-foreground">{site.phone}</p>
                 </div>
               </a>
             )}

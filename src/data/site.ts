@@ -20,11 +20,12 @@ export const site = {
   // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
   returnsAddress: null as string | null,
   email: "support@vyraxlabs.co.uk",
-  phone: null as string | null, // e.g. '+44 20 7946 0000'
+  phone: "+44 7575 894339" as string | null,
   whatsapp: null as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
   // Fulfilment
-  dispatchCutoffHour: 14, // same-day dispatch cut-off, UK time, working days
+  dispatchCutoffHour: 14, // paid orders confirmed before 2pm UK time on working days, subject to stock
+  coldChainPacked: true, // operator-confirmed packing practice; transit temperature is not monitored
   freeDeliveryThreshold: 50,
   standardDeliveryFee: 4.99,
   carrier: "Royal Mail Tracked 24",

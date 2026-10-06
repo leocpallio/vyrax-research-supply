@@ -39,6 +39,7 @@ export type EvidenceKey =
   | "paymentMethodsLive"
   | "couriers"
   | "dispatchCutoffHour"
+  | "coldChainPacked"
   | "freeShippingThreshold"
   | "mhraOrTradingRegistration"
   | "regulatoryStatus";
@@ -61,6 +62,7 @@ export type EvidenceValue = {
   paymentMethodsLive: readonly string[];
   couriers: readonly string[];
   dispatchCutoffHour: number;
+  coldChainPacked: boolean;
   freeShippingThreshold: number;
   mhraOrTradingRegistration: string;
   regulatoryStatus: string;
@@ -138,6 +140,7 @@ export const evidence: EvidenceManifest = {
     ? known([site.carrier])
     : unknown("No courier is configured, so no carrier may be named"),
   dispatchCutoffHour: known(site.dispatchCutoffHour),
+  coldChainPacked: known(site.coldChainPacked),
   freeShippingThreshold: known(site.freeDeliveryThreshold),
   mhraOrTradingRegistration: unknown(
     "No MHRA licence or trading registration number is configured; no registration may be claimed",

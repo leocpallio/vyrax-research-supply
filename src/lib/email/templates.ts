@@ -1,3 +1,5 @@
+import { site } from "../../data/site";
+import { dispatchCutoffLabel } from "../delivery";
 // Pure email rendering: no secrets, network calls or customer data access.
 // Messages describe a PAID checkout: confirmation after payment, payment failed/expired, dispatch.
 export type Line = { name: string; strength: string; quantity: number; lineTotal: number };
@@ -20,6 +22,8 @@ export const LEGAL_FOOTER =
   "Vyrax Labs";
 export const RESEARCH_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
 const CARRIER = "Royal Mail Tracked 24";
+const SUPPORT_PHONE = site.phone ?? "";
+const SHIPPING_NOTE = `Paid orders confirmed before ${dispatchCutoffLabel()} on working days are dispatched the same day, subject to stock. We pack with cold-chain protection; transit temperature is not monitored and a specific temperature is not promised.`;
 
 export const escapeHtml = (value: unknown) =>
   String(value ?? "").replace(
@@ -72,13 +76,13 @@ function wrap(
   detailHtml = "",
   tail: string[] = [],
 ) {
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(heading)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6fa"><tr><td align="center" style="padding:24px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="hd" style="${css.head}">Vyrax Labs</td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 16px;font-size:24px;color:#172238">${e(heading)}</h1>${paras.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}${detailHtml}${tail.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}<p style="${css.p}">Questions: <a href="mailto:${SUPPORT_EMAIL}" style="color:#203eab">${SUPPORT_EMAIL}</a></p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${e(LEGAL_FOOTER)}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(heading)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6fa"><tr><td align="center" style="padding:24px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="hd" style="${css.head}">Vyrax Labs</td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 16px;font-size:24px;color:#172238">${e(heading)}</h1>${paras.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}${detailHtml}${tail.map((t) => `<p style="${css.p}">${e(t)}</p>`).join("")}<p style="${css.p}">Questions: <a href="mailto:${SUPPORT_EMAIL}" style="color:#203eab">${SUPPORT_EMAIL}</a> · <a href="tel:${SUPPORT_PHONE.replace(/\s/g, "")}" style="color:#203eab">${SUPPORT_PHONE}</a></p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${e(LEGAL_FOOTER)}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     heading,
     "",
     ...textLines,
     "",
-    `Questions: ${SUPPORT_EMAIL}`,
+    `Questions: ${SUPPORT_EMAIL} · ${SUPPORT_PHONE}`,
     "",
     RESEARCH_NOTICE,
     LEGAL_FOOTER,
@@ -98,7 +102,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
         ref,
         "We have received your payment and your order is awaiting review.",
       ];
-      const after = `Orders ship by ${CARRIER}. We will email you again when your order is dispatched. No delivery date is promised.`;
+      const after = `Orders ship by ${CARRIER}. ${SHIPPING_NOTE} We will email you again when your order is dispatched. No delivery date is promised.`;
       const { html, text } = wrap(
         heading,
         intro,

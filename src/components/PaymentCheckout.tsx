@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
 import { capture } from "@/lib/analytics";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
   formatPostcode,
@@ -381,6 +382,8 @@ export function PaymentCheckout() {
                 aria-label="About this checkout"
               >
                 <li>Card details are entered on our payment provider's secure page, not here.</li>
+                <li>Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock. Cold-chain packed; transit temperature is not guaranteed.</li>
+                {site.phone && <li>Need help? <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="underline">{site.phone}</a> ({site.supportHours}).</li>}
                 <li>No account is created. Guest checkout only.</li>
                 <li>The total is calculated on our server, not in your browser.</li>
                 <li>

@@ -495,8 +495,7 @@ function ProductPage() {
               >
                 <Truck size={16} className="text-primary shrink-0" />
                 <span>
-                  <strong className="block text-sm">Indicative delivery</strong>Proposed free
-                  threshold £{site.freeDeliveryThreshold}. Read shipping policy
+                  <strong className="block text-sm">UK delivery</strong>Same-day dispatch before 2pm UK time on working days, subject to stock. Cold-chain packed; transit temperature is not guaranteed. Read shipping policy
                 </span>
               </Link>
             </div>

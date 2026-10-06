@@ -46,6 +46,7 @@ export const Route = createFileRoute("/")({
       url: site.url,
       logo: abs("/logo-512.png"),
       ...(site.email ? { email: site.email } : {}),
+      ...(site.phone ? { telephone: site.phone } : {}),
       ...(site.companyNumber ? { identifier: site.companyNumber } : {}),
     };
     const webSite = {

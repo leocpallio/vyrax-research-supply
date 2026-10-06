@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead, Fact } from "@/components/InfoPage";
 import { site } from "@/data/site";
+import { claimFilled } from "@/lib/claims";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 
 export const Route = createFileRoute("/terms")({
   head: () =>
@@ -43,7 +45,7 @@ function Terms() {
       <h2>5. Delivery</h2>
       <p>
         Delivery is UK only by {site.carrier}, £{site.standardDeliveryFee.toFixed(2)} or free from £
-        {site.freeDeliveryThreshold}. We do not promise a delivery date. See the{" "}
+        {site.freeDeliveryThreshold}. {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} We do not promise a delivery date. See the{" "}
         <Link to="/shipping">delivery page</Link>.
       </p>
       <h2>6. Cancellation and returns</h2>

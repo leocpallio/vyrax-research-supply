@@ -33,7 +33,8 @@ import {
   type Compound,
   type CartItem,
 } from "@/lib/catalog";
-import { site, spendTierLine } from "@/data/site";
+import { site } from "@/data/site";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 import { shopSections } from "@/data/shop-sections";
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
@@ -471,9 +472,9 @@ function Footer() {
             [
               Truck,
               "UK delivery",
-              `${site.carrier}, £${site.standardDeliveryFee.toFixed(2)}, free over £${site.freeDeliveryThreshold}`,
+              `${site.carrier}. Paid before ${dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock. Cold-chain packed; transit temperature not guaranteed.`,
             ],
-            [PackageCheck, "Contact", `Email ${site.email}`],
+            [PackageCheck, "Contact", site.phone ? `${site.email} · ${site.phone}` : `Email ${site.email}`],
             [
               RotateCcw,
               "Returns policy",
@@ -508,6 +509,7 @@ function Footer() {
               {site.email}
             </a>
           </p>
+          {site.phone && <p className="mt-2 text-sm"><a href={`tel:${site.phone.replace(/\s/g, "")}`} className="text-ink-foreground underline underline-offset-2">{site.phone}</a></p>}
         </div>
         <div>
           <h3 className="font-semibold mb-5">Shop</h3>

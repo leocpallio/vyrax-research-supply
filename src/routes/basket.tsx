@@ -14,6 +14,7 @@ import {
   type CartItem,
 } from "@/lib/catalog";
 import { site } from "@/data/site";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 
 export const Route = createFileRoute("/basket")({
   head: () => ({
@@ -234,7 +235,8 @@ function Basket() {
                 </Link>
               </Button>
               <ul className="mt-4 text-xs text-muted-foreground space-y-1.5">
-                <li>Delivery: {site.carrier}; no delivery date is confirmed.</li>
+                <li>Delivery: {site.carrier}. Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock.</li>
+                <li>Cold-chain packed. Transit temperature is not guaranteed. No delivery date is confirmed.</li>
                 <li>Same total is used at checkout; the server confirms the final price.</li>
                 <li>No charge is taken on this page.</li>
               </ul>

@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
 import { site } from "@/data/site";
+import { claimFilled, claimText } from "@/lib/claims";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 
 export const Route = createFileRoute("/shipping")({
   head: () =>
     pageHead(
       "/shipping",
       `UK Delivery Information | Vyrax Labs`,
-      `Indicative UK delivery costs and coverage for research product orders. Dispatch is not scheduled until an order is paid.`,
+      `UK delivery by ${site.carrier}. Paid orders confirmed before ${dispatchCutoffLabel()} on working days dispatch the same day, subject to stock.`,
     ),
   component: Shipping,
 });
@@ -44,11 +46,12 @@ function Shipping() {
           </tbody>
         </table>
       </div>
-      <h2>When it arrives</h2>
+      <h2>Dispatch and delivery</h2>
       <p>
-        We do not promise a dispatch day or a delivery date. We will send your order after payment
-        is confirmed and we have checked stock, and we will tell you if something is not available.
-        The carrier gives its own delivery estimate.
+        {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} Orders paid
+        after the cut-off, on weekends or on bank holidays are dispatched on the next working day,
+        subject to stock. If an item is unavailable, we will contact you. Dispatch is not a delivery
+        guarantee; the carrier provides its own estimate.
       </p>
       <h2>Where we deliver</h2>
       <p>
@@ -61,10 +64,11 @@ function Shipping() {
         {site.carrier} is a tracked service. When your parcel is sent we will email you the tracking
         details.
       </p>
-      <h2>Storage on arrival</h2>
+      <h2>Cold-chain packing and storage</h2>
       <p>
-        We make no promise about transit temperature. Check the label and the product page for
-        storage details when your parcel arrives.
+        {claimText("delivery.cold-chain-packing")}. {site.carrier} is a tracked postal service,
+        not a monitored temperature-controlled courier. We cannot guarantee a specific temperature
+        throughout transit. Check the label and product page for storage instructions on arrival.
       </p>
       <h2>Lost or damaged parcels</h2>
       <p>

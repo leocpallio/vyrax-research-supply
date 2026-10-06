@@ -1,5 +1,7 @@
 import { coas } from "./coa";
 import { site, spendTierLine } from "./site";
+import { claimFilled, claimText } from "../lib/claims";
+import { dispatchCutoffLabel } from "../lib/delivery";
 
 export type QA = [question: string, answer: string];
 export type FaqGroup = { title: string; items: QA[] };
@@ -32,7 +34,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "When will my order arrive?",
-        "We do not promise a dispatch day or delivery date. We send orders after payment is confirmed and stock is checked, and the carrier gives its own estimate. See the Delivery page.",
+        `${claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} Orders paid later dispatch the next working day, subject to stock. This is not a delivery-date guarantee; see the Delivery page.`,
       ],
       [
         "How much is delivery, and how is it tracked?",
@@ -68,6 +70,10 @@ export const faqGroups: FaqGroup[] = [
   {
     title: "Storage and handling",
     items: [
+      [
+        "Is my parcel sent under cold chain?",
+        `${claimText("delivery.cold-chain-packing")}. ${site.carrier} is not a monitored temperature-controlled courier, so transit temperature cannot be guaranteed. Check the product label for storage on arrival.`,
+      ],
       [
         "How should I store lyophilised peptides?",
         "Follow the storage details on the product label or product page. Do not assume one temperature or shelf life applies to every compound.",

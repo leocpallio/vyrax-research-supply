@@ -449,10 +449,16 @@ const DEFS = {
     surfaces: ["src/components/Store.tsx", "src/routes/shipping.tsx"],
   },
   "delivery.same-day-dispatch": {
-    text: "Same-day dispatch on orders before {{cutoff}}pm",
+    text: "Paid UK orders confirmed before {{cutoff}} on working days dispatch the same day, subject to stock.",
     requires: [{ key: "dispatchCutoffHour", kind: "atLeast", n: 1 }],
     assertion: false,
-    surfaces: ["src/components/Store.tsx", "src/routes/shipping.tsx"],
+    surfaces: ["src/components/Store.tsx", "src/routes/shipping.tsx", "src/data/faq.ts", "src/routes/terms.tsx", "src/lib/email/templates.ts", "src/routes/product.$slug.tsx", "src/routes/basket.tsx"],
+  },
+  "delivery.cold-chain-packing": {
+    text: "Packed with cold-chain protection before dispatch",
+    requires: [{ key: "coldChainPacked", kind: "true" }],
+    assertion: true,
+    surfaces: ["src/routes/shipping.tsx", "src/components/Store.tsx", "src/data/faq.ts", "src/lib/email/templates.ts"],
   },
   "delivery.tracked-carrier": {
     text: "Sent with {{courier}} and a tracking number",
