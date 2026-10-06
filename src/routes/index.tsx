@@ -142,7 +142,7 @@ function Home() {
   return (
     <StoreShell>
       {/* Hero */}
-      <section className="relative min-h-[560px] md:min-h-[620px] flex items-center overflow-hidden">
+      <section className="relative min-h-[480px] md:min-h-[620px] flex items-center overflow-hidden">
         <img
           src={hero}
           alt="Research peptide vials on a laboratory bench"
@@ -173,13 +173,12 @@ function Home() {
                   Browse all compounds <ArrowRight />
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-full h-12 px-7 bg-background/70 text-base"
+              <Link
+                to="/lab-reports"
+                className="inline-flex items-center h-12 px-2 font-semibold underline underline-offset-4"
               >
-                <Link to="/lab-reports">Check report status</Link>
-              </Button>
+                View lab reports
+              </Link>
             </div>
             <p className="mt-6 text-sm flex items-center gap-2">
               <Truck size={16} className="text-primary" />

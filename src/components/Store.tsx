@@ -640,14 +640,16 @@ export function ProductCard({ product }: { product: Compound }) {
               )}
           </div>
           {coa && (
-            <Link
-              to="/lab-reports"
-              title="View certificate"
-              aria-label={`Lab reports for ${product.name}`}
-              className="text-verify"
+            <a
+              href={coa.file}
+              target="_blank"
+              rel="noreferrer"
+              title="Certificate of analysis (PDF)"
+              aria-label={`Certificate of analysis PDF for ${product.name}`}
+              className="text-verify size-11 -m-2 grid place-items-center"
             >
               <FileCheck2 size={19} />
-            </Link>
+            </a>
           )}
         </div>
         <a

@@ -405,13 +405,20 @@ function ProductPage() {
               <p className="flex items-center gap-2">
                 <FileCheck2 size={17} className="text-primary" />
                 {coa ? (
-                  <Link
-                    to="/verify/$batch"
-                    params={{ batch: coa.batch }}
-                    className="underline"
-                  >
-                    Batch {coa.batch}: {coa.purity}% purity, view certificate
-                  </Link>
+                  <span>
+                    <a
+                      href={coa.file}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      Certificate of analysis (PDF), batch {coa.batch}
+                    </a>
+                    {" · "}
+                    <Link to="/verify/$batch" params={{ batch: coa.batch }} className="underline">
+                      Verify batch
+                    </Link>
+                  </span>
                 ) : (
                   <Link to="/lab-reports" className="underline">
                     {claimText("testing.batch-certificates") ?? "Certificate publication status"}
@@ -430,7 +437,10 @@ function ProductPage() {
               </div>
             )}
 
-            <div className="mt-6 flex gap-3">
+            <p className="mt-6 rounded-xl bg-tint border border-border px-4 py-3 text-sm font-semibold">
+              For laboratory research use only. Not for human or animal use.
+            </p>
+            <div className="mt-4 flex gap-3">
               <div className="flex items-center border border-border rounded-full">
                 <button
                   type="button"
@@ -481,13 +491,16 @@ function ProductPage() {
                   policy
                 </span>
               </Link>
-              <div className="flex gap-2 items-start border border-border rounded-xl p-3">
+              <Link
+                to="/shipping"
+                className="flex gap-2 items-start border border-border rounded-xl p-3"
+              >
                 <Truck size={16} className="text-primary shrink-0" />
                 <span>
                   <strong className="block text-sm">Indicative delivery</strong>Proposed free
-                  threshold £{site.freeDeliveryThreshold}
+                  threshold £{site.freeDeliveryThreshold}. Read shipping policy
                 </span>
-              </div>
+              </Link>
             </div>
 
             {c.kind !== "supply" && bac && bacStrength && (
@@ -626,6 +639,7 @@ function ProductPage() {
                   </div>
                   <a
                     href={coa.file || `/verify/${coa.batch}`}
+                    target="_blank"
                     rel="noreferrer"
                     className="sm:col-span-4 text-primary font-semibold underline"
                   >
