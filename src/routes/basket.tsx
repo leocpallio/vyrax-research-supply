@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Trash2, ArrowRight, Truck, Tag, Minus, Plus } from "lucide-react";
+import { Trash2, ArrowRight, Truck, Tag, Minus, Plus, Undo2 } from "lucide-react";
 import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +10,7 @@ import {
   priceBasket,
   productImage,
   productPath,
-  getCompound,
-  addCart,
-  cartLine,
+  isLineUnavailable,
   type CartItem,
 } from "@/lib/catalog";
 import { site } from "@/data/site";
@@ -37,14 +35,31 @@ function Basket() {
     window.addEventListener("vyrax-cart", sync);
     return () => window.removeEventListener("vyrax-cart", sync);
   }, []);
+  const [removed, setRemoved] = useState<{ item: CartItem; index: number } | null>(null);
   const update = (next: CartItem[]) => {
     setItems(next);
     writeCart(next);
   };
+  const remove = (index: number) => {
+    const item = items[index];
+    if (!item) return;
+    setRemoved({ item, index });
+    update(items.filter((_, j) => j !== index));
+  };
+  const undo = () => {
+    if (!removed) return;
+    const next = [...items];
+    next.splice(Math.min(removed.index, next.length), 0, removed.item);
+    update(next);
+    setRemoved(null);
+  };
+  const unavailable = items.filter(isLineUnavailable);
+  const ctaLabel = paymentEnabled
+    ? "Proceed to checkout"
+    : site.enquiriesLive && site.email
+      ? "Proceed to enquiry"
+      : "Site opening in 3-4 days";
   const p = priceBasket(items);
-  const bac = getCompound("bacteriostatic-water");
-  const bacS = bac?.strengths[0];
-  const hasBac = items.some((i) => i.slug === "bacteriostatic-water");
   const shipPct = Math.min(100, (p.goods / site.freeDeliveryThreshold) * 100);
   return (
     <StoreShell>
@@ -58,6 +73,19 @@ function Basket() {
               ? "Final terms must be agreed separately."
               : "The site opens in 3-4 days. Baskets are saved in this browser until then."}
         </p>
+        {removed && (
+          <div
+            role="status"
+            className="mt-6 flex items-center justify-between gap-3 border border-border rounded-xl p-3 text-sm"
+          >
+            <span>
+              Removed {removed.item.name} {removed.item.strength}.
+            </span>
+            <Button size="sm" variant="outline" className="rounded-full" onClick={undo}>
+              <Undo2 /> Undo
+            </Button>
+          </div>
+        )}
         {!items.length ? (
           <div className="py-20 text-center">
             <h2 className="font-heading text-2xl font-semibold">Your basket is empty</h2>
@@ -73,16 +101,23 @@ function Basket() {
         ) : (
           <div className="grid lg:grid-cols-[1fr_370px] gap-10 mt-8">
             <div>
+              {unavailable.length > 0 && (
+                <p role="alert" className="border border-destructive rounded-2xl p-4 mb-6 text-sm">
+                  Not currently available:{" "}
+                  {unavailable.map((i) => `${i.name} ${i.strength}`).join(", ")}. Remove{" "}
+                  {unavailable.length > 1 ? "them" : "it"} before checkout.
+                </p>
+              )}
               <div className="border border-border rounded-2xl p-4 mb-6">
                 <p className="text-sm font-semibold flex items-center gap-2">
                   <Truck size={16} className="text-primary" />
                   {p.freeDeliveryGap > 0 ? (
                     <>
-                      Add {gbp(p.freeDeliveryGap)} more to reach the proposed free UK delivery
-                      threshold
+                      Add {gbp(p.freeDeliveryGap)} more to reach the free UK delivery threshold
+                      (after discounts)
                     </>
                   ) : (
-                    <>Estimate meets the proposed free UK delivery threshold</>
+                    <>Your basket qualifies for free UK delivery</>
                   )}
                 </p>
                 <div className="h-2 bg-surface rounded-full mt-3 overflow-hidden">
@@ -160,7 +195,7 @@ function Basket() {
                         variant="ghost"
                         size="icon"
                         aria-label={`Remove ${i.name} ${i.strength} from basket`}
-                        onClick={() => update(items.filter((_, j) => j !== index))}
+                        onClick={() => remove(index)}
                       >
                         <Trash2 size={18} />
                       </Button>
@@ -168,24 +203,6 @@ function Basket() {
                   );
                 })}
               </div>
-              {!hasBac && bac && bacS && (
-                <div className="mt-6 flex items-center gap-4 border border-border rounded-2xl p-4">
-                  <div className="flex-1 text-sm">
-                    <p className="font-semibold">Compare bacteriostatic water?</p>
-                    <p className="text-muted-foreground">
-                      {bacS.label} diluent for reconstitution, {gbp(bacS.price)}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-full"
-                    onClick={() => addCart(cartLine(bac, bacS))}
-                  >
-                    Save
-                  </Button>
-                </div>
-              )}
             </div>
             <aside className="bg-surface p-7 rounded-2xl h-fit">
               <h2 className="font-heading text-xl font-semibold">
@@ -208,23 +225,23 @@ function Basket() {
                 </div>
               )}
               <div className="flex justify-between mt-3 text-sm">
-                <span>Indicative UK delivery</span>
+                <span>UK delivery</span>
                 <span>{p.delivery === 0 ? "Free" : gbp(p.delivery)}</span>
               </div>
               <div className="flex justify-between mt-4 pt-4 border-t border-border font-semibold text-lg">
-                <span>Indicative total</span>
+                <span>Total</span>
                 <span>{gbp(p.total)}</span>
               </div>
               <Button asChild className="w-full mt-6 rounded-full h-12 text-base">
                 <Link to="/checkout">
-                  {paymentEnabled
-                    ? "Continue to checkout"
-                    : site.enquiriesLive && site.email
-                      ? "Continue to enquiry"
-                      : "Site opening in 3-4 days"}{" "}
-                  <ArrowRight />
+                  {ctaLabel} <ArrowRight />
                 </Link>
               </Button>
+              <ul className="mt-4 text-xs text-muted-foreground space-y-1.5">
+                <li>Delivery: {site.carrier}; no delivery date is confirmed.</li>
+                <li>Same total is used at checkout; the server confirms the final price.</li>
+                <li>No charge is taken on this page.</li>
+              </ul>
               <p className="text-xs text-muted-foreground mt-4">
                 No charge or confirmed order on this page. Availability is not reserved.{" "}
                 {paymentEnabled
@@ -240,6 +257,19 @@ function Basket() {
           </div>
         )}
       </div>
+      {items.length > 0 && (
+        <div className="lg:hidden sticky bottom-0 z-30 bg-background border-t border-border p-3 flex items-center gap-3">
+          <div className="text-sm">
+            <p className="text-muted-foreground">Total</p>
+            <p className="font-semibold">{gbp(p.total)}</p>
+          </div>
+          <Button asChild className="flex-1 rounded-full h-12">
+            <Link to="/checkout">
+              {ctaLabel} <ArrowRight />
+            </Link>
+          </Button>
+        </div>
+      )}
       <Disclaimer />
     </StoreShell>
   );
