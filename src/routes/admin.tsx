@@ -288,7 +288,8 @@ function Admin() {
               <h2 className="text-lg font-semibold">Internal £0 test item</h2>
               <p className="text-sm text-muted-foreground mt-2">
                 Creates a clearly marked, non-fulfillable £0 record to check dashboard storage and
-                filters. It does not visit the payment provider, trigger a webhook, or test a real checkout.
+                filters. It does not visit the payment provider, trigger a webhook, or test a real
+                checkout.
               </p>
               <button
                 className="border rounded px-3 py-2 text-sm mt-3 disabled:opacity-40"

@@ -35,9 +35,9 @@ function Terms() {
       </p>
       <h2>4. Prices and payment</h2>
       <p>
-        Prices are in pounds sterling. Delivery is added at checkout where it
-        applies, and you see the full total before you pay. You pay by debit or credit card on the
-        secure page of our payment provider. We never see or store your full card details.{" "}
+        Prices are in pounds sterling. Delivery is added at checkout where it applies, and you see
+        the full total before you pay. You pay by debit or credit card on the secure page of our
+        payment provider. We never see or store your full card details.{" "}
         {site.checkoutOpen ? "" : "No payment method is available until checkout opens."}
       </p>
       <h2>5. Delivery</h2>
