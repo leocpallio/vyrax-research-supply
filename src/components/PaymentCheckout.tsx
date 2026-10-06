@@ -351,9 +351,8 @@ export function PaymentCheckout() {
                   Payment
                 </h2>
                 <p id="co-pay-how" className="mt-2 text-muted-foreground">
-                  Pay by card on SpicePay's hosted payment page. When you press the button below you
-                  are taken to SpicePay's site to enter your card details, then returned here to see
-                  your order status. Card details are never entered on this site.
+                  You'll enter your card details on our payment provider's secure page, then come
+                  back here to check your order status. We never see or store your card number.
                 </p>
               </section>
 
@@ -381,7 +380,7 @@ export function PaymentCheckout() {
                 className="space-y-1.5 text-xs text-muted-foreground"
                 aria-label="About this checkout"
               >
-                <li>Card payment is handled by SpicePay on its own hosted page.</li>
+                <li>Card details are entered on our payment provider's secure page, not here.</li>
                 <li>No account is created. Guest checkout only.</li>
                 <li>The total is calculated on our server, not in your browser.</li>
                 <li>

@@ -164,7 +164,7 @@ function Home() {
               Browse {compounds.length} research compounds, compare vial strengths and read the
               available specifications.{" "}
               {site.checkoutOpen
-                ? "Pay by card at checkout on SpicePay's hosted page. Research use only."
+                ? "Pay by card through secure checkout. Research use only."
                 : "Site opening in 3-4 days; no payment is taken on this site yet."}
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
@@ -321,7 +321,7 @@ function Home() {
                 "04",
                 site.checkoutOpen ? "Check out" : "Check out when we open",
                 site.checkoutOpen
-                  ? "Pay by card on SpicePay's hosted page. The server confirms the final price before you pay, and delivery follows our shipping policy."
+                  ? "Pay by card on our payment provider's secure page. The server confirms the final price before you pay, and delivery follows our shipping policy."
                   : "The site opens in 3-4 days. No payment, confirmed order or dispatch follows from this site yet.",
               ],
             ].map(([n, t, b]) => (

@@ -38,7 +38,7 @@ function Privacy() {
       <p>We do not send marketing email unless you ask us to.</p>
       <h2>Who we share it with</h2>
       <p>
-        {site.paymentProvider} processes your card payment on its hosted page; we do not see your
+        Our payment provider processes your card payment on its hosted page; we do not see your
         full card number. Our courier ({site.carrier}) receives your delivery name and address. Our
         database and hosting providers process data on our behalf. We do not sell personal data.
       </p>

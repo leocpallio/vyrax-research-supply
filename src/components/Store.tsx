@@ -456,8 +456,8 @@ function Footer() {
   // Only lists payment methods the evidence manifest says are actually live at checkout.
   const paymentLine =
     claimFilled("payment.methods-live", {
-      paymentMethods: `${site.paymentMethods.join(", ")}, processed on ${site.paymentProvider}'s secure hosted page`,
-    }) ?? `Card checkout (via ${site.paymentProvider}) is not open yet.`;
+      paymentMethods: `${site.paymentMethods.join(", ")}. Card details are entered on our payment provider's secure page`,
+    }) ?? "Card checkout is not open yet.";
   const pending = [!site.registeredOffice && "Registered office address: being finalised."].filter(
     Boolean,
   );

@@ -29,10 +29,9 @@ export const site = {
   standardDeliveryFee: 4.99,
   carrier: "Royal Mail Tracked 24",
   // Payments: list only methods that are actually live at checkout.
-  // Card payment is taken on SpicePay's hosted page, and only while checkout is switched on.
+  // Card payment uses a hosted provider page, and only while checkout is switched on.
   // Methods are listed only while that is true (see src/lib/evidence.ts).
   checkoutOpen,
-  paymentProvider: "SpicePay",
   paymentMethods: (checkoutOpen ? ["Debit and credit card"] : []) as string[],
   // Enable only after enquiries notify a monitored inbox and a real reply path has been tested.
   enquiriesLive: false,

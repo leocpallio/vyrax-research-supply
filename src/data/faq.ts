@@ -6,7 +6,7 @@ export type FaqGroup = { title: string; items: QA[] };
 
 const threshold = `£${site.freeDeliveryThreshold}`;
 const fee = `£${site.standardDeliveryFee.toFixed(2)}`;
-// Answers appear both in visible markup and FAQPage JSON-LD. Keep them accurate for an enquiry-only site.
+// Answers appear both in visible markup and FAQPage JSON-LD. Keep them accurate for checkout.
 export const faqGroups: FaqGroup[] = [
   {
     title: "Ordering",
@@ -18,8 +18,8 @@ export const faqGroups: FaqGroup[] = [
       [
         "How do I pay?",
         site.checkoutOpen
-          ? `By debit or credit card at checkout, on ${site.paymentProvider}'s hosted payment page. We never see your full card details.`
-          : `Card checkout, on ${site.paymentProvider}'s hosted payment page, is not open yet. You can browse and save a basket in the meantime. Nothing is reserved and no payment is taken.`,
+          ? "By debit or credit card at checkout. You'll enter your details on our payment provider's secure page; we never see or store your card number."
+          : "Card checkout is not open yet. You can browse and save a basket in the meantime. Nothing is reserved and no payment is taken.",
       ],
       [
         "Do you offer multi-buy or volume pricing?",
