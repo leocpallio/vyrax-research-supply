@@ -405,14 +405,13 @@ function ProductPage() {
               <p className="flex items-center gap-2">
                 <FileCheck2 size={17} className="text-primary" />
                 {coa ? (
-                  <a
-                    href={coa.file || `/verify/${coa.batch}`}
-                    target="_blank"
-                    rel="noreferrer"
+                  <Link
+                    to="/verify/$batch"
+                    params={{ batch: coa.batch }}
                     className="underline"
                   >
                     Batch {coa.batch}: {coa.purity}% purity, view certificate
-                  </a>
+                  </Link>
                 ) : (
                   <Link to="/lab-reports" className="underline">
                     {claimText("testing.batch-certificates") ?? "Certificate publication status"}
@@ -627,7 +626,6 @@ function ProductPage() {
                   </div>
                   <a
                     href={coa.file || `/verify/${coa.batch}`}
-                    target="_blank"
                     rel="noreferrer"
                     className="sm:col-span-4 text-primary font-semibold underline"
                   >

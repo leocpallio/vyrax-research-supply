@@ -97,7 +97,7 @@ function Verify() {
             <div className="mt-6 flex flex-wrap gap-3">
               {hit.file && (
                 <Button asChild className="rounded-full">
-                  <a href={hit.file} target="_blank" rel="noreferrer">
+                  <a href={hit.file} rel="noreferrer">
                     Open certificate (PDF)
                   </a>
                 </Button>
