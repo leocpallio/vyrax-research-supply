@@ -17,7 +17,7 @@ export const Route = createFileRoute("/verify/$batch")({
     const hit = findBatch(batch);
     return pageHead(
       `/verify/${encodeURIComponent(hit?.batch ?? batch)}`,
-      hit ? `Batch ${hit.batch} verified | Vyrax Labs` : "Batch verification | Vyrax Labs",
+      hit ? `Batch ${hit.batch} certificate | Vyrax Labs` : "Batch verification | Vyrax Labs",
       hit
         ? `Certificate of analysis for Vyrax Labs batch ${hit.batch}: laboratory, method, purity and test date.`
         : "Check a Vyrax Labs batch number against its published certificate of analysis.",
@@ -71,12 +71,12 @@ function Verify() {
               <BadgeCheck className="text-verify shrink-0" size={36} />
               {/* one flex item; the code itself never splits across lines (it did at the hyphen on phones) */}
               <span>
-                Batch <span className="whitespace-nowrap">{hit.batch}</span> verified
+                Certificate found for batch <span className="whitespace-nowrap">{hit.batch}</span>
               </span>
             </h1>
             <p className="text-muted-foreground max-w-2xl mt-4">
-              This batch number matches a certificate in the published register. Compare the
-              laboratory, method and document itself before relying on the reported result.
+              This batch number matches a certificate in our published register. The details below
+              come from that certificate. Open the PDF to read the full report.
             </p>
             <div className="mt-8 max-w-xl border border-verify/50 bg-verify/5 rounded-2xl overflow-hidden">
               <table className="w-full text-sm">

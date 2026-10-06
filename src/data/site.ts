@@ -2,14 +2,19 @@
 // Anything set to null renders as "being finalised" rather than inventing a value.
 export const SITE_URL = "https://vyraxlabs.co.uk";
 
+const checkoutOpen =
+  (import.meta as unknown as { env?: Record<string, string> }).env?.[
+    "VITE_SPICEPAY_CHECKOUT_ENABLED"
+  ] === "true";
+
 export const site = {
   name: "Vyrax Labs",
   url: SITE_URL,
   tagline: "Research peptides dispatched from the UK",
   // Business details: fill these in before launch. Null values are shown as pending.
-  legalName: null as string | null, // e.g. 'Vyrax Labs Ltd'
-  companyNumber: null as string | null, // Companies House number
-  vatNumber: null as string | null, // VAT registration number
+  legalName: "Oraxis Research Ltd" as string | null, // Vyrax Labs is a trading name of this company
+  companyNumber: "17157816" as string | null, // Companies House number
+  vatNumber: "GB523581496" as string | null, // VAT registered with effect from 1 September 2026
   registeredOffice: null as string | null,
   // Physical address a return can be sent to. Null means returns are handled by arrangement only;
   // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
@@ -24,7 +29,11 @@ export const site = {
   standardDeliveryFee: 4.99,
   carrier: "Royal Mail Tracked 24",
   // Payments: list only methods that are actually live at checkout.
-  paymentMethods: [] as string[], // e.g. ['Visa', 'Mastercard', 'Apple Pay', 'Bank transfer']
+  // Card payment is taken on SpicePay's hosted page, and only while checkout is switched on.
+  // Methods are listed only while that is true (see src/lib/evidence.ts).
+  checkoutOpen,
+  paymentProvider: "SpicePay",
+  paymentMethods: (checkoutOpen ? ["Debit and credit card"] : []) as string[],
   // Enable only after enquiries notify a monitored inbox and a real reply path has been tested.
   enquiriesLive: false,
   returnWindowDays: 14,
@@ -53,29 +62,3 @@ export const spendTierLine = () =>
     .sort((a, b) => a.over - b.over)
     .map((t) => `${Math.round(t.rate * 100)}% over £${t.over}`)
     .join(", ");
-
-/** Working-day, UK-time dispatch helper used by the countdown and delivery copy. */
-export function dispatchInfo(now = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/London",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).formatToParts(now);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  const day = get("weekday");
-  const hour = Number(get("hour")) % 24;
-  const minute = Number(get("minute"));
-  const workingDay = !["Sat", "Sun"].includes(day);
-  const minsLeft = site.dispatchCutoffHour * 60 - (hour * 60 + minute);
-  if (workingDay && minsLeft > 0) {
-    return {
-      today: true as const,
-      minsLeft,
-      label: `${Math.floor(minsLeft / 60)}h ${minsLeft % 60}m`,
-    };
-  }
-  const next = day === "Fri" || day === "Sat" ? "Monday" : day === "Sun" ? "Monday" : "tomorrow";
-  return { today: false as const, minsLeft: 0, label: next };
-}

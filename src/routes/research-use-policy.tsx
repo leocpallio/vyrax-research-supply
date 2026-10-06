@@ -17,11 +17,11 @@ function Policy() {
       eyebrow="COMPLIANCE"
       title="Research use policy"
       crumb="Research use policy"
-      updated="2026-09-28"
+      updated="2026-10-06"
     >
       <p>
-        Every product sold by Vyrax Labs is a research chemical supplied for in-vitro laboratory
-        research, analytical work and education. This policy forms part of our{" "}
+        Every product sold by Vyrax Labs is a research chemical supplied for laboratory research,
+        analytical work and education. This policy forms part of our{" "}
         <Link to="/terms">terms and conditions</Link>.
       </p>
       <h2>Conditions of sale</h2>
@@ -54,7 +54,8 @@ function Policy() {
       <h2>Refusal of orders</h2>
       <p>
         We may refuse or cancel an order, and refund it, if we have reason to believe a product will
-        not be used for legitimate research, including where correspondence refers to personal use.
+        not be used for legitimate research, including where a message refers to personal use.
+        Refunds go back to the original card.
       </p>
       <h2>Product information</h2>
       <p>

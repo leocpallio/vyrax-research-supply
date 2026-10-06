@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead, Fact } from "@/components/InfoPage";
 import { site } from "@/data/site";
-import { coas } from "@/data/coa";
 
 export const Route = createFileRoute("/terms")({
   head: () =>
@@ -15,62 +14,60 @@ export const Route = createFileRoute("/terms")({
 
 function Terms() {
   return (
-    <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-09-28">
+    <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-10-06">
       <h2>1. About us</h2>
       <p>
-        This website uses the trading name {site.name}. The legal contracting entity is{" "}
-        <Fact value={site.legalName} fallback="not yet published" />
+        This website uses the trading name {site.name}. The seller is{" "}
+        <Fact value={site.legalName} fallback="being finalised" />
         {site.companyNumber && (
           <>, a company registered in England and Wales under company number {site.companyNumber}</>
         )}
-        {site.registeredOffice && <>, registered office {site.registeredOffice}</>}. Do not assume a
-        company registration exists until the details are published. No paid sale is concluded
-        through this site before the site opens; check the legal identity before agreeing
-        any separate order.
+        {site.vatNumber && <>, VAT number {site.vatNumber}</>}.{" "}
+        {site.registeredOffice
+          ? `Registered office: ${site.registeredOffice}.`
+          : "Our registered office address is being finalised."}
       </p>
       <h2>2. Research use only</h2>
       <p>
-        All products are listed strictly for laboratory, analytical and educational research. They
-        are not medicines, food, supplements or cosmetics, and are not for human or veterinary use.
-        By submitting an enquiry you confirm you are 18 or over and that you will use products only
-        for legitimate research, in line with our{" "}
-        <Link to="/research-use-policy">research use policy</Link>. We may decline an enquiry where
-        we believe this condition is not met.
+        All products are for laboratory, analytical and educational research. They are not
+        medicines, food, supplements or cosmetics, and are not for human or veterinary use. By
+        ordering you confirm you are 18 or over and will use products only for legitimate research,
+        in line with our <Link to="/research-use-policy">research use policy</Link>. We may decline
+        or cancel an order, and refund it, if we believe this condition is not met.
       </p>
       <h2>3. Orders and contract</h2>
       <p>
-        {site.enquiriesLive && site.email
-          ? "The website records an enquiry, not an order. It does not confirm stock, take payment, arrange delivery or send an automated confirmation email."
-          : "The site opens in 3-4 days. It does not collect contact details, take payment, confirm stock or arrange delivery yet."}{" "}
-        No contract is formed by saving a basket. An order could proceed only after the parties
-        separately agree the legal seller, availability, final price, payment and delivery terms. Do
-        not send payment based on a basket.
+        {site.checkoutOpen
+          ? "Placing an order is an offer to buy. Our contract with you starts when we confirm that your payment succeeded and that the goods are available. If an item is not available we will tell you and refund any payment for it."
+          : "Card checkout is not open yet, so we cannot take orders. Saving a basket does not reserve stock or create a contract. When checkout opens, the terms below will apply."}
       </p>
       <h2>4. Prices and payment</h2>
       <p>
-        Basket prices and delivery charges are indicative pounds sterling figures, not a payable
-        invoice. Any applicable VAT treatment, discounts, delivery charge and final total must be
-        confirmed before a separate order is agreed. No payment method is available on this site.
+        Prices are in pounds sterling. We are VAT registered
+        {site.vatNumber ? ` (${site.vatNumber})` : ""}. Delivery is added at checkout where it
+        applies, and you see the full total before you pay. You pay by debit or credit card on the
+        hosted payment page of our payment provider, {site.paymentProvider}. We never see or store
+        your full card details.{" "}
+        {site.checkoutOpen ? "" : "No payment method is available until checkout opens."}
       </p>
       <h2>5. Delivery</h2>
       <p>
-        An enquiry has no dispatch date. The <Link to="/shipping">delivery page</Link> shows
-        indicative charges and the current absence of a dispatch commitment. If goods are later
-        ordered, consumer delivery rights are not displaced by these terms.
+        Delivery is UK only by {site.carrier}, £{site.standardDeliveryFee.toFixed(2)} or free from £
+        {site.freeDeliveryThreshold}. We do not promise a delivery date. See the{" "}
+        <Link to="/shipping">delivery page</Link>.
       </p>
       <h2>6. Cancellation and returns</h2>
       <p>
-        Cancellation rights, returns and reshipment are set out in our{" "}
-        <Link to="/returns">returns policy</Link>. Nothing in these terms affects your statutory
-        rights.
+        Your {site.returnWindowDays}-day right to cancel, and what to do about faulty or wrong
+        goods, are in our <Link to="/returns">returns policy</Link>. Nothing in these terms affects
+        your statutory rights.
       </p>
       <h2>7. Product information</h2>
       <p>
         Product descriptions summarise published research for information only and make no claim
         about the effect of any product in humans. Chemical data are provided for identification.
         Only batches with a published certificate in the{" "}
-        <Link to="/lab-reports">lab reports register</Link> have a result available to check here.{" "}
-        {coas.length === 0 && "None are currently published."}
+        <Link to="/lab-reports">lab reports register</Link> have a result available to check here.
       </p>
       <h2>8. Liability</h2>
       <p>
@@ -85,9 +82,8 @@ function Terms() {
       </p>
       <h2>10. Contact</h2>
       <p>
-        The <Link to="/contact">contact page</Link> shows whether a support channel is available. No
-        inbox is live yet, so an enquiry is not a reliable way to raise a legal notice or
-        time-sensitive complaint.
+        Use the <Link to="/contact">contact page</Link>
+        {site.email ? <> or email {site.email}</> : null}. We do not promise a reply time.
       </p>
     </InfoPage>
   );

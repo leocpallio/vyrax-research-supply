@@ -14,65 +14,47 @@ export const Route = createFileRoute("/privacy")({
 
 function Privacy() {
   return (
-    <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-09-28">
+    <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-10-06">
       <p>
-        This policy describes data handling on the {site.name} website. The legal identity of the
-        data controller is <Fact value={site.legalName} fallback="not yet published" />. This is a
-        material gap: please review it before submitting personal data. UK GDPR and the Data
-        Protection Act 2018 apply where relevant.
+        This policy covers the {site.name} website. The data controller is{" "}
+        <Fact value={site.legalName} fallback="being finalised" />
+        {site.companyNumber && <> (company number {site.companyNumber})</>}. UK GDPR and the Data
+        Protection Act 2018 apply.
       </p>
       <h2>What we collect</h2>
       <ul>
         <li>
-          {site.enquiriesLive && site.email
-            ? "Enquiry details: name, email, selected items and indicative basket total. The form requires a research-use checkbox, but the current enquiry record does not store a separate consent timestamp. No delivery address or card number is requested by the form."
-            : "The site opens in 3-4 days. The basket stays in your browser; no name, delivery address, card number or enquiry details are collected through checkout."}
+          At checkout: your name, email, phone number and UK delivery address, and the items you
+          order.
         </li>
-        <li>Account data, if you choose to register or sign in, such as email address.</li>
-        <li>Data you submit through any other live site feature, if applicable.</li>
-        <li>
-          Basic technical data needed to run the site, such as your basket contents stored in your
-          own browser.
-        </li>
+        <li>Account data if you register, such as your email address.</li>
+        <li>Messages you send us, including your email address.</li>
+        <li>Your basket, which stays in your own browser until you check out.</li>
       </ul>
       <h2>Why we use it</h2>
       <ul>
-        <li>
-          To record your product enquiry and, if a lawful contact channel becomes available, assess
-          whether a separate order could proceed (steps requested before a potential contract).
-        </li>
-        <li>To retain records where a legal obligation actually applies.</li>
-        <li>
-          To prevent fraud and misuse, including enforcing our research use policy (legitimate
-          interests).
-        </li>
-        <li>
-          To operate optional communications only if a working opt-in channel exists and you
-          consent.
-        </li>
+        <li>To take payment, fulfil and deliver your order, and deal with problems (contract).</li>
+        <li>To keep accounting and tax records (legal obligation).</li>
+        <li>To prevent fraud and enforce our research use policy (legitimate interests).</li>
       </ul>
+      <p>We do not send marketing email unless you ask us to.</p>
       <h2>Who we share it with</h2>
       <p>
-        Enquiries are stored through the site's database provider. Website hosting providers may
-        process technical access data. No payment processor receives a card payment here and no
-        carrier receives a delivery address from the enquiry form. If separate fulfilment services
-        become active, this policy must be updated to name the relevant recipients. We do not sell
-        personal data.
+        {site.paymentProvider} processes your card payment on its hosted page; we do not see your
+        full card number. Our courier ({site.carrier}) receives your delivery name and address. Our
+        database and hosting providers process data on our behalf. We do not sell personal data.
       </p>
       <h2>How long we keep it</h2>
       <p>
-        A verified retention schedule for enquiry data has not been published. Enquiries are not
-        automatically equivalent to accounting records for a completed sale. Do not submit
-        information you do not want stored while this gap remains. Applicable law may require
-        retention of records for different periods once an actual transaction exists.
+        We have not set a fixed retention schedule yet. We keep order records for as long as tax and
+        accounting law requires, and delete other data when we no longer need it.
       </p>
       <h2>Your rights</h2>
       <p>
         You can ask for access to, correction or deletion of your data, object to or restrict its
-        use, or ask for a copy to move elsewhere. To exercise these rights, check the{" "}
-        <Link to="/contact">contact page</Link> for an available channel. The inbox is not live yet,
-        so this site cannot currently promise a working rights-request route. You can complain to
-        the Information Commissioner's Office at{" "}
+        use, or ask for a copy. Use the <Link to="/contact">contact page</Link>
+        {site.email ? <> or email {site.email}</> : null}. You can complain to the Information
+        Commissioner's Office at{" "}
         <a href="https://ico.org.uk/" rel="noreferrer" target="_blank">
           ico.org.uk
         </a>

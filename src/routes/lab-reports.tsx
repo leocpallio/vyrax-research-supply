@@ -53,7 +53,7 @@ function Reports() {
         <h1 className="page-title">Lab reports and certificates of analysis</h1>
         <p className="text-muted-foreground max-w-2xl mt-4">
           {coas.length
-            ? "This register lists the certificates currently published. A report applies only to the batch it names; compare its methods and results with the PDF."
+            ? "Every certificate we have published is listed below with a link to the PDF. A certificate applies only to the batch it names. Enter the batch number from your vial label to find yours."
             : "No certificates are published yet. This register shows published documents only, not the status of unpublished testing or a promise that any batch will be certified."}
         </p>
 
@@ -81,7 +81,7 @@ function Reports() {
                 <Link to="/contact" className="text-primary underline">
                   contact us
                 </Link>{" "}
-                to ask about documentation if a support channel is available.
+                to ask about documentation.
               </>
             ) : (
               <>
@@ -103,8 +103,8 @@ function Reports() {
             <p className="font-semibold text-verify">{claimText("testing.batch-verified")}</p>
             <p className="mt-1">
               {getCompound(hit.compound)?.name} {hit.strength}, batch {hit.batch}: {hit.purity}%
-              purity{hit.method ? ` (${hit.method})` : ""}{hit.lab ? `, tested by ${hit.lab}` : ""}.
-              {exp && <> Expiry {monthLabel(exp)}.</>}
+              purity{hit.method ? ` (${hit.method})` : ""}
+              {hit.lab ? `, tested by ${hit.lab}` : ""}.{exp && <> Expiry {monthLabel(exp)}.</>}
             </p>
             {hit.file && (
               <a
@@ -125,13 +125,11 @@ function Reports() {
               <table className="w-full text-sm">
                 <thead className="bg-surface text-left">
                   <tr>
-                    {["Compound", "Batch", "Purity", "Method", "Tested", ""].map(
-                      (h) => (
-                        <th key={h} className="p-4 font-semibold">
-                          {h}
-                        </th>
-                      ),
-                    )}
+                    {["Compound", "Batch", "Purity", "Method", "Tested", ""].map((h) => (
+                      <th key={h} className="p-4 font-semibold">
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -151,11 +149,7 @@ function Reports() {
                       <td className="p-4">{new Date(r.tested).toLocaleDateString("en-GB")}</td>
                       <td className="p-4">
                         {r.file && (
-                          <a
-                            href={r.file}
-                            rel="noreferrer"
-                            className="text-primary underline"
-                          >
+                          <a href={r.file} rel="noreferrer" className="text-primary underline">
                             PDF
                           </a>
                         )}

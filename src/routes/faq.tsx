@@ -7,7 +7,7 @@ export const Route = createFileRoute("/faq")({
   head: () => {
     const title = "Research Peptide FAQs UK | Ordering, Testing, Delivery | Vyrax Labs";
     const desc =
-      "Answers to common questions about buying research peptides in the UK: legality, purity testing, certificates, storage, delivery times, payment and returns.";
+      "Answers about ordering research peptides in the UK: certificates, storage, delivery, payment and returns.";
     return {
       meta: [
         { title },
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/faq")({
 const anchor = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 const nextSteps = [
   [
-    { to: "/terms", label: "Enquiry terms" },
+    { to: "/terms", label: "Terms and conditions" },
     { to: "/research-use-policy", label: "Research use policy" },
     { to: "/basket", label: "Review basket" },
   ],
@@ -47,7 +47,7 @@ const nextSteps = [
   [
     { to: "/returns", label: "Returns policy" },
     { to: "/about", label: "Trading details" },
-    { to: "/contact", label: "Contact availability" },
+    { to: "/contact", label: "Contact us" },
   ],
 ] as const;
 
@@ -59,8 +59,8 @@ function FaqPage() {
         <p className="eyebrow">HELP CENTRE</p>
         <h1 className="page-title">Frequently asked questions</h1>
         <p className="text-muted-foreground mt-4 max-w-3xl">
-          The site records enquiries only. No payment, confirmed order, automated email or dispatch
-          follows a submission. Browse the answers and linked policies below before sharing details.
+          Short answers on ordering, delivery, testing and returns. The linked policies have the
+          full detail.
         </p>
         <div className="flex flex-wrap gap-2 mt-8">
           {faqGroups.map((g) => (
@@ -105,13 +105,11 @@ function FaqPage() {
         <div className="mt-14 border border-border rounded-2xl p-6">
           <h2 className="font-heading font-semibold text-lg">Need another answer?</h2>
           <p className="mt-2 text-muted-foreground">
-            {site.email
-              ? "Check the contact page for the available email channel; no reply time is guaranteed."
-              : "The support inbox is not live yet, so no direct reply is available. Use the linked policies and reports, or browse the product information without submitting payment."}
+            Email {site.email} or use the contact page. We do not promise a reply time.
           </p>
           <div className="flex flex-wrap gap-4 mt-3">
             <Link to="/contact" className="text-primary underline">
-              Contact status
+              Contact us
             </Link>
             <Link to="/shop" className="text-primary underline">
               Browse products

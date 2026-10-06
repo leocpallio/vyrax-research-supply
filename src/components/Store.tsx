@@ -42,13 +42,13 @@ import { AnalyticsConsentBanner } from "@/components/AnalyticsConsent";
 import { capture } from "@/lib/analytics";
 
 // ---------------------------------------------------------------- Announcement bar
-const announcements =
-  site.enquiriesLive && site.email
-    ? [
-        `Indicative free UK delivery over £${site.freeDeliveryThreshold}`,
-        `Multi-buy pricing: ${spendTierLine()}`,
-      ]
-    : ["Site opening in 3-4 days"];
+const RUO_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
+const announcements = [
+  RUO_NOTICE,
+  site.checkoutOpen
+    ? `Free UK delivery over £${site.freeDeliveryThreshold}`
+    : "Checkout is not open yet: browse specifications and certificates",
+];
 
 function AnnouncementBar() {
   return (
@@ -336,7 +336,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                 ["Reconstitution calculator", "/calculator"],
                 ["Guides", "/guides"],
                 ["FAQ", "/faq"],
-                ["Contact", "/contact"],
+                ["Contact us", "/contact"],
               ] as const
             ).map(([n, u]) => (
               <Link key={u} to={u} onClick={() => setMenu(false)} className="py-2">
@@ -450,15 +450,19 @@ function Footer() {
   // comes from the claim registry, so a fact appearing in the footer means the evidence manifest
   // (src/lib/evidence.ts) holds it.
   const company = [
-    site.legalName ?? "Vyrax Labs",
+    site.legalName ? `${site.name} is a trading name of ${site.legalName}` : site.name,
     claimText("identity.company-number"),
     claimText("identity.vat-number"),
     claimText("identity.registered-office"),
   ].filter(Boolean);
   // Only lists payment methods the evidence manifest says are actually live at checkout.
-  const paymentLine = claimFilled("payment.methods-live", {
-    paymentMethods: site.paymentMethods.join(", "),
-  });
+  const paymentLine =
+    claimFilled("payment.methods-live", {
+      paymentMethods: `${site.paymentMethods.join(", ")}, processed on ${site.paymentProvider}'s secure hosted page`,
+    }) ?? `Card checkout (via ${site.paymentProvider}) is not open yet.`;
+  const pending = [!site.registeredOffice && "Registered office address: being finalised."].filter(
+    Boolean,
+  );
   return (
     <footer className="bg-ink text-ink-foreground">
       <div className="border-b border-ink-line">
@@ -471,10 +475,10 @@ function Footer() {
             ],
             [
               Truck,
-              "Indicative UK delivery",
-              `If ordering opens, see delivery details and the proposed £${site.freeDeliveryThreshold} free-shipping threshold`,
+              "UK delivery",
+              `${site.carrier}, £${site.standardDeliveryFee.toFixed(2)}, free over £${site.freeDeliveryThreshold}`,
             ],
-            [PackageCheck, "Protective packaging", "Plain outer parcel, padded vials"],
+            [PackageCheck, "Contact", `Email ${site.email}`],
             [
               RotateCcw,
               "Returns policy",
@@ -498,7 +502,16 @@ function Footer() {
         <div className="lg:col-span-2">
           <Wordmark tone="light" title="Vyrax Labs" className="h-[19px] w-auto" />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-sm">
-            Research peptides for laboratory use. Read compound specifications before enquiring.
+            Research peptides for laboratory use, supplied from the UK. Check the specification and
+            the certificate for a batch before you buy.
+          </p>
+          <p className="mt-3 text-sm">
+            <a
+              href={`mailto:${site.email}`}
+              className="text-ink-foreground underline underline-offset-2"
+            >
+              {site.email}
+            </a>
           </p>
         </div>
         <div>
@@ -524,7 +537,7 @@ function Footer() {
         </div>
         <div>
           <h3 className="font-semibold mb-5">Customer care</h3>
-          <FooterLink to="/contact">Contact</FooterLink>
+          <FooterLink to="/contact">Contact us</FooterLink>
           <FooterLink to="/shipping">Delivery</FooterLink>
           <FooterLink to="/returns">Returns and reship policy</FooterLink>
           <FooterLink to="/account">My account</FooterLink>
@@ -541,13 +554,20 @@ function Footer() {
             {company.map((line) => (
               <p key={line as string}>{line}</p>
             ))}
-            <p>© {new Date().getFullYear()} Vyrax Labs. All rights reserved.</p>
+            {pending.map((line) => (
+              <p key={line as string}>{line}</p>
+            ))}
+            <p>
+              © {new Date().getFullYear()} {site.legalName ?? site.name}. All rights reserved.
+            </p>
           </div>
           <div className="md:text-right space-y-1 max-w-md">
-            {paymentLine && <p>{paymentLine}</p>}
+            <p aria-label="Payment methods" className="font-semibold text-ink-foreground">
+              {paymentLine}
+            </p>
             <p>
               All products are sold strictly for laboratory research use only. Not for human or
-              veterinary use. Not a medicine, food or cosmetic.
+              veterinary use. Not a medicine, food, cosmetic or supplement.
             </p>
           </div>
         </div>
@@ -699,14 +719,10 @@ export function TrustStrip() {
   );
 }
 
-export function DispatchCountdown({ className = "" }: { className?: string }) {
-  return <span className={className}>Delivery times are detailed in our shipping policy.</span>;
-}
-
 export function Disclaimer() {
   return (
     <div className="bg-tint border-y border-border py-3 text-center text-sm font-semibold text-foreground px-4">
-      For research use only. Not for human consumption.
+      {RUO_NOTICE}
     </div>
   );
 }

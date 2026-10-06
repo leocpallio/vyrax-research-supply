@@ -13,7 +13,7 @@ export const Route = createFileRoute("/contact")({
     pageHead(
       "/contact",
       "Contact Vyrax Labs | UK Research Peptide Support",
-      "Current Vyrax Labs contact availability and self-service answers about enquiries, reports, delivery and returns.",
+      "Contact Vyrax Labs by email about orders, delivery, returns or documentation.",
     ),
   component: Contact,
 });
@@ -49,6 +49,18 @@ function Contact() {
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "Contact" }]} />
         <p className="eyebrow">GET IN TOUCH</p>
         <h1 className="page-title">Contact us</h1>
+        <p className="mt-4 max-w-2xl text-muted-foreground">
+          Email{" "}
+          <a href={`mailto:${site.email}`} className="text-primary underline">
+            {site.email}
+          </a>{" "}
+          for orders, delivery, returns or a question about documentation. For faster answers, see
+          the{" "}
+          <Link to="/faq" className="text-primary underline">
+            FAQ
+          </Link>
+          . We do not give dosing or human-use advice.
+        </p>
         <div className="grid lg:grid-cols-[1fr_360px] gap-12 mt-10">
           {site.email ? (
             <form onSubmit={submit} className="space-y-5 max-w-2xl">
@@ -109,19 +121,18 @@ function Contact() {
               <Button className="rounded-full h-11 px-7">Send message</Button>
               {sent && (
                 <p role="status" className="text-sm">
-                  Your email app should now open with the message ready to send.
+                  Your email app should now open with the message ready. Press send there to deliver
+                  it.
                 </p>
               )}
             </form>
           ) : (
             <div className="border border-dashed border-border rounded-2xl p-7 max-w-2xl">
               <Mail className="text-primary" />
-              <h2 className="font-heading font-semibold mt-3">Our support inbox is being set up</h2>
+              <h2 className="font-heading font-semibold mt-3">Contact by email</h2>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                This form is switched off rather than collecting messages nobody can read, and it
-                becomes available only when a support address is configured. An enquiry does not
-                send an automated email or guarantee a reply. In the meantime, everything we get
-                asked most is answered on the{" "}
+                The contact form is unavailable because no support address is set. Most questions
+                are answered on the{" "}
                 <Link to="/shipping" className="text-primary underline">
                   delivery
                 </Link>
@@ -186,8 +197,8 @@ function Contact() {
                 <p className="font-semibold">Support availability</p>
                 <p className="text-sm text-muted-foreground">
                   {site.email
-                    ? `Listed hours: ${site.supportHours}. Your email app must send the message; opening a draft is not delivery. No response time is guaranteed.`
-                    : "The inbox is not live. No messages or replies can be handled through this form yet."}
+                    ? `${site.supportHours}. We do not promise a reply time.`
+                    : "Email us at the address above."}
                 </p>
               </div>
             </div>
@@ -199,7 +210,7 @@ function Contact() {
               <div>
                 <p className="font-semibold">Looking for a certificate?</p>
                 <p className="text-sm text-muted-foreground">
-                  Search published batch reports in the lab reports hub.
+                  Search published batch reports by batch number.
                 </p>
               </div>
             </Link>

@@ -13,15 +13,17 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "Who can order from Vyrax Labs?",
-        "Adults aged 18 or over may submit enquiries for legitimate laboratory, analytical or educational research. You must confirm research-only use when enquiring. These products are not medicines, foods or cosmetics and are not for human or veterinary use. See the Research use policy.",
+        "Adults aged 18 or over buying for legitimate laboratory, analytical or educational research. These products are not medicines, foods or cosmetics and are not for human or veterinary use. See the Research use policy.",
       ],
       [
-        "Why is payment an enquiry rather than an instant card payment?",
-        `${site.enquiriesLive && site.email ? "This site records an enquiry only. It does not take payment, confirm stock, place an order or send an automated receipt." : "The site opens in 3-4 days. You can browse and save a basket, but the site does not collect contact details or take payment yet."} Availability, final price, delivery and payment would need to be agreed separately before an order could proceed. Do not send payment based on a basket.`,
+        "How do I pay?",
+        site.checkoutOpen
+          ? `By debit or credit card at checkout, on ${site.paymentProvider}'s hosted payment page. We never see your full card details.`
+          : `Card checkout, on ${site.paymentProvider}'s hosted payment page, is not open yet. You can browse and save a basket in the meantime. Nothing is reserved and no payment is taken.`,
       ],
       [
         "Do you offer multi-buy or volume pricing?",
-        `The basket shows indicative multi-buy pricing: ${spendTierLine()}. Eligible lines also show a buy two, get one free offer. No price or order is final until separately agreed. See the basket for the current calculation.`,
+        `Yes. The basket applies ${spendTierLine()}. Eligible lines also get a buy two, get one free offer. The basket shows the exact total before you pay.`,
       ],
     ],
   },
@@ -29,16 +31,16 @@ export const faqGroups: FaqGroup[] = [
     title: "Delivery",
     items: [
       [
-        "When will my enquiry be dispatched?",
-        "An enquiry is not an order and is not scheduled for dispatch. If an order can proceed, availability, delivery and timing must first be agreed separately. See the Delivery page for indicative UK delivery information; no same-day dispatch is promised.",
+        "When will my order arrive?",
+        "We do not promise a dispatch day or delivery date. We send orders after payment is confirmed and stock is checked, and the carrier gives its own estimate. See the Delivery page.",
       ],
       [
         "How much is delivery, and how is it tracked?",
-        `The basket shows indicative UK delivery of ${fee}, or free from ${threshold} after discounts, subject to confirmation before any order. No parcel is sent when you submit an enquiry. See the Delivery page for the proposed service and coverage.`,
+        `UK delivery is ${fee} by ${site.carrier}, or free from ${threshold} after discounts. It is a tracked service and we email the tracking details when your parcel is sent.`,
       ],
       [
         "What happens if my parcel is lost or arrives damaged?",
-        `No parcel is dispatched from an enquiry. If you later place an order and delivery goes wrong, see the Returns page for reporting a loss, damage or an incorrect item and for your statutory rights. ${site.email ? "Check Contact for the available channel." : "The support inbox is not live yet."}`,
+        `Tell us as soon as you can through Contact${site.email ? ` or at ${site.email}` : ""}. The Returns page explains what we will do and your statutory rights.`,
       ],
     ],
   },
@@ -48,18 +50,18 @@ export const faqGroups: FaqGroup[] = [
       [
         "Are purity results available?",
         coas.length
-          ? "Only published certificates listed on the Lab Reports page have documented batch results. Check the specific product and batch; a certificate for one batch does not verify another."
-          : "No certificates are published yet, so no batch-specific purity or identity result can be checked here. The Lab Reports page shows the published register when reports become available; it does not track unpublished batches.",
+          ? "Certificates for specific batches are published on the Lab Reports page. A certificate applies only to the batch it names."
+          : "No certificates are published yet. The Lab Reports page will list them when they are.",
       ],
       [
         "How do I check the certificate for my vial?",
         coas.length
-          ? "Use the batch lookup on the Lab Reports page to check whether a matching certificate is published. A lookup miss does not confirm the identity or status of a vial."
-          : "There is no published certificate to look up yet. The Lab Reports page lists available reports and currently has none; a number on packaging or a product image is not evidence of a verified batch.",
+          ? "Enter the batch number from your vial label on the Lab Reports page, or scan the QR code on the label. If nothing is found, contact us with the batch number."
+          : "There is no published certificate to look up yet.",
       ],
       [
         "What form are the peptides supplied in, and can they be used in humans?",
-        "Check each product page for its stated form and contents. These materials are supplied for research only, not for human or veterinary use. They are not medicines.",
+        "Check each product page for the stated form and contents. These materials are for laboratory research only, not for human or veterinary use. They are not medicines.",
       ],
     ],
   },
@@ -68,7 +70,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "How should I store lyophilised peptides?",
-        "Follow the product-specific label or documentation for storage conditions. Do not assume one temperature or shelf life applies to every compound. If the required handling information is unavailable, do not treat a generic guide as batch-specific evidence.",
+        "Follow the storage details on the product label or product page. Do not assume one temperature or shelf life applies to every compound.",
       ],
     ],
   },
@@ -77,13 +79,11 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "Can I return an order?",
-        `An enquiry cannot be returned because no order is placed or payment taken. If an order is agreed later, the Returns page explains the ${site.returnWindowDays}-day change-of-mind process for eligible items and how to report faulty, damaged or incorrect goods. Opening an item does not remove statutory rights.`,
+        `Yes. You can cancel within ${site.returnWindowDays} days of delivery and return unopened, sealed vials. Faulty, damaged or wrong items are handled under your statutory rights. See the Returns page.`,
       ],
       [
         "Where can I find the trading and contact details?",
-        site.companyNumber
-          ? `The company number is ${site.companyNumber}. See About and Terms for the published identity and Contact for available channels.`
-          : `The legal trading identity and company number have not been published. ${site.email ? "Check Contact for the available channel." : "The support inbox is not live yet."} Check the About, Terms and Contact pages for current details before agreeing a separate order.`,
+        `${site.name} is a trading name of ${site.legalName ?? "a UK company"}${site.companyNumber ? `, company number ${site.companyNumber}` : ""}${site.vatNumber ? `, VAT number ${site.vatNumber}` : ""}. ${site.registeredOffice ? `Registered office: ${site.registeredOffice}. ` : "Our registered office address is being finalised. "}Contact details are on the Contact page${site.email ? ` or email ${site.email}` : ""}.`,
       ],
     ],
   },

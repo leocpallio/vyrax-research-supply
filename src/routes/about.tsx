@@ -12,7 +12,7 @@ export const Route = createFileRoute("/about")({
     pageHead(
       "/about",
       "About Vyrax Labs | UK Research Peptide Supplier",
-      "Learn about Vyrax Labs research products, published documentation and enquiry-only ordering.",
+      "Who Vyrax Labs is, how we supply research peptides from the UK, and where to find our certificates and company details.",
     ),
   component: About,
 });
@@ -32,7 +32,11 @@ function About() {
       "Specifications",
       "Review each product page for available compound information; a specification is not a batch test result.",
     ],
-    [Truck, "Enquiry first", "No payment, confirmed order or dispatch is created by an enquiry."],
+    [
+      Truck,
+      "UK delivery",
+      `${site.carrier}, free over £${site.freeDeliveryThreshold}. See the delivery page for details.`,
+    ],
     [
       ShieldCheck,
       "Research only",
@@ -46,8 +50,8 @@ function About() {
         <p className="eyebrow">ABOUT VYRAX LABS</p>
         <h1 className="page-title max-w-3xl">Research compounds for laboratory use.</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Check the specifications and the current report register before deciding what to compare.
-          Browsing or saving a basket does not reserve a vial or start an order.
+          Check the specification and the certificate for a batch before you buy. Browsing or saving
+          a basket does not reserve stock.
         </p>
         <div className="flex flex-wrap gap-4 mt-6 text-sm font-semibold">
           <Link
@@ -66,22 +70,20 @@ function About() {
         <div className="grid md:grid-cols-2 gap-12 mt-10 items-center">
           <div className="text-muted-foreground leading-relaxed space-y-4">
             <p>
-              Vyrax Labs lists research peptides for laboratory, analytical and educational
-              research. The catalogue is open for browsing, but enquiry intake and paid orders are
-              not currently available.
+              Vyrax Labs supplies research peptides for laboratory, analytical and educational
+              research, with UK delivery.
             </p>
             <p>
-              Product pages show listed specifications and indicative prices. Those details are not
-              a certificate of analysis. Check the{" "}
+              Product pages show the listed specification. A specification is not a certificate of
+              analysis. Certificates are published in the{" "}
               <Link to="/lab-reports" className="text-primary underline">
                 lab reports register
-              </Link>{" "}
-              for published batch documents; none are listed until an actual report is available.
+              </Link>
+              , and each one applies only to the batch it names.
             </p>
             <p>
-              Browse {count} listed research compounds and the accompanying catalogue supplies.
-              Availability and final terms require separate confirmation before an order can
-              proceed.
+              Browse {count} research compounds and the supplies that go with them. Everything we
+              sell is for research use only, not for human or veterinary use.
             </p>
           </div>
           <img
@@ -105,15 +107,16 @@ function About() {
         <div className="mt-12 border border-border rounded-2xl p-6 space-y-3 text-sm text-muted-foreground">
           <h2 className="font-heading font-semibold text-foreground text-lg">Trading details</h2>
           <p>
-            Trading name: {site.name}. Legal entity: {site.legalName ?? "not yet published"}.
+            Trading name: {site.name}. Company: {site.legalName ?? "being finalised"}
+            {site.companyNumber ? `, company number ${site.companyNumber}` : ""}
+            {site.vatNumber ? `, VAT number ${site.vatNumber}` : ""}.
           </p>
           <p>
-            Company number: {site.companyNumber ?? "not yet published"}. Registered office:{" "}
-            {site.registeredOffice ?? "not yet published"}.
-          </p>
-          <p>
-            Support contact: {site.email ?? "inbox not live yet"}. Do not send parcels to an
-            unconfirmed address.
+            Registered office: {site.registeredOffice ?? "being finalised"}. Email:{" "}
+            <a href={`mailto:${site.email}`} className="text-primary underline">
+              {site.email}
+            </a>
+            .
           </p>
           <p>
             <Link to="/terms" className="text-primary underline">
@@ -121,9 +124,9 @@ function About() {
             </Link>{" "}
             and{" "}
             <Link to="/contact" className="text-primary underline">
-              contact options
+              contact page
             </Link>{" "}
-            show the current position.
+            have the details.
           </p>
         </div>
         <p className="mt-12">

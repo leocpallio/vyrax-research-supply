@@ -14,7 +14,7 @@ export const Route = createFileRoute("/cookies")({
 
 function Cookies() {
   return (
-    <InfoPage title="Cookie policy" crumb="Cookies" updated="2026-09-28">
+    <InfoPage title="Cookie policy" crumb="Cookies" updated="2026-10-06">
       <p>
         We keep browser storage to the minimum needed to run the shop. We do not use advertising
         cookies or cross-site tracking. Optional PostHog analytics only run after you allow them. If
