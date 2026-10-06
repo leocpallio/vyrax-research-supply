@@ -17,7 +17,7 @@ export type RenderedEmail = { subject: string; html: string; text: string };
 
 export const SUPPORT_EMAIL = "support@vyraxlabs.co.uk";
 export const LEGAL_FOOTER =
-  "Vyrax Labs is a trading name of Oraxis Research Ltd, company number 17157816";
+  "Vyrax Labs";
 export const RESEARCH_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
 const CARRIER = "Royal Mail Tracked 24";
 

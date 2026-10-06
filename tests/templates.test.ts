@@ -34,9 +34,7 @@ describe("Vyrax paid-checkout emails", () => {
       const m = renderEmail(ev);
       for (const part of [m.html, m.text]) {
         expect(part).toContain("support@vyraxlabs.co.uk");
-        expect(part).toContain(
-          "Vyrax Labs is a trading name of Oraxis Research Ltd, company number 17157816",
-        );
+        expect(part).not.toContain("Oraxis");
         expect(part).toContain("Not for human or veterinary use");
         expect(part).not.toContain("\u2014");
         expect(part.toLowerCase()).not.toContain("enquiry");

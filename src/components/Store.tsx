@@ -450,9 +450,7 @@ function Footer() {
   // comes from the claim registry, so a fact appearing in the footer means the evidence manifest
   // (src/lib/evidence.ts) holds it.
   const company = [
-    site.legalName ? `${site.name} is a trading name of ${site.legalName}` : site.name,
-    claimText("identity.company-number"),
-    claimText("identity.vat-number"),
+    site.name,
     claimText("identity.registered-office"),
   ].filter(Boolean);
   // Only lists payment methods the evidence manifest says are actually live at checkout.
@@ -558,7 +556,7 @@ function Footer() {
               <p key={line as string}>{line}</p>
             ))}
             <p>
-              © {new Date().getFullYear()} {site.legalName ?? site.name}. All rights reserved.
+              © {new Date().getFullYear()} {site.name}. All rights reserved.
             </p>
           </div>
           <div className="md:text-right space-y-1 max-w-md">

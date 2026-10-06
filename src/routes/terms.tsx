@@ -17,15 +17,7 @@ function Terms() {
     <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-10-06">
       <h2>1. About us</h2>
       <p>
-        This website uses the trading name {site.name}. The seller is{" "}
-        <Fact value={site.legalName} fallback="being finalised" />
-        {site.companyNumber && (
-          <>, a company registered in England and Wales under company number {site.companyNumber}</>
-        )}
-        {site.vatNumber && <>, VAT number {site.vatNumber}</>}.{" "}
-        {site.registeredOffice
-          ? `Registered office: ${site.registeredOffice}.`
-          : "Our registered office address is being finalised."}
+        This website is operated under the trading name {site.name}.
       </p>
       <h2>2. Research use only</h2>
       <p>
@@ -43,8 +35,7 @@ function Terms() {
       </p>
       <h2>4. Prices and payment</h2>
       <p>
-        Prices are in pounds sterling. We are VAT registered
-        {site.vatNumber ? ` (${site.vatNumber})` : ""}. Delivery is added at checkout where it
+        Prices are in pounds sterling. Delivery is added at checkout where it
         applies, and you see the full total before you pay. You pay by debit or credit card on the
         hosted payment page of our payment provider, {site.paymentProvider}. We never see or store
         your full card details.{" "}

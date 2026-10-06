@@ -83,7 +83,7 @@ export const faqGroups: FaqGroup[] = [
       ],
       [
         "Where can I find the trading and contact details?",
-        `${site.name} is a trading name of ${site.legalName ?? "a UK company"}${site.companyNumber ? `, company number ${site.companyNumber}` : ""}${site.vatNumber ? `, VAT number ${site.vatNumber}` : ""}. ${site.registeredOffice ? `Registered office: ${site.registeredOffice}. ` : "Our registered office address is being finalised. "}Contact details are on the Contact page${site.email ? ` or email ${site.email}` : ""}.`,
+        `Contact details are on the Contact page${site.email ? ` or email ${site.email}` : ""}.`,
       ],
     ],
   },

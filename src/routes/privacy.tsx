@@ -16,9 +16,7 @@ function Privacy() {
   return (
     <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-10-06">
       <p>
-        This policy covers the {site.name} website. The data controller is{" "}
-        <Fact value={site.legalName} fallback="being finalised" />
-        {site.companyNumber && <> (company number {site.companyNumber})</>}. UK GDPR and the Data
+        This policy covers the {site.name} website. The data controller is {site.name}. UK GDPR and the Data
         Protection Act 2018 apply.
       </p>
       <h2>What we collect</h2>

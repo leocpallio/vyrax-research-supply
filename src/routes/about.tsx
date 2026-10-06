@@ -107,12 +107,10 @@ function About() {
         <div className="mt-12 border border-border rounded-2xl p-6 space-y-3 text-sm text-muted-foreground">
           <h2 className="font-heading font-semibold text-foreground text-lg">Trading details</h2>
           <p>
-            Trading name: {site.name}. Company: {site.legalName ?? "being finalised"}
-            {site.companyNumber ? `, company number ${site.companyNumber}` : ""}
-            {site.vatNumber ? `, VAT number ${site.vatNumber}` : ""}.
+            Trading name: {site.name}.
           </p>
           <p>
-            Registered office: {site.registeredOffice ?? "being finalised"}. Email:{" "}
+            Email:{" "}
             <a href={`mailto:${site.email}`} className="text-primary underline">
               {site.email}
             </a>

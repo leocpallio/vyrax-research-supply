@@ -12,9 +12,9 @@ export const site = {
   url: SITE_URL,
   tagline: "Research peptides dispatched from the UK",
   // Business details: fill these in before launch. Null values are shown as pending.
-  legalName: "Oraxis Research Ltd" as string | null, // Vyrax Labs is a trading name of this company
-  companyNumber: "17157816" as string | null, // Companies House number
-  vatNumber: "GB523581496" as string | null, // VAT registered with effect from 1 September 2026
+  legalName: null as string | null,
+  companyNumber: null as string | null,
+  vatNumber: null as string | null,
   registeredOffice: null as string | null,
   // Physical address a return can be sent to. Null means returns are handled by arrangement only;
   // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
