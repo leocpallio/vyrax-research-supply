@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { sendTransactional } from "../src/lib/email/send.server";
 import { renderEmail } from "../src/lib/email/templates";
 
-const mail = renderEmail({ kind: "support", name: "Test" });
+const mail = renderEmail({ kind: "paymentFailed", name: "Test", reference: "VX-ABCDEF12" });
 describe("server-only Resend transport", () => {
   it("refuses to send without dedicated server configuration", async () => {
     await expect(
