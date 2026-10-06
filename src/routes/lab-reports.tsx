@@ -109,7 +109,6 @@ function Reports() {
             {hit.file && (
               <a
                 href={hit.file}
-                target="_blank"
                 rel="noreferrer"
                 className="text-primary underline mt-2 inline-block"
               >
@@ -154,7 +153,6 @@ function Reports() {
                         {r.file && (
                           <a
                             href={r.file}
-                            target="_blank"
                             rel="noreferrer"
                             className="text-primary underline"
                           >
