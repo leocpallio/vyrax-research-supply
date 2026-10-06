@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
+import { latestCoa } from "@/data/coa";
 import { shopSections, sectionFor } from "@/data/shop-sections";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ function Shop() {
   const [text, setText] = useState(search.q ?? "");
   const [cat, setCat] = useState(search.cat ?? "all");
   const [sort, setSort] = useState<Sort>("name");
+  const [coaOnly, setCoaOnly] = useState(false);
   const lastSearch = useRef<string | null>(null);
   useEffect(() => setText(search.q ?? ""), [search.q]);
   useEffect(() => setCat(search.cat ?? "all"), [search.cat]);
@@ -55,13 +57,16 @@ function Shop() {
         : query.length === 1
           ? compounds.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
           : compounds;
-    const filtered = base.filter((p) => cat === "all" || sectionFor(p)?.slug === cat);
+    const filtered = base.filter(
+      (p) =>
+        (cat === "all" || sectionFor(p)?.slug === cat) && (!coaOnly || latestCoa(p.slug) != null),
+    );
     const sorted = [...filtered];
     if (sort === "price-asc") sorted.sort((a, b) => fromPrice(a) - fromPrice(b));
     if (sort === "price-desc") sorted.sort((a, b) => fromPrice(b) - fromPrice(a));
     if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
     return sorted;
-  }, [text, cat, sort]);
+  }, [text, cat, sort, coaOnly]);
   useEffect(() => {
     if (text.trim().length < 2 || text === (search.q ?? "")) return;
     const timer = setTimeout(() => {
@@ -131,11 +136,20 @@ function Shop() {
             onChange={(e) => setText(e.target.value)}
             className="min-w-0 basis-full sm:basis-auto flex-1 md:max-w-sm rounded-full"
           />
+          <label className="text-sm flex items-center gap-2 min-h-11">
+            <input
+              type="checkbox"
+              checked={coaOnly}
+              onChange={(e) => setCoaOnly(e.target.checked)}
+              className="size-4"
+            />
+            Has published certificate
+          </label>
           <label className="text-sm flex items-center gap-2 md:ml-auto">
             <span className="sr-only md:not-sr-only">Sort</span>
             <select
               aria-label="Sort products"
-              className="h-9 border border-border rounded-full px-3 bg-background"
+              className="h-11 border border-border rounded-full px-3 bg-background"
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
             >
@@ -149,7 +163,7 @@ function Shop() {
           <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
             {list.length} result{list.length === 1 ? "" : "s"}
           </p>
-          {(text || cat !== "all") && (
+          {(text || cat !== "all" || coaOnly) && (
             <Button
               type="button"
               variant="link"
@@ -157,6 +171,7 @@ function Shop() {
               onClick={() => {
                 setText("");
                 setCat("all");
+                setCoaOnly(false);
               }}
             >
               Clear filters
