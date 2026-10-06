@@ -21,9 +21,9 @@ export const Route = createFileRoute("/shop")({
     const titleTag = isClaimAllowed("testing.page-title")
       ? `, ${claimGate("testing.page-title")}`
       : "";
-    const title = `${site.enquiriesLive && site.email ? "Buy" : "Browse"} Research Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
     const batchCerts = claimText("testing.batch-certificates");
-    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.enquiriesLive && site.email ? "See delivery options before enquiring." : "Site opening in 3-4 days; no payment is taken yet."}`;
+    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."}`;
     return {
       meta: [
         { title },
@@ -88,8 +88,8 @@ function Shop() {
           Research compounds and laboratory supplies from Vyrax Labs. {compounds.length} products
           across {shopSections.length} sections. Prices are indicative; availability is unconfirmed
           and{" "}
-          {site.enquiriesLive && site.email
-            ? "enquiries do not confirm an order."
+          {site.checkoutOpen
+            ? "final prices are confirmed at checkout."
             : "the site opens in 3-4 days."}{" "}
           For laboratory research only, not for human use.
         </p>

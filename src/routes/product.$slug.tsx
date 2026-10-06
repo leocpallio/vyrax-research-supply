@@ -76,7 +76,7 @@ export const Route = createFileRoute("/product/$slug")({
     const batchCerts = coa ? "Batch certificate available" : null;
     const orderingNote = site.paymentMethods.length
       ? "For laboratory research use only."
-      : "Enquiry only; no payment is taken online.";
+      : "Checkout opens in 3-4 days; no payment is taken online yet.";
     const desc =
       c.kind === "supply"
         ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}. ${orderingNote}`
@@ -189,9 +189,7 @@ function productFaqs(c: Compound, s: Strength): QA[] {
       `How quickly will my ${c.name} order arrive?`,
       site.paymentMethods.length
         ? `See our shipping policy for dispatch times, carrier and delivery charges.`
-        : site.enquiriesLive && site.email
-          ? "This page leads to an enquiry, not a paid order. See our shipping policy for indicative delivery charges; dispatch is agreed separately."
-          : "The site opens in 3-4 days. No order or delivery is scheduled from this site yet. See our shipping policy for indicative delivery information.",
+        : "The site opens in 3-4 days. No order or delivery is scheduled from this site yet. See our shipping policy for indicative delivery information.",
     ],
   ];
   if (c.strengths.length > 1)
@@ -389,7 +387,7 @@ function ProductPage() {
                 <CheckCircle2 size={17} className="text-primary shrink-0" />
                 <span className="font-semibold">
                   {stock === "out"
-                    ? "Not currently listed for enquiry"
+                    ? "Not currently listed"
                     : "Availability to be confirmed"}
                 </span>
               </p>
@@ -472,7 +470,7 @@ function ProductPage() {
             </div>
             {stock === "out" && (
               <p className="mt-4 rounded-xl border border-border p-4 text-sm text-muted-foreground">
-                This strength is not listed for an enquiry. You can compare other listed strengths,
+                This strength is not currently listed. You can compare other listed strengths,
                 but none are reserved and nothing is charged on this site.
               </p>
             )}

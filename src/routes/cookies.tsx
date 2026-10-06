@@ -52,7 +52,7 @@ function Cookies() {
       <h2>Optional analytics</h2>
       <p>
         If you allow analytics, we send page paths (without query strings), product and collection
-        slugs, aggregate search result counts (never your search text), basket changes and enquiry
+        slugs, aggregate search result counts (never your search text), basket changes and checkout
         funnel steps to PostHog. An anonymous identifier exists only for this page session. We do
         not send names, emails, addresses, form contents or payment details, and do not use
         analytics cookies, autocapture or session replay. PostHog may process technical connection

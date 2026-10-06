@@ -1,6 +1,6 @@
 import { categories, compounds, readCart, resolveProductSlug, type CartItem } from "./catalog";
 import { shopSections } from "../data/shop-sections";
-
+import { site } from "../data/site";
 // The public project token and capture host must BOTH belong to Vyrax. Never use a different brand's token.
 const key = import.meta.env["VITE_POSTHOG_KEY"]?.trim();
 const host = import.meta.env["VITE_POSTHOG_HOST"]?.trim();
@@ -53,8 +53,6 @@ type EventName =
   | "checkout_started"
   | "hosted_payment_opened"
   | "payment_confirmed"
-  | "enquiry_submitted"
-  | "enquiry_error"
   | "page_error";
 type SafeProperties = Record<string, string | number | boolean>;
 
@@ -128,7 +126,7 @@ export function trackPage(path: string) {
   else if (path === "/basket")
     capture("basket_viewed", { item_count: readCart().reduce((n, i) => n + i.quantity, 0) });
   else if (path === "/checkout") {
-    if (import.meta.env["VITE_SPICEPAY_CHECKOUT_ENABLED"] === "true" && readCart().length)
+    if (site.checkoutOpen && readCart().length)
       capture("checkout_started", { checkout_type: "hosted_payment" });
   } else if (path.startsWith("/product/")) {
     const product = resolveProductSlug(path.slice("/product/".length));

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/shipping")({
     pageHead(
       "/shipping",
       `UK Delivery Information | Vyrax Labs`,
-      `Indicative UK delivery costs and coverage for research product enquiries. Enquiries are not orders and are not scheduled for dispatch.`,
+      `Indicative UK delivery costs and coverage for research product orders. Dispatch is not scheduled until an order is paid.`,
     ),
   component: Shipping,
 });

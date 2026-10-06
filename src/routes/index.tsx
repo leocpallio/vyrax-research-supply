@@ -36,9 +36,9 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.enquiriesLive && site.email ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.enquiriesLive && site.email ? "See delivery options before enquiring." : "Site opening in 3-4 days; no payment is taken yet."}`;
+    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."}`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -119,12 +119,12 @@ const expectations: Tile[] = [
   [
     Truck,
     "Delivery information",
-    `Indicative UK delivery terms, including a proposed free-delivery threshold of £${site.freeDeliveryThreshold}. No shipment follows a basket or enquiry.`,
+    `Indicative UK delivery terms, including a proposed free-delivery threshold of £${site.freeDeliveryThreshold}. A saved basket does not start a shipment.`,
   ],
   [
     RotateCcw,
     "Parcel issue policy",
-    `Read the conditions for lost or damaged parcels in our returns policy; an enquiry does not schedule a shipment.`,
+    `Read the conditions for lost or damaged parcels in our returns policy; a saved basket does not schedule a shipment.`,
   ],
   [
     FileCheck2,
@@ -155,7 +155,7 @@ function Home() {
         <div className="container-main relative py-16 md:py-20">
           <div className="max-w-[680px]">
             <div className="eyebrow flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · ENQUIRY ONLY
+              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · UK DELIVERY
             </div>
             <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
               Research peptides for laboratory work.
@@ -163,8 +163,8 @@ function Home() {
             <p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[560px]">
               Browse {compounds.length} research compounds, compare vial strengths and read the
               available specifications.{" "}
-              {site.enquiriesLive && site.email
-                ? "Enquiries can be submitted online; no payment is taken."
+              {site.checkoutOpen
+                ? "Pay by card at checkout on SpicePay's hosted page. Research use only."
                 : "Site opening in 3-4 days; no payment is taken on this site yet."}
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
@@ -217,16 +217,16 @@ function Home() {
         <div className="container-main py-16 grid lg:grid-cols-[1fr_1.4fr] gap-10 items-center">
           <div>
             <span className="badge-promo">
-              {site.enquiriesLive && site.email ? "MULTI-BUY PRICING" : "INDICATIVE PRICING"}
+              {site.checkoutOpen ? "MULTI-BUY PRICING" : "INDICATIVE PRICING"}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl font-semibold mt-4">
-              {site.enquiriesLive && site.email
+              {site.checkoutOpen
                 ? "Buy 2, get the 3rd free"
                 : "Compare research vial strengths"}
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
-              {site.enquiriesLive && site.email
-                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is included in the indicative estimate. Multi-buy pricing applies on top: ${spendTierLine()}. No order is placed until terms are agreed.`
+              {site.checkoutOpen
+                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is free. Multi-buy pricing applies on top: ${spendTierLine()}. The final price is confirmed at checkout.`
                 : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. The site opens in 3-4 days."}
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
@@ -299,7 +299,7 @@ function Home() {
       {/* Process */}
       <section className="section bg-surface">
         <div className="container-main">
-          <SectionTitle eyebrow="HOW IT WORKS" title="Compare before you enquire" />
+          <SectionTitle eyebrow="HOW IT WORKS" title="Compare before you buy" />
           <div className="grid md:grid-cols-4 gap-8">
             {[
               [
@@ -319,9 +319,9 @@ function Home() {
               ],
               [
                 "04",
-                "Agree terms separately",
-                site.enquiriesLive && site.email
-                  ? "An enquiry does not take payment, confirm an order or schedule dispatch. Final terms must be agreed separately."
+                site.checkoutOpen ? "Check out" : "Check out when we open",
+                site.checkoutOpen
+                  ? "Pay by card on SpicePay's hosted page. The server confirms the final price before you pay, and delivery follows our shipping policy."
                   : "The site opens in 3-4 days. No payment, confirmed order or dispatch follows from this site yet.",
               ],
             ].map(([n, t, b]) => (
@@ -489,8 +489,8 @@ function Home() {
             </h2>
             <p className="text-muted-foreground mt-1">
               Indicative multi-buy tiers: {spendTierLine()}.{" "}
-              {site.enquiriesLive && site.email
-                ? "Final terms are agreed separately."
+              {site.checkoutOpen
+                ? "The server confirms the final price at checkout."
                 : "The site opens in 3-4 days."}
             </p>
           </div>

@@ -7,7 +7,7 @@ export const Route = createFileRoute("/returns")({
     pageHead(
       "/returns",
       "Returns and Problem Reporting | Vyrax Labs",
-      `How returns, cancellations and damaged goods would be handled after an order, including a ${site.returnWindowDays}-day change-of-mind window for eligible items. Enquiries are not orders.`,
+      `How returns, cancellations and damaged goods would be handled after an order, including a ${site.returnWindowDays}-day change-of-mind window for eligible items. A saved basket is not an order.`,
     ),
   component: Returns,
 });

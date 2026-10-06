@@ -219,7 +219,6 @@ body {
   height: 36px;
   display: grid;
   place-items: center;
-  transition: color 0.2s;
 }
 .icon-link:hover {
   color: var(--primary);
@@ -229,9 +228,7 @@ body {
   border-radius: 16px;
   overflow: hidden;
   background: var(--background);
-  transition:
-    transform 0.25s,
-    box-shadow 0.25s;
+  transition: transform 0.2s ease-out;
 }
 .product-card:hover {
   transform: translateY(-4px);
@@ -243,9 +240,6 @@ body {
   background: var(--surface);
   padding: 28px;
   min-height: 160px;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
 }
 .category-tile:hover {
   border-color: var(--primary);
@@ -297,10 +291,6 @@ body {
   padding: 6px 14px;
   font-size: 0.875rem;
   font-weight: 600;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    color 0.15s;
 }
 .chip:hover {
   border-color: var(--primary);
@@ -406,5 +396,24 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+}
+
+/* Consistent keyboard focus ring across interactive surfaces (no layout shift: outline only). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+.product-card:focus-within,
+.category-tile:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-card:hover {
+    transform: none;
   }
 }

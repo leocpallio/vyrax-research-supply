@@ -63,7 +63,7 @@ function Privacy() {
       <h2>Cookies</h2>
       <p>
         Optional PostHog website analytics run only if you allow them. They use an anonymous
-        session-only identifier and do not receive enquiry contact details or search text. PostHog
+        session-only identifier and do not receive contact or delivery details or search text. PostHog
         may process technical connection data. Manage your choice in our{" "}
         <Link to="/cookies">cookie policy</Link>.
       </p>

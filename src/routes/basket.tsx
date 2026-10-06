@@ -56,9 +56,7 @@ function Basket() {
   const unavailable = items.filter(isLineUnavailable);
   const ctaLabel = paymentEnabled
     ? "Proceed to checkout"
-    : site.enquiriesLive && site.email
-      ? "Proceed to enquiry"
-      : "Site opening in 3-4 days";
+    : "Site opening in 3-4 days";
   const p = priceBasket(items);
   const shipPct = Math.min(100, (p.goods / site.freeDeliveryThreshold) * 100);
   return (
@@ -69,9 +67,7 @@ function Basket() {
           Saved in this browser. No items are reserved and no payment is taken on this page.{" "}
           {paymentEnabled
             ? "Hosted payment is available at checkout; inventory is not reserved."
-            : site.enquiriesLive && site.email
-              ? "Final terms must be agreed separately."
-              : "The site opens in 3-4 days. Baskets are saved in this browser until then."}
+            : "The site opens in 3-4 days. Baskets are saved in this browser until then."}
         </p>
         {removed && (
           <div
@@ -206,7 +202,7 @@ function Basket() {
             </div>
             <aside className="bg-surface p-7 rounded-2xl h-fit">
               <h2 className="font-heading text-xl font-semibold">
-                {paymentEnabled ? "Basket estimate" : "Enquiry estimate"}
+                {paymentEnabled ? "Basket estimate" : "Indicative estimate"}
               </h2>
               <div className="flex justify-between mt-6">
                 <span>Subtotal</span>
@@ -246,9 +242,7 @@ function Basket() {
                 No charge or confirmed order on this page. Availability is not reserved.{" "}
                 {paymentEnabled
                   ? "The server confirms the final price before hosted payment."
-                  : site.enquiriesLive && site.email
-                    ? "No automated email or dispatch is triggered by an enquiry."
-                    : "The site opens in 3-4 days; no contact details are collected yet."}
+                  : "The site opens in 3-4 days; no contact details are collected yet."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
                 For research use only. Not for human consumption.

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/category/$slug")({
       ? `${claimGate("testing.page-title")} | `
       : "";
     const title = `${c.seoName} UK | ${titleTag}Vyrax Labs`;
-    const desc = `${c.blurb} Browse ${list.length} research compounds from ${gbp(low)}. ${site.paymentMethods.length ? "For research use only." : "Enquiry only; no payment is taken online."}`;
+    const desc = `${c.blurb} Browse ${list.length} research compounds from ${gbp(low)}. ${site.paymentMethods.length ? "For research use only." : "Checkout opens in 3-4 days; no payment is taken online yet."}`;
     const entries = list.map((p) => ({ name: p.name, path: productPath(p.slug) }));
     const itemList = {
       "@context": "https://schema.org",
