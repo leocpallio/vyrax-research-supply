@@ -626,7 +626,6 @@ function ProductPage() {
                   </div>
                   <a
                     href={coa.file || `/verify/${coa.batch}`}
-                    target="_blank"
                     rel="noreferrer"
                     className="sm:col-span-4 text-primary font-semibold underline"
                   >
