@@ -31,6 +31,7 @@ type Order = {
   country?: string | null;
   merchant_id?: string | null;
   payment_id?: string | null;
+  tracking_number?: string | null;
 };
 type Metrics = {
   total: number;
@@ -41,6 +42,7 @@ type Metrics = {
   needs_attention: number;
   test_orders: number;
 };
+const automationEnabled = import.meta.env["VITE_VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true";
 const workflowOptions = ["unreviewed", "reviewing", "on_hold", "packing", "dispatched", "complete"];
 const statusOptions = ["all", "enquiry", "pending_payment", "paid", "internal_test"];
 const label = (v: string) => v.replaceAll("_", " ");
@@ -62,6 +64,8 @@ function Admin() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [selected, setSelected] = useState<Order | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [fulfilmentFeedback, setFulfilmentFeedback] = useState("");
   const [status, setStatus] = useState("all");
   const [workflow, setWorkflow] = useState("all");
   const [q, setQ] = useState("");
@@ -139,9 +143,14 @@ function Admin() {
   }, [token, refresh]);
   async function open(id: string) {
     setError("");
+    setFulfilmentFeedback("");
     try {
       const result = await api(`?id=${encodeURIComponent(id)}`);
-      if (currentToken.current === token) setSelected(result["order"] as Order);
+      if (currentToken.current === token) {
+        const order = result["order"] as Order;
+        setSelected(order);
+        setTrackingNumber(order.tracking_number ?? "");
+      }
     } catch (e) {
       if (currentToken.current === token)
         setError(e instanceof Error ? e.message : "Unable to load order");
@@ -149,20 +158,42 @@ function Admin() {
   }
   async function update(value: string) {
     if (!selected) return;
+    const id = selected.id;
     setSaving(true);
     setError("");
+    setFulfilmentFeedback("");
     try {
-      const result = await api(`?id=${encodeURIComponent(selected.id)}`, {
+      const result = await api(`?id=${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workflow: value }),
+        body: JSON.stringify(
+          value === "dispatched" && automationEnabled
+            ? { workflow: value, trackingNumber }
+            : { workflow: value },
+        ),
       });
       if (currentToken.current !== token) return;
-      setSelected(result["order"] as Order);
+      const updated = result["order"] as Order;
+      setSelected(updated);
+      setTrackingNumber(updated.tracking_number ?? "");
+      setFulfilmentFeedback(
+        result["email_status"] === "queued_not_sent"
+          ? "Dispatch saved. Customer email queued, not sent. Delivery remains disabled until the owner approves the preview and enables sending."
+          : "Workflow saved. No customer email sent.",
+      );
       await refresh();
     } catch (e) {
-      if (currentToken.current === token)
+      if (currentToken.current === token) {
         setError(e instanceof Error ? e.message : "Update failed");
+        // A dispatch may have persisted even if outbox enqueue failed. Read back instead of
+        // leaving a stale packing state; the retry control appears for the same tracking code.
+        try {
+          const current = await api(`?id=${encodeURIComponent(id)}`);
+          if (currentToken.current === token) setSelected(current["order"] as Order);
+        } catch {
+          /* retain actionable error */
+        }
+      }
     } finally {
       if (currentToken.current === token) setSaving(false);
     }
@@ -446,6 +477,19 @@ function Admin() {
                     </button>
                   </div>
                   <p className="font-mono text-sm break-all mt-3">{selected.id}</p>
+                  {error && (
+                    <p
+                      role="alert"
+                      className="mt-4 rounded border border-destructive p-3 text-destructive"
+                    >
+                      {error}
+                    </p>
+                  )}
+                  {fulfilmentFeedback && (
+                    <p role="status" className="mt-4 rounded border border-border p-3">
+                      {fulfilmentFeedback}
+                    </p>
+                  )}
                   <dl className="grid grid-cols-2 gap-4 mt-8 text-sm">
                     {[
                       ["Created", date(selected.created_at)],
@@ -497,15 +541,68 @@ function Admin() {
                     onChange={(e) => void update(e.target.value)}
                   >
                     {workflowOptions.map((v) => (
-                      <option key={v} value={v}>
+                      <option
+                        key={v}
+                        value={v}
+                        disabled={
+                          automationEnabled &&
+                          v === "dispatched" &&
+                          selected.workflow_status !== "dispatched"
+                        }
+                      >
                         {label(v)}
                       </option>
                     ))}
                   </select>
                   <p className="text-sm text-muted-foreground mt-2">
                     Packing and dispatch require a paid, live order. Payment status can only be
-                    changed by the payment webhook.
+                    changed by the payment webhook. Packing does not trigger a customer email.{" "}
+                    {!automationEnabled && "Dispatch email automation is not yet enabled."}
                   </p>
+                  {automationEnabled &&
+                    (selected.workflow_status === "packing" ||
+                      selected.workflow_status === "dispatched") && (
+                      <div className="mt-6 border-t border-border pt-5">
+                        <label className="block font-semibold" htmlFor="tracking-number">
+                          Royal Mail tracking number
+                        </label>
+                        <input
+                          id="tracking-number"
+                          type="text"
+                          maxLength={80}
+                          autoComplete="off"
+                          className="border rounded bg-background p-2 mt-2 w-full font-mono"
+                          value={trackingNumber}
+                          onChange={(e) => setTrackingNumber(e.target.value)}
+                          disabled={saving || selected.workflow_status === "dispatched"}
+                          placeholder="Enter the actual tracking number"
+                        />
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Confirm the parcel has been handed to the carrier before marking
+                          dispatched. The tracking number is saved with the order. Queuing an email
+                          does not send it; sending requires an owner-approved preview and enabled
+                          mail flags.
+                        </p>
+                        <button
+                          type="button"
+                          className="border rounded px-3 py-2 text-sm mt-3 disabled:opacity-40"
+                          disabled={
+                            saving ||
+                            selected.checkout_state !== "paid" ||
+                            selected.status !== "paid" ||
+                            selected.test_mode !== false ||
+                            trackingNumber.length < 3 ||
+                            (selected.workflow_status === "dispatched" &&
+                              trackingNumber !== selected.tracking_number)
+                          }
+                          onClick={() => void update("dispatched")}
+                        >
+                          {selected.workflow_status === "dispatched"
+                            ? "Retry dispatch email queue"
+                            : "Mark dispatched and queue email"}
+                        </button>
+                      </div>
+                    )}
                 </div>
               </section>
             )}

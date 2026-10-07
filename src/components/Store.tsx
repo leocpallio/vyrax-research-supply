@@ -450,10 +450,7 @@ function Footer() {
   // Unknown company facts render as an honest absence, never as an invented value. Every line here
   // comes from the claim registry, so a fact appearing in the footer means the evidence manifest
   // (src/lib/evidence.ts) holds it.
-  const company = [
-    site.name,
-    claimText("identity.registered-office"),
-  ].filter(Boolean);
+  const company = [site.name, claimText("identity.registered-office")].filter(Boolean);
   // Only lists payment methods the evidence manifest says are actually live at checkout.
   const paymentLine =
     claimFilled("payment.methods-live", {
@@ -474,7 +471,11 @@ function Footer() {
               "UK delivery",
               `${site.carrier}. Paid before ${dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock. Cold-chain packed; transit temperature not guaranteed.`,
             ],
-            [PackageCheck, "Contact", site.phone ? `${site.email} · ${site.phone}` : `Email ${site.email}`],
+            [
+              PackageCheck,
+              "Contact",
+              site.phone ? `${site.email} · ${site.phone}` : `Email ${site.email}`,
+            ],
             [
               RotateCcw,
               "Returns policy",
@@ -509,7 +510,16 @@ function Footer() {
               {site.email}
             </a>
           </p>
-          {site.phone && <p className="mt-2 text-sm"><a href={`tel:${site.phone.replace(/\s/g, "")}`} className="text-ink-foreground underline underline-offset-2">{site.phone}</a></p>}
+          {site.phone && (
+            <p className="mt-2 text-sm">
+              <a
+                href={`tel:${site.phone.replace(/\s/g, "")}`}
+                className="text-ink-foreground underline underline-offset-2"
+              >
+                {site.phone}
+              </a>
+            </p>
+          )}
         </div>
         <div>
           <h3 className="font-semibold mb-5">Shop</h3>
@@ -529,6 +539,12 @@ function Footer() {
           <FooterLink to="/lab-reports">Lab reports</FooterLink>
           <FooterLink to="/calculator">Reconstitution calculator</FooterLink>
           <FooterLink to="/guides">Guides</FooterLink>
+          <a
+            href="/guides/reconstitution-lab-guide.pdf"
+            className="block text-sm text-ink-muted mb-3 hover:text-ink-foreground"
+          >
+            Free laboratory preparation PDF
+          </a>
           <FooterLink to="/faq">FAQ</FooterLink>
           <FooterLink to="/about">About us</FooterLink>
         </div>

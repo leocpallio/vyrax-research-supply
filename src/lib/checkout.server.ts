@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { quoteCheckout } from "./checkout-pricing";
+import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { validatePaymentEvent, verifySignature } from "./spicepay";
 
@@ -267,17 +268,27 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
       p_status: object?.["status"],
     });
     if (rpcError) throw rpcError;
-    // Best effort, never throws: the order stays paid whatever happens to the email.
+    // Paid receipts are queued atomically by the database paid transition trigger.
+    // Failure/expiry notices are idempotent and rechecked against pending state at send time.
     const type = String(event["event_type"]);
-    const mailKind =
-      applied === "paid"
-        ? "orderConfirmation"
-        : applied === "ignored" && /expir/i.test(type)
-          ? "paymentExpired"
-          : applied === "ignored" && /fail|declin/i.test(type)
-            ? "paymentFailed"
-            : null;
-    if (mailKind) await sendOrderEmail(mailKind, order, String(event["event_id"]));
+    const mailKind = /expir/i.test(type)
+      ? "paymentExpired"
+      : /fail|declin/i.test(type)
+        ? "paymentFailed"
+        : null;
+    if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true") {
+      if (mailKind && !order.test_mode) {
+        await enqueueOrderEmail(
+          store as unknown as Rpc,
+          order.id,
+          mailKind,
+          String(event["event_id"]),
+        );
+      }
+    } else {
+      const legacyKind = applied === "paid" ? "orderConfirmation" : mailKind;
+      if (legacyKind) await sendOrderEmail(legacyKind, order, String(event["event_id"]));
+    }
     return json({ received: true, decision });
   } catch (error) {
     console.error("[vyrax webhook]", error instanceof Error ? error.message : "unknown error");

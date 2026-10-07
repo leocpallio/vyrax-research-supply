@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { enqueueOrderEmail } from "./email/outbox.server";
 
 const statuses = ["enquiry", "pending_payment", "paid", "internal_test"] as const;
 const workflows = [
@@ -60,6 +61,55 @@ export function validateWorkflowChange(value: unknown): string {
   return (value as { workflow: string }).workflow;
 }
 
+export type WorkflowChange = { workflow: string; trackingNumber: string | null };
+/** Tracking is stored as inert text only, never treated as a URL or header. */
+export function parseWorkflowChange(value: unknown): WorkflowChange {
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("Invalid workflow");
+  const fields = Object.keys(value);
+  const workflow = (value as { workflow?: unknown }).workflow;
+  if (typeof workflow !== "string" || !workflows.includes(workflow as (typeof workflows)[number]))
+    throw new Error("Invalid workflow");
+  if (workflow === "dispatched") {
+    const tracking = (value as { trackingNumber?: unknown }).trackingNumber;
+    if (
+      fields.length !== 2 ||
+      !fields.includes("trackingNumber") ||
+      typeof tracking !== "string" ||
+      tracking.trim() !== tracking ||
+      !/^[A-Za-z0-9][A-Za-z0-9 -]{2,79}$/.test(tracking)
+    )
+      throw new Error("Valid tracking number required for dispatch");
+    return { workflow, trackingNumber: tracking };
+  }
+  if (fields.length !== 1) throw new Error("Tracking is only accepted on dispatch");
+  return { workflow, trackingNumber: null };
+}
+
+export function validateFulfilmentTransition(
+  order: {
+    checkout_state: string | null;
+    status: string;
+    test_mode: boolean | null;
+    workflow_status: string;
+  },
+  workflow: string,
+): boolean {
+  if (order.status === "internal_test") return false;
+  if (["packing", "dispatched", "complete"].includes(workflow)) {
+    if (order.checkout_state !== "paid" || order.status !== "paid" || order.test_mode !== false)
+      return false;
+    if (workflow === "packing")
+      return ["unreviewed", "reviewing", "on_hold"].includes(order.workflow_status);
+    if (workflow === "dispatched") return order.workflow_status === "packing";
+    return order.workflow_status === "dispatched";
+  }
+  return (
+    ["unreviewed", "reviewing", "on_hold"].includes(order.workflow_status) &&
+    order.workflow_status !== workflow
+  );
+}
+
 function client(url: string, key: string) {
   return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -101,9 +151,12 @@ async function context(request: Request) {
   return store;
 }
 
+const emailAutomationEnabled = () => process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true";
 const listColumns =
   "id,created_at,updated_at,name,email,total,total_pence,currency,status,checkout_state,workflow_status,test_mode,items";
+const listColumnsWithTracking = `${listColumns},tracking_number`;
 const detailColumns = `${listColumns},phone,address,address2,city,postcode,country,merchant_id,payment_id`;
+const detailColumnsWithTracking = `${detailColumns},tracking_number`;
 
 export async function adminGet(request: Request): Promise<Response> {
   try {
@@ -115,7 +168,7 @@ export async function adminGet(request: Request): Promise<Response> {
       if (!uuid.test(id)) return fail(400, "Invalid order ID");
       const { data, error } = await store
         .from("orders")
-        .select(detailColumns)
+        .select(emailAutomationEnabled() ? detailColumnsWithTracking : detailColumns)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -132,7 +185,9 @@ export async function adminGet(request: Request): Promise<Response> {
     } catch {
       return fail(400, "Invalid filters");
     }
-    let query = store.from("orders").select(listColumns, { count: "exact" });
+    let query = store
+      .from("orders")
+      .select(emailAutomationEnabled() ? listColumnsWithTracking : listColumns, { count: "exact" });
     if (filters.status !== "all") query = query.eq("status", filters.status);
     if (filters.workflow !== "all") query = query.eq("workflow_status", filters.workflow);
     if (filters.q)
@@ -212,24 +267,119 @@ export async function adminPatch(request: Request): Promise<Response> {
       return fail(413, "Payload too large");
     const raw = await request.text();
     if (raw.length > 1024) return fail(413, "Payload too large");
-    let workflow: string;
+    let change: WorkflowChange;
     try {
-      workflow = validateWorkflowChange(JSON.parse(raw));
+      const parsed = JSON.parse(raw);
+      change =
+        !emailAutomationEnabled() &&
+        parsed?.workflow === "dispatched" &&
+        Object.keys(parsed).length === 1
+          ? { workflow: "dispatched", trackingNumber: null }
+          : parseWorkflowChange(parsed);
     } catch {
-      return fail(400, "Invalid workflow");
+      return fail(400, "Invalid workflow or tracking number");
     }
-    const { data, error } = await store
+    const { data: prior, error: readError } = await store
       .from("orders")
-      .update({ workflow_status: workflow })
+      .select("id,status,checkout_state,test_mode,workflow_status")
       .eq("id", id)
-      .select(detailColumns)
       .maybeSingle();
-    if (error) {
-      if (error.code === "23514")
-        return fail(409, "Only paid, live orders may be packed or dispatched");
-      throw error;
+    if (readError) throw readError;
+    if (!prior) return fail(404, "Order not found");
+    let priorTracking: string | null = null;
+    if (
+      emailAutomationEnabled() &&
+      change.workflow === "dispatched" &&
+      prior.workflow_status === "dispatched"
+    ) {
+      const result = await store
+        .from("orders")
+        .select("tracking_number")
+        .eq("id", id)
+        .maybeSingle();
+      if (result.error) throw result.error;
+      priorTracking = result.data?.tracking_number ?? null;
     }
-    return data ? json({ order: data }) : fail(404, "Order not found");
+    // A failed enqueue can be safely retried without a second workflow transition.
+    const retryDispatch =
+      emailAutomationEnabled() &&
+      change.workflow === "dispatched" &&
+      prior.workflow_status === "dispatched" &&
+      priorTracking === change.trackingNumber &&
+      prior.checkout_state === "paid" &&
+      prior.status === "paid" &&
+      prior.test_mode === false;
+    if (!retryDispatch && !validateFulfilmentTransition(prior, change.workflow))
+      return fail(409, "Transition requires a paid, live order and the preceding workflow state");
+    let data: Record<string, unknown> | null = null;
+    if (!retryDispatch) {
+      const values =
+        change.workflow === "dispatched" && emailAutomationEnabled()
+          ? { workflow_status: change.workflow, tracking_number: change.trackingNumber }
+          : { workflow_status: change.workflow };
+      // Compare-and-swap avoids double dispatch on concurrent admin requests. Recheck payment
+      // in the UPDATE as well as in the preflight read; the database CHECK remains the backstop.
+      let update = store
+        .from("orders")
+        .update(values)
+        .eq("id", id)
+        .eq("workflow_status", prior.workflow_status);
+      if (["packing", "dispatched", "complete"].includes(change.workflow))
+        update = update.eq("status", "paid").eq("checkout_state", "paid").eq("test_mode", false);
+      const result = await update
+        .select(emailAutomationEnabled() ? detailColumnsWithTracking : detailColumns)
+        .maybeSingle();
+      if (result.error) {
+        if (result.error.code === "23514")
+          return fail(409, "Only paid, live orders may be packed or dispatched");
+        throw result.error;
+      }
+      if (!result.data) return fail(409, "Order changed; refresh and try again");
+      data = result.data as unknown as Record<string, unknown>;
+    }
+    if (change.workflow === "dispatched" && emailAutomationEnabled()) {
+      try {
+        const queuedId = await enqueueOrderEmail(
+          {
+            rpc: async (name, args) => {
+              const { data, error } = await store.rpc(name, args);
+              return { data, error };
+            },
+          },
+          id,
+          "dispatched",
+          "dispatched",
+        );
+        if (!queuedId) throw new Error("Dispatch email ineligible");
+        // Do not claim that an email was sent: delivery is gated separately by owner approval.
+      } catch (error) {
+        console.error(
+          "[vyrax admin dispatch enqueue]",
+          error instanceof Error ? error.message : "unknown error",
+        );
+        return json(
+          {
+            error:
+              "Dispatch saved, but email queue could not be verified. Retry with the same tracking number.",
+            order: data,
+            email_status: "unverified",
+          },
+          503,
+        );
+      }
+    }
+    const { data: current, error: verifyError } = await store
+      .from("orders")
+      .select(emailAutomationEnabled() ? detailColumnsWithTracking : detailColumns)
+      .eq("id", id)
+      .maybeSingle();
+    if (verifyError) throw verifyError;
+    return current
+      ? json({
+          order: current,
+          email_status: change.workflow === "dispatched" ? "queued_not_sent" : "not_applicable",
+        })
+      : fail(503, "Order update could not be verified");
   } catch (error) {
     console.error("[vyrax admin]", error instanceof Error ? error.message : "unknown error");
     return fail(503, "Admin update unavailable");

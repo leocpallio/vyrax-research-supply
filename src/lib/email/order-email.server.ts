@@ -10,6 +10,11 @@ export type OrderRow = {
   email: string;
   items: unknown;
   total_pence: number;
+  address?: string;
+  address2?: string | null;
+  city?: string | null;
+  postcode?: string;
+  created_at?: string;
 };
 
 /** Build the itemised summary. Discount and delivery are shown only when they reproduce the paid total exactly. */
@@ -23,7 +28,9 @@ export function summarise(order: OrderRow) {
   }));
   const total = order.total_pence / 100;
   try {
-    const q = quoteCheckout(items.map((i) => ({ slug: i.slug, strength: i.strength, quantity: i.quantity })));
+    const q = quoteCheckout(
+      items.map((i) => ({ slug: i.slug, strength: i.strength, quantity: i.quantity })),
+    );
     if (q.totalPence === order.total_pence)
       return {
         lines,
@@ -39,7 +46,13 @@ export function summarise(order: OrderRow) {
   return { lines, total };
 }
 
-export type OrderEmailKind = "orderConfirmation" | "paymentFailed" | "paymentExpired" | "dispatched";
+export type OrderEmailKind =
+  | "orderConfirmation"
+  | "paymentPending"
+  | "paymentFailed"
+  | "paymentExpired"
+  | "packed"
+  | "dispatched";
 
 /**
  * Best effort. Never throws: gated off without RESEND_API_KEY, and any failure is logged and swallowed
@@ -53,7 +66,15 @@ export async function sendOrderEmail(
 ): Promise<"sent" | "skipped" | "failed"> {
   try {
     if (!process.env["RESEND_API_KEY"]) return "skipped";
-    const base = { name: order.name, reference: orderRef(order.id) };
+    const address = [order.address, order.address2, order.city, order.postcode]
+      .filter((part): part is string => typeof part === "string" && part.trim().length > 0)
+      .join(", ");
+    const base = {
+      name: order.name,
+      reference: orderRef(order.id),
+      ...(address ? { address } : {}),
+      ...(order.created_at ? { orderDate: order.created_at.slice(0, 10) } : {}),
+    };
     const event: EmailEvent =
       kind === "orderConfirmation"
         ? { kind, ...base, ...summarise(order) }

@@ -30,6 +30,7 @@ import { site, abs, spendTierLine } from "@/data/site";
 import hero from "@/assets/vyrax-hero-wide.webp";
 import social from "@/assets/vyrax-social.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
+import { GuideSignup } from "@/components/GuideSignup";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -221,9 +222,7 @@ function Home() {
               {site.checkoutOpen ? "MULTI-BUY PRICING" : "INDICATIVE PRICING"}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl font-semibold mt-4">
-              {site.checkoutOpen
-                ? "Buy 2, get the 3rd free"
-                : "Compare research vial strengths"}
+              {site.checkoutOpen ? "Buy 2, get the 3rd free" : "Compare research vial strengths"}
             </h2>
             <p className="text-ink-muted mt-4 leading-relaxed">
               {site.checkoutOpen
@@ -441,6 +440,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <GuideSignup />
 
       {/* SEO copy + FAQ */}
       <section className="section">

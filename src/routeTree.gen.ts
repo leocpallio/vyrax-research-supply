@@ -28,6 +28,8 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
+import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
+import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -135,6 +137,16 @@ const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
   path: '/api/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailAutomationRoute = ApiEmailAutomationRouteImport.update({
+  id: '/api/email-automation',
+  path: '/api/email-automation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGuideSignupRoute = ApiGuideSignupRouteImport.update({
+  id: '/api/guide-signup',
+  path: '/api/guide-signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   id: '/api/order-status',
   path: '/api/order-status',
@@ -211,6 +223,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/email-automation': typeof ApiEmailAutomationRoute
+  '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -243,6 +257,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/email-automation': typeof ApiEmailAutomationRoute
+  '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -276,6 +292,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/email-automation': typeof ApiEmailAutomationRoute
+  '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -310,6 +328,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/checkout'
+    | '/api/email-automation'
+    | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -342,6 +362,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/checkout'
+    | '/api/email-automation'
+    | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -374,6 +396,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/api/checkout'
+    | '/api/email-automation'
+    | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -407,6 +431,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
+  ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
+  ApiGuideSignupRoute: typeof ApiGuideSignupRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -555,6 +581,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/email-automation': {
+      id: '/api/email-automation'
+      path: '/api/email-automation'
+      fullPath: '/api/email-automation'
+      preLoaderRoute: typeof ApiEmailAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/guide-signup': {
+      id: '/api/guide-signup'
+      path: '/api/guide-signup'
+      fullPath: '/api/guide-signup'
+      preLoaderRoute: typeof ApiGuideSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/order-status': {
       id: '/api/order-status'
       path: '/api/order-status'
@@ -655,6 +695,8 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
+  ApiEmailAutomationRoute: ApiEmailAutomationRoute,
+  ApiGuideSignupRoute: ApiGuideSignupRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   CategorySlugRoute: CategorySlugRoute,

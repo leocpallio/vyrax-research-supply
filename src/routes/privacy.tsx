@@ -16,8 +16,8 @@ function Privacy() {
   return (
     <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-10-06">
       <p>
-        This policy covers the {site.name} website. The data controller is {site.name}. UK GDPR and the Data
-        Protection Act 2018 apply.
+        This policy covers the {site.name} website. The data controller is {site.name}. UK GDPR and
+        the Data Protection Act 2018 apply.
       </p>
       <h2>What we collect</h2>
       <ul>
@@ -27,6 +27,10 @@ function Privacy() {
         </li>
         <li>Account data if you register, such as your email address.</li>
         <li>Messages you send us, including your email address.</li>
+        <li>
+          When you opt in for the laboratory guide and updates: your email address and subscription
+          choice, stored with our email provider Resend.
+        </li>
         <li>Your basket, which stays in your own browser until you check out.</li>
       </ul>
       <h2>Why we use it</h2>
@@ -34,6 +38,11 @@ function Privacy() {
         <li>To take payment, fulfil and deliver your order, and deal with problems (contract).</li>
         <li>To keep accounting and tax records (legal obligation).</li>
         <li>To prevent fraud and enforce our research use policy (legitimate interests).</li>
+        <li>
+          To email the requested guide and, with your separate opt-in, research updates and
+          occasional offers (consent). You can unsubscribe using a marketing email link or by
+          contacting us.
+        </li>
       </ul>
       <p>We do not send marketing email unless you ask us to.</p>
       <h2>Who we share it with</h2>
@@ -61,8 +70,8 @@ function Privacy() {
       <h2>Cookies</h2>
       <p>
         Optional PostHog website analytics run only if you allow them. They use an anonymous
-        session-only identifier and do not receive contact or delivery details or search text. PostHog
-        may process technical connection data. Manage your choice in our{" "}
+        session-only identifier and do not receive contact or delivery details or search text.
+        PostHog may process technical connection data. Manage your choice in our{" "}
         <Link to="/cookies">cookie policy</Link>.
       </p>
     </InfoPage>
