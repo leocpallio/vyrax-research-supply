@@ -1,0 +1,319 @@
+// Below-grid long-form copy for /shop, /collections/<slug> and /category/<slug>.
+// Research register only: what the compounds are, how they are grouped, how to compare listings.
+// No dosing, no condition-to-product mapping, no human-use benefit claims, no testing assertions
+// (those come from src/lib/claims.ts). No em-dashes.
+
+import type { QA } from "./faq";
+
+export type ContentBlock = { heading: string; paragraphs: string[] };
+export type CategoryContent = {
+  /** One or two sentences under the H1. */
+  lede: string;
+  blocks: ContentBlock[];
+  faqs: QA[];
+};
+
+const RUO =
+  "Everything listed is supplied for laboratory research. It is not for human or veterinary use and is not a medicine, food, cosmetic or supplement.";
+
+const COMMON_FAQS: QA[] = [
+  [
+    "Who can order these compounds?",
+    "Adults aged 18 or over buying for legitimate laboratory, analytical or educational research. We do not supply for personal use of any kind. See the Research use policy for the full terms.",
+  ],
+  [
+    "How are prices shown?",
+    "Each card shows the lowest vial price for the compound and the product page lists every strength with its cost per mg, so like-for-like comparison is straightforward. Multi-buy tiers are applied in the basket and the final total is confirmed before payment.",
+  ],
+  [
+    "What does the stock pill on a card mean?",
+    "It reflects the current listing state for that compound. Where availability has not yet been confirmed the pill says so rather than implying stock on the shelf. Nothing is reserved until an order is paid.",
+  ],
+  [
+    "How should lyophilised peptides be stored on arrival?",
+    "Sealed lyophilised vials are normally held refrigerated or frozen and protected from light. The handling guides cover storage and reconstitution for laboratory work; follow your own institution's procedures.",
+  ],
+];
+
+const shopContent: CategoryContent = {
+  lede: "Every research compound and laboratory supply we list, in one grid.",
+  blocks: [
+    {
+      heading: "Browsing the full catalogue",
+      paragraphs: [
+        "The shop lists every compound in a single grid so you can compare across ranges without moving between pages. Use the pill row to narrow to a range, or sort by price or name. Each card shows the stock state, the lowest vial price and a quick-add button; choosing an amount adds that strength straight to the basket.",
+        "Compounds are grouped into research ranges by the receptor system or biological process they are most often studied in. The same compound page is reached from any range it belongs to, so there is no duplication of specifications.",
+      ],
+    },
+    {
+      heading: "What is on each product page",
+      paragraphs: [
+        "Product pages carry the CAS number, molecular formula and molecular weight, a research overview written from the published literature, PubMed references and the full list of vial strengths with cost per mg. Where a certificate of analysis is held for a batch it is linked from the page and from the Lab Reports hub.",
+      ],
+    },
+    {
+      heading: "Research use only",
+      paragraphs: [RUO],
+    },
+  ],
+  faqs: COMMON_FAQS,
+};
+
+const SECTION: Record<string, CategoryContent> = {
+  "weight-metabolic": {
+    lede: "Incretin, amylin and mitochondrial peptides used as tool compounds in metabolic research.",
+    blocks: [
+      {
+        heading: "Compounds in the metabolic range",
+        paragraphs: [
+          "This range covers the incretin receptor agonists that dominate current metabolic literature: the GLP-1 receptor agonist semaglutide, the dual GIP and GLP-1 agonist tirzepatide and the triple agonist retatrutide. Alongside them sit the amylin analogue cagrilintide, the growth hormone fragment AOD-9604 and its parent fragment 176-191, the NNMT inhibitor 5-Amino-1MQ and the mitochondrial-derived peptide MOTS-c.",
+          "Each compound page sets out which receptors the molecule acts at and how it differs from its nearest relatives, with references to the primary literature, so a study design can select the right tool compound.",
+        ],
+      },
+      {
+        heading: "Comparing strengths and cost per mg",
+        paragraphs: [
+          "Most compounds in this range are offered in several vial strengths. The card shows the lowest price; the product page lists every strength and its cost per mg. Larger vials generally have a lower cost per mg and suit protocols that need repeated aliquots from a single preparation.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "What is the difference between semaglutide, tirzepatide and retatrutide as research compounds?",
+        "They differ in receptor coverage. Semaglutide is a single GLP-1 receptor agonist, tirzepatide acts at both GIP and GLP-1 receptors, and retatrutide adds glucagon receptor activity. Each product page describes the receptor profile with references.",
+      ],
+      [
+        "Why is cagrilintide grouped with the incretins?",
+        "Cagrilintide is an amylin analogue rather than an incretin, but it is studied in the same metabolic models and frequently alongside GLP-1 agonists, so researchers tend to browse them together.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "copper-blends": {
+    lede: "The copper tripeptide GHK-Cu, on its own and in the GLOW and KLOW combination vials.",
+    blocks: [
+      {
+        heading: "GHK-Cu and copper peptide blends",
+        paragraphs: [
+          "GHK-Cu is the naturally occurring tripeptide glycyl-L-histidyl-L-lysine complexed with copper. It is studied in dermal fibroblast, wound model and gene expression research. GLOW combines GHK-Cu with BPC-157 and TB-500 in a single lyophilised vial; KLOW adds KPV to the same base.",
+          "Blends are prepared as one batch, so every component comes from the same preparation. The composition of each vial is printed on the product page and on the batch documentation.",
+        ],
+      },
+      {
+        heading: "Choosing between the single compound and a blend",
+        paragraphs: [
+          "The single-compound vial suits work that isolates copper peptide activity. The blends suit protocols that already combine these peptides and benefit from a fixed ratio. Ratios and total content are stated on each blend page.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "Does GHK-Cu need a different solvent?",
+        "GHK-Cu is reconstituted with bacteriostatic water in the same way as other lyophilised peptides. Its solution is blue because of the copper complex. The handling guide covers reconstitution for laboratory work.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "brain-focus": {
+    lede: "The synthetic heptapeptide Semax and the related anxiolytic-class peptide Selank, used in neuropeptide research.",
+    blocks: [
+      {
+        heading: "Semax and Selank",
+        paragraphs: [
+          "Semax is an ACTH(4-10) analogue and Selank is a tuftsin analogue. Both originate in Russian neuropeptide research and are studied in models of BDNF expression, enkephalin metabolism and related neurochemistry. The combined Selank and Semax vial supplies both in a fixed ratio for work that uses them together.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "What is the difference between Semax and Selank?",
+        "Semax is derived from a fragment of ACTH and Selank from the immunomodulatory peptide tuftsin. They are studied in overlapping but distinct neurochemical pathways; each product page summarises the literature.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "growth-hormone": {
+    lede: "GHRH analogues, ghrelin receptor agonists, IGF-1 LR3 and related compounds for GH axis research.",
+    blocks: [
+      {
+        heading: "Two receptor systems",
+        paragraphs: [
+          "Growth hormone secretagogues act through two main routes. GHRH receptor agonists include sermorelin, tesamorelin and CJC-1295 with and without DAC. Ghrelin receptor (GHS-R1a) agonists include ipamorelin, GHRP-2, GHRP-6 and hexarelin. The range also carries IGF-1 LR3, a long-acting IGF-1 analogue widely used as a cell culture growth factor, MGF and PEG-MGF, and kisspeptin-10.",
+          "The Hulk Stack and the CJC-1295 and ipamorelin blend combine a GHRH analogue with a ghrelin receptor agonist in one vial, the pairing most often used in combined secretagogue studies.",
+        ],
+      },
+      {
+        heading: "DAC or no DAC",
+        paragraphs: [
+          "CJC-1295 is offered with and without the drug affinity complex (DAC). The DAC version binds serum albumin and has a far longer half-life in published pharmacokinetic work; the version without DAC (also called modified GRF 1-29) is short-acting. The two product pages compare them directly.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "Is IGF-1 LR3 a peptide?",
+        "IGF-1 LR3 is a 83-amino-acid recombinant protein, an analogue of insulin-like growth factor 1 with an extended N-terminus. It is listed here because it is studied alongside the GH secretagogues.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "recovery-repair": {
+    lede: "BPC-157, TB-500, KPV, LL-37, ARA-290 and the Wolverine blend for tissue repair model research.",
+    blocks: [
+      {
+        heading: "Peptides studied in tissue repair models",
+        paragraphs: [
+          "BPC-157 is a 15-amino-acid fragment of body protection compound, and TB-500 is the active fragment of thymosin beta-4. Both are extensively studied in cell and animal models of tendon, muscle and gut tissue. KPV is the C-terminal tripeptide of alpha-MSH, LL-37 is the human cathelicidin antimicrobial peptide and ARA-290 is an erythropoietin-derived peptide. SNAP-8 is an octapeptide studied in dermal research.",
+          "The Wolverine Stack combines BPC-157 and TB-500 in one vial for protocols that use the pair together.",
+        ],
+      },
+      {
+        heading: "Reading the literature",
+        paragraphs: [
+          "Most published work on these compounds is preclinical. Each product page summarises the models used and links to the original papers on PubMed so the evidence base can be read directly rather than through a marketing summary.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "What is the difference between TB-500 and thymosin beta-4?",
+        "Thymosin beta-4 is the full 43-amino-acid protein. TB-500 is the synthetic fragment (residues 17-23) that carries its actin-binding domain and is the form normally used in research.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "longevity-cellular": {
+    lede: "NAD+, SS-31, epithalon, the thymic peptides and other compounds studied in ageing biology.",
+    blocks: [
+      {
+        heading: "Compounds in the longevity range",
+        paragraphs: [
+          "The range covers the coenzyme NAD+, the mitochondria-targeted tetrapeptide SS-31 (elamipretide), the pineal tetrapeptide epithalon and pinealon, the thymic peptides thymosin alpha-1 and thymalin, the tripeptide glutathione, the nonapeptide oxytocin and the Semax derivative adamax.",
+          "They are grouped here because they appear together in the ageing, mitochondrial function and immunosenescence literature, not because they share a mechanism. Each product page explains the specific pathway the compound is studied in.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "Is NAD+ a peptide?",
+        "No. Nicotinamide adenine dinucleotide is a coenzyme. It is listed in this range because it is studied alongside the longevity peptides and is supplied in the same lyophilised vial format.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "tanning-libido": {
+    lede: "Melanotan 1, Melanotan 2 and PT-141: alpha-MSH analogues with different melanocortin receptor profiles.",
+    blocks: [
+      {
+        heading: "Three melanocortin receptor agonists",
+        paragraphs: [
+          "Melanotan 1 (afamelanotide) is a linear alpha-MSH analogue selective for MC1R. Melanotan 2 is a cyclic analogue active across several melanocortin receptors. PT-141 (bremelanotide) is a metabolite of Melanotan 2 studied mainly at MC4R. They are used as tool compounds in melanocortin receptor pharmacology and melanogenesis research.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "How do Melanotan 1 and Melanotan 2 differ?",
+        "Melanotan 1 is linear and MC1R-selective; Melanotan 2 is cyclic and less selective, with activity at MC3R, MC4R and MC5R in published receptor assays. The product pages compare the two with references.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  sleep: {
+    lede: "Delta sleep-inducing peptide (DSIP), a nonapeptide studied in sleep physiology research.",
+    blocks: [
+      {
+        heading: "DSIP",
+        paragraphs: [
+          "DSIP was first isolated from rabbit cerebral venous blood in the 1970s and is studied in electroencephalographic sleep models and in the regulation of several neuroendocrine pathways. The product page carries its CAS number, sequence and references.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: COMMON_FAQS,
+  },
+  "bacteriostatic-water": {
+    lede: "Sterile water with 0.9% benzyl alcohol, the standard solvent for reconstituting lyophilised peptides.",
+    blocks: [
+      {
+        heading: "Reconstitution solvent",
+        paragraphs: [
+          "Bacteriostatic water is sterile water containing 0.9% benzyl alcohol as a preservative, which allows a reconstituted vial to be drawn from more than once in a laboratory setting. Use the reconstitution calculator to work out the solvent volume for a target concentration.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "How much bacteriostatic water does a vial need?",
+        "It depends on the target concentration for your protocol. The calculator takes the vial content and the concentration you want and returns the solvent volume. We do not provide dosing guidance of any kind.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+};
+
+const CATEGORY: Record<string, CategoryContent> = {
+  "metabolic-research": SECTION["weight-metabolic"]!,
+  "regenerative-research": {
+    lede: "BPC-157, TB-500, GHK-Cu and related peptides studied in tissue repair models.",
+    blocks: [
+      {
+        heading: "The regenerative research range",
+        paragraphs: [
+          "This category groups the peptides most widely studied in tissue repair models: BPC-157, TB-500, the copper tripeptide GHK-Cu, KPV, LL-37 and ARA-290. Most published work uses cell culture and animal models; each product page summarises the models and links to the primary literature.",
+          "For combination work see the GLOW, KLOW and Wolverine blends in the peptide blends category.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: SECTION["recovery-repair"]!.faqs,
+  },
+  "gh-secretagogues": SECTION["growth-hormone"]!,
+  "longevity-research": {
+    lede: "NAD+, SS-31, epithalon, thymic peptides and neuropeptides studied in ageing biology.",
+    blocks: [
+      ...SECTION["longevity-cellular"]!.blocks.slice(0, 1),
+      {
+        heading: "Neuropeptides",
+        paragraphs: [
+          "The category also includes DSIP, Semax and Selank, which are studied in sleep physiology and neurochemistry rather than ageing directly but are catalogued here for historical reasons. They are also browsable in the Brain and Focus and Sleep ranges.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: SECTION["longevity-cellular"]!.faqs,
+  },
+  "pigmentation-research": SECTION["tanning-libido"]!,
+  "peptide-blends": {
+    lede: "Two or more research peptides in one lyophilised vial, prepared as a single batch.",
+    blocks: [
+      {
+        heading: "Why blends",
+        paragraphs: [
+          "A blend puts a fixed ratio of peptides into one vial so every component comes from the same preparation and batch. GLOW combines GHK-Cu, BPC-157 and TB-500; KLOW adds KPV; the Wolverine Stack pairs BPC-157 and TB-500; the Hulk Stack pairs CJC-1295 DAC with ipamorelin. Composition and total content are printed on each product page.",
+        ],
+      },
+      { heading: "Research use only", paragraphs: [RUO] },
+    ],
+    faqs: [
+      [
+        "Can I see the ratio of each component?",
+        "Yes. Each blend page lists the components and the amount of each per vial. Where a blend is offered in more than one total strength, the composition is stated for each.",
+      ],
+      ...COMMON_FAQS,
+    ],
+  },
+  "lab-supplies": SECTION["bacteriostatic-water"]!,
+};
+
+export const shopSeo = shopContent;
+export const sectionSeo = (slug: string): CategoryContent => SECTION[slug] ?? shopContent;
+export const categorySeo = (slug: string): CategoryContent => CATEGORY[slug] ?? shopContent;

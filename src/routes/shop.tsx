@@ -1,16 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { StoreShell, ProductGrid, Disclaimer, Breadcrumbs } from "@/components/Store";
-import { compounds, searchCompounds, fromPrice } from "@/lib/catalog";
-import { latestCoa } from "@/data/coa";
+import { Search, X } from "lucide-react";
+import { ListingPage } from "@/components/Listing";
+import { sectionPills } from "@/components/CategoryPills";
+import { compounds, searchCompounds } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { shopSeo } from "@/data/category-content";
 import { abs, site } from "@/data/site";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { capture } from "@/lib/analytics";
-
-type Sort = "price-asc" | "price-desc" | "name";
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (s: Record<string, unknown>): { q?: string; cat?: string } => ({
@@ -23,7 +21,7 @@ export const Route = createFileRoute("/shop")({
       : "";
     const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
     const batchCerts = claimText("testing.batch-certificates");
-    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."}`;
+    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."} Research use only.`;
     return {
       meta: [
         { title },
@@ -43,12 +41,14 @@ export const Route = createFileRoute("/shop")({
 function Shop() {
   const search = Route.useSearch();
   const [text, setText] = useState(search.q ?? "");
-  const [cat, setCat] = useState(search.cat ?? "all");
-  const [sort, setSort] = useState<Sort>("name");
-  const [coaOnly, setCoaOnly] = useState(false);
   const lastSearch = useRef<string | null>(null);
   useEffect(() => setText(search.q ?? ""), [search.q]);
-  useEffect(() => setCat(search.cat ?? "all"), [search.cat]);
+  // Legacy ?cat= deep links still filter; the pill row itself links to /collections/<slug>.
+  const cat =
+    search.cat && shopSections.some((s) => s.slug === search.cat) ? search.cat : undefined;
+  useEffect(() => {
+    if (cat) capture("collection_viewed", { collection_slug: cat, listing_type: "shop_filter" });
+  }, [cat]);
   const list = useMemo(() => {
     const query = text.trim();
     const base =
@@ -57,16 +57,8 @@ function Shop() {
         : query.length === 1
           ? compounds.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()))
           : compounds;
-    const filtered = base.filter(
-      (p) =>
-        (cat === "all" || sectionFor(p)?.slug === cat) && (!coaOnly || latestCoa(p.slug) != null),
-    );
-    const sorted = [...filtered];
-    if (sort === "price-asc") sorted.sort((a, b) => fromPrice(a) - fromPrice(b));
-    if (sort === "price-desc") sorted.sort((a, b) => fromPrice(b) - fromPrice(a));
-    if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
-    return sorted;
-  }, [text, cat, sort, coaOnly]);
+    return cat ? base.filter((p) => sectionFor(p)?.slug === cat) : base;
+  }, [text, cat]);
   useEffect(() => {
     if (text.trim().length < 2 || text === (search.q ?? "")) return;
     const timer = setTimeout(() => {
@@ -76,117 +68,42 @@ function Shop() {
     }, 600);
     return () => clearTimeout(timer);
   }, [text, search.q, list.length]);
+
   return (
-    <StoreShell>
-      <div className="container-main py-4 md:py-12">
-        <div className="hidden md:block">
-          <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "Shop" }]} />
-        </div>
-        <p className="eyebrow hidden md:block">THE CATALOGUE</p>
-        <h1 className="page-title">All peptides</h1>
-        <p className="text-muted-foreground mt-2 mb-4 md:mt-3 md:mb-8 max-w-2xl text-sm md:text-base">
-          Research compounds and laboratory supplies from Vyrax Labs. {compounds.length} products
-          across {shopSections.length} sections. Prices are indicative; availability is unconfirmed
-          and{" "}
-          {site.checkoutOpen
-            ? "final prices are confirmed at checkout."
-            : "the site opens in 3-4 days."}{" "}
-          For laboratory research only, not for human use.
-        </p>
-        <div
-          className="flex gap-2 mb-4 md:mb-6 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible"
-          aria-label="Filter by section"
-        >
-          <Button
+    <ListingPage
+      title="All peptides"
+      lede={`${compounds.length} research compounds and laboratory supplies across ${shopSections.length} ranges. ${site.checkoutOpen ? "Final prices are confirmed at checkout." : "Prices are indicative; the site opens in 3-4 days."} Supplied for laboratory research only.`}
+      crumbs={[{ name: "Home", to: "/" }, { name: "Shop" }]}
+      pills={sectionPills(cat)}
+      list={list}
+      content={shopSeo}
+      emptyText="No compounds match that search. Check the spelling, try an alternative name such as GLP-3, or clear the search to browse the full catalogue."
+    >
+      <label className="mt-5 relative block max-w-sm">
+        <span className="sr-only">Filter compounds</span>
+        <Search
+          size={16}
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#040825]/50 pointer-events-none"
+        />
+        <input
+          type="search"
+          data-testid="shop-search"
+          placeholder="Search by name or alias, e.g. GLP-3"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="h-11 w-full rounded-full border border-[#040825]/15 bg-[#F5F0E5] pl-10 pr-10 text-sm placeholder:text-[#040825]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] [&::-webkit-search-cancel-button]:hidden"
+        />
+        {text && (
+          <button
             type="button"
-            variant="outline"
-            className="chip h-auto shrink-0"
-            data-active={cat === "all"}
-            aria-pressed={cat === "all"}
-            onClick={() => setCat("all")}
+            aria-label="Clear search"
+            onClick={() => setText("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 size-8 grid place-items-center rounded-full hover:bg-[#EAE6DC]"
           >
-            All
-          </Button>
-          {shopSections.map((c) => (
-            <Button
-              key={c.slug}
-              type="button"
-              variant="outline"
-              className="chip h-auto shrink-0"
-              data-active={cat === c.slug}
-              aria-pressed={cat === c.slug}
-              onClick={() => {
-                if (cat !== c.slug)
-                  capture("collection_viewed", {
-                    collection_slug: c.slug,
-                    listing_type: "shop_filter",
-                  });
-                setCat(c.slug);
-              }}
-            >
-              {c.name}
-            </Button>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2 md:gap-3 mb-3 md:mb-6 items-center">
-          <Input
-            aria-label="Filter compounds"
-            placeholder="Search by name or alias, e.g. GLP-3"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="min-w-0 basis-full sm:basis-auto flex-1 md:max-w-sm rounded-full"
-          />
-          <label className="text-sm flex items-center gap-2 min-h-11">
-            <input
-              type="checkbox"
-              checked={coaOnly}
-              onChange={(e) => setCoaOnly(e.target.checked)}
-              className="size-4"
-            />
-            Has published certificate
-          </label>
-          <label className="text-sm flex items-center gap-2 md:ml-auto">
-            <span className="sr-only md:not-sr-only">Sort</span>
-            <select
-              aria-label="Sort products"
-              className="h-11 border border-border rounded-full px-3 bg-background"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
-            >
-              <option value="name">Name A to Z</option>
-              <option value="price-asc">Price: low to high</option>
-              <option value="price-desc">Price: high to low</option>
-            </select>
-          </label>
-        </div>
-        <div className="flex items-center justify-between gap-3 mb-3 md:mb-5">
-          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
-            {list.length} result{list.length === 1 ? "" : "s"}
-          </p>
-          {(text || cat !== "all" || coaOnly) && (
-            <Button
-              type="button"
-              variant="link"
-              className="h-11 px-2"
-              onClick={() => {
-                setText("");
-                setCat("all");
-                setCoaOnly(false);
-              }}
-            >
-              Clear filters
-            </Button>
-          )}
-        </div>
-        <ProductGrid list={list} />
-        {list.length === 0 && (
-          <p className="py-20 text-center text-muted-foreground">
-            No compounds match that search. Check the spelling, try an alternative name such as
-            GLP-3, or clear the filters above to browse the full catalogue.
-          </p>
+            <X size={14} />
+          </button>
         )}
-      </div>
-      <Disclaimer />
-    </StoreShell>
+      </label>
+    </ListingPage>
   );
 }

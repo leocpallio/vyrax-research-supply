@@ -1,16 +1,10 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import {
-  StoreShell,
-  ProductGrid,
-  Disclaimer,
-  FAQ,
-  SectionTitle,
-  Breadcrumbs,
-} from "@/components/Store";
-import { categories, getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/catalog";
-import { shopSections, sectionFor } from "@/data/shop-sections";
-import { abs, site } from "@/data/site";
-import { coreFaqs, faqJsonLd } from "@/data/faq";
+import { ListingPage } from "@/components/Listing";
+import { categoryPills } from "@/components/CategoryPills";
+import { getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/catalog";
+import { categorySeo } from "@/data/category-content";
+import { faqJsonLd } from "@/data/faq";
+import { abs } from "@/data/site";
 import { claimGate, isClaimAllowed } from "@/lib/claims";
 
 export const Route = createFileRoute("/category/$slug")({
@@ -25,20 +19,20 @@ export const Route = createFileRoute("/category/$slug")({
     const url = abs(`/category/${c.slug}`);
     const list = compoundsIn(c.slug);
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
+    const content = categorySeo(c.slug);
     const titleTag = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} | `
       : "";
     const title = `${c.seoName} UK | ${titleTag}Vyrax Labs`;
-    const desc = `${c.blurb} Browse ${list.length} research compounds from ${gbp(low)}. ${site.paymentMethods.length ? "For research use only." : "Checkout opens in 3-4 days; no payment is taken online yet."}`;
-    const entries = list.map((p) => ({ name: p.name, path: productPath(p.slug) }));
+    const desc = `${c.blurb} Browse ${list.length} research compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. Research use only.`;
     const itemList = {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: c.seoName,
-      itemListElement: entries.map((entry, i) => ({
+      itemListElement: list.map((p, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        item: { "@type": "Product", name: entry.name, url: abs(entry.path) },
+        item: { "@type": "Product", name: p.name, url: abs(productPath(p.slug)) },
       })),
     };
     const crumbs = {
@@ -64,7 +58,7 @@ export const Route = createFileRoute("/category/$slug")({
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(itemList) },
         { type: "application/ld+json", children: JSON.stringify(crumbs) },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(coreFaqs)) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content.faqs)) },
       ],
     };
   },
@@ -76,65 +70,16 @@ function CategoryPage() {
   const c = getCategory(slug);
   if (!c) return null;
   const list = compoundsIn(c.slug);
+  const content = categorySeo(c.slug);
   return (
-    <StoreShell>
-      <div className="container-main py-8 md:py-12">
-        <Breadcrumbs
-          items={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: c.name }]}
-        />
-        <p className="eyebrow">RESEARCH CATEGORY</p>
-        <h1 className="page-title">{c.seoName}</h1>
-        <p className="text-muted-foreground mt-4 max-w-3xl text-lg">{c.blurb}</p>
-
-        <div className="flex flex-wrap gap-2 mt-8 mb-10">
-          {categories.map((x) => (
-            <a
-              key={x.slug}
-              href={`/category/${x.slug}`}
-              className="chip"
-              aria-current={x.slug === c.slug ? "page" : undefined}
-            >
-              {x.name}
-            </a>
-          ))}
-        </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          {list.length} compound{list.length === 1 ? "" : "s"}
-        </p>
-        <ProductGrid list={list} />
-        {shopSections.some((section) =>
-          list.some((product) => sectionFor(product)?.slug === section.slug),
-        ) && (
-          <nav aria-label="Related collections" className="mt-10">
-            <h2 className="font-heading font-semibold mb-3">Related collections</h2>
-            <div className="flex flex-wrap gap-2">
-              {shopSections
-                .filter((section) =>
-                  list.some((product) => sectionFor(product)?.slug === section.slug),
-                )
-                .map((section) => (
-                  <a className="chip" href={`/collections/${section.slug}`} key={section.slug}>
-                    {section.name}
-                  </a>
-                ))}
-            </div>
-          </nav>
-        )}
-
-        <section className="max-w-3xl mt-20">
-          <SectionTitle title={`About our ${c.name.toLowerCase()} range`} />
-          <div className="space-y-4 text-muted-foreground leading-relaxed">
-            {c.intro.map((p) => (
-              <p key={p.slice(0, 40)}>{p}</p>
-            ))}
-          </div>
-        </section>
-        <section className="max-w-3xl mt-16 mb-20">
-          <SectionTitle title="Frequently asked questions" />
-          <FAQ items={coreFaqs} />
-        </section>
-      </div>
-      <Disclaimer />
-    </StoreShell>
+    <ListingPage
+      title={c.seoName}
+      lede={c.blurb}
+      crumbs={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: c.name }]}
+      pills={categoryPills(c.slug)}
+      pillsLabel="Browse by research category"
+      list={list}
+      content={content}
+    />
   );
 }

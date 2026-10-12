@@ -1,36 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  FileCheck2,
-  FlaskConical,
-  Truck,
-  TestTube2,
-  RotateCcw,
-  Microscope,
-  BookOpen,
-  Calculator,
-  type LucideIcon,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  StoreShell,
-  Disclaimer,
-  FeaturedGrid,
-  FAQ,
-  SectionTitle,
-  TrustStrip,
-  ProductGrid,
-} from "@/components/Store";
-import { compounds, blends, getCompound, productPath, gbp, fromPrice } from "@/lib/catalog";
+import { ArrowRight, FileCheck2, FlaskConical, Truck, type LucideIcon } from "lucide-react";
+import { StoreShell } from "@/components/Store";
+import { ProductCardGrid } from "@/components/ProductCard";
+import { compounds, featured, getCompound, gbp, fromPrice } from "@/lib/catalog";
 import { coas } from "@/data/coa";
-import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
-import { guides } from "@/data/guides";
+import { claimFilled, claimGate, claimText, isClaimAllowed } from "@/lib/claims";
+import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
-import { site, abs, spendTierLine } from "@/data/site";
-import hero from "@/assets/vyrax-hero-wide.webp";
+import { site, abs } from "@/data/site";
 import social from "@/assets/vyrax-social.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
-import { GuideSignup } from "@/components/GuideSignup";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -39,16 +18,15 @@ export const Route = createFileRoute("/")({
       : "";
     const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."}`;
+    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."} Research use only.`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
-      name: site.legalName ?? site.name,
+      name: site.name,
       url: site.url,
       logo: abs("/logo-512.png"),
       ...(site.email ? { email: site.email } : {}),
       ...(site.phone ? { telephone: site.phone } : {}),
-      ...(site.companyNumber ? { identifier: site.companyNumber } : {}),
     };
     const webSite = {
       "@context": "https://schema.org",
@@ -85,423 +63,264 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const glp = ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"]
-  .map(getCompound)
-  .filter((c) => c !== undefined);
+// ---------------------------------------------------------------- Trust strip data
+// Every testing string comes from the claim registry; the purity figure is computed from the real
+// certificates in src/data/coa.ts and renders only when at least one is on file.
+const purityStat = (() => {
+  if (!coas.length || !isClaimAllowed("testing.purity-badge")) return null;
+  const values = coas.map((c) => c.purity);
+  const min = Math.min(...values);
+  return { min, batches: coas.length };
+})();
 
-// Homepage trust tiles. Every string that asserts testing has happened, or that a certificate
-// exists, comes from the claim registry (src/lib/claims.ts) and is switched on by real evidence
-// (src/lib/evidence.ts). The registry supplies the honest placeholder while nothing is on file,
-// so the page can never claim a document we do not hold.
-type Tile = [LucideIcon, string, string];
-const testingTiles: Tile[] = isClaimAllowed("testing.hplc-ms-tested")
-  ? [
-      [TestTube2, claimGate("testing.hplc-ms-tested"), claimGate("testing.hplc-ms-tested-body")],
-      [
-        FileCheck2,
-        claimGate("testing.certificates-you-can-read"),
-        claimGate("testing.full-reports-body"),
-      ],
-    ]
-  : [
-      [
-        FileCheck2,
-        claimGate("testing.certificates-you-can-read"),
-        claimGate("testing.full-reports-body"),
-      ],
-      [
-        BookOpen,
-        "Handling guides",
-        "Storage, reconstitution and handling notes written for laboratory work.",
-      ],
-    ];
-
-const expectations: Tile[] = [
-  ...testingTiles,
-  [
-    Truck,
-    "Delivery information",
-    `Indicative UK delivery terms, including a proposed free-delivery threshold of £${site.freeDeliveryThreshold}. A saved basket does not start a shipment.`,
-  ],
-  [
-    RotateCcw,
-    "Parcel issue policy",
-    `Read the conditions for lost or damaged parcels in our returns policy; a saved basket does not schedule a shipment.`,
-  ],
-  [
-    FileCheck2,
-    "Check the evidence",
-    "See whether a batch certificate is published before relying on a test result.",
-  ],
-  [
-    Microscope,
-    "Real research data",
-    "CAS numbers, molecular formulas and PubMed references on our compound pages.",
-  ],
+type Tile = { icon: LucideIcon; stat: string; body: string; to: string; testId: string };
+const trustTiles: Tile[] = [
+  purityStat
+    ? {
+        icon: FlaskConical,
+        stat: `${purityStat.min.toFixed(1)}%+ HPLC purity`,
+        body: `Lowest purity across ${purityStat.batches} published batch${purityStat.batches === 1 ? "" : "es"}. Every figure comes from a certificate you can read.`,
+        to: "/lab-reports",
+        testId: "trust-purity",
+      }
+    : {
+        icon: FlaskConical,
+        stat: claimGate("testing.certificates-you-can-read"),
+        body: claimGate("testing.full-reports-body"),
+        to: "/lab-reports",
+        testId: "trust-purity",
+      },
+  {
+    icon: FileCheck2,
+    stat: claimGate("testing.independent-lab"),
+    body: claimGate("testing.batch-documented"),
+    to: "/lab-reports",
+    testId: "trust-testing",
+  },
+  (() => {
+    const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
+    return {
+      icon: Truck,
+      stat: dispatch ? `Same-day dispatch before ${dispatchCutoffLabel()}` : "Delivery information",
+      body: dispatch
+        ? `${dispatch} Tracked, not a delivery-date guarantee.`
+        : "See the delivery page for dispatch times and charges.",
+      to: "/shipping",
+      testId: "trust-dispatch",
+    };
+  })(),
 ];
+
+const bestSellers = featured.slice(0, 4);
+
+const ranges = shopSections
+  .map((s) => ({ ...s, list: productsInSection(compounds, s.slug) }))
+  .filter((s) => s.list.length > 0);
 
 function Home() {
   return (
     <StoreShell>
       {/* Hero */}
-      <section className="relative min-h-[480px] md:min-h-[620px] flex items-center overflow-hidden">
-        <img
-          src={hero}
-          alt="Research peptide vials on a laboratory bench"
-          width={1920}
-          height={1080}
-          fetchPriority="high"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent" />
-        <div className="container-main relative py-16 md:py-20">
-          <div className="max-w-[680px]">
-            <div className="eyebrow flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-verify" /> RESEARCH COMPOUNDS · UK DELIVERY
-            </div>
-            <h1 className="font-heading text-[40px] md:text-[58px] font-semibold leading-[1.08]">
-              Research peptides for laboratory work.
-            </h1>
-            <p className="text-muted-foreground text-lg leading-relaxed mt-6 max-w-[560px]">
-              Browse {compounds.length} research compounds, compare vial strengths and read the
-              available specifications.{" "}
-              {site.checkoutOpen
-                ? "Pay by card through secure checkout. Research use only."
-                : "Site opening in 3-4 days; no payment is taken on this site yet."}
-            </p>
-            <div className="flex flex-wrap gap-3 mt-8">
-              <Button asChild className="rounded-full h-12 px-7 text-base">
-                <Link to="/shop">
-                  Browse all compounds <ArrowRight />
-                </Link>
-              </Button>
-              <Link
-                to="/lab-reports"
-                className="inline-flex items-center h-12 px-2 font-semibold underline underline-offset-4"
-              >
-                View lab reports
-              </Link>
-            </div>
-            <p className="mt-6 text-sm flex items-center gap-2">
-              <Truck size={16} className="text-primary" />
-              <Link to="/shipping" className="underline underline-offset-2">
-                Read delivery information
-              </Link>
-            </p>
-            <div className="mt-10 pt-6 border-t border-border/70">
-              <TrustStrip />
-            </div>
-          </div>
-        </div>
-      </section>
-      <Disclaimer />
-
-      {/* Best sellers */}
-      <section className="section">
-        <div className="container-main">
-          <div className="flex items-end justify-between gap-4">
-            {/* A curated selection, not a sales ranking: the shop has no order history yet, so a
-                "most ordered" label would be a claim there is no data behind. */}
-            <SectionTitle eyebrow="START HERE" title="Explore research compounds" />
+      <section className="container-main pt-14 pb-10 md:pt-24 md:pb-16">
+        <div className="max-w-[760px]">
+          <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+            Research peptides · UK dispatch
+          </p>
+          <h1
+            data-testid="hero-title"
+            className="mt-4 font-heading text-[40px] md:text-[64px] font-semibold leading-[1.02] tracking-tight"
+          >
+            Research peptides, documented by batch.
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-[#040825]/70 leading-relaxed max-w-[600px]">
+            {compounds.length} research compounds with CAS numbers, literature references and per-mg
+            pricing.{" "}
+            {site.checkoutOpen
+              ? "Card checkout on a secure hosted payment page."
+              : "Site opening in 3-4 days; no payment is taken yet."}{" "}
+            Supplied for laboratory research only.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link
               to="/shop"
-              className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
+              data-testid="hero-cta"
+              className="inline-flex items-center gap-2 h-13 px-7 rounded-full bg-[#040825] text-[#F5F0E5] font-semibold text-base transition-[transform,opacity] duration-150 hover:opacity-90 hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825]"
             >
-              Browse all {compounds.length} <ArrowRight size={16} />
+              Shop all peptides <ArrowRight size={18} />
+            </Link>
+            <Link
+              to="/lab-reports"
+              data-testid="hero-lab-reports"
+              className="inline-flex items-center h-13 font-semibold underline underline-offset-4 decoration-[#040825]/30 hover:decoration-[#040825] transition-colors duration-150"
+            >
+              Browse lab reports
             </Link>
           </div>
-          <FeaturedGrid />
         </div>
       </section>
 
-      {/* Launch offer + GLP band */}
-      <section className="bg-ink text-ink-foreground">
-        <div className="container-main py-16 grid lg:grid-cols-[1fr_1.4fr] gap-10 items-center">
-          <div>
-            <span className="badge-promo">
-              {site.checkoutOpen ? "MULTI-BUY PRICING" : "INDICATIVE PRICING"}
-            </span>
-            <h2 className="font-heading text-3xl md:text-4xl font-semibold mt-4">
-              {site.checkoutOpen ? "Buy 2, get the 3rd free" : "Compare research vial strengths"}
-            </h2>
-            <p className="text-ink-muted mt-4 leading-relaxed">
-              {site.checkoutOpen
-                ? `On Retatrutide 10mg and Tirzepatide 20mg. Add three vials and the third is free. Multi-buy pricing applies on top: ${spendTierLine()}. The final price is confirmed at checkout.`
-                : "Browse Retatrutide and Tirzepatide strengths and compare their indicative prices. The site opens in 3-4 days."}
-            </p>
-            <div className="flex gap-3 mt-7 flex-wrap">
-              <Button asChild variant="secondary" className="rounded-full">
-                <a href={productPath("retatrutide", "10mg")}>Retatrutide 10mg</a>
-              </Button>
-              <Button asChild variant="secondary" className="rounded-full">
-                <a href={productPath("tirzepatide", "20mg")}>Tirzepatide 20mg</a>
-              </Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {glp.map((c) => (
-              <a
-                key={c.slug}
-                href={productPath(c.slug)}
-                className="bg-ink-panel border border-ink-line rounded-2xl p-5 hover:border-primary-soft transition-colors"
+      {/* Trust strip */}
+      <section className="container-main pb-16 md:pb-24">
+        <ul className="grid sm:grid-cols-3 gap-3 md:gap-4" data-testid="trust-strip">
+          {trustTiles.map((t) => (
+            <li key={t.testId}>
+              <Link
+                to={t.to as "/"}
+                data-testid={t.testId}
+                className="group flex h-full flex-col rounded-[18px] border border-[#040825]/10 bg-[#EAE6DC] p-5 md:p-6 transition-colors duration-200 hover:border-[#040825]/30"
               >
-                <p className="font-heading text-xl font-semibold mt-1">{c.name}</p>
-                <p className="text-sm text-ink-muted mt-1 font-mono">
-                  {c.strengths.map((s) => s.label).join(" · ")}
+                <t.icon size={20} className="text-[#040825]/70" />
+                <p className="mt-5 font-heading text-lg md:text-xl font-semibold leading-tight tabular-nums">
+                  {t.stat}
                 </p>
-                <p className="mt-3 font-semibold">from {gbp(fromPrice(c))}</p>
-              </a>
-            ))}
+                <p className="mt-2 text-sm text-[#040825]/70 leading-relaxed">{t.body}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Best sellers (curated: no order history exists yet, so this is a selection, not a ranking) */}
+      <section className="container-main pb-16 md:pb-24">
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+              Start here
+            </p>
+            <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+              Featured compounds
+            </h2>
           </div>
+          <Link
+            to="/shop"
+            className="hidden sm:inline-flex items-center gap-1.5 font-semibold text-sm underline underline-offset-4 decoration-[#040825]/30 hover:decoration-[#040825]"
+          >
+            All {compounds.length} <ArrowRight size={14} />
+          </Link>
+        </div>
+        <ProductCardGrid list={bestSellers} priorityCount={4} />
+      </section>
+
+      {/* Research ranges */}
+      <section className="container-main pb-16 md:pb-24">
+        <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+          Browse by range
+        </p>
+        <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+          Research ranges
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" data-testid="range-tiles">
+          {ranges.map((r) => (
+            <Link
+              key={r.slug}
+              to="/collections/$slug"
+              params={{ slug: r.slug }}
+              data-testid="range-tile"
+              className="group flex flex-col rounded-[18px] border border-[#040825]/10 p-5 md:p-6 min-h-[164px] transition-colors duration-200 hover:bg-[#EAE6DC] hover:border-[#040825]/30"
+            >
+              <h3 className="font-heading text-base md:text-lg font-semibold leading-snug">
+                {r.name}
+              </h3>
+              <p className="mt-2 text-xs md:text-sm text-[#040825]/60 leading-relaxed flex-1">
+                {r.list
+                  .slice(0, 3)
+                  .map((c) => c.name)
+                  .join(" · ")}
+              </p>
+              <span className="mt-4 flex items-center justify-between text-xs text-[#040825]/60">
+                {r.list.length} product{r.list.length === 1 ? "" : "s"}
+                <ArrowRight
+                  size={16}
+                  className="text-[#040825] transition-transform duration-200 group-hover:translate-x-1"
+                />
+              </span>
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="section">
-        <div className="container-main">
-          <SectionTitle eyebrow="BROWSE BY SECTION" title="Shop by section" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {shopSections
-              .filter((c) => productsInSection(compounds, c.slug).length > 0)
-              .map((c) => {
-                const n = productsInSection(compounds, c.slug).length;
+      {/* Lab report ticker band */}
+      <section className="bg-[#040825] text-[#F5F0E5] py-14 md:py-20" data-testid="lab-report-band">
+        <div className="container-main flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#F5F0E5]/60">
+              Lab reports
+            </p>
+            <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+              {claimText("testing.home-certs-heading")}
+            </h2>
+          </div>
+          <Link
+            to="/lab-reports"
+            data-testid="view-all-lab-reports"
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#F5F0E5]/30 font-semibold text-sm transition-colors duration-150 hover:bg-[#F5F0E5] hover:text-[#040825] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5F0E5] self-start"
+          >
+            View all lab reports <ArrowRight size={16} />
+          </Link>
+        </div>
+        {coas.length ? (
+          <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ul className="container-main flex gap-3 w-max pr-10" data-testid="lab-report-ticker">
+              {coas.map((r) => {
+                const name = getCompound(r.compound)?.name ?? r.compound;
                 return (
-                  <Link
-                    key={c.slug}
-                    to="/collections/$slug"
-                    params={{ slug: c.slug }}
-                    className="category-tile group flex flex-col"
-                  >
-                    <h3 className="font-heading text-lg font-semibold">{c.name}</h3>
-                    <div className="flex items-center justify-between mt-6 text-sm">
-                      <span className="text-muted-foreground">
-                        {n} product{n === 1 ? "" : "s"}
+                  <li key={r.batch}>
+                    <a
+                      href={`/verify/${r.batch}`}
+                      data-testid="lab-report-chip"
+                      className="flex flex-col gap-1 w-[220px] rounded-2xl border border-[#F5F0E5]/15 bg-[#F5F0E5]/5 p-4 transition-colors duration-150 hover:bg-[#F5F0E5]/10"
+                    >
+                      <span className="text-sm font-semibold truncate">
+                        {name} {r.strength}
                       </span>
-                      <ArrowRight
-                        className="text-primary group-hover:translate-x-1 transition-transform"
-                        size={18}
-                      />
-                    </div>
-                  </Link>
+                      <span className="font-mono text-xs text-[#F5F0E5]/60">{r.batch}</span>
+                      <span className="mt-2 font-heading text-2xl font-semibold tabular-nums">
+                        {r.purity.toFixed(2)}%
+                      </span>
+                      <span className="text-[11px] text-[#F5F0E5]/60">
+                        {r.method} · {r.lab}
+                      </span>
+                    </a>
+                  </li>
                 );
               })}
-            <Link to="/calculator" className="category-tile group flex flex-col bg-tint">
-              <h3 className="font-heading text-lg font-semibold">Reconstitution calculator</h3>
-              <p className="text-muted-foreground text-sm mt-1 flex-1">
-                Stock concentration, molarity and working dilutions for any vial.
-              </p>
-              <Calculator className="text-primary mt-6" size={20} />
-            </Link>
+            </ul>
           </div>
-        </div>
-      </section>
-
-      {/* Process */}
-      <section className="section bg-surface">
-        <div className="container-main">
-          <SectionTitle eyebrow="HOW IT WORKS" title="Compare before you buy" />
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              [
-                "01",
-                "Choose a specification",
-                "Compare listed vial strengths and indicative prices. Availability is not confirmed by a listing.",
-              ],
-              [
-                "02",
-                "Check the documentation",
-                "The Lab Reports register shows published certificates. No purity result is claimed without a report.",
-              ],
-              [
-                "03",
-                "Save a basket",
-                "A basket is saved in this browser; it does not reserve goods or send a request.",
-              ],
-              [
-                "04",
-                site.checkoutOpen ? "Check out" : "Check out when we open",
-                site.checkoutOpen
-                  ? "Pay by card on our payment provider's secure page. The server confirms the final price before you pay, and delivery follows our shipping policy."
-                  : "The site opens in 3-4 days. No payment, confirmed order or dispatch follows from this site yet.",
-              ],
-            ].map(([n, t, b]) => (
-              <div key={n} className="border-t-2 border-primary pt-5">
-                <span className="font-mono text-primary text-sm">{n}</span>
-                <h3 className="font-heading text-xl font-semibold mt-4">{t}</h3>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{b}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Why us */}
-      <section className="section">
-        <div className="container-main">
-          <SectionTitle eyebrow="BEFORE YOU DECIDE" title="Information you can check" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {expectations.map(([I, t, b]) => (
-              <div key={t} className="border border-border rounded-2xl p-6">
-                <I className="text-primary mb-4" size={26} />
-                <h3 className="font-heading font-semibold text-lg">{t}</h3>
-                <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{b}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Lab reports widget */}
-      <section className="bg-ink text-ink-foreground py-20">
-        <div className="container-main grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="eyebrow !text-primary-soft">TRANSPARENCY</p>
-            <h2 className="font-heading text-3xl md:text-4xl font-semibold">
-              {claimGate("testing.lab-report-before-order")}
-            </h2>
-            <p className="text-ink-muted mt-5 leading-relaxed max-w-lg">
-              {claimGate("testing.certificate-detail-body")}
-            </p>
-            <Button asChild variant="secondary" className="rounded-full mt-7">
-              <Link to="/lab-reports">
-                Open Lab Reports <ArrowRight />
-              </Link>
-            </Button>
-          </div>
-          <div className="bg-ink-panel border border-ink-line rounded-2xl p-7">
-            <div className="flex items-center gap-3 border-b border-ink-line pb-5">
-              <FileCheck2 className="text-primary-soft" />
-              <div>
-                <p className="font-semibold">{claimText("testing.home-certs-heading")}</p>
-                <p className="text-xs text-ink-muted">Published as each batch is released</p>
-              </div>
-            </div>
-            {coas.length ? (
-              <ul className="divide-y divide-ink-line">
-                {coas.slice(0, 5).map((r) => (
-                  <li key={r.batch} className="py-3 flex justify-between text-sm">
-                    <span>
-                      {getCompound(r.compound)?.name} {r.strength}
-                    </span>
-                    <span className="font-mono">{r.purity}%</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-6 border border-dashed border-ink-line p-7 text-center rounded-xl">
-                <FileCheck2 className="mx-auto text-ink-muted" />
-                <p className="mt-3 font-semibold">{claimText("testing.home-certs-heading")}</p>
-                <p className="text-sm text-ink-muted mt-2">
-                  {claimText("testing.home-certs-empty")}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Blends */}
-      <section className="section">
-        <div className="container-main">
-          <SectionTitle
-            eyebrow="PRE-FORMULATED"
-            title="Peptide blends"
-            body="Multi-peptide vials for combination research, each component listed on the product page."
-          />
-          <ProductGrid list={blends} />
-        </div>
-      </section>
-
-      {/* Guides */}
-      <section className="section bg-surface">
-        <div className="container-main">
-          <div className="flex items-end justify-between gap-4">
-            <SectionTitle eyebrow="LABORATORY NOTES" title="Research guides" />
-            <Link
-              to="/guides"
-              className="hidden md:flex items-center gap-2 font-semibold text-primary mb-10"
-            >
-              All guides <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5">
-            {guides.slice(0, 3).map((g) => (
-              <Link
-                key={g.slug}
-                to="/guides/$slug"
-                params={{ slug: g.slug }}
-                className="category-tile bg-background flex flex-col"
-              >
-                <BookOpen className="text-primary mb-4" size={20} />
-                <h3 className="font-heading text-lg font-semibold leading-snug">{g.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 flex-1">{g.description}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <GuideSignup />
-
-      {/* SEO copy + FAQ */}
-      <section className="section">
-        <div className="container-main grid lg:grid-cols-2 gap-16">
-          <div>
-            <SectionTitle eyebrow="BUYING GUIDE" title="Buying research peptides in the UK" />
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
-              <p>
-                When you buy peptides in the UK for research, the things that matter are identity,
-                purity and traceability. Vyrax Labs lists the CAS number, molecular formula and
-                molecular weight for each compound and links to the peer-reviewed literature.
-              </p>
-              <p>{claimGate("testing.every-batch-analysed")}</p>
-              <p>
-                Our catalogue covers metabolic research peptides such as retatrutide, tirzepatide
-                and semaglutide, regenerative research peptides such as BPC-157, TB-500 and GHK-Cu,
-                growth hormone secretagogues, longevity peptides and pre-formulated blends. Most
-                compounds come in more than one vial strength, and each product page shows the cost
-                per mg so you can compare.
-              </p>
-              <p>
-                See the delivery policy for indicative charges and the proposed free-delivery
-                threshold of £{site.freeDeliveryThreshold}. No delivery is booked here. All products
-                are listed strictly for laboratory research use only.
+        ) : (
+          <div className="container-main">
+            <div className="rounded-2xl border border-dashed border-[#F5F0E5]/25 p-6 md:p-8 max-w-2xl">
+              <p className="text-sm md:text-base text-[#F5F0E5]/75 leading-relaxed">
+                {claimText("testing.home-certs-empty")}
               </p>
             </div>
-            <Link
-              to="/faq"
-              className="inline-flex items-center text-primary font-semibold gap-2 mt-7"
-            >
-              Read all FAQs <ArrowRight size={16} />
-            </Link>
           </div>
-          <div>
-            <h3 className="font-heading text-2xl font-semibold mb-5">Common questions</h3>
-            <FAQ items={coreFaqs} />
-          </div>
-        </div>
+        )}
       </section>
 
-      <section className="bg-tint py-14">
-        <div className="container-main flex flex-col md:flex-row md:items-center gap-4 md:gap-12">
-          <FlaskConical className="text-primary" size={36} />
+      {/* RUO band */}
+      <section className="container-main py-14 md:py-20" data-testid="ruo-band">
+        <div className="rounded-[20px] bg-[#EAE6DC] p-6 md:p-10 grid md:grid-cols-[1fr_auto] gap-6 items-center">
           <div>
-            <h2 className="font-heading text-2xl font-semibold">
-              Comparing materials for a lab or research group?
+            <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight">
+              Supplied for laboratory research only
             </h2>
-            <p className="text-muted-foreground mt-1">
-              Indicative multi-buy tiers: {spendTierLine()}.{" "}
-              {site.checkoutOpen
-                ? "The server confirms the final price at checkout."
-                : "The site opens in 3-4 days."}
+            <p className="mt-2 text-sm md:text-base text-[#040825]/70 leading-relaxed max-w-2xl">
+              Not for human or veterinary use. Nothing on this site is a medicine, food, cosmetic or
+              supplement, and no product page gives dosing or usage guidance. Ordering confirms you
+              are an adult buying for research.
             </p>
           </div>
-          <Button asChild variant="outline" className="md:ml-auto shrink-0 rounded-full">
-            <Link to="/contact">
-              Check contact availability <ArrowRight />
-            </Link>
-          </Button>
+          <Link
+            to="/research-use-policy"
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#040825]/20 font-semibold text-sm hover:bg-[#F5F0E5] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825]"
+          >
+            Research use policy <ArrowRight size={16} />
+          </Link>
         </div>
+        {/* Indicative "from" prices for the hero compounds, for crawlers and quick scanning. */}
+        <p className="sr-only">
+          {bestSellers.map((c) => `${c.name} from ${gbp(fromPrice(c))}`).join(". ")}.
+        </p>
       </section>
     </StoreShell>
   );
