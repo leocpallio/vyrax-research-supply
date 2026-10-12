@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
       : "";
     const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "Site opening in 3-4 days; no payment is taken yet."} Research use only.`;
+    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`;
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -138,7 +138,7 @@ function Home() {
             pricing.{" "}
             {site.checkoutOpen
               ? "Card checkout on a secure hosted payment page."
-              : "Site opening in 3-4 days; no payment is taken yet."}{" "}
+              : "The site is not live yet; no orders or payments are taken."}{" "}
             Supplied for laboratory research only.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">

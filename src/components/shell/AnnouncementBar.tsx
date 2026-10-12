@@ -11,6 +11,8 @@ export function announcementStrings(): string[] {
     freeShippingThreshold: String(site.freeDeliveryThreshold),
   });
   const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
+  if (!site.checkoutOpen)
+    out.push("Site not live yet. Checkout is disabled; no orders or payments are taken.");
   if (site.checkoutOpen && free) out.push(free);
   if (dispatch) out.push(dispatch);
   if (out.length < 2) out.push(claimText("regulatory.research-use-only") ?? "Research use only.");

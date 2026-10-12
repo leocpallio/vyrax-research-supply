@@ -55,9 +55,7 @@ function Basket() {
     setRemoved(null);
   };
   const unavailable = items.filter(isLineUnavailable);
-  const ctaLabel = paymentEnabled
-    ? "Proceed to checkout"
-    : "Site opening in 3-4 days";
+  const ctaLabel = paymentEnabled ? "Proceed to checkout" : "Site not live yet";
   const p = priceBasket(items);
   const shipPct = Math.min(100, (p.goods / site.freeDeliveryThreshold) * 100);
   return (
@@ -68,7 +66,7 @@ function Basket() {
           Saved in this browser. No items are reserved and no payment is taken on this page.{" "}
           {paymentEnabled
             ? "Hosted payment is available at checkout; inventory is not reserved."
-            : "The site opens in 3-4 days. Baskets are saved in this browser until then."}
+            : "The site is not live yet and checkout is disabled. Baskets are saved in this browser until it opens."}
         </p>
         {removed && (
           <div
@@ -235,8 +233,14 @@ function Basket() {
                 </Link>
               </Button>
               <ul className="mt-4 text-xs text-muted-foreground space-y-1.5">
-                <li>Delivery: {site.carrier}. Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock.</li>
-                <li>Cold-chain packed. Transit temperature is not guaranteed. No delivery date is confirmed.</li>
+                <li>
+                  Delivery: {site.carrier}. Paid before {dispatchCutoffLabel()} on working days:
+                  same-day dispatch, subject to stock.
+                </li>
+                <li>
+                  Cold-chain packed. Transit temperature is not guaranteed. No delivery date is
+                  confirmed.
+                </li>
                 <li>Same total is used at checkout; the server confirms the final price.</li>
                 <li>No charge is taken on this page.</li>
               </ul>
@@ -244,7 +248,7 @@ function Basket() {
                 No charge or confirmed order on this page. Availability is not reserved.{" "}
                 {paymentEnabled
                   ? "The server confirms the final price before hosted payment."
-                  : "The site opens in 3-4 days; no contact details are collected yet."}
+                  : "The site is not live yet; no contact details are collected."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
                 For research use only. Not for human consumption.
