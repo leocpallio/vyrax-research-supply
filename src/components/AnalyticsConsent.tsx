@@ -26,8 +26,10 @@ export function AnalyticsConsentBanner() {
     >
       <h2 className="font-heading font-semibold">Optional website analytics</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        With your permission, we send anonymous, session-only page and shop activity to PostHog. No
-        form details, search text or payment information are sent. You can change your choice in our{" "}
+        With your permission, we load PostHog analytics to see which pages and products are viewed
+        and where checkout is abandoned. Nothing loads before you choose. No form details, search
+        text, referrer or payment information are sent, and inputs are never recorded. You can
+        change your choice in our{" "}
         <Link to="/cookies" className="underline">
           cookie policy
         </Link>

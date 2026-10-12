@@ -21,7 +21,7 @@ export const Route = createFileRoute("/verify/$batch")({
       hit
         ? `Certificate of analysis for Vyrax Labs batch ${hit.batch}: laboratory, method, purity and test date.`
         : "Check a Vyrax Labs batch number against its published certificate of analysis.",
-      { noindex: true },
+      { noindex: true, crumb: "Batch verification" },
     );
   },
   component: Verify,

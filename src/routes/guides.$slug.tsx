@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { StoreShell, Disclaimer, Breadcrumbs, ProductGrid, SectionTitle } from "@/components/Store";
 import { guideBySlug, guides, type Block } from "@/data/guides";
-import { getCompound, type Compound } from "@/lib/catalog";
+import { getCompound, productPath, type Compound } from "@/lib/catalog";
+import { ORG_ID, breadcrumbListJsonLd, buildHead, titles, withRuoTail } from "@/lib/seo";
 import { abs, site } from "@/data/site";
 
 export const Route = createFileRoute("/guides/$slug")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/guides/$slug")({
   head: ({ loaderData }) => {
     const g = loaderData ? guideBySlug(loaderData.slug) : undefined;
     if (!g) return {};
-    const url = abs(`/guides/${g.slug}`);
+    const path = `/guides/${g.slug}`;
     const article = {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -21,35 +22,29 @@ export const Route = createFileRoute("/guides/$slug")({
       description: g.description,
       dateModified: g.updated,
       datePublished: g.updated,
-      author: { "@type": "Organization", name: site.name },
-      publisher: { "@type": "Organization", name: site.name },
-      mainEntityOfPage: url,
+      inLanguage: "en-GB",
+      author: { "@id": ORG_ID },
+      publisher: { "@id": ORG_ID },
+      mainEntityOfPage: abs(path),
+      about: g.compounds
+        .map(getCompound)
+        .filter((c): c is Compound => Boolean(c))
+        .map((c) => ({ "@type": "Thing", name: c.name, url: abs(productPath(c.slug)) })),
     };
-    const crumbs = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: abs("/") },
-        { "@type": "ListItem", position: 2, name: "Guides", item: abs("/guides") },
-        { "@type": "ListItem", position: 3, name: g.title, item: url },
+    return buildHead({
+      title: titles.guide(g.seoTitle),
+      description: withRuoTail(g.description),
+      path,
+      type: "article",
+      jsonLd: [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Guides", path: "/guides" },
+          { name: g.title, path },
+        ]),
+        article,
       ],
-    };
-    return {
-      meta: [
-        { title: `${g.seoTitle} | Vyrax Labs` },
-        { name: "description", content: g.description },
-        { property: "og:title", content: g.seoTitle },
-        { property: "og:description", content: g.description },
-        { property: "og:type", content: "article" },
-        { property: "og:url", content: url },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-      links: [{ rel: "canonical", href: url }],
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(article) },
-        { type: "application/ld+json", children: JSON.stringify(crumbs) },
-      ],
-    };
+    });
   },
   component: GuidePage,
 });

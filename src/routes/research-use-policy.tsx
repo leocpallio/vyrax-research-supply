@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 
 export const Route = createFileRoute("/research-use-policy")({
   head: () =>
     pageHead(
       "/research-use-policy",
-      "Research Use Policy | Vyrax Labs",
+      titles.info("Research Use Policy"),
       "Vyrax Labs products are supplied strictly for laboratory research. Read the conditions every order is placed under.",
+      { crumb: "Research use policy" },
     ),
   component: Policy,
 });

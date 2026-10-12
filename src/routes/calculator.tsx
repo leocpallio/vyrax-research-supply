@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { compounds, productPath } from "@/lib/catalog";
 import { chem } from "@/data/research";
 import { abs } from "@/data/site";
-import { faqJsonLd, type QA } from "@/data/faq";
+import { type QA } from "@/data/faq";
+import { breadcrumbListJsonLd, buildHead, faqPageJsonLd, howToJsonLd } from "@/lib/seo";
 
 const faqs: QA[] = [
   [
@@ -34,35 +35,54 @@ const faqs: QA[] = [
 export const Route = createFileRoute("/calculator")({
   head: () => {
     const title = "Peptide Reconstitution Calculator | mg/ml Concentration | Vyrax Labs";
-    const desc =
-      "Free peptide reconstitution calculator for laboratory research: stock concentration in mg/ml and µg/ml, molar concentration from molecular weight, and C1V1 = C2V2 working dilutions.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: abs("/calculator") },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-      links: [{ rel: "canonical", href: abs("/calculator") }],
-      scripts: [
+    const description =
+      "Free peptide reconstitution calculator for laboratory research: stock concentration in mg/ml and µg/ml, molar concentration from molecular weight, and C1V1 = C2V2 working dilutions. Research use only.";
+    return buildHead({
+      title,
+      description,
+      path: "/calculator",
+      jsonLd: [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Calculator", path: "/calculator" },
+        ]),
         {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: "Peptide reconstitution calculator",
-            applicationCategory: "UtilitiesApplication",
-            operatingSystem: "Any",
-            offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
-            url: abs("/calculator"),
-          }),
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "Peptide reconstitution calculator",
+          applicationCategory: "UtilitiesApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+          url: abs("/calculator"),
         },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqs)) },
+        howToJsonLd({
+          name: "How to calculate the concentration of a reconstituted peptide",
+          description:
+            "Work out stock concentration, molar concentration and a working dilution for a lyophilised research peptide.",
+          path: "/calculator",
+          totalTime: "PT2M",
+          steps: [
+            {
+              name: "Enter the vial amount",
+              text: "Type the total peptide mass stated on the vial label, in mg, into the calculator.",
+            },
+            {
+              name: "Enter the diluent volume",
+              text: "Enter the volume of diluent you will add in ml. The calculator returns the stock concentration in mg/ml and µg/ml.",
+            },
+            {
+              name: "Select the compound for molarity",
+              text: "Choose the compound so its published molecular weight converts mg/ml into µM.",
+            },
+            {
+              name: "Set a working dilution",
+              text: "Enter the target concentration and final volume. C1V1 = C2V2 gives the stock volume to transfer and the diluent to add.",
+            },
+          ],
+        }),
+        faqPageJsonLd(faqs),
       ],
-    };
+    });
   },
   component: CalculatorPage,
 });

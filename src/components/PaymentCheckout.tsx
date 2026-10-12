@@ -4,7 +4,7 @@ import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
-import { capture } from "@/lib/analytics";
+import { capture, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
@@ -68,6 +68,7 @@ export function PaymentCheckout() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const lock = useRef(false);
+  const addressStarted = useRef(false);
   const summaryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -87,6 +88,10 @@ export function PaymentCheckout() {
   const quote = priceBasket(items);
 
   function set(key: FieldKey, value: string) {
+    if (!addressStarted.current) {
+      addressStarted.current = true; // funnel step: first keystroke in the address form (no values sent)
+      trackCheckoutStep("address", items);
+    }
     setForm((f) => ({ ...f, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   }
@@ -108,6 +113,7 @@ export function PaymentCheckout() {
     lock.current = true;
     setBusy(true);
     setError("");
+    trackCheckoutStep("payment", items);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -143,7 +149,13 @@ export function PaymentCheckout() {
       )
         throw new Error("Checkout unavailable");
       sessionStorage.setItem(`vyrax-order-${data.order_id}`, data.guest_token);
-      capture("hosted_payment_opened", { test_mode: data.test_mode === true });
+      capture("hosted_payment_opened", {
+        test_mode: data.test_mode === true,
+        order_id: data.order_id,
+        value: quote.total,
+        currency: "GBP",
+        item_count: items.reduce((n, i) => n + i.quantity, 0),
+      });
       // Stay locked: the browser is leaving for the payment page.
       window.location.assign(data.checkout_url);
     } catch {
@@ -382,8 +394,19 @@ export function PaymentCheckout() {
                 aria-label="About this checkout"
               >
                 <li>Card details are entered on our payment provider's secure page, not here.</li>
-                <li>Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to stock. Cold-chain packed; transit temperature is not guaranteed.</li>
-                {site.phone && <li>Need help? <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="underline">{site.phone}</a> ({site.supportHours}).</li>}
+                <li>
+                  Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to
+                  stock. Cold-chain packed; transit temperature is not guaranteed.
+                </li>
+                {site.phone && (
+                  <li>
+                    Need help?{" "}
+                    <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="underline">
+                      {site.phone}
+                    </a>{" "}
+                    ({site.supportHours}).
+                  </li>
+                )}
                 <li>No account is created. Guest checkout only.</li>
                 <li>The total is calculated on our server, not in your browser.</li>
                 <li>

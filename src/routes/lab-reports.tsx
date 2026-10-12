@@ -7,26 +7,23 @@ import { Button } from "@/components/ui/button";
 import { coas, expiryFor, findBatch, monthLabel, testingPublished } from "@/data/coa";
 import { compounds, getCompound, productPath } from "@/lib/catalog";
 import { claimText } from "@/lib/claims";
-import { abs } from "@/data/site";
+import { breadcrumbListJsonLd, buildHead, titles } from "@/lib/seo";
 
 export const Route = createFileRoute("/lab-reports")({
   head: () => {
-    const title = "Peptide Lab Reports & Certificates of Analysis (CoA) | Vyrax Labs";
+    const title = titles.labReports();
     const desc = coas.length
       ? (claimText("testing.lab-reports-meta") ?? "Available documents for listed batches.")
       : "No certificates of analysis are currently published. Check this register for actual batch documents, not an unpublished testing status.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: abs("/lab-reports") },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-      links: [{ rel: "canonical", href: abs("/lab-reports") }],
-    };
+    return buildHead({
+      title,
+      description: desc,
+      path: "/lab-reports",
+      jsonLd: breadcrumbListJsonLd([
+        { name: "Home", path: "/" },
+        { name: "Lab reports", path: "/lab-reports" },
+      ]),
+    });
   },
   component: Reports,
 });

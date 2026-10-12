@@ -13,6 +13,13 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { analyticsConsent, capture, trackPage } from "../lib/analytics";
+import {
+  SITE_NAME,
+  THEME_COLOR,
+  organizationJsonLd,
+  serializeJsonLd,
+  webSiteJsonLd,
+} from "../lib/seo";
 
 function NotFoundComponent() {
   return (
@@ -80,11 +87,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "Vyrax Labs" },
-      { name: "theme-color", content: "#0B1B33" },
-      { name: "apple-mobile-web-app-title", content: "Vyrax Labs" },
-      { property: "og:site_name", content: "Vyrax Labs" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "author", content: SITE_NAME },
+      { name: "theme-color", content: THEME_COLOR },
+      { name: "color-scheme", content: "light" },
+      { name: "apple-mobile-web-app-title", content: SITE_NAME },
+      { name: "format-detection", content: "telephone=no" },
+      { property: "og:site_name", content: SITE_NAME },
       { property: "og:locale", content: "en_GB" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -105,6 +114,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
+    ],
+    // Site-wide entity graph. Routes add their own BreadcrumbList / FAQPage / Product etc.
+    scripts: [
+      { type: "application/ld+json", children: serializeJsonLd(organizationJsonLd()) },
+      { type: "application/ld+json", children: serializeJsonLd(webSiteJsonLd()) },
     ],
   }),
   shellComponent: RootShell,
