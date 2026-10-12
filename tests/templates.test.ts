@@ -92,6 +92,21 @@ describe("Vyrax paid-checkout emails", () => {
     expect(mail.text).toContain('Check your delivery address: <12 & "Main">');
     expect(renderEmail(confirmation).text).not.toContain("Check your delivery address:");
   });
+  it("shows the fulfilment stepper on paid, packed and dispatched only, and drops the address check once dispatched", () => {
+    const addr = { ...who, address: "12 Example Road" };
+    const paid = renderEmail({ ...confirmation, address: "12 Example Road" });
+    expect(paid.text).toContain("[x] Payment confirmed  [ ] Packed  [ ] Dispatched");
+    expect(paid.text).toContain("Check your delivery address:");
+    expect(renderEmail({ kind: "packed", ...addr }).text).toContain(
+      "[x] Payment confirmed  [x] Packed  [ ] Dispatched",
+    );
+    const out = renderEmail({ kind: "dispatched", ...addr });
+    expect(out.text).toContain("[x] Payment confirmed  [x] Packed  [x] Dispatched");
+    expect(out.text).not.toContain("Check your delivery address");
+    expect(out.html).not.toContain("Check your delivery address");
+    expect(renderEmail({ kind: "paymentPending", ...addr }).text).not.toContain("[ ] Packed");
+    expect(renderEmail({ kind: "reorder", ...addr, unsubscribeUrl }).html).not.toContain("Packed");
+  });
   it("keeps paid, pending, packed and dispatch statuses distinct", () => {
     expect(renderEmail({ kind: "paymentPending", ...who }).text).toContain(
       "has not yet been confirmed",
