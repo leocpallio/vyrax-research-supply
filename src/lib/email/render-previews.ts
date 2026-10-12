@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { renderEmail, type EmailEvent } from "./templates";
 import { SITE_URL, site } from "../../data/site";
+import { lineMedia } from "./order-email.server";
 
 const who = {
   name: "Alex Researcher",
@@ -16,9 +17,31 @@ const fixtures: EmailEvent[] = [
   {
     kind: "orderConfirmation",
     ...who,
-    lines: [{ name: "Research material", strength: "5mg", quantity: 2, lineTotal: 40 }],
+    lines: [
+      {
+        name: "Retatrutide",
+        strength: "10mg",
+        quantity: 2,
+        lineTotal: 120,
+        ...lineMedia("retatrutide", "10mg"),
+      },
+      {
+        name: "BPC-157",
+        strength: "10mg",
+        quantity: 1,
+        lineTotal: 25,
+        ...lineMedia("bpc-157", "10mg"),
+      },
+      {
+        name: "Bacteriostatic Water",
+        strength: "10ml",
+        quantity: 1,
+        lineTotal: 6,
+        ...lineMedia("bacteriostatic-water", "10ml"),
+      },
+    ],
     delivery: 4.99,
-    total: 44.99,
+    total: 155.99,
   },
   { kind: "paymentPending", ...who },
   { kind: "paymentFailed", ...who },

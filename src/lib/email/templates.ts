@@ -3,7 +3,16 @@ import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
 
 // Pure rendering only. Sending and consent/idempotency decisions belong to the caller.
-export type Line = { name: string; strength: string; quantity: number; lineTotal: number };
+export type Line = {
+  name: string;
+  strength: string;
+  quantity: number;
+  lineTotal: number;
+  /** Absolute https URL of a product thumbnail (public/email-thumbs/*.jpg). Omitted = text-only row. */
+  image?: string;
+  /** Store product page for the thumbnail link. */
+  url?: string;
+};
 export type Summary = {
   lines: readonly Line[];
   /** Show a breakdown only when the stored order reproduces it exactly. Values are GBP. */
@@ -88,7 +97,7 @@ const css = {
   foot: "padding:22px 32px;border-top:1px solid #DDD7C8;font-size:12px;line-height:1.7;color:#5B5F73",
   cell: "padding:12px 0;border-bottom:1px solid #DDD7C8;vertical-align:top",
 };
-const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#040825!important}.card{background:#0B1232!important;border-color:#1F2A55!important}.tx{color:#F5F0E5!important}.mute{color:#A9B0C9!important}.rule{border-color:#1F2A55!important}.tint{background:#111A3F!important}.btn{background:#F5F0E5!important}.btn a{color:#040825!important}.step-on{background:#F5F0E5!important;color:#040825!important}.step-off{background:#1F2A55!important;color:#A9B0C9!important}}@media (max-width:620px){.pad{padding:22px!important}}</style>`;
+const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#040825!important}.card{background:#0B1232!important;border-color:#1F2A55!important}.tx{color:#F5F0E5!important}.mute{color:#A9B0C9!important}.rule{border-color:#1F2A55!important}.tint{background:#111A3F!important}.btn{background:#F5F0E5!important}.btn a{color:#040825!important}.step-on{background:#F5F0E5!important;color:#040825!important}.step-off{background:#1F2A55!important;color:#A9B0C9!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
 
 /** Three-step fulfilment strip. `current` is 1-based and passed by the caller, never inferred. */
 function steps(current: 1 | 2 | 3): { html: string; text: string } {
@@ -112,16 +121,40 @@ function steps(current: 1 | 2 | 3): { html: string; text: string } {
   };
 }
 
+// Product thumbnail cell, UKPL pattern: 64px JPEG (Outlook-safe) with a hairline and radius, linking to the product page.
+// Only store-origin images are embedded; anything else renders as the text-only row.
+function thumb(l: Line): string {
+  if (!l.image)
+    return `<td class="rule" style="${css.cell};width:0;padding-left:0;padding-right:0"></td>`;
+  let img: string;
+  try {
+    img = safeUrl(l.image);
+  } catch {
+    return `<td class="rule" style="${css.cell};width:0;padding-left:0;padding-right:0"></td>`;
+  }
+  const pic = `<img class="thumb" src="${e(img)}" width="64" height="64" alt="${e(oneLine(l.name))}" style="display:block;width:64px;height:64px;border:1px solid #DDD7C8;border-radius:10px;background:#EAE6DC">`;
+  const href = l.url
+    ? (() => {
+        try {
+          return safeUrl(l.url as string);
+        } catch {
+          return null;
+        }
+      })()
+    : null;
+  return `<td class="rule thumbtd" width="78" style="${css.cell};width:78px;padding-right:14px;vertical-align:middle">${href ? `<a href="${e(href)}">${pic}</a>` : pic}</td>`;
+}
+
 function table(s: Summary): { html: string; text: string[] } {
   const subtotal = s.lines.reduce((sum, l) => sum + l.lineTotal, 0);
   const rows = s.lines
     .map(
       (l) =>
-        `<tr><td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#5B5F73;font-size:13px">${e(oneLine(l.strength))} · Qty ${e(l.quantity)}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
+        `<tr>${thumb(l)}<td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#5B5F73;font-size:13px">${e(oneLine(l.strength))} · Qty ${e(l.quantity)}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
     )
     .join("");
   const extra = (label: string, v: string, bold = false) =>
-    `<tr><td class="${bold ? "tx" : "mute"}" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 400};color:${bold ? "#040825" : "#5B5F73"}">${e(label)}</td><td class="tx" align="right" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 500}">${e(v)}</td></tr>`;
+    `<tr><td colspan="2" class="${bold ? "tx" : "mute"}" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 400};color:${bold ? "#040825" : "#5B5F73"}">${e(label)}</td><td class="tx" align="right" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 500}">${e(v)}</td></tr>`;
   const breakdown = s.delivery !== undefined || s.discount;
   return {
     html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 24px;font-size:15px"><tbody>${rows}${breakdown ? extra("Subtotal", gbp(subtotal)) : ""}${s.discount ? extra("Discount", `-${gbp(s.discount)}`) : ""}${s.delivery !== undefined ? extra(`Delivery (${CARRIER})`, s.delivery === 0 ? "Free" : gbp(s.delivery)) : ""}${extra("Total paid", gbp(s.total), true)}</tbody></table>`,

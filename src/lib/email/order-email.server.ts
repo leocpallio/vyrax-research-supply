@@ -2,6 +2,25 @@ import { quoteCheckout } from "../checkout-pricing";
 import { orderRef } from "../checkout-form";
 import { sendTransactional } from "./send.server";
 import { renderEmail, type EmailEvent } from "./templates";
+import { SITE_URL } from "../../data/site";
+import { metabolicAndRegenerative } from "../../data/compounds-a";
+import { secretagoguesToSupplies } from "../../data/compounds-b";
+import { ukplAdditions } from "../../data/ukpl-additions";
+import { hasEmailThumb } from "./thumbs";
+
+// catalog.ts uses import.meta.glob (Vite only), so the URL rules are mirrored here from catalog.ts
+// (strengthKey / variantSlug) over the raw compound data, which loads anywhere.
+const compounds = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...ukplAdditions];
+const strengthKey = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+/** Absolute thumbnail + product URL for a line, matching scripts/build-email-thumbs.py output. Empty when no render exists. */
+export function lineMedia(slug: string, strength: string): { image?: string; url?: string } {
+  const stem = `${slug}__${strengthKey(strength)}`;
+  if (!hasEmailThumb(stem)) return {};
+  const c = compounds.find((x) => x.slug === slug);
+  const page = !c || c.strengths[0]?.label === strength ? slug : `${slug}-${strengthKey(strength)}`;
+  return { image: `${SITE_URL}/email-thumbs/${stem}.jpg`, url: `${SITE_URL}/product/${page}` };
+}
 
 type Item = { slug: string; name: string; strength: string; quantity: number; linePence: number };
 export type OrderRow = {
@@ -25,6 +44,7 @@ export function summarise(order: OrderRow) {
     strength: i.strength,
     quantity: i.quantity,
     lineTotal: i.linePence / 100,
+    ...(i.slug ? lineMedia(i.slug, i.strength) : {}),
   }));
   const total = order.total_pence / 100;
   try {
