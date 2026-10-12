@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead, Fact } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 import { claimFilled } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
@@ -8,8 +9,9 @@ export const Route = createFileRoute("/terms")({
   head: () =>
     pageHead(
       "/terms",
-      "Terms and Conditions of Sale | Vyrax Labs",
-      "Terms and conditions for ordering research compounds from Vyrax Labs.",
+      titles.info("Terms & Conditions"),
+      "Terms and conditions for ordering research peptides and laboratory supplies from Vyrax Labs in the UK. Research use only.",
+      { crumb: "Terms" },
     ),
   component: Terms,
 });
@@ -18,9 +20,7 @@ function Terms() {
   return (
     <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-10-06">
       <h2>1. About us</h2>
-      <p>
-        This website is operated under the trading name {site.name}.
-      </p>
+      <p>This website is operated under the trading name {site.name}.</p>
       <h2>2. Research use only</h2>
       <p>
         All products are for laboratory, analytical and educational research. They are not
@@ -45,8 +45,9 @@ function Terms() {
       <h2>5. Delivery</h2>
       <p>
         Delivery is UK only by {site.carrier}, £{site.standardDeliveryFee.toFixed(2)} or free from £
-        {site.freeDeliveryThreshold}. {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} We do not promise a delivery date. See the{" "}
-        <Link to="/shipping">delivery page</Link>.
+        {site.freeDeliveryThreshold}.{" "}
+        {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} We do not
+        promise a delivery date. See the <Link to="/shipping">delivery page</Link>.
       </p>
       <h2>6. Cancellation and returns</h2>
       <p>

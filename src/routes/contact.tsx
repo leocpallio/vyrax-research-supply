@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Mail, Clock, FileCheck2, MessageCircle, Phone } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,9 @@ export const Route = createFileRoute("/contact")({
   head: () =>
     pageHead(
       "/contact",
-      "Contact Vyrax Labs | UK Research Peptide Support",
-      "Contact Vyrax Labs by email about orders, delivery, returns or documentation.",
+      titles.info("Contact Us"),
+      "Contact Vyrax Labs by email or phone about research peptide orders, UK delivery, returns and batch documentation. Research use only.",
+      { crumb: "Contact" },
     ),
   component: Contact,
 });
@@ -180,7 +182,10 @@ function Contact() {
               </a>
             )}
             {site.phone && (
-              <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="flex gap-4 border border-border rounded-2xl p-5 hover:border-primary">
+              <a
+                href={`tel:${site.phone.replace(/\s/g, "")}`}
+                className="flex gap-4 border border-border rounded-2xl p-5 hover:border-primary"
+              >
                 <Phone className="text-primary shrink-0" />
                 <div>
                   <p className="font-semibold">Customer support phone</p>

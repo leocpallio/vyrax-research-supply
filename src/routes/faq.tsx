@@ -1,27 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
-import { faqGroups, allFaqs, faqJsonLd } from "@/data/faq";
-import { abs, site } from "@/data/site";
+import { faqGroups, allFaqs } from "@/data/faq";
+import { site } from "@/data/site";
+import { breadcrumbListJsonLd, buildHead, faqPageJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
-  head: () => {
-    const title = "Research Peptide FAQs UK | Ordering, Testing, Delivery | Vyrax Labs";
-    const desc =
-      "Answers about ordering research peptides in the UK: certificates, storage, delivery, payment and returns.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: abs("/faq") },
-        { name: "twitter:card", content: "summary_large_image" },
+  head: () =>
+    buildHead({
+      title: "Research Peptide FAQs UK | Ordering, Testing, Delivery | Vyrax Labs",
+      description:
+        "Answers about ordering research peptides in the UK: certificates of analysis, storage, delivery, payment and returns. Research use only.",
+      path: "/faq",
+      jsonLd: [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "FAQ", path: "/faq" },
+        ]),
+        faqPageJsonLd(allFaqs),
       ],
-      links: [{ rel: "canonical", href: abs("/faq") }],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(faqJsonLd(allFaqs)) }],
-    };
-  },
+    }),
   component: FaqPage,
 });
 

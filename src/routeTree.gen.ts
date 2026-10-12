@@ -20,6 +20,8 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LabReportsRouteImport } from './routes/lab-reports'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as PricingDotmdRouteImport } from './routes/pricing[.]md'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResearchUsePolicyRouteImport } from './routes/research-use-policy'
 import { Route as ReturnsRouteImport } from './routes/returns'
@@ -95,6 +97,16 @@ const FaqRoute = FaqRouteImport.update({
 const LabReportsRoute = LabReportsRouteImport.update({
   id: '/lab-reports',
   path: '/lab-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingDotmdRoute = PricingDotmdRouteImport.update({
+  id: '/pricing.md',
+  path: '/pricing.md',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -215,6 +227,8 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
@@ -249,6 +263,8 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
@@ -284,6 +300,8 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
@@ -320,6 +338,8 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms.txt'
+    | '/pricing.md'
     | '/privacy'
     | '/research-use-policy'
     | '/returns'
@@ -354,6 +374,8 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms.txt'
+    | '/pricing.md'
     | '/privacy'
     | '/research-use-policy'
     | '/returns'
@@ -388,6 +410,8 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms.txt'
+    | '/pricing.md'
     | '/privacy'
     | '/research-use-policy'
     | '/returns'
@@ -423,6 +447,8 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   LabReportsRoute: typeof LabReportsRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  PricingDotmdRoute: typeof PricingDotmdRoute
   PrivacyRoute: typeof PrivacyRoute
   ResearchUsePolicyRoute: typeof ResearchUsePolicyRoute
   ReturnsRoute: typeof ReturnsRoute
@@ -523,6 +549,20 @@ declare module '@tanstack/react-router' {
       path: '/lab-reports'
       fullPath: '/lab-reports'
       preLoaderRoute: typeof LabReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing.md': {
+      id: '/pricing.md'
+      path: '/pricing.md'
+      fullPath: '/pricing.md'
+      preLoaderRoute: typeof PricingDotmdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -687,6 +727,8 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   LabReportsRoute: LabReportsRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  PricingDotmdRoute: PricingDotmdRoute,
   PrivacyRoute: PrivacyRoute,
   ResearchUsePolicyRoute: ResearchUsePolicyRoute,
   ReturnsRoute: ReturnsRoute,

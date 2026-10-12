@@ -30,6 +30,7 @@ function PaymentReturn() {
   const [state, setState] = useState<State>({ kind: "checking" });
   const [attempt, setAttempt] = useState(0);
   const orderId = useRef("");
+  const confirmed = useRef(false);
 
   const check = useCallback(async (): Promise<boolean> => {
     const order = orderId.current;
@@ -44,11 +45,26 @@ function PaymentReturn() {
         { cache: "no-store", referrerPolicy: "no-referrer" },
       );
       if (!res.ok) throw new Error("Status unavailable");
-      const r = (await res.json()) as { status: string; test_mode: boolean };
+      const r = (await res.json()) as {
+        status: string;
+        test_mode: boolean;
+        total_pence?: number;
+        currency?: string;
+      };
       const view = classifyStatus(r.status);
       const done = view !== "processing";
       setState({ kind: "result", order, view, test: r.test_mode === true, polling: !done });
-      if (view === "paid") capture("payment_confirmed", { test_mode: r.test_mode === true });
+      if (view === "paid" && !confirmed.current) {
+        confirmed.current = true; // one purchase event per order, even if the poll repeats
+        const pence = typeof r.total_pence === "number" ? r.total_pence : null;
+        capture("payment_confirmed", {
+          test_mode: r.test_mode === true,
+          order_id: order,
+          ...(pence !== null ? { value: pence / 100, revenue: pence / 100 } : {}),
+          currency: (r.currency ?? "GBP").toUpperCase(),
+          payment_type: "hosted_payment",
+        });
+      }
       return done;
     } catch {
       setState({ kind: "error", order });

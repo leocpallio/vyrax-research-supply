@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { AnalyticsConsentSettings } from "@/components/AnalyticsConsent";
 
 export const Route = createFileRoute("/cookies")({
   head: () =>
     pageHead(
       "/cookies",
-      "Cookie Policy | Vyrax Labs",
-      "How Vyrax Labs uses cookies and browser storage.",
+      titles.info("Cookie Policy"),
+      "How Vyrax Labs uses cookies and browser storage, and how to allow or decline optional, consent-gated analytics.",
+      { crumb: "Cookies" },
     ),
   component: Cookies,
 });

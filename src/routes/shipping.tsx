@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
@@ -8,8 +9,9 @@ export const Route = createFileRoute("/shipping")({
   head: () =>
     pageHead(
       "/shipping",
-      `UK Delivery Information | Vyrax Labs`,
+      titles.info("UK Delivery & Dispatch"),
       `UK delivery by ${site.carrier}. Paid orders confirmed before ${dispatchCutoffLabel()} on working days dispatch the same day, subject to stock.`,
+      { crumb: "Delivery" },
     ),
   component: Shipping,
 });
@@ -66,8 +68,8 @@ function Shipping() {
       </p>
       <h2>Cold-chain packing and storage</h2>
       <p>
-        {claimText("delivery.cold-chain-packing")}. {site.carrier} is a tracked postal service,
-        not a monitored temperature-controlled courier. We cannot guarantee a specific temperature
+        {claimText("delivery.cold-chain-packing")}. {site.carrier} is a tracked postal service, not
+        a monitored temperature-controlled courier. We cannot guarantee a specific temperature
         throughout transit. Check the label and product page for storage instructions on arrival.
       </p>
       <h2>Lost or damaged parcels</h2>

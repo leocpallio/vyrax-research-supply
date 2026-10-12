@@ -2,26 +2,28 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Calculator, ArrowRight } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { guides } from "@/data/guides";
-import { abs } from "@/data/site";
+import { breadcrumbListJsonLd, buildHead, collectionPageJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/guides/")({
-  head: () => {
-    const title = "Peptide Research Guides UK | Reconstitution & CoAs | Vyrax Labs";
-    const desc =
-      "Laboratory guides for research peptides: how to reconstitute lyophilised peptides, storage temperatures, reading a certificate of analysis and compound comparisons.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: desc },
-        { property: "og:title", content: title },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "website" },
-        { property: "og:url", content: abs("/guides") },
-        { name: "twitter:card", content: "summary_large_image" },
+  head: () =>
+    buildHead({
+      title: "Peptide Research Guides UK | Reconstitution & CoAs | Vyrax Labs",
+      description:
+        "Laboratory guides for research peptides: how to reconstitute lyophilised peptides, storage temperatures, reading a certificate of analysis and compound comparisons. Research use only.",
+      path: "/guides",
+      jsonLd: [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Guides", path: "/guides" },
+        ]),
+        collectionPageJsonLd({
+          name: "Research guides",
+          description: "Laboratory guides for research peptides from Vyrax Labs.",
+          path: "/guides",
+          items: guides.map((g) => ({ name: g.title, path: `/guides/${g.slug}` })),
+        }),
       ],
-      links: [{ rel: "canonical", href: abs("/guides") }],
-    };
-  },
+    }),
   component: Guides,
 });
 

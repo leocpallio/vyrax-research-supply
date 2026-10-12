@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 
 export const Route = createFileRoute("/returns")({
   head: () =>
     pageHead(
       "/returns",
-      "Returns and Problem Reporting | Vyrax Labs",
+      titles.info("Returns & Replacements"),
       `How returns, cancellations and damaged goods would be handled after an order, including a ${site.returnWindowDays}-day change-of-mind window for eligible items. A saved basket is not an order.`,
+      { crumb: "Returns" },
     ),
   component: Returns,
 });

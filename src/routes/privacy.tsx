@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead, Fact } from "@/components/InfoPage";
+import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 
 export const Route = createFileRoute("/privacy")({
   head: () =>
     pageHead(
       "/privacy",
-      "Privacy Policy | Vyrax Labs",
+      titles.info("Privacy Policy"),
       "How Vyrax Labs collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018.",
+      { crumb: "Privacy" },
     ),
   component: Privacy,
 });

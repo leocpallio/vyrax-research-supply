@@ -1,26 +1,37 @@
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
-import { abs } from "@/data/site";
+import { breadcrumbListJsonLd, buildHead, type HeadInput, type OgType } from "@/lib/seo";
 
-/** Standard head() for simple content pages: title, description, canonical, OG. */
+/** Standard head() for simple content pages: full meta set via buildHead plus a BreadcrumbList.
+ *  opts.crumb names the current page in the breadcrumb (Home > crumb); opts.jsonLd adds more schema. */
 export function pageHead(
   path: string,
   title: string,
   description: string,
-  opts: { noindex?: boolean } = {},
+  opts: {
+    noindex?: boolean;
+    crumb?: string;
+    type?: OgType;
+    jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  } = {},
 ) {
-  return {
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: abs(path) },
-      { name: "twitter:card", content: "summary_large_image" },
-      ...(opts.noindex ? [{ name: "robots", content: "noindex" }] : []),
-    ],
-    links: [{ rel: "canonical", href: abs(path) }],
+  const extra = opts.jsonLd ? (Array.isArray(opts.jsonLd) ? opts.jsonLd : [opts.jsonLd]) : [];
+  const crumbs = opts.crumb
+    ? [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: opts.crumb, path },
+        ]),
+      ]
+    : [];
+  const input: HeadInput = {
+    title,
+    description,
+    path,
+    jsonLd: [...crumbs, ...extra],
   };
+  if (opts.noindex) input.noindex = true;
+  if (opts.type) input.type = opts.type;
+  return buildHead(input);
 }
 
 export function InfoPage({

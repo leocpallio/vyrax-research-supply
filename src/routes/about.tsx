@@ -12,7 +12,8 @@ export const Route = createFileRoute("/about")({
     pageHead(
       "/about",
       "About Vyrax Labs | UK Research Peptide Supplier",
-      "Who Vyrax Labs is, how we supply research peptides from the UK, and where to find our certificates and company details.",
+      "Who Vyrax Labs is, how we supply research peptides from the UK with same-day dispatch, and where to find published lab reports. Research use only.",
+      { crumb: "About" },
     ),
   component: About,
 });
@@ -106,9 +107,7 @@ function About() {
         </div>
         <div className="mt-12 border border-border rounded-2xl p-6 space-y-3 text-sm text-muted-foreground">
           <h2 className="font-heading font-semibold text-foreground text-lg">Trading details</h2>
-          <p>
-            Trading name: {site.name}.
-          </p>
+          <p>Trading name: {site.name}.</p>
           <p>
             Email:{" "}
             <a href={`mailto:${site.email}`} className="text-primary underline">
