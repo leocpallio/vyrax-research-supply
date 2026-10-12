@@ -1,27 +1,13 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
+import { ExternalLink } from "lucide-react";
+import { StoreShell } from "@/components/Store";
 import {
-  FileCheck2,
-  Truck,
-  CheckCircle2,
-  FlaskConical,
-  Snowflake,
-  ShieldCheck,
-  RotateCcw,
-  ExternalLink,
-  Minus,
-  Plus,
-  Calculator,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  StoreShell,
-  Disclaimer,
-  FAQ,
-  ProductGrid,
-  SectionTitle,
-  Breadcrumbs,
-} from "@/components/Store";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   resolveProductSlug,
   productImage,
@@ -30,10 +16,8 @@ import {
   addCart,
   cartLine,
   costPerUnitLabel,
-  isB2G1,
   stockOf,
-  trustModifier,
-  getCategory,
+  stockLabel,
   getCompound,
   compoundsIn,
   chem,
@@ -41,13 +25,26 @@ import {
   type Compound,
   type Strength,
 } from "@/lib/catalog";
-import { latestCoa } from "@/data/coa";
-import { claimFilled, claimGate, claimText } from "@/lib/claims";
-import { site, abs, spendTierLine } from "@/data/site";
-import { faqJsonLd, type QA } from "@/data/faq";
-
+import { claimFilled, claimText } from "@/lib/claims";
+import { dispatchCutoffLabel } from "@/lib/delivery";
+import { abs } from "@/data/site";
+import { guides } from "@/data/guides";
+import { purityStat } from "@/lib/pdp-coa";
+import { packOptions } from "@/lib/pdp-packs";
+import {
+  listingFor,
+  productDescription,
+  productFaqs,
+  productJsonLd,
+  productTitle,
+} from "@/lib/pdp-schema";
 import { ProductGallery } from "@/components/ProductGallery";
-import { sectionFor } from "@/data/shop-sections";
+import { PurityStatBlock } from "@/components/pdp/PurityStat";
+import { PackPicker } from "@/components/pdp/PackPicker";
+import { PairsWith, ResearchStatement, TrustBlock } from "@/components/pdp/BuyBoxBits";
+import { TestingReportCard } from "@/components/pdp/TestingReportCard";
+import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -68,78 +65,9 @@ export const Route = createFileRoute("/product/$slug")({
     const s = c?.strengths.find((x) => x.label === loaderData.strengthLabel);
     if (!c || !s) return {};
     const url = abs(`/product/${loaderData.slug}`);
-    const cat = getCategory(c.category);
     const imgUrl = abs(productImage(c.slug, s.label).src);
-    const kw = c.kind === "supply" ? c.name : `${c.name} ${s.label}`;
-    const title = `${kw} UK | ${trustModifier(c.slug, s.label)} | Vyrax Labs`;
-    const coa = latestCoa(c.slug, s.label);
-    const batchCerts = coa ? "Batch certificate available" : null;
-    const orderingNote = site.paymentMethods.length
-      ? "For laboratory research use only."
-      : "Checkout opens in 3-4 days; no payment is taken online yet.";
-    const desc =
-      c.kind === "supply"
-        ? `${c.name} ${s.label} for laboratory reconstitution. ${gbp(s.price)}. ${orderingNote}`
-        : `Browse ${c.name} ${s.label} for laboratory research: ${gbp(s.price)} (${costPerUnitLabel(s)}).${batchCerts ? ` ${batchCerts}.` : ""} ${orderingNote}`;
-    const ch = chem[c.slug] ?? {};
-
-    const section = sectionFor(c);
-    const listingPath = section ? `/collections/${section.slug}` : `/category/${c.category}`;
-    const productLd = {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: `${c.name} ${s.label}`,
-      description: c.summary,
-      sku: `VYX-${c.slug.toUpperCase()}-${s.label.toUpperCase().replace(/[^A-Z0-9]/g, "")}`,
-      ...(ch.cas ? { mpn: ch.cas } : {}),
-      // QR and storage-side artwork carries unverified batch identifiers. Publish only
-      // the cleaned front render until those views are regenerated from actual batches.
-      image: [imgUrl],
-      brand: { "@type": "Brand", name: site.name },
-      category: cat?.name,
-      url,
-      additionalProperty: [
-        { "@type": "PropertyValue", name: "Quantity", value: s.label },
-        ...(ch.cas ? [{ "@type": "PropertyValue", name: "CAS Number", value: ch.cas }] : []),
-        ...(ch.formula
-          ? [{ "@type": "PropertyValue", name: "Molecular Formula", value: ch.formula }]
-          : []),
-        ...(coa && /\bHPLC\b/i.test(coa.method)
-          ? [{ "@type": "PropertyValue", name: "Purity (HPLC)", value: `${coa.purity}%` }]
-          : []),
-      ],
-      ...(site.paymentMethods.length
-        ? {
-            offers: {
-              "@type": "Offer",
-              url,
-              priceCurrency: "GBP",
-              price: s.price.toFixed(2),
-              itemCondition: "https://schema.org/NewCondition",
-              seller: { "@type": "Organization", name: site.name },
-            },
-          }
-        : {}),
-    };
-    const crumbs = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: abs("/") },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: section?.name ?? cat?.name ?? "Shop",
-          item: abs(listingPath),
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: loaderData.isHub ? c.name : `${c.name} ${s.label}`,
-          item: url,
-        },
-      ],
-    };
+    const title = productTitle(c, s);
+    const desc = productDescription(c, s);
     return {
       meta: [
         { title },
@@ -154,595 +82,367 @@ export const Route = createFileRoute("/product/$slug")({
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(productLd) },
-        { type: "application/ld+json", children: JSON.stringify(crumbs) },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(productFaqs(c, s))) },
-      ],
+      scripts: productJsonLd(c, s, loaderData.slug).map((ld) => ({
+        type: "application/ld+json",
+        children: JSON.stringify(ld),
+      })),
     };
   },
   component: ProductPage,
 });
 
-// ---------------------------------------------------------------- Per-product FAQ (also emitted as FAQPage JSON-LD)
-function productFaqs(c: Compound, s: Strength): QA[] {
-  const coa = latestCoa(c.slug, s.label);
+const STOCK_TONE: Record<ReturnType<typeof stockOf>, string> = {
+  in: "bg-verify/15 text-foreground",
+  available: "bg-tint text-foreground",
+  low: "bg-[var(--warm,#AC4821)] text-white",
+  out: "bg-muted text-muted-foreground",
+  preorder: "bg-tint text-foreground",
+};
 
-  const list: QA[] = [
-    [
-      `Is ${c.name} for human use?`,
-      `No. ${c.name} is sold strictly for laboratory research use only. It is not a medicine, food supplement or cosmetic and must not be used in humans or animals.`,
-    ],
-    [
-      `How is ${c.name} tested?`,
-      coa
-        ? `The published report for batch ${coa.batch} names ${coa.lab}, ${coa.method}, and a result of ${coa.purity}%. Read the certificate linked on this page.`
-        : claimGate("testing.each-batch-tested-pdp"),
-    ],
-    [
-      `How should ${c.name} be stored?`,
-      c.kind === "supply"
-        ? "Store sealed at room temperature away from direct light. Once the stopper has been punctured, keep refrigerated at 2 to 8°C and follow your laboratory procedures for multi-use vials."
-        : "Lyophilised material should be stored sealed, dry and protected from light, ideally at -20°C for long-term storage. After reconstitution, laboratories typically store solutions at 2 to 8°C and avoid repeated freeze-thaw cycles.",
-    ],
-    [
-      `How quickly will my ${c.name} order arrive?`,
-      site.paymentMethods.length
-        ? `See our shipping policy for dispatch times, carrier and delivery charges.`
-        : "The site opens in 3-4 days. No order or delivery is scheduled from this site yet. See our shipping policy for indicative delivery information.",
-    ],
-  ];
-  if (c.strengths.length > 1)
-    list.push([
-      `Which ${c.name} strengths are listed?`,
-      `${c.name} is listed in ${c.strengths.map((x) => `${x.label} (${gbp(x.price)})`).join(", ")}. Prices are indicative and availability must be confirmed before any order.`,
-    ]);
-  if (c.kind !== "supply")
-    list.push([
-      `Do I need bacteriostatic water for ${c.name}?`,
-      "The listed form is lyophilised powder. Laboratories may use a suitable diluent according to their own protocols. Bacteriostatic water is listed separately, subject to availability. Our calculator works out a resulting concentration from your inputs.",
-    ]);
-  return list;
-}
-
-// ---------------------------------------------------------------- Page
 function ProductPage() {
   const data = Route.useLoaderData();
   const c = getCompound(data.compoundSlug) as Compound;
   const s = c.strengths.find((x) => x.label === data.strengthLabel) as Strength;
-  const [qty, setQty] = useState(1);
-  const cat = getCategory(c.category);
-  const section = sectionFor(c);
+  const [pack, setPack] = useState(1);
+  const [added, setAdded] = useState(false);
+
+  const listing = listingFor(c);
   const img = productImage(c.slug, s.label);
-  const gallery = [img]; // Side views are withheld until their batch/QR artwork is verifiable.
-  const coa = latestCoa(c.slug, s.label);
+  const stat = purityStat(c.slug, s.label);
+  const coa = stat.kind === "report" ? stat.coa : undefined;
   const ch = chem[c.slug] ?? {};
   const cites = citations[c.slug] ?? [];
-  const b2g1 = isB2G1(c.slug, s.label);
   const stock = stockOf(s);
-  const compare = c.compare ? getCompound(c.compare.slug) : undefined;
+  const orderable = stock !== "out" && stock !== "preorder";
+  const packs = packOptions(c, s);
+  const chosen = packs.find((p) => p.count === pack) ?? packs[0]!;
+  const heading = `${c.name} ${s.label}`;
+  const form = c.form ?? (c.kind === "supply" ? "Solution" : "Lyophilised powder");
+  const composition = s.composition ?? c.composition;
+  const faqs = productFaqs(c, s);
   const related = compoundsIn(c.category)
     .filter((x) => x.slug !== c.slug)
     .slice(0, 4);
-  const bac = getCompound("bacteriostatic-water");
-  const bacStrength = bac?.strengths[0];
-  const heading = c.kind === "supply" ? c.name : `${c.name} ${s.label}`;
-  const faqs = productFaqs(c, s);
-  const composition = s.composition ?? c.composition;
+  const bac = c.kind !== "supply" ? getCompound("bacteriostatic-water") : undefined;
+  const relatedGuides = guides.filter((g) => g.compounds.includes(c.slug)).slice(0, 2);
+  const dispatchLine = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
+  const coldChain = claimText("delivery.cold-chain-packing");
+
+  // addCart -> writeCart -> trackBasketChange fires capture("basket_added") once per changed SKU
+  // with the canonical property set. Calling capture() here too would double-count every add.
+  const add = () => {
+    addCart(cartLine(c, s, chosen.count));
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1800);
+  };
 
   const specs: [string, string][] = [
-    ["Product", c.name],
+    ["Product name", c.name],
     ...(c.aliases.length
-      ? ([["Also known as", c.aliases.slice(0, 3).join(", ")]] as [string, string][])
+      ? ([["Synonyms", c.aliases.slice(0, 4).join(", ")]] as [string, string][])
       : []),
-    [c.kind === "supply" ? "Volume" : "Quantity per vial", s.label],
-    ...(composition ? ([["Composition", composition.join(" + ")]] as [string, string][]) : []),
-    ...(ch.cas ? ([["CAS number", ch.cas]] as [string, string][]) : []),
+    ...(ch.sequence ? ([["Sequence", ch.sequence]] as [string, string][]) : []),
     ...(ch.formula ? ([["Molecular formula", ch.formula]] as [string, string][]) : []),
     ...(ch.mw ? ([["Molecular weight", `${ch.mw} g/mol`]] as [string, string][]) : []),
-    ...(ch.sequence ? ([["Sequence", ch.sequence]] as [string, string][]) : []),
-    ["Form", c.form ?? (c.kind === "supply" ? "Solution" : "Lyophilised powder")],
-    ["Appearance", c.appearance ?? "White lyophilised powder"],
-    [
-      "Purity",
-      coa
-        ? `${coa.purity}% (${coa.method})`
-        : c.kind === "supply"
-          ? "Sterile water with 0.9% benzyl alcohol"
-          : "Not shown until the batch certificate is published",
-    ],
+    ...(ch.cas ? ([["CAS number", ch.cas]] as [string, string][]) : []),
+    [c.kind === "supply" ? "Volume" : "Quantity per vial", s.label],
+    ...(composition ? ([["Composition", composition.join(" + ")]] as [string, string][]) : []),
+    ...(stat.kind === "report"
+      ? ([["Purity", `${stat.purityLabel} (${stat.coa.method})`]] as [string, string][])
+      : []),
+    ["Form", form],
+    ...(c.appearance ? ([["Appearance", c.appearance]] as [string, string][]) : []),
     [
       "Storage",
       c.kind === "supply"
         ? "Room temperature, sealed. 2 to 8°C once opened"
         : "-20°C long term, dry and protected from light",
     ],
-    ["Classification", "For laboratory research use only"],
   ];
 
   return (
     <StoreShell>
       <div className="container-main py-6 md:py-10">
-        <Breadcrumbs
-          items={[
-            { name: "Home", to: "/" },
-            {
-              name: section?.name ?? cat?.name ?? "Shop",
-              to: section ? `/collections/${section.slug}` : `/category/${c.category}`,
-            },
-            { name: heading },
-          ]}
-        />
-        <div className="grid min-w-0 lg:grid-cols-2 gap-8 lg:gap-14">
-          <div className="min-w-0">
-            {gallery.length > 1 ? (
-              <ProductGallery
-                images={gallery}
-                name={`${c.name} ${s.label}`}
-                badges={
-                  (b2g1 || coa) && (
-                    <>
-                      {b2g1 && <span className="badge-promo">Buy 2 get 1 free</span>}
-                      {coa && /\bHPLC\b/i.test(coa.method) && (
-                        <span className="badge-verify">{coa.purity}% HPLC</span>
-                      )}
-                    </>
-                  )
-                }
-              />
-            ) : (
-              <div className="relative bg-surface aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden">
-                <img
-                  src={img.src}
-                  srcSet={img.srcSet}
-                  sizes="(min-width: 1024px) 600px, 100vw"
-                  alt={`${c.name} ${s.label} research vial, Vyrax Labs`}
-                  width={1024}
-                  height={1024}
-                  className="w-full h-full object-contain sm:object-cover"
-                />
-                {!img.isRender && (
-                  <span className="absolute inset-x-10 top-[46%] text-center font-heading font-semibold text-ink text-xl leading-tight pointer-events-none">
-                    {c.name}
-                    <span className="block font-mono text-sm text-primary mt-1">{s.label}</span>
+        <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+          <ol className="flex flex-wrap items-center gap-1.5">
+            {[
+              { name: "Home", to: "/" },
+              { name: "Shop", to: "/shop" },
+              { name: listing.name, to: listing.path },
+              { name: heading },
+            ].map((it, i) => (
+              <li key={it.name} className="flex items-center gap-1.5">
+                {i > 0 && <span aria-hidden>/</span>}
+                {it.to ? (
+                  <Link to={it.to} className="hover:text-foreground transition-colors">
+                    {it.name}
+                  </Link>
+                ) : (
+                  <span className="text-foreground" aria-current="page">
+                    {it.name}
                   </span>
                 )}
-                <span className="absolute top-4 left-4 flex gap-2">
-                  {b2g1 && <span className="badge-promo">{claimText("offer.b2g1")}</span>}
-                  {coa &&
-                    /\bHPLC\b/i.test(coa.method) &&
-                    claimFilled("testing.purity-badge", { purity: String(coa.purity) }) != null && (
-                      <span className="badge-verify">
-                        {claimFilled("testing.purity-badge", { purity: String(coa.purity) })}
-                      </span>
-                    )}
-                </span>
-              </div>
-            )}
-            <div className="hidden sm:grid grid-cols-3 gap-3 mt-4 text-xs text-center">
-              {(
-                [
-                  [FileCheck2, claimGate("testing.hplc-ms-tested")],
-                  [Snowflake, "Storage guidance"],
-                  [ShieldCheck, "Research use only"],
-                ] as const
-              ).map(([Icon, t]) => (
-                <div
-                  key={t}
-                  className="border border-border rounded-xl p-3 flex flex-col items-center gap-1.5"
-                >
-                  <Icon size={18} className="text-primary" />
-                  {t}
-                </div>
-              ))}
-            </div>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div className="mt-6 grid min-w-0 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+          <div className="min-w-0 lg:sticky lg:top-24">
+            <ProductGallery image={img} name={heading} fallbackLabel={heading} />
           </div>
 
           <div className="min-w-0">
-            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight">
+            <Link
+              to={listing.categoryPath}
+              data-testid="pdp-category-link"
+              className="text-[11px] font-bold tracking-[0.08em] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {listing.categoryName.toUpperCase()}
+            </Link>
+            <h1
+              data-testid="product-title"
+              className="font-heading text-3xl sm:text-4xl font-semibold leading-tight mt-2"
+            >
               {heading}
             </h1>
             {c.aliases.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-sm text-muted-foreground mt-1">
                 Also known as {c.aliases.slice(0, 3).join(", ")}
               </p>
             )}
-            <p className="text-muted-foreground mt-4 leading-relaxed">{c.summary}</p>
 
-            <div className="flex items-end gap-3 mt-6">
-              <p className="font-heading text-4xl font-bold">{gbp(s.price)}</p>
+            <PurityStatBlock stat={stat} productName={heading} />
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <p
+                data-testid="product-price"
+                className="font-heading text-3xl font-semibold tabular-nums"
+              >
+                {gbp(s.price)}
+              </p>
               {c.kind !== "supply" && (
-                <p className="text-sm text-muted-foreground pb-1.5 font-mono">
-                  {costPerUnitLabel(s)}
-                </p>
+                <p className="text-sm text-muted-foreground tabular-nums">{costPerUnitLabel(s)}</p>
               )}
+              <span
+                data-testid="stock-badge"
+                data-stock={stock}
+                className={cn(
+                  "inline-block rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.08em]",
+                  STOCK_TONE[stock],
+                )}
+              >
+                {stockLabel[stock].toUpperCase()}
+              </span>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Indicative price per vial. Availability and final terms are not confirmed here.
-            </p>
+            {dispatchLine && (
+              <p
+                className="text-sm text-muted-foreground mt-2"
+                title="Dispatch timing is not a delivery guarantee."
+              >
+                {dispatchLine}
+                {coldChain ? ` ${coldChain}.` : ""}
+              </p>
+            )}
 
             {c.strengths.length > 1 && (
-              <div className="mt-6">
-                <p className="text-sm font-semibold mb-2.5">Strength</p>
-                <div className="flex flex-wrap gap-2">
-                  {c.strengths.map((x) => (
-                    <a
-                      key={x.label}
-                      href={productPath(c.slug, x.label)}
-                      className="chip"
-                      aria-current={x.label === s.label ? "page" : undefined}
-                    >
-                      {x.label}
-                      <span className="font-normal text-muted-foreground text-xs">
-                        {gbp(x.price)}
-                      </span>
-                    </a>
-                  ))}
+              <fieldset className="mt-6">
+                <legend className="text-xs font-bold tracking-[0.08em] mb-2.5">STRENGTH</legend>
+                <div
+                  role="radiogroup"
+                  aria-label="Strength"
+                  data-testid="product-strength-options"
+                  className="flex flex-wrap gap-2"
+                >
+                  {c.strengths.map((x) => {
+                    const current = x.label === s.label;
+                    return (
+                      <Link
+                        key={x.label}
+                        to={productPath(c.slug, x.label)}
+                        role="radio"
+                        aria-checked={current}
+                        data-testid="strength-option"
+                        className={cn("chip tabular-nums", current && "border-foreground bg-tint")}
+                      >
+                        {x.label}
+                        <span className="font-normal text-muted-foreground text-xs">
+                          {gbp(x.price)}
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </div>
+              </fieldset>
             )}
 
-            <div className="mt-6 space-y-2.5 text-sm">
-              <p className="flex items-center gap-2">
-                <CheckCircle2 size={17} className="text-primary shrink-0" />
-                <span className="font-semibold">
-                  {stock === "out"
-                    ? "Not currently listed"
-                    : "Availability to be confirmed"}
-                </span>
-              </p>
-              <p className="flex items-center gap-2">
-                <Truck size={17} className="text-primary" />
-                <span>
-                  No dispatch follows from saving a basket.{" "}
-                  <Link to="/shipping" className="underline">
-                    Shipping information
-                  </Link>
-                </span>
-              </p>
-              <p className="flex items-center gap-2">
-                <FileCheck2 size={17} className="text-primary" />
-                {coa ? (
-                  <span>
-                    <a
-                      href={coa.file}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline"
-                    >
-                      Certificate of analysis (PDF), batch {coa.batch}
-                    </a>
-                    {" · "}
-                    <Link to="/verify/$batch" params={{ batch: coa.batch }} className="underline">
-                      Verify batch
-                    </Link>
-                  </span>
-                ) : (
-                  <Link to="/lab-reports" className="underline">
-                    {claimText("testing.batch-certificates") ?? "Certificate publication status"}
-                  </Link>
-                )}
-              </p>
-            </div>
+            <PackPicker options={packs} value={pack} onChange={setPack} strengthLabel={s.label} />
 
-            {b2g1 && (
-              <div className="mt-6 rounded-xl border border-promo/60 bg-promo/10 p-4 text-sm">
-                <p className="font-semibold">Indicative buy 2, get the 3rd free</p>
-                <p className="text-muted-foreground mt-1">
-                  Add 3 eligible vials to see the saving in your basket estimate. This is not a
-                  confirmed offer or order.
-                </p>
-              </div>
-            )}
-
-            <p className="mt-6 rounded-xl bg-tint border border-border px-4 py-3 text-sm font-semibold">
-              For laboratory research use only. Not for human or animal use.
-            </p>
-            <div className="mt-4 flex gap-3">
-              <div className="flex items-center border border-border rounded-full">
-                <button
-                  type="button"
-                  aria-label="Decrease quantity"
-                  className="size-11 grid place-items-center"
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                >
-                  <Minus size={16} />
-                </button>
-                <span className="w-8 text-center font-mono" aria-live="polite">
-                  {qty}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Increase quantity"
-                  className="size-11 grid place-items-center"
-                  onClick={() => setQty((q) => Math.min(99, q + 1))}
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
-              <Button
-                className="flex-1 min-w-0 h-auto min-h-11 rounded-full whitespace-normal text-center text-sm sm:text-base"
-                disabled={stock === "out"}
-                onClick={() => addCart(cartLine(c, s, qty))}
-              >
-                {stock === "out" ? "Not listed" : `Save to basket · ${gbp(s.price * qty)}`}
-              </Button>
-            </div>
-            {stock === "out" && (
-              <p className="mt-4 rounded-xl border border-border p-4 text-sm text-muted-foreground">
-                This strength is not currently listed. You can compare other listed strengths,
-                but none are reserved and nothing is charged on this site.
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground mt-3">
-              Indicative multi-buy tiers: {spendTierLine()}. Reflected in your basket estimate.
+            <button
+              type="button"
+              data-testid="add-product-button"
+              disabled={!orderable}
+              onClick={add}
+              className="mt-6 w-full h-12 rounded-full bg-foreground text-background font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {!orderable
+                ? stockLabel[stock]
+                : added
+                  ? "Added to basket"
+                  : `Add to basket  ${gbp(chosen.total)}`}
+            </button>
+            <p className="sr-only" aria-live="polite">
+              {added ? `${heading} added to basket` : ""}
             </p>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 text-xs">
-              <Link
-                to="/returns"
-                className="flex gap-2 items-start border border-border rounded-xl p-3"
-              >
-                <RotateCcw size={16} className="text-primary shrink-0" />
-                <span>
-                  <strong className="block text-sm">Returns information</strong>Read the published
-                  policy
-                </span>
-              </Link>
-              <Link
-                to="/shipping"
-                className="flex gap-2 items-start border border-border rounded-xl p-3"
-              >
-                <Truck size={16} className="text-primary shrink-0" />
-                <span>
-                  <strong className="block text-sm">UK delivery</strong>Same-day dispatch before 2pm UK time on working days, subject to stock. Cold-chain packed; transit temperature is not guaranteed. Read shipping policy
-                </span>
-              </Link>
-            </div>
-
-            {c.kind !== "supply" && bac && bacStrength && (
-              <div className="mt-6 flex items-center gap-4 border border-border rounded-xl p-4">
-                <FlaskConical className="text-primary shrink-0" />
-                <div className="flex-1 text-sm">
-                  <p className="font-semibold">Compare a diluent?</p>
-                  <p className="text-muted-foreground">
-                    Bacteriostatic water {bacStrength.label}, {gbp(bacStrength.price)}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="rounded-full"
-                  onClick={() => addCart(cartLine(bac, bacStrength))}
-                >
-                  Save
-                </Button>
-              </div>
+            <TrustBlock coa={coa} form={form} />
+            {bac && (
+              <PairsWith product={bac} onAdd={() => addCart(cartLine(bac, bac.strengths[0]!, 1))} />
             )}
+            <ResearchStatement />
           </div>
         </div>
-      </div>
 
-      <Disclaimer />
+        <div className="max-w-3xl mt-14 lg:mt-20">
+          <Accordion
+            type="multiple"
+            defaultValue={["description"]}
+            className="border-t border-border"
+          >
+            <AccordionItem value="description">
+              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
+                Description
+              </AccordionTrigger>
+              <AccordionContent className="prose-area mt-0 text-base">
+                <p>{c.summary}</p>
+                <h2>What is {c.name}?</h2>
+                {c.overview.map((p) => (
+                  <p key={p.slice(0, 48)} className="mt-3">
+                    {p}
+                  </p>
+                ))}
+                {c.applications.length > 0 && (
+                  <>
+                    <h2>What does the research on {c.name} investigate?</h2>
+                    <ul className="list-disc ml-5 space-y-1.5 mt-2">
+                      {c.applications.map((a) => (
+                        <li key={a}>{a}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {c.compare && (
+                  <>
+                    <h2>{c.name} compared</h2>
+                    <p className="mt-2">{c.compare.text}</p>
+                    <Link
+                      to={productPath(c.compare.slug)}
+                      className="inline-block mt-2 underline underline-offset-4 text-foreground"
+                    >
+                      View {getCompound(c.compare.slug)?.name ?? c.compare.slug}
+                    </Link>
+                  </>
+                )}
+                {cites.length > 0 && (
+                  <>
+                    <h3 className="font-heading font-semibold text-foreground mt-8 mb-2">
+                      External resources for researchers
+                    </h3>
+                    <ol className="space-y-2.5 text-sm">
+                      {cites.map((ct) => (
+                        <li key={ct.pmid}>
+                          <a
+                            href={`https://pubmed.ncbi.nlm.nih.gov/${ct.pmid}/`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-medium text-foreground underline-offset-4 hover:underline"
+                          >
+                            {ct.title} <ExternalLink size={12} className="inline" />
+                          </a>
+                          <span className="block text-xs mt-0.5">
+                            {ct.author} et al. {ct.journal}, {ct.year}. PMID {ct.pmid}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                )}
+              </AccordionContent>
+            </AccordionItem>
 
-      <div className="container-main">
-        <div className="max-w-4xl mx-auto mt-16 space-y-16">
-          <section>
-            <SectionTitle eyebrow="RESEARCH OVERVIEW" title={`What is ${c.name}?`} />
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
-              {c.overview.map((p) => (
-                <p key={p.slice(0, 48)}>{p}</p>
-              ))}
-            </div>
-            {cites.length > 0 && (
-              <div className="mt-8">
-                <h3 className="font-heading font-semibold text-lg mb-3">Selected literature</h3>
-                <ol className="space-y-3 text-sm">
-                  {cites.map((ct) => (
-                    <li key={ct.pmid} className="border-l-2 border-primary/40 pl-4">
-                      <a
-                        href={`https://pubmed.ncbi.nlm.nih.gov/${ct.pmid}/`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-medium hover:text-primary"
-                      >
-                        {ct.title} <ExternalLink size={12} className="inline" />
-                      </a>
-                      <span className="block text-muted-foreground text-xs mt-0.5">
-                        {ct.author} et al. {ct.journal}, {ct.year}. PMID {ct.pmid}
-                      </span>
-                    </li>
+            <AccordionItem value="specifications">
+              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
+                Specifications
+              </AccordionTrigger>
+              <AccordionContent>
+                <table className="spec-table" data-testid="pdp-specifications">
+                  <tbody>
+                    {specs.map(([k, v]) => (
+                      <tr key={k}>
+                        <th scope="row">{k}</th>
+                        <td
+                          className={
+                            k === "Sequence" || k === "CAS number"
+                              ? "font-mono text-sm break-all"
+                              : undefined
+                          }
+                        >
+                          {v}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="testing-reports" id="testing-reports">
+              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
+                Testing reports
+              </AccordionTrigger>
+              <AccordionContent>
+                <TestingReportCard coa={coa} productName={heading} identity={c.name} />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="questions">
+              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
+                Common questions
+              </AccordionTrigger>
+              <AccordionContent>
+                <dl className="divide-y divide-border">
+                  {faqs.map(([q, a]) => (
+                    <div key={q} className="py-4">
+                      <dt className="font-semibold">{q}</dt>
+                      <dd className="mt-1.5 text-muted-foreground leading-relaxed">{a}</dd>
+                    </div>
                   ))}
-                </ol>
-              </div>
-            )}
-          </section>
-
-          {c.applications.length > 0 && (
-            <section>
-              <SectionTitle
-                title={`${c.name} research applications`}
-                body="Areas explored in published in-vitro and animal-model research. No clinical claims are made."
-              />
-              <ul className="grid sm:grid-cols-2 gap-3">
-                {c.applications.map((a) => (
-                  <li key={a} className="flex gap-3 border border-border rounded-xl p-4 text-sm">
-                    <FlaskConical size={17} className="text-primary shrink-0 mt-0.5" />
-                    {a}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {compare && c.compare && (
-            <section>
-              <SectionTitle title={`${c.name} vs ${compare.name}`} />
-              <p className="text-muted-foreground leading-relaxed">{c.compare.text}</p>
-              <a
-                href={productPath(compare.slug)}
-                className="inline-block mt-4 text-primary font-semibold underline"
-              >
-                View {compare.name}
-              </a>
-            </section>
-          )}
-
-          <section>
-            <SectionTitle title="Specifications" />
-            <table className="spec-table">
-              <tbody>
-                {specs.map(([k, v]) => (
-                  <tr key={k}>
-                    <th scope="row">{k}</th>
-                    <td>{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-
-          <section>
-            <SectionTitle title="Purity and testing" />
-            {coa ? (
-              <>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  The report below names its batch, testing laboratory, method, result and test
-                  date. Check the batch number on the certificate against the vial before relying on
-                  it.
-                </p>
-                <div className="border border-verify/40 bg-verify/5 rounded-2xl p-6 grid sm:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground text-xs">Batch</p>
-                    <p className="font-mono font-semibold">{coa.batch}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Purity</p>
-                    <p className="font-mono font-semibold">{coa.purity}%</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Laboratory</p>
-                    <p className="font-semibold">{coa.lab}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs">Tested</p>
-                    <p className="font-semibold">
-                      {new Date(coa.tested).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                  <a
-                    href={coa.file || `/verify/${coa.batch}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="sm:col-span-4 text-primary font-semibold underline"
-                  >
-                    Download the full certificate (PDF)
-                  </a>
-                </div>
-              </>
-            ) : (
-              <div className="border border-border rounded-2xl p-6 text-sm leading-relaxed text-muted-foreground">
-                <p>{claimGate("testing.every-batch-sent-pdp")}</p>
-                <p className="mt-3">
-                  No certificate is published for this product yet. Certificates appear on our{" "}
-                  <Link to="/lab-reports" className="text-primary underline">
-                    Lab Reports
-                  </Link>{" "}
-                  page when we hold a report. No publication date is promised. We do not display a
-                  purity figure until we hold the certificate behind it.
-                </p>
-              </div>
-            )}
-          </section>
-
-          {c.kind !== "supply" && (
-            <section>
-              <SectionTitle title="Laboratory handling" />
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
-                <div className="border border-border rounded-2xl p-6">
-                  <h3 className="font-heading font-semibold mb-3 flex items-center gap-2">
-                    <Calculator size={18} className="text-primary" /> Reconstitution
-                  </h3>
-                  <ol className="list-decimal ml-5 space-y-2 text-muted-foreground">
-                    <li>Allow the sealed vial to reach room temperature.</li>
-                    <li>Wipe the stopper with an alcohol swab.</li>
-                    <li>Add diluent slowly down the inside wall of the vial.</li>
-                    <li>Swirl gently until dissolved. Do not shake.</li>
-                    <li>Label with concentration and date, then refrigerate.</li>
-                  </ol>
-                  <Link
-                    to="/calculator"
-                    className="inline-block mt-4 text-primary font-semibold underline"
-                  >
-                    Open the reconstitution calculator
-                  </Link>
-                </div>
-                <div className="border border-border rounded-2xl p-6">
-                  <h3 className="font-heading font-semibold mb-3 flex items-center gap-2">
-                    <Snowflake size={18} className="text-primary" /> Storage
-                  </h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>
-                      <strong className="text-foreground">Lyophilised:</strong> -20°C for long-term
-                      storage, sealed and dry, away from light.
-                    </li>
-                    <li>
-                      <strong className="text-foreground">Short term:</strong> 2 to 8°C for weeks in
-                      the sealed vial.
-                    </li>
-                    <li>
-                      <strong className="text-foreground">Reconstituted:</strong> 2 to 8°C,
-                      protected from light. Avoid repeated freeze-thaw cycles.
-                    </li>
-                  </ul>
-                  <Link
-                    to="/guides/$slug"
-                    params={{ slug: "peptide-storage-guide" }}
-                    className="inline-block mt-4 text-primary font-semibold underline"
-                  >
-                    Read the full storage guide
-                  </Link>
-                </div>
-              </div>
-            </section>
-          )}
-
-          <section>
-            <SectionTitle title={`${c.name} FAQs`} />
-            <FAQ items={faqs} />
-          </section>
+                </dl>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
 
-        {related.length > 0 && (
-          <section className="mt-20">
-            <SectionTitle eyebrow={cat?.name.toUpperCase()} title="Related research compounds" />
-            <ProductGrid list={related} />
-          </section>
-        )}
+        <GuideCards guides={relatedGuides} />
+        <RelatedProducts list={related} eyebrow={listing.categoryName.toUpperCase()} />
       </div>
-      <div className="mt-20 lg:mt-0" />
-      {/* Mobile sticky basket bar: remains an estimate, never an order. */}
-      <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3 shadow-[0_-8px_24px_-16px_rgba(11,27,51,.35)]">
+
+      {/* Mobile sticky CTA */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-xs text-muted-foreground truncate">{heading}</p>
-          <p className="font-heading font-bold text-lg leading-tight">
-            {gbp(s.price * qty)}{" "}
-            <span className="font-mono text-xs font-normal text-muted-foreground">
-              {costPerUnitLabel(s)}
-            </span>
+          <p className="font-heading font-semibold text-lg leading-tight tabular-nums">
+            {gbp(chosen.total)}
           </p>
         </div>
-        <Button
-          className="h-11 rounded-full px-5"
-          disabled={stock === "out"}
-          onClick={() => addCart(cartLine(c, s, qty))}
+        <button
+          type="button"
+          disabled={!orderable}
+          onClick={add}
+          className="h-11 rounded-full bg-foreground text-background px-5 text-sm font-semibold disabled:opacity-40"
         >
-          {stock === "out" ? "Not listed" : `Save ${qty} to basket`}
-        </Button>
+          {!orderable ? stockLabel[stock] : "Add to basket"}
+        </button>
       </div>
       <div className="h-20 lg:hidden" aria-hidden="true" />
     </StoreShell>
