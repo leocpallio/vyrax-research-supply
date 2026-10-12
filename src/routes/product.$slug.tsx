@@ -303,7 +303,7 @@ function ProductPage() {
           </div>
         </div>
 
-        <div className="max-w-3xl mt-14 lg:mt-20">
+        <div className="mt-14 lg:mt-20 max-w-[920px]">
           <Accordion
             type="multiple"
             defaultValue={["description"]}

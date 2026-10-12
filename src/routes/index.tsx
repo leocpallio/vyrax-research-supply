@@ -9,6 +9,7 @@ import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
 import social from "@/assets/vyrax-social.webp";
+import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
 export const Route = createFileRoute("/")({
@@ -121,7 +122,7 @@ function Home() {
   return (
     <StoreShell>
       {/* Hero */}
-      <section className="container-main pt-14 pb-10 md:pt-24 md:pb-16">
+      <section className="container-main pt-14 pb-10 md:pt-24 md:pb-16 grid lg:grid-cols-[1fr_minmax(0,460px)] gap-10 items-center">
         <div className="max-w-[760px]">
           <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
             Research peptides · UK dispatch
@@ -156,6 +157,16 @@ function Home() {
               Browse lab reports
             </Link>
           </div>
+        </div>
+        <div className="hidden lg:block rounded-[24px] bg-[#EAE6DC] p-10" data-testid="hero-visual">
+          <img
+            src={heroImage}
+            alt="Vyrax Labs research peptide vial with batch label"
+            width={1000}
+            height={1000}
+            fetchPriority="high"
+            className="w-full h-auto aspect-square object-contain"
+          />
         </div>
       </section>
 
@@ -209,7 +220,7 @@ function Home() {
         <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
           Research ranges
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" data-testid="range-tiles">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" data-testid="range-tiles">
           {ranges.map((r) => (
             <Link
               key={r.slug}
@@ -239,63 +250,68 @@ function Home() {
         </div>
       </section>
 
-      {/* Lab report ticker band */}
-      <section className="bg-[#040825] text-[#F5F0E5] py-14 md:py-20" data-testid="lab-report-band">
-        <div className="container-main flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#F5F0E5]/60">
-              Lab reports
-            </p>
-            <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
-              {claimText("testing.home-certs-heading")}
-            </h2>
-          </div>
-          <Link
-            to="/lab-reports"
-            data-testid="view-all-lab-reports"
-            className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#F5F0E5]/30 font-semibold text-sm transition-colors duration-150 hover:bg-[#F5F0E5] hover:text-[#040825] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5F0E5] self-start"
-          >
-            View all lab reports <ArrowRight size={16} />
-          </Link>
-        </div>
-        {coas.length ? (
-          <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <ul className="container-main flex gap-3 w-max pr-10" data-testid="lab-report-ticker">
-              {coas.map((r) => {
-                const name = getCompound(r.compound)?.name ?? r.compound;
-                return (
-                  <li key={r.batch}>
-                    <a
-                      href={`/verify/${r.batch}`}
-                      data-testid="lab-report-chip"
-                      className="flex flex-col gap-1 w-[220px] rounded-2xl border border-[#F5F0E5]/15 bg-[#F5F0E5]/5 p-4 transition-colors duration-150 hover:bg-[#F5F0E5]/10"
-                    >
-                      <span className="text-sm font-semibold truncate">
-                        {name} {r.strength}
-                      </span>
-                      <span className="font-mono text-xs text-[#F5F0E5]/60">{r.batch}</span>
-                      <span className="mt-2 font-heading text-2xl font-semibold tabular-nums">
-                        {r.purity.toFixed(2)}%
-                      </span>
-                      <span className="text-[11px] text-[#F5F0E5]/60">
-                        {r.method} · {r.lab}
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ) : (
-          <div className="container-main">
-            <div className="rounded-2xl border border-dashed border-[#F5F0E5]/25 p-6 md:p-8 max-w-2xl">
-              <p className="text-sm md:text-base text-[#F5F0E5]/75 leading-relaxed">
-                {claimText("testing.home-certs-empty")}
+      {/* Lab report ticker band (only once real certificates exist) */}
+      {coas.length > 0 && (
+        <section
+          className="bg-[#040825] text-[#F5F0E5] py-14 md:py-20"
+          data-testid="lab-report-band"
+        >
+          <div className="container-main flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#F5F0E5]/60">
+                Lab reports
               </p>
+              <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+                {claimText("testing.home-certs-heading")}
+              </h2>
             </div>
+            <Link
+              to="/lab-reports"
+              data-testid="view-all-lab-reports"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#F5F0E5]/30 font-semibold text-sm transition-colors duration-150 hover:bg-[#F5F0E5] hover:text-[#040825] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F5F0E5] self-start"
+            >
+              View all lab reports <ArrowRight size={16} />
+            </Link>
           </div>
-        )}
-      </section>
+          {coas.length ? (
+            <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <ul className="container-main flex gap-3 w-max pr-10" data-testid="lab-report-ticker">
+                {coas.map((r) => {
+                  const name = getCompound(r.compound)?.name ?? r.compound;
+                  return (
+                    <li key={r.batch}>
+                      <a
+                        href={`/verify/${r.batch}`}
+                        data-testid="lab-report-chip"
+                        className="flex flex-col gap-1 w-[220px] rounded-2xl border border-[#F5F0E5]/15 bg-[#F5F0E5]/5 p-4 transition-colors duration-150 hover:bg-[#F5F0E5]/10"
+                      >
+                        <span className="text-sm font-semibold truncate">
+                          {name} {r.strength}
+                        </span>
+                        <span className="font-mono text-xs text-[#F5F0E5]/60">{r.batch}</span>
+                        <span className="mt-2 font-heading text-2xl font-semibold tabular-nums">
+                          {r.purity.toFixed(2)}%
+                        </span>
+                        <span className="text-[11px] text-[#F5F0E5]/60">
+                          {r.method} · {r.lab}
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            <div className="container-main">
+              <div className="rounded-2xl border border-dashed border-[#F5F0E5]/25 p-6 md:p-8 max-w-2xl">
+                <p className="text-sm md:text-base text-[#F5F0E5]/75 leading-relaxed">
+                  {claimText("testing.home-certs-empty")}
+                </p>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* RUO band */}
       <section className="container-main py-14 md:py-20" data-testid="ruo-band">

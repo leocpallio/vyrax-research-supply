@@ -173,12 +173,10 @@ export function ProductCard({
             : label}
         </p>
         <p className="mt-1.5 flex items-baseline gap-1.5">
+          {multi && <span className="text-xs text-[#040825]/60">From</span>}
           <span data-testid="product-price" className="font-semibold tabular-nums">
             {gbp(fromPrice(product))}
           </span>
-          {multi && (
-            <span className="text-[11px] uppercase tracking-wider text-[#040825]/60">From</span>
-          )}
         </p>
       </div>
     </article>
