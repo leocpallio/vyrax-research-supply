@@ -115,7 +115,14 @@ function Basket() {
                     <>Your basket qualifies for free UK delivery</>
                   )}
                 </p>
-                <div className="h-2 bg-surface rounded-full mt-3 overflow-hidden">
+                <div
+                  role="progressbar"
+                  aria-label="Progress to free delivery"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(shipPct)}
+                  className="h-2 bg-surface rounded-full mt-3 overflow-hidden"
+                >
                   <div
                     className="h-full bg-verify rounded-full transition-all"
                     style={{ width: `${shipPct}%` }}
@@ -205,27 +212,27 @@ function Basket() {
               </h2>
               <div className="flex justify-between mt-6">
                 <span>Subtotal</span>
-                <strong>{gbp(p.subtotal)}</strong>
+                <strong className="tabular-nums">{gbp(p.subtotal)}</strong>
               </div>
               {p.freeVials > 0 && (
                 <div className="flex justify-between mt-3 text-sm text-verify">
                   <span>Multi-buy discount (buy 2, get 1 free)</span>
-                  <span>-{gbp(p.freeVials)}</span>
+                  <span className="tabular-nums">-{gbp(p.freeVials)}</span>
                 </div>
               )}
               {p.tierDiscount > 0 && (
                 <div className="flex justify-between mt-3 text-sm text-verify">
                   <span>Spend saving ({Math.round(p.rate * 100)}%)</span>
-                  <span>-{gbp(p.tierDiscount)}</span>
+                  <span className="tabular-nums">-{gbp(p.tierDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between mt-3 text-sm">
                 <span>UK delivery</span>
-                <span>{p.delivery === 0 ? "Free" : gbp(p.delivery)}</span>
+                <span className="tabular-nums">{p.delivery === 0 ? "Free" : gbp(p.delivery)}</span>
               </div>
               <div className="flex justify-between mt-4 pt-4 border-t border-border font-semibold text-lg">
                 <span>Total</span>
-                <span>{gbp(p.total)}</span>
+                <span className="tabular-nums">{gbp(p.total)}</span>
               </div>
               <Button asChild className="w-full mt-6 rounded-full h-12 text-base">
                 <Link to="/checkout">
