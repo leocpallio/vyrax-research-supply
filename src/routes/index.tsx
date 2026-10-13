@@ -12,6 +12,8 @@ import social from "@/assets/vyrax-social.webp";
 import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
+const strengthCount = compounds.reduce((n, c) => n + c.strengths.length, 0);
+
 export const Route = createFileRoute("/")({
   head: () => {
     const modifier = isClaimAllowed("testing.page-title")
@@ -134,8 +136,8 @@ function Home() {
             Research peptides, documented by batch.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-[#040825]/70 leading-relaxed max-w-[600px]">
-            {compounds.length} research compounds with CAS numbers, literature references and per-mg
-            pricing.{" "}
+            {compounds.length} research compounds across {strengthCount} strengths, each with CAS
+            numbers, literature references and per-mg pricing.{" "}
             {site.checkoutOpen
               ? "Card checkout on a secure hosted payment page."
               : "The site is not live yet; no orders or payments are taken."}{" "}
