@@ -20,6 +20,7 @@ import { AnalyticsConsentBanner } from "@/components/AnalyticsConsent";
 import { AnnouncementBar } from "@/components/shell/AnnouncementBar";
 import { Header } from "@/components/shell/Header";
 import { Footer } from "@/components/shell/Footer";
+import { FooterSignup } from "@/components/shell/FooterSignup";
 import { SearchDialog } from "@/components/shell/SearchDialog";
 import { CartDrawer } from "@/components/shell/CartDrawer";
 import { RuoGate } from "@/components/shell/RuoGate";
@@ -86,7 +87,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-paper text-foreground flex flex-col">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:p-3 focus:bg-paper"
+        className="skip-link sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[200] focus:rounded-md focus:bg-paper focus:p-3 focus:font-semibold"
       >
         Skip to content
       </a>
@@ -95,6 +96,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <main id="main" className="flex-1">
         {children}
       </main>
+      <FooterSignup />
       <Footer />
       <SearchDialog open={search} onOpenChange={setSearch} />
       <CartDrawer open={cart} onOpenChange={setCart} />
