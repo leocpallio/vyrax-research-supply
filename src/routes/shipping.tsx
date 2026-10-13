@@ -25,29 +25,33 @@ function Shipping() {
           : "Card checkout is not open yet, so we cannot take orders. The delivery terms below are what will apply when it opens."}
       </p>
       <h2>Service and cost</h2>
-      <div className="overflow-x-auto border border-border rounded-2xl not-prose">
+      <div className="overflow-x-auto border border-border not-prose" data-testid="delivery-table">
         <table className="w-full text-sm">
           <thead className="bg-surface text-left">
             <tr>
-              <th scope="col" className="p-4">
-                Service
-              </th>
-              <th scope="col" className="p-4">
-                Cost
-              </th>
+              {["Service", "Price", "Estimated delivery", "Free over"].map((h) => (
+                <th key={h} scope="col" className="p-4">
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             <tr>
               <td className="p-4">{site.carrier}</td>
+              <td className="p-4 tabular-nums">£{site.standardDeliveryFee.toFixed(2)}</td>
               <td className="p-4">
-                £{site.standardDeliveryFee.toFixed(2)}, free when your order is £
-                {site.freeDeliveryThreshold} or more after discounts
+                Carrier estimate from dispatch. Tracked. Dispatch is not a delivery guarantee.
               </td>
+              <td className="p-4 tabular-nums">£{site.freeDeliveryThreshold} after discounts</td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p className="text-sm text-muted-foreground">
+        One UK service, {claimText("delivery.cold-chain-packing")?.toLowerCase()}. No express or
+        international option is offered.
+      </p>
       <h2>Dispatch and delivery</h2>
       <p>
         {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} Orders paid
