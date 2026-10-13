@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { coas, expiryFor, findBatch, monthLabel, testingPublished } from "@/data/coa";
 import { compounds, getCompound, productPath } from "@/lib/catalog";
-import { claimText } from "@/lib/claims";
+import { claimFilled, claimText } from "@/lib/claims";
+import { dispatchCutoffLabel } from "@/lib/delivery";
+import { site } from "@/data/site";
+import { SHELF_LIFE_MONTHS } from "@/data/coa";
 import { breadcrumbListJsonLd, buildHead, titles } from "@/lib/seo";
 
 export const Route = createFileRoute("/lab-reports")({
@@ -185,6 +188,120 @@ function Reports() {
             </div>
           </section>
         )}
+
+        <section className="mt-14" data-testid="how-we-publish">
+          <SectionTitle title="How a certificate reaches this register" />
+          <p className="text-sm text-muted-foreground max-w-2xl mb-6">
+            These steps describe how this site publishes documents. They are not a statement that
+            any particular batch has been tested; only a listed report establishes that.
+          </p>
+          <ol className="divide-y divide-border border border-border">
+            {(
+              [
+                [
+                  "A report is held",
+                  "A batch is added only once we hold the laboratory report for it as a PDF. Nothing is listed on the strength of a supplier description or a purity figure quoted to us.",
+                ],
+                [
+                  "The entry is copied from the report",
+                  "Batch number, strength, method, purity, test date and the laboratory name are recorded from the document itself, not retyped from memory.",
+                ],
+                [
+                  "It is published in three places",
+                  "The PDF is linked here, on the product page for that strength, and the batch number resolves at /verify so the vial in your hand can be matched to its document.",
+                ],
+                [
+                  "The expiry is derived from the test date",
+                  `The EXP month shown for a batch is the test date plus ${SHELF_LIFE_MONTHS} months unless the report states its own expiry. This is a storage policy, not a measured stability result.`,
+                ],
+                [
+                  "If a report is incomplete or below specification",
+                  "The batch is not listed, the product page shows no certificate for it and the batch number does not resolve. A failed or missing report is never replaced by a badge.",
+                ],
+              ] as const
+            ).map(([t, b], i) => (
+              <li key={t} className="grid grid-cols-[40px_1fr] gap-4 p-4">
+                <span className="font-heading text-xl font-semibold tabular-nums text-muted-foreground">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 className="font-semibold">{t}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{b}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="mt-14" data-testid="supplier-comparison">
+          <SectionTitle title="Vyrax Labs compared with a typical supplier" />
+          <p className="text-sm text-muted-foreground max-w-2xl mb-6">
+            Each row on our side is something you can check on this site today. The right-hand
+            column is what to look out for elsewhere, not a claim about any named company.
+          </p>
+          <div className="overflow-x-auto border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-surface text-left">
+                <tr>
+                  {["", "Vyrax Labs", "A typical supplier"].map((h) => (
+                    <th key={h} scope="col" className="p-4 font-semibold">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {(
+                  [
+                    [
+                      "Certificates",
+                      `Published PDFs only, listed by batch (${coas.length} published today). Nothing is listed until the report is held.`,
+                      "A purity percentage on the product page with no document behind it.",
+                    ],
+                    [
+                      "Batch lookup",
+                      "Any batch number can be entered above or at /verify and either resolves to its document or says plainly that nothing is published.",
+                      "No way to match the vial in your hand to a report.",
+                    ],
+                    [
+                      "Dispatch",
+                      `${claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() }) ?? "See the delivery page."} Not a delivery guarantee.`,
+                      "Same-day promised without a cut-off, working-day or stock caveat.",
+                    ],
+                    [
+                      "Transit",
+                      `${claimText("delivery.cold-chain-packing") ?? "Protective packing"}. ${site.carrier}, tracked, not temperature-controlled.`,
+                      "Temperature-controlled delivery implied for an ordinary tracked parcel.",
+                    ],
+                    [
+                      "Pricing",
+                      "Price per mg of active shown on every strength, with the single-vial equivalent next to any larger vial.",
+                      "Headline price only, so the ladder cannot be compared.",
+                    ],
+                    [
+                      "Payment",
+                      "Card details are entered on our payment provider's secure hosted page, never stored on this site.",
+                      "Card form embedded in the shop page, or bank transfer only.",
+                    ],
+                    [
+                      "Research use",
+                      "Research-use-only policy on every page; no dosing or administration guidance anywhere on the site.",
+                      "Dosing tables or wellness language alongside the listing.",
+                    ],
+                  ] as const
+                ).map(([k, us, them]) => (
+                  <tr key={k}>
+                    <th scope="row" className="p-4 font-semibold align-top whitespace-nowrap">
+                      {k}
+                    </th>
+                    <td className="p-4 align-top leading-relaxed">{us}</td>
+                    <td className="p-4 align-top leading-relaxed text-muted-foreground">{them}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <p className="mt-12 text-sm text-muted-foreground">
           The methods below explain terminology you may encounter in a certificate. They do not mean
