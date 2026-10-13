@@ -54,7 +54,7 @@ function Reports() {
             : "No certificates are published yet. This register shows published documents only, not the status of unpublished testing or a promise that any batch will be certified."}
         </p>
 
-        <form onSubmit={lookup} className="mt-8 max-w-xl flex gap-2">
+        <form id="batch-lookup" onSubmit={lookup} className="mt-8 max-w-xl flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
             <Input

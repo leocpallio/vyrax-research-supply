@@ -15,7 +15,6 @@ import {
   gbp,
   addCart,
   cartLine,
-  costPerUnitLabel,
   stockOf,
   stockLabel,
   getCompound,
@@ -41,9 +40,10 @@ import {
 import { ProductGallery } from "@/components/ProductGallery";
 import { PurityStatBlock } from "@/components/pdp/PurityStat";
 import { PackPicker } from "@/components/pdp/PackPicker";
-import { PairsWith, ResearchStatement, TrustBlock } from "@/components/pdp/BuyBoxBits";
+import { ResearchStatement, TrustBlock } from "@/components/pdp/BuyBoxBits";
 import { TestingReportCard } from "@/components/pdp/TestingReportCard";
 import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
+import { BoughtTogether, BuyBoxTrustStrip, PriceBlock } from "@/components/pdp/PortMoves";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -124,6 +124,12 @@ function ProductPage() {
     .filter((x) => x.slug !== c.slug)
     .slice(0, 4);
   const bac = c.kind !== "supply" ? getCompound("bacteriostatic-water") : undefined;
+  const pair = c.compare ? getCompound(c.compare.slug) : undefined;
+  const bundle = [
+    { c, s },
+    ...(bac?.strengths[0] ? [{ c: bac, s: bac.strengths[0] }] : []),
+    ...(pair?.strengths[0] && pair.slug !== c.slug ? [{ c: pair, s: pair.strengths[0] }] : []),
+  ];
   const relatedGuides = guides.filter((g) => g.compounds.includes(c.slug)).slice(0, 2);
   const dispatchLine = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
@@ -214,16 +220,8 @@ function ProductPage() {
 
             <PurityStatBlock stat={stat} productName={heading} />
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <p
-                data-testid="product-price"
-                className="font-heading text-3xl font-semibold tabular-nums"
-              >
-                {gbp(s.price)}
-              </p>
-              {c.kind !== "supply" && (
-                <p className="text-sm text-muted-foreground tabular-nums">{costPerUnitLabel(s)}</p>
-              )}
+            <div className="mt-5 flex flex-wrap items-start gap-3">
+              <PriceBlock c={c} s={s} />
               <span
                 data-testid="stock-badge"
                 data-stock={stock}
@@ -283,7 +281,7 @@ function ProductPage() {
               data-testid="add-product-button"
               disabled={!orderable}
               onClick={add}
-              className="mt-6 w-full h-12 rounded-full bg-foreground text-background font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="mt-6 w-full h-12 rounded-md bg-[var(--warm,#AC4821)] text-white font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {!orderable
                 ? stockLabel[stock]
@@ -291,14 +289,27 @@ function ProductPage() {
                   ? "Added to basket"
                   : `Add to basket  ${gbp(chosen.total)}`}
             </button>
+            <Link
+              to="/lab-reports"
+              data-testid="check-lab-report"
+              className="mt-2 w-full h-11 inline-flex items-center justify-center rounded-md border border-foreground text-sm font-semibold transition-colors duration-150 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              Check lab report
+            </Link>
             <p className="sr-only" aria-live="polite">
               {added ? `${heading} added to basket` : ""}
             </p>
 
+            <BuyBoxTrustStrip />
             <TrustBlock coa={coa} form={form} />
-            {bac && (
-              <PairsWith product={bac} onAdd={() => addCart(cartLine(bac, bac.strengths[0]!, 1))} />
-            )}
+            <BoughtTogether
+              lines={bundle}
+              onAddAll={() => {
+                for (const l of bundle) addCart(cartLine(l.c, l.s, 1));
+                setAdded(true);
+                window.setTimeout(() => setAdded(false), 1800);
+              }}
+            />
             <ResearchStatement />
           </div>
         </div>
@@ -439,7 +450,7 @@ function ProductPage() {
           type="button"
           disabled={!orderable}
           onClick={add}
-          className="h-11 rounded-full bg-foreground text-background px-5 text-sm font-semibold disabled:opacity-40"
+          className="h-11 rounded-md bg-[var(--warm,#AC4821)] text-white px-5 text-sm font-semibold disabled:opacity-40"
         >
           {!orderable ? stockLabel[stock] : "Add to basket"}
         </button>
