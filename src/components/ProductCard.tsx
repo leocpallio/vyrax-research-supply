@@ -16,6 +16,7 @@ import {
   type Strength,
 } from "@/lib/catalog";
 import { sectionFor } from "@/data/shop-sections";
+import { bestLadderPct, ladderSaving } from "@/lib/price-ladder";
 
 // Minimal card, kova pattern: stock pill, 1:1 render, round quick-add, name, category, "From £".
 // No purity, no rating, no pack chips: trust lives on the product page.
@@ -62,6 +63,7 @@ export function ProductCard({
   const label = sectionFor(product)?.name ?? getCategory(product.category)?.name ?? "";
   const multi = product.strengths.length > 1;
   const canAdd = product.strengths.some(orderable);
+  const bestPct = bestLadderPct(product);
 
   const add = (strength: Strength) => {
     addCart(cartLine(product, strength)); // writeCart fires basket_added through trackBasketChange.
@@ -76,7 +78,7 @@ export function ProductCard({
   return (
     <article
       data-testid="product-wrapper"
-      className="group flex flex-col rounded-[18px] border border-[#040825]/10 bg-[#F5F0E5] overflow-hidden transition-colors duration-200 hover:border-[#040825]/30"
+      className="group flex flex-col rounded-none border border-[#040825]/10 bg-[#F5F0E5] overflow-hidden transition-colors duration-200 hover:border-[#040825]/30"
     >
       <div className="relative aspect-square bg-[#EAE6DC] overflow-hidden">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
@@ -136,7 +138,15 @@ export function ProductCard({
                         className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm hover:bg-[#EAE6DC] disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-[#040825]"
                       >
                         <span className="font-mono">{x.label}</span>
-                        <span className="tabular-nums font-semibold">{gbp(x.price)}</span>
+                        <span className="tabular-nums font-semibold">
+                          {(() => {
+                            const l = ladderSaving(product, x);
+                            return l ? (
+                              <s className="mr-1.5 font-normal text-[#040825]/50">{gbp(l.was)}</s>
+                            ) : null;
+                          })()}
+                          {gbp(x.price)}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -177,6 +187,14 @@ export function ProductCard({
           <span data-testid="product-price" className="font-semibold tabular-nums">
             {gbp(fromPrice(product))}
           </span>
+          {bestPct && (
+            <span
+              data-testid="card-ladder-save"
+              className="text-xs font-semibold tabular-nums text-[#AC4821]"
+            >
+              Save up to {bestPct}% on larger vials
+            </span>
+          )}
         </p>
       </div>
     </article>
