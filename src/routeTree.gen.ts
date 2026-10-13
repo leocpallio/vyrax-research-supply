@@ -37,6 +37,7 @@ import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-we
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout_.return'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
+import { Route as GuidesMdSlugRouteImport } from './routes/guides-md.$slug'
 import { Route as GuidesIndexRouteImport } from './routes/guides.index'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -184,6 +185,11 @@ const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
   path: '/collections/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesMdSlugRoute = GuidesMdSlugRouteImport.update({
+  id: '/guides-md/$slug',
+  path: '/guides-md/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuidesIndexRoute = GuidesIndexRouteImport.update({
   id: '/guides/',
   path: '/guides/',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/guides-md/$slug': typeof GuidesMdSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/v/$batch': typeof VBatchRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/guides-md/$slug': typeof GuidesMdSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/v/$batch': typeof VBatchRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/checkout_/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/guides-md/$slug': typeof GuidesMdSlugRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/product/$slug': typeof ProductSlugRoute
   '/v/$batch': typeof VBatchRoute
@@ -355,6 +364,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
+    | '/guides-md/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/v/$batch'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
+    | '/guides-md/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/v/$batch'
@@ -427,6 +438,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/checkout_/return'
     | '/collections/$slug'
+    | '/guides-md/$slug'
     | '/guides/$slug'
     | '/product/$slug'
     | '/v/$batch'
@@ -464,6 +476,7 @@ export interface RootRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
+  GuidesMdSlugRoute: typeof GuidesMdSlugRoute
   GuidesSlugRoute: typeof GuidesSlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   VBatchRoute: typeof VBatchRoute
@@ -670,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides-md/$slug': {
+      id: '/guides-md/$slug'
+      path: '/guides-md/$slug'
+      fullPath: '/guides-md/$slug'
+      preLoaderRoute: typeof GuidesMdSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guides/': {
       id: '/guides/'
       path: '/guides'
@@ -744,6 +764,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
+  GuidesMdSlugRoute: GuidesMdSlugRoute,
   GuidesSlugRoute: GuidesSlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   VBatchRoute: VBatchRoute,

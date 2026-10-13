@@ -21,7 +21,7 @@ export const Route = createFileRoute("/guides/$slug")({
       headline: g.title,
       description: g.description,
       dateModified: g.updated,
-      datePublished: g.updated,
+      datePublished: g.published ?? g.updated,
       inLanguage: "en-GB",
       author: { "@id": ORG_ID },
       publisher: { "@id": ORG_ID },
@@ -97,6 +97,9 @@ function Render({ b }: { b: Block }) {
   }
 }
 
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
 function GuidePage() {
   const { slug } = Route.useLoaderData();
   const g = guideBySlug(slug);
@@ -116,15 +119,24 @@ function GuidePage() {
           />
           <p className="eyebrow">LABORATORY GUIDE</p>
           <h1 className="page-title">{g.title}</h1>
-          <p className="text-sm text-muted-foreground mt-4">
-            Updated{" "}
-            {new Date(g.updated).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}{" "}
-            · {g.readMins} min read
+          <p className="text-sm text-muted-foreground mt-4 tabular-nums" data-testid="guide-dates">
+            Published {fmt(g.published ?? g.updated)}
+            {(g.published ?? g.updated) !== g.updated ? (
+              <> · Updated {fmt(g.updated)}</>
+            ) : null} · {g.readMins} min read ·{" "}
+            <a
+              href={`/guides-md/${g.slug}`}
+              className="underline underline-offset-4 hover:text-foreground"
+              data-testid="guide-markdown-link"
+            >
+              View as Markdown
+            </a>
           </p>
+          {g.changed && (
+            <p className="mt-3 text-sm border-l-2 border-border pl-3" data-testid="guide-changed">
+              <span className="font-semibold">What changed:</span> {g.changed}
+            </p>
+          )}
           <div className="prose-guide mt-8">
             {g.body.map((b, i) => (
               <Render key={i} b={b} />

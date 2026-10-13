@@ -40,7 +40,9 @@ export function buildLlmsTxt(): string {
   lines.push("");
   lines.push("## Guides", "");
   for (const g of guides)
-    lines.push(`- [${g.title}](${url(`/guides/${g.slug}`)}): ${g.description}`);
+    lines.push(
+      `- [${g.title}](${url(`/guides/${g.slug}`)}): ${g.description} Markdown: ${url(`/guides-md/${g.slug}`)}`,
+    );
   lines.push("");
   lines.push("## Trust and policies", "");
   const names: Record<string, string> = {

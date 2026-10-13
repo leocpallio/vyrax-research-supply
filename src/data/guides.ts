@@ -12,6 +12,10 @@ export type Guide = {
   seoTitle: string;
   description: string;
   updated: string; // ISO date
+  /** First publication date. Defaults to `updated` when absent. */
+  published?: string;
+  /** Short note on what changed in the latest revision, shown on older posts. */
+  changed?: string;
   readMins: number;
   compounds: string[]; // related compound slugs
   body: Block[];
