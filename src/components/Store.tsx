@@ -23,7 +23,6 @@ import { Footer } from "@/components/shell/Footer";
 import { FooterSignup } from "@/components/shell/FooterSignup";
 import { SearchDialog } from "@/components/shell/SearchDialog";
 import { CartDrawer } from "@/components/shell/CartDrawer";
-import { RuoGate } from "@/components/shell/RuoGate";
 import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/shell/cart-store";
 
 export { openCartDrawer };
@@ -102,7 +101,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <CartDrawer open={cart} onOpenChange={setCart} />
       <AddedToast />
       <AnalyticsConsentBanner />
-      <RuoGate />
     </div>
   );
 }
