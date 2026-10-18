@@ -140,8 +140,7 @@ function Home() {
             numbers, literature references and per-mg pricing.{" "}
             {site.checkoutOpen
               ? "Card checkout on a secure hosted payment page."
-              : "The site is not live yet; no orders or payments are taken."}{" "}
-            Supplied for laboratory research only.
+              : "The site is not live yet; no orders or payments are taken."}
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link

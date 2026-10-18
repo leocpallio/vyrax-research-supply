@@ -27,7 +27,6 @@ import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/
 
 export { openCartDrawer };
 
-const RUO_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
 
 // ---------------------------------------------------------------- Added-to-basket toast
 function AddedToast() {
@@ -241,11 +240,7 @@ export function TrustStrip() {
 }
 
 export function Disclaimer() {
-  return (
-    <div className="bg-tint border-y border-border py-3 text-center text-sm font-semibold text-foreground px-4">
-      {RUO_NOTICE}
-    </div>
-  );
+  return null;
 }
 
 export const faqItems: QA[] = coreFaqs;
