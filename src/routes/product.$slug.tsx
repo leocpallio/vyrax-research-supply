@@ -40,7 +40,7 @@ import {
 import { ProductGallery } from "@/components/ProductGallery";
 import { PurityStatBlock } from "@/components/pdp/PurityStat";
 import { PackPicker } from "@/components/pdp/PackPicker";
-import { ResearchStatement, TrustBlock } from "@/components/pdp/BuyBoxBits";
+import { TrustBlock } from "@/components/pdp/BuyBoxBits";
 import { TestingReportCard } from "@/components/pdp/TestingReportCard";
 import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
 import { BoughtTogether, BuyBoxTrustStrip, PriceBlock } from "@/components/pdp/PortMoves";
@@ -310,7 +310,6 @@ function ProductPage() {
                 window.setTimeout(() => setAdded(false), 1800);
               }}
             />
-            <ResearchStatement />
           </div>
         </div>
 

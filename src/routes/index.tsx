@@ -315,26 +315,7 @@ function Home() {
         </section>
       )}
 
-      {/* RUO band */}
-      <section className="container-main py-14 md:py-20" data-testid="ruo-band">
-        <div className="rounded-[20px] bg-[#EAE6DC] p-6 md:p-10 grid md:grid-cols-[1fr_auto] gap-6 items-center">
-          <div>
-            <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight">
-              Supplied for laboratory research only
-            </h2>
-            <p className="mt-2 text-sm md:text-base text-[#040825]/70 leading-relaxed max-w-2xl">
-              Not for human or veterinary use. Nothing on this site is a medicine, food, cosmetic or
-              supplement, and no product page gives dosing or usage guidance. Ordering confirms you
-              are an adult buying for research.
-            </p>
-          </div>
-          <Link
-            to="/research-use-policy"
-            className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-[#040825]/20 font-semibold text-sm hover:bg-[#F5F0E5] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825]"
-          >
-            Research use policy <ArrowRight size={16} />
-          </Link>
-        </div>
+      <section className="container-main">
         {/* Indicative "from" prices for the hero compounds, for crawlers and quick scanning. */}
         <p className="sr-only">
           {bestSellers.map((c) => `${c.name} from ${gbp(fromPrice(c))}`).join(". ")}.

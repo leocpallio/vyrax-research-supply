@@ -236,9 +236,6 @@ export function TrustStrip() {
       <span className="flex items-center gap-2">
         <Truck size={18} className="text-primary" /> Delivery information
       </span>
-      <span className="flex items-center gap-2">
-        <ShieldCheck size={18} className="text-primary" /> Research use only
-      </span>
     </div>
   );
 }

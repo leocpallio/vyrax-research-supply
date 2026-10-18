@@ -67,9 +67,6 @@ export function GuideSignup() {
               <span className="text-primary">✓</span> Free PDF, no purchase required
             </p>
           </div>
-          <p className="text-xs text-muted-foreground mt-7">
-            For in-vitro laboratory research only. Not for human or veterinary use.
-          </p>
         </div>
         <div className="rounded-2xl bg-background border border-border shadow-sm p-6 md:p-8">
           <Mail size={24} className="text-primary" aria-hidden="true" />

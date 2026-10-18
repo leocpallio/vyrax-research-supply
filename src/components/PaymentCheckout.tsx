@@ -243,7 +243,7 @@ export function PaymentCheckout() {
       <div className="container-main py-8 md:py-12 max-w-5xl min-h-[60vh]" ref={summaryRef}>
         <h1 className="page-title">Checkout</h1>
         <p className="mt-3 text-muted-foreground">
-          Guest checkout, no account needed. For research use only, not for human consumption.
+          Guest checkout, no account needed.
         </p>
         {!loaded ? (
           <p className="mt-8 text-muted-foreground" role="status">
@@ -346,7 +346,6 @@ export function PaymentCheckout() {
                     <Link to="/research-use-policy" className="underline">
                       research use policy
                     </Link>
-                    . Not for human or veterinary use.
                   </span>
                 </label>
                 {errors.agree && (

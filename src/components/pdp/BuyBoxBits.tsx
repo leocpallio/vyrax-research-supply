@@ -83,20 +83,3 @@ export function PairsWith({ product, onAdd }: { product: Compound; onAdd: () => 
   );
 }
 
-/** RUO ladder, PDP rung. Links to the full policy. */
-export function ResearchStatement() {
-  return (
-    <p
-      data-testid="research-statement"
-      className="mt-6 text-xs text-muted-foreground leading-relaxed"
-    >
-      Supplied for laboratory research. Not for human or veterinary use.{" "}
-      <Link
-        to="/research-use-policy"
-        className="underline underline-offset-4 hover:text-foreground"
-      >
-        Read full disclaimer
-      </Link>
-    </p>
-  );
-}

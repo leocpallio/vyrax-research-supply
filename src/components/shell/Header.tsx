@@ -231,9 +231,6 @@ function MobileMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
               ))}
             </div>
           </nav>
-          <p className="px-4 py-3 text-[11px] text-muted-foreground border-t border-line">
-            For laboratory research use only. Not for human or veterinary use.
-          </p>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

@@ -35,7 +35,6 @@ function L({ to, children, href }: { to?: string; href?: string; children: React
 
 export function Footer() {
   // Facts only from the claim registry. No legal entity, company number or VAT number renders here.
-  const ruo = claimText("regulatory.research-use-only");
   const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
   const payment = claimFilled("payment.methods-live", {
@@ -115,8 +114,6 @@ export function Footer() {
             </p>
           </div>
           <p className="md:text-right max-w-md md:justify-self-end" data-testid="footer-ruo">
-            {ruo ??
-              "All products are sold strictly for laboratory research use only. Not for human or veterinary use."}{" "}
             Not a pharmacy. No dosing, medical, dietary or therapeutic advice is offered.
           </p>
         </div>

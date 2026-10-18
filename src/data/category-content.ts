@@ -51,10 +51,6 @@ const shopContent: CategoryContent = {
         "Product pages carry the CAS number, molecular formula and molecular weight, a research overview written from the published literature, PubMed references and the full list of vial strengths with cost per mg. Where a certificate of analysis is held for a batch it is linked from the page and from the Lab Reports hub.",
       ],
     },
-    {
-      heading: "Research use only",
-      paragraphs: [RUO],
-    },
   ],
   faqs: COMMON_FAQS,
 };
@@ -76,7 +72,6 @@ const SECTION: Record<string, CategoryContent> = {
           "Most compounds in this range are offered in several vial strengths. The card shows the lowest price; the product page lists every strength and its cost per mg. Larger vials generally have a lower cost per mg and suit protocols that need repeated aliquots from a single preparation.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -106,7 +101,6 @@ const SECTION: Record<string, CategoryContent> = {
           "The single-compound vial suits work that isolates copper peptide activity. The blends suit protocols that already combine these peptides and benefit from a fixed ratio. Ratios and total content are stated on each blend page.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -125,7 +119,6 @@ const SECTION: Record<string, CategoryContent> = {
           "Semax is an ACTH(4-10) analogue and Selank is a tuftsin analogue. Both originate in Russian neuropeptide research and are studied in models of BDNF expression, enkephalin metabolism and related neurochemistry. The combined Selank and Semax vial supplies both in a fixed ratio for work that uses them together.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -151,7 +144,6 @@ const SECTION: Record<string, CategoryContent> = {
           "CJC-1295 is offered with and without the drug affinity complex (DAC). The DAC version binds serum albumin and has a far longer half-life in published pharmacokinetic work; the version without DAC (also called modified GRF 1-29) is short-acting. The two product pages compare them directly.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -177,7 +169,6 @@ const SECTION: Record<string, CategoryContent> = {
           "Most published work on these compounds is preclinical. Each product page summarises the models used and links to the original papers on PubMed so the evidence base can be read directly rather than through a marketing summary.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -197,7 +188,6 @@ const SECTION: Record<string, CategoryContent> = {
           "They are grouped here because they appear together in the ageing, mitochondrial function and immunosenescence literature, not because they share a mechanism. Each product page explains the specific pathway the compound is studied in.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -216,7 +206,6 @@ const SECTION: Record<string, CategoryContent> = {
           "Melanotan 1 (afamelanotide) is a linear alpha-MSH analogue selective for MC1R. Melanotan 2 is a cyclic analogue active across several melanocortin receptors. PT-141 (bremelanotide) is a metabolite of Melanotan 2 studied mainly at MC4R. They are used as tool compounds in melanocortin receptor pharmacology and melanogenesis research.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -235,7 +224,6 @@ const SECTION: Record<string, CategoryContent> = {
           "DSIP was first isolated from rabbit cerebral venous blood in the 1970s and is studied in electroencephalographic sleep models and in the regulation of several neuroendocrine pathways. The product page carries its CAS number, sequence and references.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: COMMON_FAQS,
   },
@@ -248,7 +236,6 @@ const SECTION: Record<string, CategoryContent> = {
           "Bacteriostatic water is sterile water containing 0.9% benzyl alcohol as a preservative, which allows a reconstituted vial to be drawn from more than once in a laboratory setting. Use the reconstitution calculator to work out the solvent volume for a target concentration.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [
@@ -272,7 +259,6 @@ const CATEGORY: Record<string, CategoryContent> = {
           "For combination work see the GLOW, KLOW and Wolverine blends in the peptide blends category.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: SECTION["recovery-repair"]!.faqs,
   },
@@ -287,7 +273,6 @@ const CATEGORY: Record<string, CategoryContent> = {
           "The category also includes DSIP, Semax and Selank, which are studied in sleep physiology and neurochemistry rather than ageing directly but are catalogued here for historical reasons. They are also browsable in the Brain and Focus and Sleep ranges.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: SECTION["longevity-cellular"]!.faqs,
   },
@@ -301,7 +286,6 @@ const CATEGORY: Record<string, CategoryContent> = {
           "A blend puts a fixed ratio of peptides into one vial so every component comes from the same preparation and batch. GLOW combines GHK-Cu, BPC-157 and TB-500; KLOW adds KPV; the Wolverine Stack pairs BPC-157 and TB-500; the Hulk Stack pairs CJC-1295 DAC with ipamorelin. Composition and total content are printed on each product page.",
         ],
       },
-      { heading: "Research use only", paragraphs: [RUO] },
     ],
     faqs: [
       [

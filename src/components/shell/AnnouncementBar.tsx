@@ -15,7 +15,6 @@ export function announcementStrings(): string[] {
     out.push("Site not live yet. Checkout is disabled; no orders or payments are taken.");
   if (site.checkoutOpen && free) out.push(free);
   if (dispatch) out.push(dispatch);
-  if (out.length < 2) out.push(claimText("regulatory.research-use-only") ?? "Research use only.");
   return out.slice(0, 2);
 }
 
