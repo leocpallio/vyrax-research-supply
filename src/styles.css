@@ -503,3 +503,6 @@ textarea:focus-visible,
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* Seamless product pages: pure white page behind the white-edged renders */
+.bg-paper:has([data-pdp-gallery]) { background-color: #fff; }

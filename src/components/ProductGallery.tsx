@@ -16,7 +16,7 @@ export function ProductGallery({
   return (
     <figure
       data-testid="pdp-gallery"
-      className="relative aspect-square rounded-2xl overflow-hidden bg-surface border border-border"
+      data-pdp-gallery className="relative aspect-square overflow-hidden bg-white"
     >
       <img
         src={image.src}
