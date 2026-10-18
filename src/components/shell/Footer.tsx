@@ -44,7 +44,7 @@ export function Footer() {
     <footer className="bg-ink text-ink-foreground mt-16" data-testid="site-footer">
       <div className="container-main py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="md:col-span-2 lg:col-span-1">
-          <Wordmark tone="light" title={site.name} className="h-[18px] w-auto" />
+          <Wordmark tone="light" title={site.name} className="h-[44px] w-auto" />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-sm">
             Research peptides supplied from the UK for laboratory use. Read the specification and
             the certificate for a batch before you order.

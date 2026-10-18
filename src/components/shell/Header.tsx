@@ -166,7 +166,7 @@ function MobileMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
         >
           <div className="flex items-center justify-between px-4 h-14 border-b border-line">
             <DialogPrimitive.Title className="sr-only">Menu</DialogPrimitive.Title>
-            <Wordmark className="h-[15px] w-auto" title="Vyrax Labs" />
+            <Wordmark className="h-[34px] w-auto" title="Vyrax Labs" />
             <DialogPrimitive.Close
               className="icon-link -mr-2"
               aria-label="Close menu"
@@ -265,7 +265,7 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
             aria-label={`${site.name} home`}
             data-testid="logo"
           >
-            <Wordmark className="h-[15px] sm:h-[17px] w-auto" />
+            <Wordmark className="h-[30px] sm:h-[38px] w-auto" />
           </Link>
           <nav className="hidden lg:flex items-center gap-1" aria-label="Primary">
             {NAV.map((g) => (
