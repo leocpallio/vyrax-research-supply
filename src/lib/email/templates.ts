@@ -108,15 +108,15 @@ function steps(current: 1 | 2 | 3): { html: string; text: string } {
       const on = n <= current;
       const done = n < current;
       const dot = done
-        ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#AC4821;color:#F5F0E5;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
+        ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#14213D;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
         : on
-          ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#040825;color:#F5F0E5;font-size:12px;font-weight:700;text-align:center">${n}</span>`
-          : `<span class="step-off" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#EAE6DC;color:#5B5F73;font-size:12px;font-weight:700;text-align:center">${n}</span>`;
-      return `<td align="center" style="padding:0 4px;width:33%">${dot}<div class="${on ? "tx" : "mute"}" style="margin-top:8px;font-size:12px;font-weight:${n === current ? 700 : 500};color:${on ? "#040825" : "#5B5F73"}">${e(label)}</div></td>`;
+          ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#14213D;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
+          : `<span class="step-off" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#ffffff;border:1px solid #C9CDDA;color:#8A8FA6;font-size:12px;font-weight:700;text-align:center">${n}</span>`;
+      return `<td align="center" style="padding:0 4px;width:33%">${dot}<div class="${on ? "tx" : "mute"}" style="margin-top:8px;font-size:12px;font-weight:${n === current ? 700 : 500};color:${on ? "#14213D" : "#6B7088"}">${e(label)}</div></td>`;
     })
     .join("");
   return {
-    html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="tint" style="background:#F5F0E5;border-radius:12px;margin:0 0 24px"><tr><td style="padding:16px 8px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>${cells}</tr></table></td></tr></table>`,
+    html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="tint" style="background:#F4F6FB;border-radius:12px;margin:0 0 24px"><tr><td style="padding:18px 8px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>${cells}</tr></table></td></tr></table>`,
     text: labels.map((l, i) => `${i + 1 <= current ? "[x]" : "[ ]"} ${l}`).join("  "),
   };
 }
@@ -150,7 +150,7 @@ function table(s: Summary): { html: string; text: string[] } {
   const rows = s.lines
     .map(
       (l) =>
-        `<tr>${thumb(l)}<td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#5B5F73;font-size:13px">${e(oneLine(l.strength))} · Qty ${e(l.quantity)}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
+        `<tr>${thumb(l)}<td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#5B5F73;font-size:13px">${e(oneLine(l.strength).replace(/(\d)(mg|ml)\b/gi, "$1 $2"))} · ${l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${e(l.quantity)}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
     )
     .join("");
   const extra = (label: string, v: string, bold = false) =>
@@ -178,7 +178,7 @@ type Content = {
   paragraphs: string[];
   subject: string;
   reference?: string;
-  orderDate?: string;
+  orderDate?: string | undefined;
   address?: string;
   action?: { label: string; url: string; external?: boolean };
   detail?: { html: string; text: string[] };
@@ -186,7 +186,12 @@ type Content = {
   unsubscribeUrl?: string;
   step?: 1 | 2 | 3;
 };
+const longDate = (d?: string) => {
+  if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d;
+  return new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+};
 function wrap(c: Content): RenderedEmail {
+  c = { ...c, orderDate: longDate(c.orderDate) };
   const meta = c.reference
     ? `Order reference: ${oneLine(c.reference)}${c.orderDate ? ` · ${oneLine(c.orderDate)}` : ""}`
     : "";
@@ -196,7 +201,7 @@ function wrap(c: Content): RenderedEmail {
       : "";
 
   const addressHtml = address
-    ? `<div class="tx tint" style="background:#EAE6DC;border-radius:12px;padding:16px 18px;margin:0 0 24px;color:#040825;font-size:15px"><strong>Check your delivery address</strong><br>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#5B5F73;font-size:13px">Your address cannot be changed after dispatch. If it is incorrect, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
+    ? `<div class="tx tint" style="background:#F4F6FB;border-radius:12px;padding:16px 18px;margin:0 0 24px;color:#040825;font-size:15px"><strong>Check your delivery address</strong><br>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#5B5F73;font-size:13px">Your address cannot be changed after dispatch. If it is incorrect, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
     : "";
   const unsubscribe = c.unsubscribeUrl
     ? c.unsubscribeUrl === `mailto:${SUPPORT_EMAIL}`
@@ -207,7 +212,7 @@ function wrap(c: Content): RenderedEmail {
   const metaHtml = c.reference
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#040825">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#040825">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:20px;font-weight:700;letter-spacing:-.01em;color:#040825">${e(site.name)}</td><td class="mute" align="right" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5B5F73">Research use only</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${progress?.html ?? ""}${addressHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:14px;color:#5B5F73">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research-use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? `<br>${link("Unsubscribe from research updates", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:20px;font-weight:800;letter-spacing:.14em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:14px;color:#5B5F73">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research-use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? `<br>${link("Unsubscribe from research updates", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -250,7 +255,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
         step: 1,
         preheader: "Check your delivery address before dispatch.",
         subject: subject("Order confirmed"),
-        paragraphs: [hello, "We have received your payment and your order is awaiting review."],
+        paragraphs: [hello, "We have received your payment and your order is now being prepared."],
         detail: table(event),
         lines: [after],
       });
