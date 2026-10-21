@@ -26,44 +26,63 @@ def accent(img):
 BASE = f"""<style>@font-face{{font-family:S;src:url({FONT});font-weight:100 900}}
 *{{margin:0;box-sizing:border-box}}body{{width:1200px;height:630px;font-family:S,sans-serif;overflow:hidden;position:relative;background:#fff}}
 .logo svg{{display:block;height:100%;width:auto}}</style>"""
+N_A, N_B, N_C = "#0b1424", "#14213D", "#1a2c52"
+MUTED, DOMAIN = "#9fb0cf", "#7385a8"
+TAG = "Batch-documented  ·  Tracked UK delivery"
+CHECK = f'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="{PERI}" stroke-width="2"/><path d="M7 12.4l3.2 3.2L17.5 8.4" stroke="{PERI}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+def motif():
+    import math
+    r, cx, cy = 96, 360, 300
+    cs = [(cx, cy)] + [(cx + math.sqrt(3)*r*math.cos(math.radians(60*k)), cy + math.sqrt(3)*r*math.sin(math.radians(60*k))) for k in range(6)]
+    def hexp(x, y):
+        pts = " ".join(f"{x + r*math.cos(math.radians(60*k-90)):.1f},{y + r*math.sin(math.radians(60*k-90)):.1f}" for k in range(6))
+        return f'<polygon points="{pts}" fill="none" stroke="{PERI}" stroke-width="2.2" stroke-opacity=".26"/>'
+    o = "".join(hexp(x, y) for x, y in cs)
+    o += "".join(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="{PERI}" stroke-width="2" stroke-opacity=".32"/>' for x, y in cs[1:])
+    o += "".join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{9 if i==0 else 7}" fill="{PERI}" fill-opacity="{.6 if i==0 else .42}"/>' for i, (x, y) in enumerate(cs))
+    return f'<svg width="720" height="620" viewBox="0 0 720 620">{o}</svg>'
+def vial(src):
+    from PIL import ImageChops
+    im = Image.open(src).convert("RGB")
+    bb = ImageChops.difference(im, Image.new("RGB", im.size, (255,255,255))).point(lambda v: 255 if v > 12 else 0).getbbox()
+    im = im.crop(bb); h = 1120
+    im = im.resize((round(im.width*h/im.height), h), Image.LANCZOS)
+    out = f"{TMP}/v_{os.path.basename(src)}.jpg"; im.save(out, quality=92); return out
+def headfs(t): n = len(t); return 82 if n <= 11 else 66 if n <= 15 else 54 if n <= 20 else 46
+CSS = """*{margin:0;padding:0;box-sizing:border-box}html,body{width:1200px;height:630px}
+.brand{height:46px;position:relative}.brand svg{height:100%%;width:auto;display:block}
+.name{font-weight:800;line-height:1.02;color:#fff;letter-spacing:-1.2px}
+.str{font-weight:600;font-size:31px;color:%s;margin-top:22px}
+.tag{font-weight:600;font-size:20px;color:%s;margin-top:28px;display:flex;align-items:center;gap:11px}
+.dom{font-weight:600;font-size:23px;color:%s;letter-spacing:.4px;position:relative}""" % (PERI, MUTED, DOMAIN)
 def product(c, lab):
     src = f"{R}/src/assets/products/{c['slug']}__{key(lab)}.webp"
     if not os.path.exists(src): return None
-    a = accent(src); name = c["name"]; fs = 78 if len(name) < 10 else 64 if len(name) < 14 else 52 if len(name) < 20 else 42 if len(name) < 28 else 36
-    return f"""<html><head>{BASE}<style>
-.l{{position:absolute;left:0;top:0;width:640px;height:630px;background:{NAVY};padding:64px 56px 64px 60px;overflow:hidden}}
-.bar{{position:absolute;left:0;top:0;width:12px;height:630px;background:{a}}}
-.k{{color:{PERI};font-weight:700;letter-spacing:.2em;font-size:25px;text-transform:uppercase}}
-h1{{color:#fff;font-weight:800;font-size:{fs}px;line-height:1.02;margin-top:30px;letter-spacing:-.02em}}
-.p{{display:inline-block;margin-top:34px;border:3px solid #fff;color:#fff;border-radius:99px;padding:8px 26px;font-weight:700;font-size:34px}}
-.logo{{position:absolute;left:56px;bottom:56px;height:92px}}
-.r{{position:absolute;left:640px;top:0;width:560px;height:630px;background:#fff}}
-.r img{{position:absolute;left:-120px;top:-70px;width:800px;height:800px}}</style></head><body>
-<div class=l><div class=bar></div><div class=k>{CATNAME.get(c['category'],'')}</div><h1>{name}</h1><div class=p>{lab.replace('mg',' mg') if lab.endswith('mg') else lab}</div><div class=logo>{LOGO_W}</div></div>
-<div class=r><img src="file://{src}"></div></body></html>"""
+    a = accent(src); v = vial(src)
+    st = lab.replace("mg", " mg") if lab.endswith("mg") else lab
+    return f"""<html><head>{BASE}<style>{CSS}
+.card{{width:1200px;height:630px;display:flex;overflow:hidden;background:#fff}}
+.left{{width:715px;height:100%;background:linear-gradient(135deg,{N_A} 0%,{N_B} 58%,{N_C} 100%);padding:64px 62px 60px;display:flex;flex-direction:column;justify-content:space-between;position:relative;box-shadow:10px 0 30px rgba(0,0,0,.28);z-index:2}}
+.glow{{position:absolute;top:-140px;right:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,{PERI}26 0%,transparent 70%)}}
+.right{{width:485px;height:100%;background:#fff;display:flex;align-items:center;justify-content:center;position:relative}}
+.right::before{{content:'';position:absolute;left:0;top:0;width:6px;height:100%;background:linear-gradient({a},{a}cc)}}
+.vial{{height:544px;max-width:420px;object-fit:contain;mix-blend-mode:multiply}}
+.name{{font-size:{headfs(c['name'])}px}}</style></head><body><div class=card>
+<div class=left><div class=glow></div><div class=brand>{LOGO_W}</div>
+<div style="position:relative"><div class=name>{c['name']}</div><div class=str>{st}</div><div class=tag>{CHECK}{TAG}</div></div>
+<div class=dom>vyraxlabs.co.uk</div></div>
+<div class=right><img class=vial src="file://{v}"></div></div></body></html>"""
 def brand(kicker, title, sub, slugs=None):
-    pick = []
-    for s_ in (slugs or ["retatrutide"]):
-        fl = sorted(glob.glob(f"{R}/src/assets/products/{s_}__*.webp"))
-        if fl: pick.append(fl[0])
-    pick = pick[:3]; n = len(pick); imgs = ""
-    for i, f in enumerate(pick):
-        if n == 1: w, cx = 740, 920
-        else: w, cx = 470, 920 + (i - (n - 1) / 2) * 190
-        imgs += f'<img src="file://{f}" style="position:absolute;left:{cx - w/2:.0f}px;top:{(630 - w)/2 - 10:.0f}px;width:{w}px;height:{w}px;mix-blend-mode:multiply;z-index:{3 - i}">'
-    fs = 78 if len(title) < 16 else 62 if len(title) < 24 else 52 if len(title) < 36 else 44
-    return f"""<html><head>{BASE}<style>
-.l{{position:absolute;left:0;top:0;width:640px;height:630px;background:{NAVY};padding:64px 56px 64px 60px;z-index:9;overflow:hidden}}
-.k{{color:{PERI};font-weight:700;letter-spacing:.2em;font-size:25px;text-transform:uppercase}}
-h1{{color:#fff;font-weight:800;font-size:{fs}px;line-height:1.04;margin-top:30px;letter-spacing:-.02em}}
-.s{{color:#b8c4dc;font-size:30px;font-weight:500;margin-top:26px;line-height:1.3;max-width:520px}}
-.logo{{position:absolute;left:60px;bottom:56px;height:92px}}</style></head><body>
-<div class=l><div class=k>{kicker}</div><h1>{title}</h1><div class=s>{sub}</div><div class=logo>{LOGO_W}</div></div>{imgs}</body></html>"""
+    fs = 80 if len(title) < 18 else 64 if len(title) < 28 else 52
+    return f"""<html><head>{BASE}<style>{CSS}
+.b{{width:1200px;height:630px;position:relative;overflow:hidden;background:linear-gradient(125deg,{N_A} 0%,{N_B} 55%,{N_C} 100%)}}
+.m{{position:absolute;right:-70px;top:20px}}.mg{{position:absolute;right:-40px;top:60px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,{PERI}26 0%,transparent 68%)}}
+.ct{{position:relative;z-index:2;height:100%;padding:64px 70px 60px;display:flex;flex-direction:column;justify-content:space-between}}
+.h{{font-weight:800;font-size:{fs}px;line-height:1.0;color:#fff;letter-spacing:-1.6px;max-width:760px}}
+.sub{{font-weight:600;font-size:33px;color:{PERI};margin-top:24px}}</style></head><body><div class=b><div class=mg></div><div class=m>{motif()}</div>
+<div class=ct><div class=brand>{LOGO_W}</div><div><div class=h>{title}</div><div class=sub>{sub}</div><div class=tag>{CHECK}{TAG}</div></div><div class=dom>vyraxlabs.co.uk</div></div></div></body></html>"""
 def default():
-    return f"""<html><head>{BASE}<style>body{{background:{NAVY}}}
-.c{{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center}}
-.logo{{height:300px}}.t{{color:{PERI};font-weight:700;letter-spacing:.3em;font-size:28px;margin-top:50px;text-transform:uppercase}}</style></head><body>
-<div class=c><div class=logo>{LOGO_W}</div><div class=t>UK research peptides</div></div></body></html>"""
+    return brand("", "UK research peptides", "50 compounds, 75 strengths")
 jobs = {}
 jobs["default"] = default()
 for c in D["compounds"]:
@@ -79,7 +98,7 @@ for s in D["sections"]:
     jobs[f"s/{s['slug']}"] = brand("Collection", s["name"], f"{len(s['products'])} compounds, UK dispatch", s["products"])
 for g in D["guides"]:
     jobs[f"g/{g['slug']}"] = brand("Guide", g["title"], "Vyrax Labs knowledge base")
-PAGES = {"home": ("Vyrax Labs", "UK research peptides", "Batch-documented, tracked UK delivery", ["retatrutide","bpc-157","tb-500","ghk-cu"]),
+PAGES = {"home": ("Vyrax Labs", "UK research peptides", "50 compounds, 75 strengths", ["retatrutide","bpc-157","tb-500","ghk-cu"]),
  "shop": ("Shop", "Full catalogue", "50 compounds, 75 strengths", ["retatrutide","tirzepatide","bpc-157","semaglutide"]),
  "lab-reports": ("Lab reports", "Certificates of Analysis", "Batch certificates in one place", None),
  "guides": ("Guides", "Research guides", "Handling, reading CoAs and comparisons", None),
