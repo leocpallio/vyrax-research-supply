@@ -39,7 +39,25 @@ import { claimGate, isClaimAllowed } from "@/lib/claims";
 
 export const SITE_NAME = site.name;
 export const THEME_COLOR = "#F5F0E5";
-export const DEFAULT_OG_IMAGE = "/logo-512.png";
+export const DEFAULT_OG_IMAGE = "/og/default.jpg";
+
+const OG_PAGES = new Set([
+  "shop", "lab-reports", "guides", "faq", "about", "contact", "calculator",
+  "shipping", "returns", "terms", "privacy", "cookies", "verify",
+]);
+export const ogKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+/** Per-page 1200x630 link-preview card built by scripts/build-og.py (public/og/). */
+export function ogImageFor(path: string, productStrength?: string): string {
+  const parts = path.split("?")[0]!.split("/").filter(Boolean);
+  if (parts.length === 0) return "/og/page/home.jpg";
+  const [a, b] = parts;
+  if (a === "product" && b && productStrength) return `/og/p/${b}__${ogKey(productStrength)}.jpg`;
+  if (a === "category" && b) return `/og/c/${b}.jpg`;
+  if (a === "collections" && b) return `/og/s/${b}.jpg`;
+  if (a === "guides" && b) return `/og/g/${b}.jpg`;
+  if (parts.length === 1 && OG_PAGES.has(a!)) return `/og/page/${a}.jpg`;
+  return DEFAULT_OG_IMAGE;
+}
 export const RUO_TAIL = "Research use only.";
 /** Last catalogue/trust-content change (ISO date). Bump when compounds, prices, categories or policy
  *  pages change; sitemap lastmod reads it. A request date is not a content change date. */
@@ -114,7 +132,7 @@ export const titles = {
 export function buildHead(input: HeadInput): HeadOutput {
   const type = input.type ?? "website";
   const url = abs(input.path);
-  const image = absolute(input.image ?? DEFAULT_OG_IMAGE);
+  const image = absolute(input.image ?? ogImageFor(input.path));
   const description = clampText(input.description, 300);
   const robots = input.noindex ? "noindex, follow" : "index, follow, max-image-preview:large";
   const meta: Meta[] = [
@@ -128,12 +146,14 @@ export function buildHead(input: HeadInput): HeadOutput {
     { property: "og:type", content: type },
     { property: "og:url", content: url },
     { property: "og:image", content: image },
-    { property: "og:image:alt", content: `${SITE_NAME} research peptide vial` },
+    { property: "og:image:alt", content: `${input.title}` },
     { property: "og:locale", content: "en_GB" },
     { property: "og:site_name", content: SITE_NAME },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: input.title },
     { name: "twitter:description", content: description },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
     { name: "twitter:image", content: image },
   ];
   const links: LinkTag[] = [{ rel: "canonical", href: url }];

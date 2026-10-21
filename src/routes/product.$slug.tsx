@@ -27,6 +27,7 @@ import {
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { abs } from "@/data/site";
+import { DEFAULT_OG_IMAGE, ogImageFor } from "@/lib/seo";
 import { guides } from "@/data/guides";
 import { purityStat } from "@/lib/pdp-coa";
 import { packOptions } from "@/lib/pdp-packs";
@@ -65,7 +66,9 @@ export const Route = createFileRoute("/product/$slug")({
     const s = c?.strengths.find((x) => x.label === loaderData.strengthLabel);
     if (!c || !s) return {};
     const url = abs(`/product/${loaderData.slug}`);
-    const imgUrl = abs(productImage(c.slug, s.label).src);
+    const imgUrl = abs(
+      productImage(c.slug, s.label).isRender ? ogImageFor(`/product/${c.slug}`, s.label) : DEFAULT_OG_IMAGE,
+    );
     const title = productTitle(c, s);
     const desc = productDescription(c, s);
     return {
@@ -79,6 +82,9 @@ export const Route = createFileRoute("/product/$slug")({
         { property: "og:image", content: imgUrl },
         { property: "product:price:amount", content: s.price.toFixed(2) },
         { property: "product:price:currency", content: "GBP" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:image", content: imgUrl },
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],

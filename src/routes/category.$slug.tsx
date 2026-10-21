@@ -5,6 +5,7 @@ import { getCategory, compoundsIn, fromPrice, gbp, productPath } from "@/lib/cat
 import { categorySeo } from "@/data/category-content";
 import { faqJsonLd } from "@/data/faq";
 import { abs } from "@/data/site";
+import { ogImageFor } from "@/lib/seo";
 import { claimGate, isClaimAllowed } from "@/lib/claims";
 
 export const Route = createFileRoute("/category/$slug")({
@@ -52,6 +53,10 @@ export const Route = createFileRoute("/category/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
+        { property: "og:image", content: abs(ogImageFor(`/category/${c.slug}`)) },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:image", content: abs(ogImageFor(`/category/${c.slug}`)) },
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],

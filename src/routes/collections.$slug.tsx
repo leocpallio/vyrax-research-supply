@@ -6,6 +6,7 @@ import { shopSections, productsInSection } from "@/data/shop-sections";
 import { sectionSeo } from "@/data/category-content";
 import { faqJsonLd } from "@/data/faq";
 import { abs } from "@/data/site";
+import { ogImageFor } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections/$slug")({
   loader: ({ params }) => {
@@ -49,6 +50,10 @@ export const Route = createFileRoute("/collections/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
+        { property: "og:image", content: abs(ogImageFor(`/collections/${section.slug}`)) },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:image", content: abs(ogImageFor(`/collections/${section.slug}`)) },
         { name: "twitter:card", content: "summary_large_image" },
       ],
       // Category pages overlap but do not contain identical sets. Keep distinct self canonicals.

@@ -13,6 +13,7 @@ import {
   titles,
   webSiteJsonLd,
   withRuoTail,
+  ogImageFor,
 } from "./seo";
 import { site } from "../data/site";
 
@@ -60,7 +61,7 @@ describe("buildHead", () => {
   test("defaults: website type and og image", () => {
     const h = buildHead({ title: "x", description: "y", path: "/faq" });
     expect(meta(h, "og:type", "property")).toBe("website");
-    expect(meta(h, "og:image", "property")).toBe("https://vyraxlabs.co.uk/logo-512.png");
+    expect(meta(h, "og:image", "property")).toBe("https://vyraxlabs.co.uk/og/page/faq.jpg");
   });
   test("json-ld scripts, one per object, script-safe", () => {
     expect(head.scripts).toHaveLength(2);
@@ -164,5 +165,17 @@ describe("imageAltAudit", () => {
       { src: "b.webp", reason: "missing" },
       { src: "c.webp", reason: "empty" },
     ]);
+  });
+});
+
+describe("ogImageFor", () => {
+  test("maps each route type to its card", () => {
+    expect(ogImageFor("/")).toBe("/og/page/home.jpg");
+    expect(ogImageFor("/product/retatrutide", "10mg")).toBe("/og/p/retatrutide__10mg.jpg");
+    expect(ogImageFor("/category/metabolic-research")).toBe("/og/c/metabolic-research.jpg");
+    expect(ogImageFor("/collections/weight-metabolic")).toBe("/og/s/weight-metabolic.jpg");
+    expect(ogImageFor("/guides/peptide-storage-guide")).toBe("/og/g/peptide-storage-guide.jpg");
+    expect(ogImageFor("/shop")).toBe("/og/page/shop.jpg");
+    expect(ogImageFor("/something-else")).toBe("/og/default.jpg");
   });
 });

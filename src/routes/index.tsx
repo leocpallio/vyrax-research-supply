@@ -8,7 +8,7 @@ import { claimFilled, claimGate, claimText, isClaimAllowed } from "@/lib/claims"
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
-import social from "@/assets/vyrax-social.webp";
+import { ogImageFor } from "@/lib/seo";
 import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
@@ -50,7 +50,8 @@ export const Route = createFileRoute("/")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: abs("/") },
-        { property: "og:image", content: abs(social) },
+        { property: "og:image", content: abs(ogImageFor("/")) },
+        { name: "twitter:image", content: abs(ogImageFor("/")) },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
         { name: "twitter:card", content: "summary_large_image" },

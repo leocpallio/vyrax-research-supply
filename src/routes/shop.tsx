@@ -7,6 +7,7 @@ import { compounds, searchCompounds } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
 import { shopSeo } from "@/data/category-content";
 import { abs, site } from "@/data/site";
+import { ogImageFor } from "@/lib/seo";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { capture } from "@/lib/analytics";
 
@@ -30,6 +31,10 @@ export const Route = createFileRoute("/shop")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: abs("/shop") },
+        { property: "og:image", content: abs(ogImageFor("/shop")) },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:image", content: abs(ogImageFor("/shop")) },
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: abs("/shop") }],
