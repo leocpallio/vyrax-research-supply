@@ -201,7 +201,12 @@ function ProductPage() {
 
         <div className="mt-6 grid min-w-0 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
           <div className="min-w-0 lg:sticky lg:top-24">
-            <ProductGallery image={img} name={heading} fallbackLabel={heading} />
+            <ProductGallery
+              image={img}
+              name={heading}
+              fallbackLabel={heading}
+              report={coa?.file?.endsWith(".png") ? { src: coa.file, batch: coa.batch } : undefined}
+            />
           </div>
 
           <div className="min-w-0">
