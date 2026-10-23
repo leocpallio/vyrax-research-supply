@@ -23,14 +23,14 @@ export type Coa = {
 export const SHELF_LIFE_MONTHS = 24;
 
 // Takedown 2026-10-08: the previous entries were built from site numbers, not lab reports.
-// Add rows back only for real independent lab reports (Janoshik).
+// Add rows back only for real independent lab reports (Janoshik). Methods HPLC-UV + LC-MS confirmed by the owner (client of the test order); the report image itself prints only "Common GLP-1 peptide blind test".
 export const coas: Coa[] = [
   // Janoshik task #244685, key IFY9PLTLISZE. Report printed: Retatrutide 11.27 mg, purity 99.330%.
-  { compound: "retatrutide", strength: "10mg", batch: "RET-6121", purity: 99.33, measuredMg: 11.27, lab: "Janoshik", method: "Janoshik GLP-1 blind test", tested: "2026-10-23", file: "/coa/retatrutide-10mg-RET-6121.png", verifyUrl: "https://verify.janoshik.com/tests/244685-Retatrutide_10mg_IFY9PLTLISZE" },
+  { compound: "retatrutide", strength: "10mg", batch: "RET-6121", purity: 99.33, measuredMg: 11.27, lab: "Janoshik", method: "HPLC-UV and LC-MS (Janoshik)", tested: "2026-10-23", file: "/coa/retatrutide-10mg-RET-6121.png", verifyUrl: "https://verify.janoshik.com/tests/244685-Retatrutide_10mg_IFY9PLTLISZE" },
   // Janoshik task #244686, key TKTNYTAA8JRH. Report printed: Retatrutide 21.51 mg, purity 99.910%.
-  { compound: "retatrutide", strength: "20mg", batch: "RET-3599", purity: 99.91, measuredMg: 21.51, lab: "Janoshik", method: "Janoshik GLP-1 blind test", tested: "2026-10-23", file: "/coa/retatrutide-20mg-RET-3599.png", verifyUrl: "https://verify.janoshik.com/tests/244686-Retatrutide_20mg_TKTNYTAA8JRH" },
+  { compound: "retatrutide", strength: "20mg", batch: "RET-3599", purity: 99.91, measuredMg: 21.51, lab: "Janoshik", method: "HPLC-UV and LC-MS (Janoshik)", tested: "2026-10-23", file: "/coa/retatrutide-20mg-RET-3599.png", verifyUrl: "https://verify.janoshik.com/tests/244686-Retatrutide_20mg_TKTNYTAA8JRH" },
   // Janoshik task #244687, key Q7BBKBYNDAWK. Report printed: Retatrutide 32.78 mg, purity 99.684%.
-  { compound: "retatrutide", strength: "30mg", batch: "RET-3610", purity: 99.684, measuredMg: 32.78, lab: "Janoshik", method: "Janoshik GLP-1 blind test", tested: "2026-10-23", file: "/coa/retatrutide-30mg-RET-3610.png", verifyUrl: "https://verify.janoshik.com/tests/244687-Retatrutide_30mg_Q7BBKBYNDAWK" },
+  { compound: "retatrutide", strength: "30mg", batch: "RET-3610", purity: 99.684, measuredMg: 32.78, lab: "Janoshik", method: "HPLC-UV and LC-MS (Janoshik)", tested: "2026-10-23", file: "/coa/retatrutide-30mg-RET-3610.png", verifyUrl: "https://verify.janoshik.com/tests/244687-Retatrutide_30mg_Q7BBKBYNDAWK" },
 ];
 
 // True once at least one real certificate exists. Copy that asserts testing has happened, or that
