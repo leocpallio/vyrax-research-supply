@@ -15,7 +15,7 @@ export function ProductGallery({
   image: Img;
   name: string;
   fallbackLabel?: string;
-  report?: { src: string; batch: string } | undefined;
+  report?: { src: string; batch: string; verifyUrl?: string | undefined } | undefined;
 }) {
   const [view, setView] = useState<"vial" | "report">("vial");
   const showReport = Boolean(report) && view === "report";
@@ -79,6 +79,14 @@ export function ProductGallery({
             <img src={report.src} alt="" className="h-full w-full object-cover object-top" />
           </button>
         </div>
+      )}
+      {report?.verifyUrl && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Third-party report from Janoshik, batch {report.batch}.{" "}
+          <a href={report.verifyUrl} target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 text-foreground">
+            Verify on Janoshik
+          </a>
+        </p>
       )}
     </div>
   );

@@ -205,7 +205,7 @@ function ProductPage() {
               image={img}
               name={heading}
               fallbackLabel={heading}
-              report={coa?.file?.endsWith(".png") ? { src: coa.file, batch: coa.batch } : undefined}
+              report={coa?.file?.endsWith(".png") ? { src: coa.file, batch: coa.batch, verifyUrl: coa.verifyUrl } : undefined}
             />
           </div>
 
