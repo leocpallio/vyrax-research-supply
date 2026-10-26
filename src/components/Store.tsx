@@ -18,6 +18,7 @@ import { latestCoa } from "@/data/coa";
 import { claimFilled, claimText } from "@/lib/claims";
 import { AnnouncementBar } from "@/components/shell/AnnouncementBar";
 import { Header } from "@/components/shell/Header";
+import { WhatsAppButton } from "@/components/shell/WhatsAppButton";
 import { Footer } from "@/components/shell/Footer";
 import { FooterSignup } from "@/components/shell/FooterSignup";
 import { SearchDialog } from "@/components/shell/SearchDialog";
@@ -95,6 +96,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       </main>
       <FooterSignup />
       <Footer />
+      <WhatsAppButton />
       <SearchDialog open={search} onOpenChange={setSearch} />
       <CartDrawer open={cart} onOpenChange={setCart} />
       <AddedToast />

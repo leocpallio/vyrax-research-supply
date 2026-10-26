@@ -41,7 +41,7 @@ export function Footer() {
     paymentMethods: `${site.paymentMethods.join(", ")}, entered on our payment provider's secure hosted page`,
   });
   return (
-    <footer className="bg-ink text-ink-foreground mt-16" data-testid="site-footer">
+    <footer className="bg-ink text-ink-foreground mt-16 pb-24 sm:pb-20" data-testid="site-footer">
       <div className="container-main py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
         <div className="md:col-span-2 lg:col-span-1">
           <Wordmark tone="light" title={site.name} className="h-[44px] w-auto" />
@@ -97,6 +97,7 @@ export function Footer() {
         <Col title="Company">
           <L to="/about">About</L>
           <L to="/contact">Contact</L>
+          {site.whatsapp && <L href={`https://wa.me/${site.whatsapp}`}>WhatsApp support</L>}
           <L to="/research-use-policy">Research use policy</L>
           <L to="/terms">Terms</L>
           <L to="/privacy">Privacy</L>
