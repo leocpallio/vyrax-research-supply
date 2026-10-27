@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
 import { capture, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
@@ -281,6 +282,30 @@ export function PaymentCheckout() {
                           <span className="font-normal text-muted-foreground"> (optional)</span>
                         )}
                       </label>
+{f.key === "address" ? (
+                      <AddressAutocomplete
+                        id={id}
+                        name={f.key}
+                        className="mt-2 h-11 text-base"
+                        type={f.type ?? "text"}
+                        inputMode={f.inputMode}
+                        autoComplete={f.autoComplete}
+                                                                        required={!f.optional}
+                        aria-required={!f.optional}
+                        aria-invalid={err ? true : undefined}
+                        aria-describedby={err ? `${id}-err` : f.hint ? `${id}-hint` : undefined}
+                        maxLength={200}
+                        value={form[f.key]}
+                        disabled={busy}
+                        onValue={(v) => set(f.key, v)}
+                        onResolve={(a) => { set("address", a.address); set("address2", a.address2); if (a.city) set("city", a.city); if (a.postcode) set("postcode", formatPostcode(a.postcode)); }}
+                        onBlur={() => {
+                          if (f.key === "postcode" && form.postcode)
+                            set("postcode", formatPostcode(form.postcode));
+                          if (form[f.key] || errors[f.key]) validateOne(f.key);
+                        }}
+                      />
+                      ) : (
                       <Input
                         id={id}
                         name={f.key}
@@ -304,6 +329,7 @@ export function PaymentCheckout() {
                           if (form[f.key] || errors[f.key]) validateOne(f.key);
                         }}
                       />
+                      )}
                       {err ? (
                         <p id={`${id}-err`} className="mt-1.5 text-sm text-destructive">
                           {err}
