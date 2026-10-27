@@ -8,7 +8,7 @@ import { claimFilled, claimGate, claimText, isClaimAllowed } from "@/lib/claims"
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
-import { ogImageFor } from "@/lib/seo";
+import { clampDescription, ogImageFor } from "@/lib/seo";
 import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
       : "";
     const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = `Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`;
+    const desc = clampDescription(`Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`);
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",

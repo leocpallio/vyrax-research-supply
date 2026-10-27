@@ -7,7 +7,7 @@ import { compounds, searchCompounds } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
 import { shopSeo } from "@/data/category-content";
 import { abs, site } from "@/data/site";
-import { ogImageFor } from "@/lib/seo";
+import { clampDescription, ogImageFor } from "@/lib/seo";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { capture } from "@/lib/analytics";
 
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/shop")({
       : "";
     const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
     const batchCerts = claimText("testing.batch-certificates");
-    const desc = `Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`;
+    const desc = clampDescription(`Browse all ${compounds.length} Vyrax Labs research compounds for laboratory use: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`);
     return {
       meta: [
         { title },

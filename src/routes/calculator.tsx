@@ -34,7 +34,7 @@ const faqs: QA[] = [
 
 export const Route = createFileRoute("/calculator")({
   head: () => {
-    const title = "Peptide Reconstitution Calculator | mg/ml Concentration | Vyrax Labs";
+    const title = "Peptide Reconstitution Calculator | Vyrax Labs";
     const description =
       "Free peptide reconstitution calculator for laboratory research: stock concentration in mg/ml and µg/ml, molar concentration from molecular weight, and C1V1 = C2V2 working dilutions. Research use only.";
     return buildHead({

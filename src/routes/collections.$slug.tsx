@@ -6,7 +6,7 @@ import { shopSections, productsInSection } from "@/data/shop-sections";
 import { sectionSeo } from "@/data/category-content";
 import { faqJsonLd } from "@/data/faq";
 import { abs } from "@/data/site";
-import { ogImageFor } from "@/lib/seo";
+import { clampDescription, ogImageFor } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections/$slug")({
   loader: ({ params }) => {
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/collections/$slug")({
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const content = sectionSeo(section.slug);
     const title = `${section.name} Research Peptides UK | Vyrax Labs`;
-    const desc = `${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. Research use only.`;
+    const desc = clampDescription(`${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. Research use only.`);
     const url = abs(`/collections/${section.slug}`);
     const itemList = {
       "@context": "https://schema.org",

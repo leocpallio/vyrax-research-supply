@@ -8,7 +8,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { featuredSlugs, fromPrice, type Compound } from "@/lib/catalog";
+import { Link } from "@tanstack/react-router";
+import { featuredSlugs, fromPrice, productPath, type Compound } from "@/lib/catalog";
 import type { CategoryContent } from "@/data/category-content";
 
 export function sortCompounds(list: Compound[], sort: SortKey): Compound[] {
@@ -127,6 +128,24 @@ export function ListingPage({
           <ProductCardGrid list={sorted} priorityCount={4} />
         ) : (
           <p className="py-20 text-center text-[#040825]/60">{emptyText}</p>
+        )}
+        {sorted.some((c) => c.strengths.length > 1) && (
+          <nav aria-label="Browse by strength" className="mt-12 border-t border-border pt-8">
+            <h2 className="text-lg font-semibold">Browse by strength</h2>
+            <ul className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+              {sorted
+                .filter((c) => c.strengths.length > 1)
+                .flatMap((c) =>
+                  c.strengths.map((st) => (
+                    <li key={`${c.slug}-${st.label}`}>
+                      <Link to={productPath(c.slug, st.label)} className="underline-offset-2 hover:underline">
+                        {c.name} {st.label}
+                      </Link>
+                    </li>
+                  )),
+                )}
+            </ul>
+          </nav>
         )}
         <SeoBlock content={content} />
       </div>

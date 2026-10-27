@@ -7,7 +7,7 @@ import { breadcrumbListJsonLd, buildHead, faqPageJsonLd } from "@/lib/seo";
 export const Route = createFileRoute("/faq")({
   head: () =>
     buildHead({
-      title: "Research Peptide FAQs UK | Ordering, Testing, Delivery | Vyrax Labs",
+      title: "Research Peptide FAQs UK | Vyrax Labs",
       description:
         "Answers about ordering research peptides in the UK: certificates of analysis, storage, delivery, payment and returns. Research use only.",
       path: "/faq",

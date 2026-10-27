@@ -7,7 +7,7 @@ import { breadcrumbListJsonLd, buildHead, collectionPageJsonLd } from "@/lib/seo
 export const Route = createFileRoute("/guides/")({
   head: () =>
     buildHead({
-      title: "Peptide Research Guides UK | Reconstitution & CoAs | Vyrax Labs",
+      title: "Peptide Research Guides UK | Vyrax Labs",
       description:
         "Laboratory guides for research peptides: how to reconstitute lyophilised peptides, storage temperatures, reading a certificate of analysis and compound comparisons. Research use only.",
       path: "/guides",

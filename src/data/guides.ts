@@ -25,7 +25,7 @@ export const guides: Guide[] = [
   {
     slug: "how-to-reconstitute-peptides",
     title: "How to reconstitute lyophilised peptides",
-    seoTitle: "How to Reconstitute Peptides: Step-by-Step Lab Guide UK",
+    seoTitle: "How to Reconstitute Peptides: Lab Guide UK",
     description:
       "A step-by-step laboratory guide to reconstituting lyophilised research peptides with bacteriostatic water, including concentration maths and handling tips.",
     updated: "2026-09-28",
@@ -92,7 +92,7 @@ export const guides: Guide[] = [
   {
     slug: "peptide-storage-guide",
     title: "Peptide storage and handling guide",
-    seoTitle: "Peptide Storage Guide: Temperature, Light & Stability UK",
+    seoTitle: "Peptide Storage Guide: Temperature & Light",
     description:
       "How to store lyophilised and reconstituted research peptides: temperatures, light, moisture, freeze-thaw cycles and shelf-life considerations.",
     updated: "2026-09-28",
@@ -145,7 +145,7 @@ export const guides: Guide[] = [
   {
     slug: "how-to-read-a-certificate-of-analysis",
     title: "How to read a peptide certificate of analysis",
-    seoTitle: "How to Read a Peptide COA: HPLC & Mass Spec Explained",
+    seoTitle: "How to Read a Peptide COA: HPLC & Mass Spec",
     description:
       "What a peptide certificate of analysis should show, how HPLC purity and mass spectrometry work, and the red flags to look out for.",
     updated: "2026-09-28",
@@ -199,7 +199,7 @@ export const guides: Guide[] = [
   {
     slug: "bpc-157-vs-tb-500",
     title: "BPC-157 vs TB-500: how the research compares",
-    seoTitle: "BPC-157 vs TB-500: Research Differences Explained | UK",
+    seoTitle: "BPC-157 vs TB-500: Research Differences",
     description:
       "BPC-157 and TB-500 compared: structure, proposed mechanisms, research models and why they are often studied together.",
     updated: "2026-09-28",
@@ -253,7 +253,7 @@ export const guides: Guide[] = [
   {
     slug: "retatrutide-vs-tirzepatide-vs-semaglutide",
     title: "Retatrutide vs tirzepatide vs semaglutide: receptor pharmacology compared",
-    seoTitle: "Retatrutide vs Tirzepatide vs Semaglutide: Research Guide",
+    seoTitle: "Retatrutide vs Tirzepatide vs Semaglutide",
     description:
       "How the single, dual and triple incretin agonists differ in receptor targets, structure and research use.",
     updated: "2026-09-28",

@@ -66,7 +66,7 @@ export function ProductGallery({
             onClick={() => setView("vial")}
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "vial" ? "border-primary" : "border-border"}`}
           >
-            <img src={image.src} alt="" className="h-full w-full object-cover" />
+            <img src={image.src} alt="" width={64} height={64} className="h-full w-full object-cover" />
           </button>
           <button
             type="button"
@@ -76,7 +76,7 @@ export function ProductGallery({
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "report" ? "border-primary" : "border-border"}`}
             aria-label="Lab report"
           >
-            <img src={report.src} alt="" className="h-full w-full object-cover object-top" />
+            <img src={report.src} alt="" width={64} height={64} loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
           </button>
         </div>
       )}
