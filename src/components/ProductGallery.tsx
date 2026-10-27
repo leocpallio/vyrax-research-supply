@@ -24,7 +24,7 @@ export function ProductGallery({
       <figure
         data-testid="pdp-gallery"
         data-pdp-gallery
-        className="relative aspect-square overflow-hidden bg-white"
+        className={`relative overflow-hidden bg-white ${showReport ? "" : "aspect-square"}`}
       >
         {showReport && report ? (
           <a href={report.src} target="_blank" rel="noreferrer" aria-label={`Open the Janoshik lab report for batch ${report.batch}`}>
@@ -34,14 +34,14 @@ export function ProductGallery({
               width={1600}
               height={2360}
               decoding="async"
-              className="w-full h-full object-contain object-top select-none border border-border"
+              className="w-full h-auto select-none border border-border"
             />
           </a>
         ) : (
           <img
             src={image.src}
             srcSet={image.srcSet}
-            sizes="(min-width: 1024px) 600px, 100vw"
+            sizes="(min-width: 1024px) 1200px, 100vw"
             alt={`${name} research vial, illustrative front render`}
             width={1024}
             height={1024}
