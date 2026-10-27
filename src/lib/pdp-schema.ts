@@ -104,7 +104,26 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
             availability:
               stockOf(s) === "out" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
             itemCondition: "https://schema.org/NewCondition",
+            priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
             seller: { "@type": "Organization", name: site.name },
+            shippingDetails: {
+              "@type": "OfferShippingDetails",
+              shippingRate: {
+                "@type": "MonetaryAmount",
+                value: s.price >= site.freeDeliveryThreshold ? "0.00" : site.standardDeliveryFee.toFixed(2),
+                currency: "GBP",
+              },
+              shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
+            },
+            hasMerchantReturnPolicy: {
+              "@type": "MerchantReturnPolicy",
+              applicableCountry: "GB",
+              returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+              merchantReturnDays: site.returnWindowDays,
+              returnMethod: "https://schema.org/ReturnByMail",
+              returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+              merchantReturnLink: abs("/returns"),
+            },
           },
         }
       : {}),
