@@ -39,7 +39,7 @@ export function AnnouncementBar() {
         data-testid="whatsapp-banner"
       >
         <div className="container-main min-h-11 py-2 flex items-center justify-center text-center">
-          <p>Message us on WhatsApp for product or order support: +44 7575 894339</p>
+          <p><span className="sm:hidden">WhatsApp support: +44 7575 894339</span><span className="hidden sm:inline">Message us on WhatsApp for product or order support: +44 7575 894339</span></p>
         </div>
       </a>
     )}

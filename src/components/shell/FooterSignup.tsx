@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { GuideSignup } from "@/components/GuideSignup";
 
 const KEY = "vx:footer-signup:dismissed";
 
 /** Footer email capture on every page. Explicit "No thanks" hides it for this browser. No discount promise. */
 export function FooterSignup() {
+  const path = useRouterState({ select: (r) => r.location.pathname });
   const [open, setOpen] = useState(false);
   useEffect(() => {
     try {
@@ -22,6 +24,7 @@ export function FooterSignup() {
     }
     setOpen(false);
   };
+  if (path.startsWith("/checkout")) return null; // nothing between the buyer and the pay button
   return (
     <div data-testid="footer-signup" className="relative">
       <GuideSignup />
