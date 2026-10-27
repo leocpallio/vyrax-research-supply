@@ -37,6 +37,8 @@ describe("buildHead", () => {
     expect(meta(head, "description")).toContain("Research use only.");
     expect(head.links).toEqual([
       { rel: "canonical", href: "https://vyraxlabs.co.uk/product/bpc-157" },
+      { rel: "alternate", hrefLang: "en-GB", href: "https://vyraxlabs.co.uk/product/bpc-157" },
+      { rel: "alternate", hrefLang: "x-default", href: "https://vyraxlabs.co.uk/product/bpc-157" },
     ]);
   });
   test("og and twitter", () => {

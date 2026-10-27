@@ -111,3 +111,8 @@ export function buildPricingMd(): string {
 function dispatchPromise() {
   return `Paid UK orders confirmed before ${dispatchCutoffLabel()} on working days dispatch the same day, subject to stock; this is a dispatch target, not a delivery guarantee.`;
 }
+
+/** /llms-full.txt: the catalogue summary plus the full price list in one plain-text file. */
+export function buildLlmsFullTxt(): string {
+  return buildLlmsTxt() + "\n\n---\n\n" + buildPricingMd();
+}

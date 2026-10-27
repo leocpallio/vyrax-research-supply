@@ -61,7 +61,7 @@ export function ogImageFor(path: string, productStrength?: string): string {
 export const RUO_TAIL = "Research use only.";
 /** Last catalogue/trust-content change (ISO date). Bump when compounds, prices, categories or policy
  *  pages change; sitemap lastmod reads it. A request date is not a content change date. */
-export const CONTENT_UPDATED = "2026-10-12";
+export const CONTENT_UPDATED = "2026-10-27";
 /** Trust and legal pages every crawler should find (path, priority, changefreq). */
 export const TRUST_PAGES = [
   ["/lab-reports", "0.8", "weekly"],
@@ -106,6 +106,16 @@ export function clampText(text: string, max: number): string {
   return cut.slice(0, Math.max(cut.lastIndexOf(" "), 40)).trimEnd() + "\u2026";
 }
 
+/** Meta description capped at 155 chars, cut at the last full sentence when one fits, else at a word. */
+export function clampDescription(text: string, max = 155): string {
+  const t = text.replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  const head = t.slice(0, max);
+  const stop = Math.max(head.lastIndexOf(". "), head.lastIndexOf("? "));
+  if (stop >= 90) return head.slice(0, stop + 1);
+  return clampText(t, max);
+}
+
 /** Append the RUO tail if the description does not already end with an RUO statement. */
 export function withRuoTail(description: string): string {
   const d = description.trim();
@@ -120,8 +130,11 @@ export const titles = {
   testingModifier: () =>
     isClaimAllowed("testing.page-title") ? claimGate("testing.page-title") : "",
   shop: () => `Shop UK Research Peptides | BPC-157 & Retatrutide | ${SITE_NAME}`,
-  product: (name: string, strength?: string) =>
-    `Buy ${name}${strength ? ` ${strength}` : ""} UK | Research Peptide | ${SITE_NAME}`,
+  product: (name: string, strength?: string) => {
+    const base = `Buy ${name}${strength ? ` ${strength}` : ""} UK`;
+    const full = `${base} | Research Peptide | ${SITE_NAME}`;
+    return full.length <= 60 ? full : `${base} | ${SITE_NAME}`;
+  },
   category: (seoName: string) => `Buy ${seoName} UK | Research Grade | ${SITE_NAME}`,
   collection: (name: string) => `${name} Research Peptides UK | ${SITE_NAME}`,
   labReports: () => `Lab Results & Certificates of Analysis | ${SITE_NAME} UK`,
@@ -133,7 +146,7 @@ export function buildHead(input: HeadInput): HeadOutput {
   const type = input.type ?? "website";
   const url = abs(input.path);
   const image = absolute(input.image ?? ogImageFor(input.path));
-  const description = clampText(input.description, 300);
+  const description = clampDescription(input.description);
   const robots = input.noindex ? "noindex, follow" : "index, follow, max-image-preview:large";
   const meta: Meta[] = [
     { title: input.title },
@@ -156,7 +169,11 @@ export function buildHead(input: HeadInput): HeadOutput {
     { property: "og:image:height", content: "630" },
     { name: "twitter:image", content: image },
   ];
-  const links: LinkTag[] = [{ rel: "canonical", href: url }];
+  const links: LinkTag[] = [
+    { rel: "canonical", href: url },
+    { rel: "alternate", hrefLang: "en-GB", href: url },
+    { rel: "alternate", hrefLang: "x-default", href: url },
+  ];
   const jsonLd = input.jsonLd ? (Array.isArray(input.jsonLd) ? input.jsonLd : [input.jsonLd]) : [];
   const scripts: ScriptTag[] = jsonLd.map((obj) => ({
     type: "application/ld+json",

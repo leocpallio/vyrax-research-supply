@@ -28,14 +28,21 @@ User-agent: cohere-ai
 User-agent: DuckAssistBot
 User-agent: meta-externalagent
 User-agent: YouBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: Googlebot
+User-agent: Bingbot
 Allow: /
 Disallow: /api/
 Disallow: /admin
 Disallow: /account
 Disallow: /checkout
 Disallow: /basket
+Disallow: /*?q=
+Disallow: /*?*utm_
 
 Sitemap: https://vyraxlabs.co.uk/sitemap.xml
 # Machine-readable catalogue summaries for LLMs:
 # https://vyraxlabs.co.uk/llms.txt
+# https://vyraxlabs.co.uk/llms-full.txt
 # https://vyraxlabs.co.uk/pricing.md

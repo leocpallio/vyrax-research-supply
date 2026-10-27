@@ -20,6 +20,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as LabReportsRouteImport } from './routes/lab-reports'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PricingDotmdRouteImport } from './routes/pricing[.]md'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -98,6 +99,11 @@ const FaqRoute = FaqRouteImport.update({
 const LabReportsRoute = LabReportsRouteImport.update({
   id: '/lab-reports',
   path: '/lab-reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lab-reports': typeof LabReportsRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/lab-reports'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
@@ -459,6 +471,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   LabReportsRoute: typeof LabReportsRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   PricingDotmdRoute: typeof PricingDotmdRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -562,6 +575,13 @@ declare module '@tanstack/react-router' {
       path: '/lab-reports'
       fullPath: '/lab-reports'
       preLoaderRoute: typeof LabReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/llms.txt': {
@@ -747,6 +767,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   LabReportsRoute: LabReportsRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   PricingDotmdRoute: PricingDotmdRoute,
   PrivacyRoute: PrivacyRoute,
