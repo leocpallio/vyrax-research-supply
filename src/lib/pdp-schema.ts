@@ -121,7 +121,7 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
               returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
               merchantReturnDays: site.returnWindowDays,
               returnMethod: "https://schema.org/ReturnByMail",
-              returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+              returnFees: "https://schema.org/FreeReturn",
               merchantReturnLink: abs("/returns"),
             },
           },

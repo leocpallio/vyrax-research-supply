@@ -35,6 +35,7 @@ function Returns() {
         opened cannot be taken back for health protection reasons, and we may reduce a refund if
         goods have been handled more than needed to inspect them.
       </p>
+      <p>Return postage is free: we cover the cost of sending eligible items back to us.</p>
       <h2>Faulty, damaged or wrong items</h2>
       <p>
         Tell us as soon as you can and include your order number and photos. Keep the packaging and
