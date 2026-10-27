@@ -59,7 +59,11 @@ export const Route = createFileRoute("/category/$slug")({
         { name: "twitter:image", content: abs(ogImageFor(`/category/${c.slug}`)) },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "en-GB", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(itemList) },
         { type: "application/ld+json", children: JSON.stringify(crumbs) },

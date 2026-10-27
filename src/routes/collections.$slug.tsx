@@ -57,7 +57,11 @@ export const Route = createFileRoute("/collections/$slug")({
         { name: "twitter:card", content: "summary_large_image" },
       ],
       // Category pages overlap but do not contain identical sets. Keep distinct self canonicals.
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "en-GB", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(itemList) },
         { type: "application/ld+json", children: JSON.stringify(crumbs) },

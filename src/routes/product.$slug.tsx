@@ -87,7 +87,11 @@ export const Route = createFileRoute("/product/$slug")({
         { name: "twitter:image", content: imgUrl },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [
+        { rel: "canonical", href: url },
+        { rel: "alternate", hrefLang: "en-GB", href: url },
+        { rel: "alternate", hrefLang: "x-default", href: url },
+      ],
       scripts: productJsonLd(c, s, loaderData.slug).map((ld) => ({
         type: "application/ld+json",
         children: JSON.stringify(ld),

@@ -56,7 +56,11 @@ export const Route = createFileRoute("/")({
         { property: "og:image:height", content: "630" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: abs("/") }],
+      links: [
+        { rel: "canonical", href: abs("/") },
+        { rel: "alternate", hrefLang: "en-GB", href: abs("/") },
+        { rel: "alternate", hrefLang: "x-default", href: abs("/") },
+      ],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(org) },
         { type: "application/ld+json", children: JSON.stringify(webSite) },

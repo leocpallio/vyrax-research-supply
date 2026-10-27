@@ -19,13 +19,17 @@ export function listingFor(c: Compound) {
 
 export const productHeading = (c: Compound, s: Strength) => `${c.name} ${s.label}`;
 
-export const productTitle = (c: Compound, s: Strength) =>
-  `Buy ${c.name} ${s.label} UK | ${c.kind === "supply" ? "Lab Supply" : "Research Peptide"} | ${site.name}`;
+export const productTitle = (c: Compound, s: Strength) => {
+  const base = `Buy ${c.name} ${s.label} UK`;
+  const full = `${base} | ${c.kind === "supply" ? "Lab Supply" : "Research Peptide"} | ${site.name}`;
+  return full.length <= 60 ? full : `${base} | ${site.name}`;
+};
 
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
   const base = `${c.name} ${s.label} from ${site.name}. ${first}`;
-  const clipped = base.length > 140 ? base.slice(0, 137).replace(/\s+\S*$/, "") + "..." : base;
+  const room = 155 - " Research use only.".length;
+  const clipped = base.length > room ? base.slice(0, room - 1).replace(/\s+\S*$/, "") + "…" : base;
   return `${clipped} Research use only.`;
 };
 

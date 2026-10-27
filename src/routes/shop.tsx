@@ -37,7 +37,11 @@ export const Route = createFileRoute("/shop")({
         { name: "twitter:image", content: abs(ogImageFor("/shop")) },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: abs("/shop") }],
+      links: [
+        { rel: "canonical", href: abs("/shop") },
+        { rel: "alternate", hrefLang: "en-GB", href: abs("/shop") },
+        { rel: "alternate", hrefLang: "x-default", href: abs("/shop") },
+      ],
     };
   },
   component: Shop,
