@@ -1,11 +1,30 @@
+import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { site } from "@/data/site";
+import { CART_ADDED_EVENT, CART_OPEN_EVENT } from "@/components/shell/cart-store";
 
 /** Floating support button, bottom right, on every page. */
 export function WhatsAppButton() {
+  // Step aside while the added-to-basket toast or the basket drawer is on screen.
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const hide = () => {
+      setBusy(true);
+      clearTimeout(t);
+      t = setTimeout(() => setBusy(false), 4600);
+    };
+    window.addEventListener(CART_ADDED_EVENT, hide);
+    window.addEventListener(CART_OPEN_EVENT, hide);
+    return () => {
+      window.removeEventListener(CART_ADDED_EVENT, hide);
+      window.removeEventListener(CART_OPEN_EVENT, hide);
+      clearTimeout(t);
+    };
+  }, []);
   const path = useRouterState({ select: (r) => r.location.pathname });
   // Never compete with the pay step.
-  if (!site.whatsapp || path.startsWith("/checkout")) return null;
+  if (busy || !site.whatsapp || path.startsWith("/checkout")) return null;
   // On product pages the mobile sticky add-to-basket bar owns the bottom edge.
   const onPdp = path.startsWith("/product/");
   return (
