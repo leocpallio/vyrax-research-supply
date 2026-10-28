@@ -30,7 +30,8 @@ export const Route = createFileRoute("/collections/$slug")({
       itemListElement: list.map((product, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        item: { "@type": "Product", name: product.name, url: abs(productPath(product.slug)) },
+        name: product.name,
+        url: abs(productPath(product.slug)),
       })),
     };
     const crumbs = {
