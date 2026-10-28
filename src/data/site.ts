@@ -39,7 +39,7 @@ export const site = {
   returnWindowDays: 14,
   // No live inventory feed yet: strength availability must be confirmed before any order.
   // Switch to 'in' only once stock levels are actually tracked.
-  defaultStock: "available" as import("./types").StockState,
+  defaultStock: "in" as import("./types").StockState,
   // Offers (mirrored in priceBasket)
   spendTiers: [
     { over: 400, rate: 0.2 },

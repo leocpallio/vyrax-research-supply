@@ -298,6 +298,93 @@ export const guides: Guide[] = [
       },
     ],
   },
+  {
+    slug: "how-long-do-reconstituted-peptides-last",
+    title: "How long do reconstituted peptides last?",
+    seoTitle: "How Long Do Reconstituted Peptides Last?",
+    description:
+      "What decides the shelf life of a reconstituted peptide: sequence, diluent, temperature, light and handling. No single number fits every compound.",
+    updated: "2026-10-28",
+    readMins: 5,
+    compounds: ["bacteriostatic-water", "bpc-157", "tb-500"],
+    body: [
+      {
+        type: "p",
+        text: "There is no single shelf life for a reconstituted peptide. Stability depends on the amino acid sequence, the diluent, the storage temperature, light exposure and how often the vial is opened. Any fixed number quoted for every peptide should be treated with caution.",
+      },
+      { type: "h", text: "Lyophilised versus reconstituted" },
+      {
+        type: "p",
+        text: "Freeze-dried powder is far more stable than the same peptide in solution. Water drives most degradation routes, so once a peptide is dissolved the clock starts. Unopened lyophilised vials are typically stored cold and dark, and the powder is the form to keep for long-term holding.",
+      },
+      { type: "h", text: "What shortens stability in solution" },
+      {
+        type: "list",
+        items: [
+          "Sequence: methionine and cysteine residues oxidise, while asparagine and glutamine can deamidate.",
+          "Temperature: degradation speeds up as temperature rises, which is why solutions are held at 2 to 8°C.",
+          "Freeze-thaw cycles: repeated freezing can aggregate peptides, so dividing a solution into single-use aliquots is common lab practice.",
+          "Light and air: amber vials and minimal headspace reduce photo-oxidation.",
+          "Contamination: every needle puncture is a chance to introduce microbes.",
+        ],
+      },
+      { type: "h", text: "The diluent matters" },
+      {
+        type: "p",
+        text: "Bacteriostatic water contains 0.9% benzyl alcohol, which suppresses bacterial growth across repeated punctures. Sterile water has no preservative, so a vial made up with it is normally treated as single-use. Neither extends the chemical stability of the peptide itself.",
+      },
+      { type: "h", text: "How labs decide" },
+      {
+        type: "p",
+        text: "Where a defined hold time matters, laboratories test it, usually by re-running HPLC on stored aliquots and comparing the purity against the day-zero result. A visible change such as cloudiness, particles or discolouration means the solution should be discarded.",
+      },
+      {
+        type: "note",
+        text: "Products are supplied for laboratory research use only. This guide describes general peptide chemistry and is not guidance on using any product in people or animals.",
+      },
+    ],
+  },
+  {
+    slug: "melanotan-1-vs-melanotan-2",
+    title: "Melanotan 1 vs melanotan 2: how the research compares",
+    seoTitle: "Melanotan 1 vs Melanotan 2: Research Compared",
+    description:
+      "Melanotan 1 (afamelanotide) and melanotan 2 compared: structure, receptor selectivity, molecular weight and regulatory status in research.",
+    updated: "2026-10-28",
+    readMins: 5,
+    compounds: ["melanotan-1", "melanotan-2"],
+    body: [
+      {
+        type: "p",
+        text: "Melanotan 1 and melanotan 2 are both synthetic analogues of alpha-melanocyte-stimulating hormone (alpha-MSH). They share a name and an origin in pigmentation research, but they are different molecules with different receptor profiles.",
+      },
+      {
+        type: "table",
+        head: ["", "Melanotan 1", "Melanotan 2"],
+        rows: [
+          ["Also known as", "Afamelanotide", "MT-II"],
+          ["Structure", "Linear, 13 amino acids", "Cyclic heptapeptide"],
+          ["Molecular weight", "approx. 1,647 Da", "approx. 1,024 Da"],
+          ["Receptor profile", "Mainly MC1R", "Non-selective: MC1R, MC3R, MC4R and MC5R"],
+          ["Main research focus", "Melanogenesis and photoprotection models", "Melanocortin signalling across several receptor subtypes"],
+        ],
+      },
+      { type: "h", text: "Receptor selectivity" },
+      {
+        type: "p",
+        text: "The key distinction in the literature is selectivity. Melanotan 1 acts mostly at the melanocortin 1 receptor, which controls pigment production in melanocytes. Melanotan 2 binds several melanocortin receptors, which is why it appears in a wider range of research models.",
+      },
+      { type: "h", text: "Regulatory status" },
+      {
+        type: "p",
+        text: "Afamelanotide has been licensed in some jurisdictions as a medicine for one rare condition, erythropoietic protoporphyria. Melanotan 2 has no marketing authorisation in the UK, and the MHRA has warned against unlicensed products sold for tanning. Vyrax Labs supplies these compounds for laboratory research only.",
+      },
+      {
+        type: "note",
+        text: "Products are supplied for laboratory research use only. Not for human or veterinary use. This guide compares published chemistry and is not guidance on use.",
+      },
+    ],
+  },
 ];
 
 export const guideBySlug = (slug: string) => guides.find((g) => g.slug === slug);
