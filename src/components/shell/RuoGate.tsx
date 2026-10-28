@@ -75,7 +75,7 @@ export function RuoGate() {
                 {site.name} sells peptides in sealed vials, with a certificate for every batch. They
                 are not licensed medicines, so the label carries no dose.
               </p>
-              <p>You must be 18 or over to order.</p>
+              <p>You must be 18 or over to order. Everything is sold for research use only.</p>
               <p>
                 Selecting "I agree" confirms the above and your acceptance of our{" "}
                 <Link

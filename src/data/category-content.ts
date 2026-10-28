@@ -14,12 +14,12 @@ export type CategoryContent = {
 };
 
 const RUO =
-  "Everything listed is sold as a research compound. Not a licensed medicine, food, cosmetic or supplement, and no dose is on the label.";
+  "Everything listed is sold for research use only. Not a licensed medicine, food, cosmetic or supplement, and no dose is on the label.";
 
 const COMMON_FAQS: QA[] = [
   [
     "Who can order these compounds?",
-    "Anyone aged 18 or over in the UK. Most buyers use them themselves. They are sold as research compounds rather than licensed medicines, so the label carries no dose. See the Research use policy for the full terms.",
+    "Anyone aged 18 or over in the UK. Most buyers use them themselves. They are sold for research use only rather than as licensed medicines, so the label carries no dose. See the Research use policy for the full terms.",
   ],
   [
     "How are prices shown?",
@@ -36,7 +36,7 @@ const COMMON_FAQS: QA[] = [
 ];
 
 const shopContent: CategoryContent = {
-  lede: "Every compound and lab supply we list, in one grid.",
+  lede: "Every peptide and lab supply we list, in one grid: weight loss, recovery, growth hormone, skin, sleep and more.",
   blocks: [
     {
       heading: "Browsing the full catalogue",
@@ -57,13 +57,20 @@ const shopContent: CategoryContent = {
 
 const SECTION: Record<string, CategoryContent> = {
   "weight-metabolic": {
-    lede: "Incretin, amylin and mitochondrial peptides, grouped by the receptors they act on.",
+    lede: "Weight loss, fat loss and appetite control peptides: incretin, amylin and mitochondrial compounds, grouped by the receptors they act on.",
     blocks: [
       {
-        heading: "Compounds in the metabolic range",
+        heading: "Weight loss peptides and how they differ",
         paragraphs: [
           "This range covers the incretin receptor agonists that dominate the current literature: the GLP-1 receptor agonist semaglutide, the dual GIP and GLP-1 agonist tirzepatide and the triple agonist retatrutide. Alongside them sit the amylin analogue cagrilintide, the growth hormone fragment AOD-9604 and its parent fragment 176-191, the NNMT inhibitor 5-Amino-1MQ and the mitochondrial-derived peptide MOTS-c.",
           "Each compound page sets out which receptors the molecule acts at and how it differs from its nearest relatives, with references to the primary literature, so you can pick the right compound for a comparison.",
+        ],
+      },
+      {
+        heading: "Fat loss, appetite and metabolism",
+        paragraphs: [
+          "The incretins work on appetite signalling and gastric emptying. Cagrilintide acts on the amylin pathway, which is the satiety side of the same picture. AOD-9604 and the 176-191 fragment are growth hormone fragments studied for lipolysis rather than for growth. 5-Amino-1MQ and MOTS-c sit on the metabolic side: NNMT inhibition and mitochondrial peptide signalling respectively.",
+          "That split is why the range is listed together. If you want the appetite route, look at the incretins and cagrilintide. If you want the fat oxidation or metabolic route, look at the fragments, 5-Amino-1MQ and MOTS-c.",
         ],
       },
       {
@@ -86,7 +93,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "copper-blends": {
-    lede: "The copper tripeptide GHK-Cu, on its own and in the GLOW and KLOW combination vials.",
+    lede: "Skin, collagen and hair peptides: the copper tripeptide GHK-Cu, on its own and in the GLOW and KLOW combination vials.",
     blocks: [
       {
         heading: "GHK-Cu and copper peptide blends",
@@ -111,7 +118,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "brain-focus": {
-    lede: "The synthetic heptapeptide Semax and the related anxiolytic-class peptide Selank.",
+    lede: "Focus, memory and mood peptides: the synthetic heptapeptide Semax and the related anxiolytic-class peptide Selank.",
     blocks: [
       {
         heading: "Semax and Selank",
@@ -129,7 +136,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "growth-hormone": {
-    lede: "GHRH analogues, ghrelin receptor agonists, IGF-1 LR3 and related compounds acting on the GH axis.",
+    lede: "Growth hormone, muscle growth and recovery peptides: GHRH analogues, ghrelin receptor agonists, IGF-1 LR3 and related compounds acting on the GH axis.",
     blocks: [
       {
         heading: "Two receptor systems",
@@ -154,7 +161,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "recovery-repair": {
-    lede: "BPC-157, TB-500, KPV, LL-37, ARA-290 and the Wolverine blend.",
+    lede: "Recovery and repair peptides for tendon, joint, muscle and gut work: BPC-157, TB-500, KPV, LL-37, ARA-290 and the Wolverine blend.",
     blocks: [
       {
         heading: "Peptides used in tissue repair work",
@@ -179,7 +186,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "longevity-cellular": {
-    lede: "NAD+, SS-31, epithalon, the thymic peptides and other compounds in the ageing literature.",
+    lede: "Anti-ageing, energy and longevity compounds: NAD+, SS-31, epithalon, the thymic peptides and other compounds in the ageing literature.",
     blocks: [
       {
         heading: "Compounds in the longevity range",
@@ -198,7 +205,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   "tanning-libido": {
-    lede: "Melanotan 1, Melanotan 2 and PT-141: alpha-MSH analogues with different melanocortin receptor profiles.",
+    lede: "Tanning and libido peptides: Melanotan 1, Melanotan 2 and PT-141, alpha-MSH analogues with different melanocortin receptor profiles.",
     blocks: [
       {
         heading: "Three melanocortin receptor agonists",
@@ -216,7 +223,7 @@ const SECTION: Record<string, CategoryContent> = {
     ],
   },
   sleep: {
-    lede: "Delta sleep-inducing peptide (DSIP), a nonapeptide acting on sleep physiology.",
+    lede: "Sleep peptides: delta sleep-inducing peptide (DSIP), a nonapeptide acting on sleep physiology.",
     blocks: [
       {
         heading: "DSIP",

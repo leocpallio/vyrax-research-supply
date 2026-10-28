@@ -129,7 +129,7 @@ function ProductPage() {
   const orderable = stock !== "out" && stock !== "preorder";
   const packs = packOptions(c, s);
   const chosen = packs.find((p) => p.count === pack) ?? packs[0]!;
-  const heading = `${c.name} ${s.label} ${productForm(c)}`;
+  const heading = `${c.name} ${s.label}${c.useCases?.[0] ? ` for ${c.useCases[0]}` : ""}`;
   const form = productForm(c);
   const composition = s.composition ?? c.composition;
   const faqs = productFaqs(c, s);
@@ -245,6 +245,7 @@ function ProductPage() {
             )}
             <p className="text-sm text-muted-foreground mt-2 max-w-[60ch]">
               Buy {c.name} {s.label} in the UK as {form.toLowerCase()}
+              {c.useCases?.[0] ? ` for ${c.useCases[0].toLowerCase()}` : ""}
               {c.aliases.length > 0 ? `, also sold as ${c.aliases[0]}` : ""}. Dispatched from stock
               held in the UK.
             </p>

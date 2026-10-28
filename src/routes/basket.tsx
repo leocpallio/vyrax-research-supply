@@ -258,7 +258,7 @@ function Basket() {
                   : "The site is not live yet; no contact details are collected."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
-                Research compounds, not a licensed medicine. UK supplied.
+                Sold for research use only. Not a licensed medicine. UK supplied.
               </p>
             </aside>
           </div>

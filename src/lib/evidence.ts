@@ -146,7 +146,7 @@ export const evidence: EvidenceManifest = {
     "No MHRA licence or trading registration number is configured; no registration may be claimed",
   ),
   regulatoryStatus: known(
-    "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement.",
+    "All products are sold for research use only. Not a licensed medicine, food, cosmetic or supplement.",
   ),
 };
 

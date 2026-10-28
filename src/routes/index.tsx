@@ -19,10 +19,10 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK · ${modifier}Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery & Growth | Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
     const desc = clampDescription(
-      `Buy peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
+      `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
     );
     const org = {
       "@context": "https://schema.org",
@@ -140,11 +140,12 @@ function Home() {
             data-testid="hero-title"
             className="mt-4 font-heading text-[40px] md:text-[64px] font-semibold leading-[1.02] tracking-tight"
           >
-            Peptides, documented by batch.
+            Peptides for weight loss, recovery and growth.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-[#040825]/70 leading-relaxed max-w-[600px]">
-            {compounds.length} compounds across {strengthCount} strengths, each with CAS numbers,
-            literature references and per-mg pricing.{" "}
+            {compounds.length} compounds across {strengthCount} strengths for weight loss, fat loss,
+            recovery, growth hormone, skin and sleep, each with CAS numbers, literature references
+            and per-mg pricing.{" "}
             {site.checkoutOpen
               ? "Card checkout on a secure hosted payment page."
               : "The site is not live yet; no orders or payments are taken."}

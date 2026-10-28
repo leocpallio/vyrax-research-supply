@@ -10,6 +10,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["Mod GRF 1-29", "modified GRF (1-29)", "CJC-1295 without DAC"],
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Pulsatile GH"],
+    useCases: ["Growth Hormone", "Muscle Growth", "Recovery"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 24.99 }],
     summary:
@@ -35,6 +36,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["CJC-1295 with DAC", "drug affinity complex"],
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Long-acting peptides"],
+    useCases: ["Growth Hormone", "Muscle Growth", "Anti-Ageing"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 34.99 }],
     summary:
@@ -59,6 +61,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["NNC 26-0161", "ghrelin agonist"],
     category: "gh-secretagogues",
     tags: ["Ghrelin receptor", "Selective secretagogue"],
+    useCases: ["Growth Hormone", "Muscle Growth", "Sleep"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 18.99 },
@@ -87,6 +90,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["TH9507", "GHRH analogue"],
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Visceral fat"],
+    useCases: ["Growth Hormone", "Fat Loss", "Visceral Fat"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
@@ -114,6 +118,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["pralmorelin", "KP-102"],
     category: "gh-secretagogues",
     tags: ["Ghrelin receptor", "Secretagogues"],
+    useCases: ["Growth Hormone", "Appetite", "Muscle Growth"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 9.99 },
@@ -141,6 +146,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["growth hormone releasing hexapeptide"],
     category: "gh-secretagogues",
     tags: ["Ghrelin receptor", "Secretagogues"],
+    useCases: ["Growth Hormone", "Appetite", "Muscle Growth"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 9.49 },
@@ -168,6 +174,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["examorelin"],
     category: "gh-secretagogues",
     tags: ["Ghrelin receptor", "Cardiovascular"],
+    useCases: ["Growth Hormone", "Muscle Growth", "Heart"],
     kind: "peptide",
     strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 12.99 }],
     summary:
@@ -192,6 +199,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["GRF 1-29", "GHRH 1-29"],
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Pituitary"],
+    useCases: ["Growth Hormone", "Anti-Ageing", "Sleep"],
     kind: "peptide",
     strengths: [
       { label: "2mg", amount: 2, unit: "mg", price: 12.99 },
@@ -220,6 +228,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["Long R3 IGF-1", "LR3 IGF-I"],
     category: "gh-secretagogues",
     tags: ["Growth factors", "Cell culture"],
+    useCases: ["Muscle Growth", "Growth Hormone", "Recovery"],
     kind: "protein",
     strengths: [{ label: "1mg", amount: 1, unit: "mg", price: 39.99 }],
     summary:
@@ -242,6 +251,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["nicotinamide adenine dinucleotide", "NAD"],
     category: "longevity-research",
     tags: ["Cellular energy", "Sirtuins"],
+    useCases: ["Anti-Ageing", "Energy", "Longevity"],
     kind: "coenzyme",
     appearance: "White to off-white lyophilised powder",
     strengths: [
@@ -270,6 +280,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["epitalon", "AEDG", "Ala-Glu-Asp-Gly"],
     category: "longevity-research",
     tags: ["Telomeres", "Pineal peptides"],
+    useCases: ["Anti-Ageing", "Longevity", "Sleep"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 19.99 }],
     summary:
@@ -294,6 +305,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["elamipretide", "Bendavia", "MTP-131"],
     category: "longevity-research",
     tags: ["Mitochondria", "Cardiolipin"],
+    useCases: ["Mitochondria", "Energy", "Anti-Ageing"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
@@ -321,6 +333,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["delta sleep-inducing peptide"],
     category: "longevity-research",
     tags: ["Sleep", "Neuropeptides"],
+    useCases: ["Sleep", "Recovery", "Brain & Focus"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 13.99 },
@@ -344,6 +357,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["thymalfasin", "TA1", "Tα1"],
     category: "longevity-research",
     tags: ["Immune", "Thymic peptides"],
+    useCases: ["Immune Support", "Longevity", "Recovery"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 21.99 },
@@ -371,6 +385,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["thymus peptide complex"],
     category: "longevity-research",
     tags: ["Bioregulators", "Thymic peptides"],
+    useCases: ["Immune Support", "Longevity", "Anti-Ageing"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 21.99 }],
     summary:
@@ -395,6 +410,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["ACTH 4-7 Pro-Gly-Pro", "Met-Glu-His-Phe-Pro-Gly-Pro"],
     category: "longevity-research",
     tags: ["Neuropeptides", "BDNF signalling"],
+    useCases: ["Brain & Focus", "Memory", "Mood"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
@@ -422,6 +438,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["tuftsin analogue", "Thr-Lys-Pro-Arg-Pro-Gly-Pro"],
     category: "longevity-research",
     tags: ["Neuropeptides", "GABAergic signalling"],
+    useCases: ["Anxiety & Calm", "Brain & Focus", "Mood"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
@@ -451,6 +468,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["MT-2", "MT2", "melanotan II"],
     category: "pigmentation-research",
     tags: ["Melanocortin", "Pigmentation"],
+    useCases: ["Tanning", "Appetite Control", "Libido"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 21.99 }],
     summary:
@@ -475,6 +493,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["MT-1", "afamelanotide", "melanotan I"],
     category: "pigmentation-research",
     tags: ["Melanocortin", "Photoprotection"],
+    useCases: ["Tanning", "Skin", "Pigmentation"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 19.99 }],
     summary:
@@ -495,6 +514,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["bremelanotide"],
     category: "pigmentation-research",
     tags: ["Melanocortin", "MC4R signalling"],
+    useCases: ["Libido", "Sexual Health", "Melanocortin"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 19.99 }],
     summary:
@@ -521,6 +541,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["GLOW blend", "GHK-Cu BPC-157 TB-500 blend"],
     category: "peptide-blends",
     tags: ["Skin", "Tissue repair"],
+    useCases: ["Skin & Anti-Ageing", "Glow", "Recovery & Repair"],
     kind: "blend",
     composition: ["GHK-Cu 50mg", "BPC-157 10mg", "TB-500 10mg"],
     appearance: "Pale blue lyophilised powder (from the GHK-Cu)",
@@ -546,6 +567,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["KLOW blend", "KPV GHK-Cu BPC-157 TB-500 blend"],
     category: "peptide-blends",
     tags: ["Inflammation", "Tissue repair"],
+    useCases: ["Skin & Anti-Ageing", "Glow", "Gut Health"],
     kind: "blend",
     composition: ["GHK-Cu 50mg", "BPC-157 10mg", "TB-500 10mg", "KPV 10mg"],
     appearance: "Pale blue lyophilised powder (from the GHK-Cu)",
@@ -569,6 +591,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["BPC-157 + TB-500", "BPC TB blend"],
     category: "peptide-blends",
     tags: ["Tissue repair", "Blends"],
+    useCases: ["Recovery & Repair", "Tendon & Joint", "Muscle Repair"],
     kind: "blend",
     composition: ["BPC-157 5mg", "TB-500 5mg"],
     strengths: [
@@ -599,6 +622,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["CJC-1295 DAC + Ipamorelin", "CJC ipamorelin blend"],
     category: "peptide-blends",
     tags: ["Secretagogues", "Blends"],
+    useCases: ["Muscle Growth", "Growth Hormone", "Strength"],
     kind: "blend",
     composition: ["CJC-1295 DAC", "Ipamorelin"],
     strengths: [{ label: "20mg", amount: 20, unit: "mg", price: 69.99 }],
@@ -626,6 +650,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["bac water", "BW", "benzyl alcohol water"],
     category: "lab-supplies",
     tags: ["Reconstitution", "Lab supplies"],
+    useCases: ["Lab Supply", "Reconstitution"],
     kind: "supply",
     form: "Sterile solution",
     appearance: "Clear, colourless liquid",

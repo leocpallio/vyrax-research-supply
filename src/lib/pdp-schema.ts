@@ -44,6 +44,12 @@ const titleSynonym = (c: Compound) => {
 export const productTitle = (c: Compound, s: Strength) => {
   const base = `Buy ${c.name} ${s.label} UK`;
   const syn = titleSynonym(c);
+  // The use case ("Weight Loss Peptide") outranks a chemical synonym: it is the phrase people type.
+  // Only peptide and blend kinds take the "Peptide" suffix; NAD+ and glutathione are not peptides.
+  const isPeptide = c.kind === "peptide" || c.kind === "blend";
+  const useCase = c.useCases?.[0] ? `${c.useCases[0]}${isPeptide ? " Peptide" : ""}` : "";
+  const withUse = useCase ? `${base} | ${useCase} | ${site.name}` : "";
+  if (withUse && withUse.length <= 60) return withUse;
   const withSyn = syn ? `${base} | ${syn} | ${site.name}` : "";
   if (withSyn && withSyn.length <= 60) return withSyn;
   const full = `${base} | ${site.name}`;
@@ -53,7 +59,9 @@ export const productTitle = (c: Compound, s: Strength) => {
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
   const syn = c.aliases.slice(0, 2).join(", ");
-  const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK.`;
+  // Two keywords in the lead sentence, then the summary. The first is the title keyword.
+  const use = c.useCases?.length ? ` for ${c.useCases.slice(0, 2).join(", ").toLowerCase()}` : "";
+  const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK${use}.`;
   const room = 155 - ` ${DESC_TAIL}`.length;
   // Summary first so the sentence that survives truncation is the informative one; aliases only
   // pad the tail when there is room left over.
@@ -70,7 +78,7 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
   const list: QA[] = [
     [
       `Can I use ${c.name} myself?`,
-      `Yes. ${c.name} is sold as a ${productForm(c).toLowerCase()} in a sealed vial, and most buyers reconstitute and use it themselves. It is not a licensed medicine, so the label carries no dose: the vial, the certificate and the published literature are what you work from.`,
+      `Yes. ${c.name} is sold as a ${productForm(c).toLowerCase()} in a sealed vial, and most buyers reconstitute and use it themselves. It is sold for research use only and is not a licensed medicine, so the label carries no dose: the vial, the certificate and the published literature are what you work from.`,
     ],
     [
       `How is ${c.name} ${s.label} tested?`,
@@ -107,6 +115,15 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
         : "Ordering runs through the basket."
     } Stock status is shown on this page and is not a delivery guarantee.`,
   ]);
+  if (c.useCases?.length)
+    list.push([
+      `What is ${c.name} used for?`,
+      `It is sold under ${c.useCases.join(", ").toLowerCase()}. ${
+        c.useCases[0] === "Weight Loss"
+          ? "The incretin and metabolic peptides are the ones people search for weight loss, and this page lists the vial sizes and the cost per mg so the options can be compared."
+          : `It sits in the ${(c.useCases[0] ?? "").toLowerCase()} group in our catalogue, alongside the other compounds listed under the same heading.`
+      }`,
+    ]);
   if (c.compare) {
     const other = getCompound(c.compare.slug);
     if (other)

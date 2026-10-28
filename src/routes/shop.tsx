@@ -20,10 +20,10 @@ export const Route = createFileRoute("/shop")({
     const titleTag = isClaimAllowed("testing.page-title")
       ? `, ${claimGate("testing.page-title")}`
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Full Catalogue${titleTag} | Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss & Recovery | Full Catalogue | Vyrax Labs`;
     const batchCerts = claimText("testing.batch-certificates");
     const desc = clampDescription(
-      `Buy peptides in the UK from ${compounds.length} compounds: retatrutide, BPC-157, TB-500 and GHK-Cu.${batchCerts ? ` ${batchCerts}.` : ""} UK supplied.`,
+      `Buy peptides in the UK from ${compounds.length} compounds, grouped by what people search for: weight loss, recovery and repair, growth hormone, longevity, tanning and sleep.${batchCerts ? ` ${batchCerts}.` : ""} UK supplied.`,
     );
     return {
       meta: [

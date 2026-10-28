@@ -115,7 +115,8 @@ export function Footer() {
             </p>
           </div>
           <p className="md:text-right max-w-md md:justify-self-end" data-testid="footer-ruo">
-            Not a pharmacy. No dosing, medical, dietary or therapeutic advice is offered.
+            Sold for research use only. Not a pharmacy. No dosing, medical, dietary or therapeutic
+            advice is offered.
           </p>
         </div>
       </div>

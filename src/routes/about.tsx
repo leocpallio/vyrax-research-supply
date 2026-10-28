@@ -84,7 +84,8 @@ function About() {
             </p>
             <p>
               Browse {count} compounds and the supplies that go with them. Everything we sell is a
-              research compound: not a licensed medicine, and not sold with a dose on the label.
+              research compound: sold for research use only, not a licensed medicine, and not sold
+              with a dose on the label.
             </p>
           </div>
           <img

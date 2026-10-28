@@ -23,9 +23,9 @@ function Terms() {
       <p>This website is operated under the trading name {site.name}.</p>
       <h2>2. What you are buying</h2>
       <p>
-        All products are research compounds. They are not licensed medicines, food supplements or
-        cosmetics, and they are not sold with a dose on the label. By ordering you confirm you are
-        18 or over and accept the conditions in our{" "}
+        All products are supplied for research use only. They are not licensed medicines, food
+        supplements or cosmetics, and they are not sold with a dose on the label. By ordering you
+        confirm you are 18 or over and accept the conditions in our{" "}
         <Link to="/research-use-policy">research use policy</Link>. We may decline or cancel an
         order, and refund it, if we believe those conditions are not met.
       </p>
@@ -64,7 +64,7 @@ function Terms() {
       </p>
       <h2>8. Liability</h2>
       <p>
-        Products are sold as research compounds. Nothing in these terms limits liability for death
+        Products are sold for research use only. Nothing in these terms limits liability for death
         or personal injury caused by negligence, fraud, or any liability that cannot be limited by
         law. Your statutory rights remain unaffected.
       </p>

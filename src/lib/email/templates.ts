@@ -35,7 +35,7 @@ export type RenderedEmail = { subject: string; html: string; text: string };
 export const SUPPORT_EMAIL = site.email;
 export const LEGAL_FOOTER = site.name;
 export const RESEARCH_NOTICE =
-  "Research compound, not a licensed medicine. No dose is on the label.";
+  "Sold for research use only. Not a licensed medicine. No dose is on the label.";
 const CARRIER = site.carrier;
 const GUIDE_URL = `${SITE_URL}/guides/reconstitution-lab-guide.pdf`;
 const STORAGE_URL = `${SITE_URL}/guides/peptide-storage-guide`;

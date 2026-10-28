@@ -366,7 +366,7 @@ export function PaymentCheckout() {
                     className="accent-primary mt-0.5 h-5 w-5 shrink-0"
                   />
                   <span>
-                    I am 18 or over and accept the{" "}
+                    I am 18 or over, buying for research use only, and accept the{" "}
                     <Link to="/terms" className="underline">
                       terms
                     </Link>{" "}

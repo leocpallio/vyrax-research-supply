@@ -11,6 +11,7 @@ export const ukplAdditions: Compound[] = [
     aliases: [],
     category: "longevity-research",
     tags: ["Peptides"],
+    useCases: ["Brain & Focus", "Longevity", "Memory"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 39.99 }],
     summary:
@@ -26,6 +27,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["CJC + Ipamorelin"],
     category: "peptide-blends",
     tags: ["Blends"],
+    useCases: ["Growth Hormone", "Muscle Growth", "Sleep"],
     kind: "blend",
     composition: ["CJC-1295 5mg", "Ipamorelin 5mg"],
     strengths: [{ label: "5+5mg", amount: 10, unit: "mg", price: 42.99 }],
@@ -42,6 +44,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["GSH", "reduced glutathione"],
     category: "longevity-research",
     tags: ["Redox"],
+    useCases: ["Skin Brightening", "Antioxidant", "Detox"],
     kind: "small-molecule",
     strengths: [{ label: "1500mg", amount: 1500, unit: "mg", price: 38.99 }],
     summary:
@@ -57,6 +60,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["hGH 176-191"],
     category: "metabolic-research",
     tags: ["Growth hormone fragment"],
+    useCases: ["Fat Loss", "Weight Loss", "Lipolysis"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 29.99 }],
     summary:
@@ -72,6 +76,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["KP-10"],
     category: "gh-secretagogues",
     tags: ["Reproductive signalling"],
+    useCases: ["Hormones", "Fertility", "Libido"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 34.99 }],
     summary:
@@ -87,6 +92,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["levocarnitine"],
     category: "metabolic-research",
     tags: ["Fatty acid transport"],
+    useCases: ["Fat Loss", "Energy", "Recovery"],
     kind: "small-molecule",
     form: "Solution; 600mg/ml, 10ml",
     appearance: "Solution",
@@ -104,6 +110,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["mechano growth factor"],
     category: "gh-secretagogues",
     tags: ["Growth factors"],
+    useCases: ["Muscle Growth", "Recovery", "Strength"],
     kind: "peptide",
     strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 17.99 }],
     summary:
@@ -119,6 +126,7 @@ export const ukplAdditions: Compound[] = [
     aliases: [],
     category: "longevity-research",
     tags: ["Neuropeptides"],
+    useCases: ["Libido", "Mood", "Social Bonding"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 24.99 }],
     summary:
@@ -134,6 +142,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["pegylated MGF"],
     category: "gh-secretagogues",
     tags: ["Growth factors"],
+    useCases: ["Muscle Growth", "Recovery", "Strength"],
     kind: "peptide",
     strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 24.99 }],
     summary:
@@ -149,6 +158,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["Glu-Asp-Arg", "EDR"],
     category: "longevity-research",
     tags: ["Neuropeptides"],
+    useCases: ["Sleep", "Brain & Focus", "Anti-Ageing"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 29.99 }],
     summary:
@@ -164,6 +174,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["Selank Semax blend"],
     category: "peptide-blends",
     tags: ["Neuropeptides"],
+    useCases: ["Brain & Focus", "Anxiety & Calm", "Memory"],
     kind: "blend",
     composition: ["Selank 10mg", "Semax 10mg"],
     strengths: [{ label: "10+10mg", amount: 20, unit: "mg", price: 34.99 }],
@@ -179,6 +190,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["acetyl octapeptide-3"],
     category: "regenerative-research",
     tags: ["Skin"],
+    useCases: ["Anti-Ageing", "Skin & Wrinkles", "Cosmetic"],
     kind: "peptide",
     strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 19.99 }],
     summary:

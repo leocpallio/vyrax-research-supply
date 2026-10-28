@@ -6,6 +6,7 @@ export const shopSections = [
   {
     slug: "weight-metabolic",
     name: "Weight Loss",
+    seoName: "Weight Loss Peptides",
     products: [
       "retatrutide",
       "tirzepatide",
@@ -18,11 +19,22 @@ export const shopSections = [
       "l-carnitine",
     ],
   },
-  { slug: "copper-blends", name: "Copper & Copper Blends", products: ["ghk-cu", "glow", "klow"] },
-  { slug: "brain-focus", name: "Brain & Focus", products: ["semax", "selank", "selank-semax"] },
+  {
+    slug: "copper-blends",
+    name: "Copper & Copper Blends",
+    seoName: "Copper Peptides for Skin",
+    products: ["ghk-cu", "glow", "klow"],
+  },
+  {
+    slug: "brain-focus",
+    name: "Brain & Focus",
+    seoName: "Nootropic Peptides",
+    products: ["semax", "selank", "selank-semax"],
+  },
   {
     slug: "growth-hormone",
     name: "Growth Hormone",
+    seoName: "Growth Hormone Peptides",
     products: [
       "cjc-1295-no-dac",
       "cjc-1295-dac",
@@ -43,11 +55,13 @@ export const shopSections = [
   {
     slug: "recovery-repair",
     name: "Recovery & Repair",
+    seoName: "Recovery & Repair Peptides",
     products: ["bpc-157", "tb-500", "kpv", "ll-37", "ara-290", "wolverine-stack", "snap-8"],
   },
   {
     slug: "longevity-cellular",
     name: "Longevity & Cellular",
+    seoName: "Longevity & Anti-Ageing Peptides",
     products: [
       "nad-plus",
       "epithalon",
@@ -63,12 +77,14 @@ export const shopSections = [
   {
     slug: "tanning-libido",
     name: "Tanning & Libido",
+    seoName: "Tanning & Libido Peptides",
     products: ["melanotan-1", "melanotan-2", "pt-141"],
   },
-  { slug: "sleep", name: "Sleep", products: ["dsip"] },
+  { slug: "sleep", name: "Sleep", seoName: "Sleep Peptides", products: ["dsip"] },
   {
     slug: "bacteriostatic-water",
     name: "Bacteriostatic Water",
+    seoName: "Bacteriostatic Water",
     products: ["bacteriostatic-water"],
   },
 ] as const;

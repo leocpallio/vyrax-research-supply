@@ -20,7 +20,7 @@ export const Route = createFileRoute("/collections/$slug")({
     const list = productsInSection(compounds, section.slug);
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const content = sectionSeo(section.slug);
-    const title = `${section.name} UK | Vyrax Labs`;
+    const title = `${section.seoName} UK | Vyrax Labs`;
     const desc = clampDescription(
       `${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
     );

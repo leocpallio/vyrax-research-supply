@@ -10,7 +10,7 @@ import { dispatchCutoffLabel } from "./delivery";
 import { CONTENT_UPDATED, TRUST_PAGES } from "./seo";
 
 const RUO =
-  "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement. No dose is on the label.";
+  "All products are sold for research use only. Not a licensed medicine, food, cosmetic or supplement. No dose is on the label.";
 const url = (p: string) => SITE_URL + p;
 const sellable = (c: Compound) => c.strengths.length > 0;
 

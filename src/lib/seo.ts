@@ -140,12 +140,11 @@ export function withDescTail(description: string): string {
 
 export const titles = {
   // The testing modifier comes from the claims registry: "Lab-Tested" until certificates exist.
-  home: () =>
-    `Buy Peptides UK | ${claimGate("testing.page-title")} | Same-Day Dispatch | ${SITE_NAME}`,
+  home: () => `Buy Peptides UK | Weight Loss, Recovery & Growth | ${SITE_NAME}`,
   /** "Lab-Tested" only when claim-gated evidence exists, otherwise empty string. */
   testingModifier: () =>
     isClaimAllowed("testing.page-title") ? claimGate("testing.page-title") : "",
-  shop: () => `Buy Peptides UK | Full Catalogue | ${SITE_NAME}`,
+  shop: () => `Buy Peptides UK | Weight Loss & Recovery | Full Catalogue | ${SITE_NAME}`,
   product: (name: string, strength?: string) =>
     `Buy ${name}${strength ? ` ${strength}` : ""} UK | ${SITE_NAME}`,
   category: (seoName: string) => `Buy ${seoName} UK | ${SITE_NAME}`,

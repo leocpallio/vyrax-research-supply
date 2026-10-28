@@ -520,7 +520,7 @@ const DEFS = {
   // Regulatory position and trading registration.
   // -------------------------------------------------------------------------------------------
   "regulatory.research-use-only": {
-    text: "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement.",
+    text: "All products are sold for research use only. Not a licensed medicine, food, cosmetic or supplement.",
     requires: [{ key: "regulatoryStatus", kind: "present" }],
     assertion: false,
     surfaces: ["src/components/Store.tsx", "src/routes/research-use-policy.tsx"],

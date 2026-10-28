@@ -1,7 +1,7 @@
 import { guides, type Block, type Guide } from "../data/guides";
 import { SITE_URL } from "../data/site";
 
-const RUO = "Research compounds, not a licensed medicine. No dose is on the label.";
+const RUO = "Sold for research use only. Not a licensed medicine. No dose is on the label.";
 
 function block(b: Block): string {
   switch (b.type) {

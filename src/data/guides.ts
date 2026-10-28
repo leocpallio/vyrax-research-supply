@@ -198,7 +198,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "bpc-157-vs-tb-500",
-    title: "BPC-157 vs TB-500: how the research compares",
+    title: "BPC-157 vs TB-500: recovery peptides compared",
     seoTitle: "BPC-157 vs TB-500: Research Differences",
     description:
       "BPC-157 and TB-500 compared: structure, proposed mechanisms, what the studies looked at and why the two get paired.",
@@ -252,7 +252,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "retatrutide-vs-tirzepatide-vs-semaglutide",
-    title: "Retatrutide vs tirzepatide vs semaglutide: receptor pharmacology compared",
+    title: "Retatrutide vs tirzepatide vs semaglutide: weight loss peptides compared",
     seoTitle: "Retatrutide vs Tirzepatide vs Semaglutide",
     description:
       "Semaglutide, tirzepatide and retatrutide compared: receptor targets, structure, half-life chemistry and what separates them.",
@@ -346,7 +346,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "melanotan-1-vs-melanotan-2",
-    title: "Melanotan 1 vs melanotan 2: how the research compares",
+    title: "Melanotan 1 vs melanotan 2: tanning peptides compared",
     seoTitle: "Melanotan 1 vs Melanotan 2: Research Compared",
     description:
       "Melanotan 1 (afamelanotide) and melanotan 2 compared: structure, receptor selectivity, molecular weight and what each is licensed for.",
@@ -391,7 +391,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "buy-retatrutide-uk",
-    title: "Buying retatrutide in the UK: what to check before you order",
+    title: "Buying retatrutide in the UK for weight loss: what to check",
     seoTitle: "Buy Retatrutide UK: Vial Sizes and Batch Checks",
     description:
       "Retatrutide UK buyer's checklist: vial sizes and cost per mg, what a certificate must show, fill and identity checks.",
@@ -475,13 +475,13 @@ export const guides: Guide[] = [
       },
       {
         type: "note",
-        text: "Vyrax Labs supplies retatrutide as a lyophilised powder in 10mg, 20mg and 30mg vials, with a certificate published for each batch on the Lab Reports page. It is sold as a research compound, not a licensed medicine.",
+        text: "Vyrax Labs supplies retatrutide as a lyophilised powder in 10mg, 20mg and 30mg vials, with a certificate published for each batch on the Lab Reports page. It is sold for research use only, not as a licensed medicine.",
       },
     ],
   },
   {
     slug: "retatrutide-vs-tirzepatide",
-    title: "Retatrutide vs tirzepatide: the third receptor",
+    title: "Retatrutide vs tirzepatide: the third receptor and weight loss",
     seoTitle: "Retatrutide vs Tirzepatide: Receptors Compared",
     description:
       "Retatrutide vs tirzepatide compared: receptor targets, glucagon agonism, structure and molecular weight.",

@@ -34,6 +34,10 @@ export type Compound = {
   category: CategorySlug;
   /** Two or three research-area tags shown on cards. */
   tags: string[];
+  /** Human-facing search phrases for what the compound is used for ("Weight Loss", "Fat Loss",
+   *  "Skin & Anti-Ageing"). Derived from the mechanism, not a health claim. First entry is the
+   *  primary keyword and drives the title; the rest go in the description and the FAQ. */
+  useCases?: string[];
   kind: "peptide" | "blend" | "small-molecule" | "coenzyme" | "protein" | "supply";
   /** First entry is the default strength (the one the compound hub page shows). */
   strengths: Strength[];

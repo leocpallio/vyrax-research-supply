@@ -7,7 +7,7 @@ export const Route = createFileRoute("/research-use-policy")({
     pageHead(
       "/research-use-policy",
       titles.info("Research Use Policy"),
-      "Vyrax Labs products are supplied as research compounds. Read the conditions every order is placed under.",
+      "Vyrax Labs products are supplied for research use only. Read the conditions every order is placed under.",
       { crumb: "Research use policy" },
     ),
   component: Policy,
@@ -22,13 +22,13 @@ function Policy() {
       updated="2026-10-06"
     >
       <p>
-        Every product sold by Vyrax Labs is a research compound. This policy forms part of our{" "}
-        <Link to="/terms">terms and conditions</Link>.
+        Every product sold by Vyrax Labs is supplied for research use only. This policy forms part
+        of our <Link to="/terms">terms and conditions</Link>.
       </p>
       <h2>Conditions of sale</h2>
       <ul>
         <li>
-          Products are sold as research compounds, not as licensed medicines. They carry no dose on
+          Products are sold for research use only, not as licensed medicines. They carry no dose on
           the label and no marketing authorisation.
         </li>
         <li>
