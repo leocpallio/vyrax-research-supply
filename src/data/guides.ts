@@ -366,7 +366,11 @@ export const guides: Guide[] = [
           ["Structure", "Linear, 13 amino acids", "Cyclic heptapeptide"],
           ["Molecular weight", "approx. 1,647 Da", "approx. 1,024 Da"],
           ["Receptor profile", "Mainly MC1R", "Non-selective: MC1R, MC3R, MC4R and MC5R"],
-          ["Main research focus", "Melanogenesis and photoprotection models", "Melanocortin signalling across several receptor subtypes"],
+          [
+            "Main research focus",
+            "Melanogenesis and photoprotection models",
+            "Melanocortin signalling across several receptor subtypes",
+          ],
         ],
       },
       { type: "h", text: "Receptor selectivity" },
@@ -382,6 +386,259 @@ export const guides: Guide[] = [
       {
         type: "note",
         text: "Products are supplied for laboratory research use only. Not for human or veterinary use. This guide compares published chemistry and is not guidance on use.",
+      },
+    ],
+  },
+  {
+    slug: "buy-retatrutide-uk",
+    title: "Buying retatrutide in the UK: what to check before you order",
+    seoTitle: "Buy Retatrutide UK: Vial Sizes and Batch Checks",
+    description:
+      "Retatrutide UK buyer's checklist: vial sizes and cost per mg, what a certificate must show, fill and identity checks.",
+    updated: "2026-10-27",
+    readMins: 7,
+    compounds: ["retatrutide", "tirzepatide", "bacteriostatic-water"],
+    body: [
+      {
+        type: "p",
+        text: "Retatrutide is one of the most searched research peptides in the UK and one of the most inconsistently supplied. The molecule is a 39 amino acid triple agonist at the GIP, GLP-1 and glucagon receptors, and it is sold as a lyophilised powder in sealed vials. Because it is supplied for laboratory research rather than as a licensed medicine, the buyer carries the checking. This page sets out what to look at before paying, and what to compare between sellers.",
+      },
+      { type: "h", text: "What is actually in the vial" },
+      {
+        type: "p",
+        text: "A retatrutide vial should contain a white to off-white lyophilised cake or powder and nothing else. The label should carry the compound name, the strength in milligrams, a batch number and a storage instruction. The batch number is the important one: it is the only thing that ties your vial to a laboratory report. A vial with no batch number cannot be verified by anyone, including the seller.",
+      },
+      {
+        type: "p",
+        text: "The theoretical molecular weight of retatrutide is approximately 4,731 Da. That figure belongs on the certificate, next to a mass spectrometry result, because it is what distinguishes the real molecule from a lookalike peptide sold under the same name.",
+      },
+      { type: "h", text: "Vial sizes and cost per milligram" },
+      {
+        type: "p",
+        text: "Retatrutide is normally listed in 10mg, 20mg and 30mg vials. Larger vials are cheaper per milligram, but only if you will get through the material before it degrades, and only if the fill is honest. Price per milligram is the only fair comparison between sellers, so work it out rather than comparing headline prices.",
+      },
+      {
+        type: "table",
+        head: ["Vial", "Typical UK price", "Cost per mg"],
+        rows: [
+          ["10mg", "£59.99", "£6.00"],
+          ["20mg", "£79.99", "£4.00"],
+          ["30mg", "£109.99", "£3.67"],
+        ],
+      },
+      {
+        type: "p",
+        text: "A 30mg vial is roughly 40% cheaper per milligram than a 10mg vial. That is a real saving, but it only holds if the 30mg vial actually contains 30mg. Fill is the quietest form of short-measure in this market, and it is invisible without a laboratory result for that batch.",
+      },
+      { type: "h", text: "What the certificate has to show" },
+      {
+        type: "list",
+        items: [
+          "The laboratory that ran the work, named, with a report or sample number you could quote back to them",
+          "The batch number, matching the number printed on the vial you are sent",
+          "HPLC purity as a percentage, with the chromatogram rather than the number alone",
+          "A mass spectrometry result confirming the molecular weight near 4,731 Da",
+          "Net peptide content, or measured fill, for the strength on the label",
+          "The test date and the method used",
+        ],
+      },
+      {
+        type: "p",
+        text: "If a seller shows a certificate but the batch number does not match the vial, the certificate is decoration. If the same certificate appears on every product page and has done for a year, it is being reused. Our guide to reading a certificate of analysis goes through the structure of a proper report in detail.",
+      },
+      { type: "h", text: "Red flags" },
+      {
+        type: "list",
+        items: [
+          "Purity quoted as a round number with no chromatogram and no method",
+          "A certificate with no laboratory name, or one that cannot be found anywhere else",
+          "Retatrutide sold as a liquid, pre-mixed, without stating the diluent or the concentration",
+          "Prices far below the market with no batch documentation to explain them",
+          "A seller who cannot say what the molecular weight of the compound is",
+          "Vials with no batch number, or a batch number that changes between the listing and the delivery",
+        ],
+      },
+      { type: "h", text: "Powder or pre-mixed liquid" },
+      {
+        type: "p",
+        text: "Almost all retatrutide is sold as lyophilised powder because the dry form is far more stable in transit and in storage. Pre-mixed liquid is convenient but starts degrading the day it is made, and you inherit whatever diluent and concentration the seller chose. For anything you intend to keep, powder is the safer purchase.",
+      },
+      { type: "h", text: "On arrival" },
+      {
+        type: "list",
+        items: [
+          "Check the batch number on the vial against the certificate before opening anything",
+          "Confirm the powder is an intact cake or free powder, not a collapsed sticky film",
+          "Store unopened vials cold and dark, at -20°C for long term holding",
+          "Let a cold vial reach room temperature before opening it, so moisture does not condense on the powder",
+        ],
+      },
+      {
+        type: "note",
+        text: "Vyrax Labs supplies retatrutide as a lyophilised powder in 10mg, 20mg and 30mg vials, with a certificate published for each batch on the Lab Reports page. Products are for laboratory research use only and not for human or veterinary use.",
+      },
+    ],
+  },
+  {
+    slug: "retatrutide-vs-tirzepatide",
+    title: "Retatrutide vs tirzepatide: the third receptor",
+    seoTitle: "Retatrutide vs Tirzepatide: Receptors Compared",
+    description:
+      "Retatrutide vs tirzepatide compared: receptor targets, glucagon agonism, structure and molecular weight.",
+    updated: "2026-10-27",
+    readMins: 6,
+    compounds: ["retatrutide", "tirzepatide", "semaglutide"],
+    body: [
+      {
+        type: "p",
+        text: "Retatrutide and tirzepatide are both engineered incretin peptides built on a GIP backbone with a fatty diacid for half-life extension. The difference that matters in the literature is one receptor: tirzepatide activates GIP and GLP-1, while retatrutide adds glucagon receptor agonism on top of both. That single addition is the whole reason the pair is studied side by side.",
+      },
+      {
+        type: "table",
+        head: ["", "Tirzepatide", "Retatrutide"],
+        rows: [
+          ["Receptor targets", "GIP and GLP-1", "GIP, GLP-1 and glucagon"],
+          ["Class", "Dual agonist", "Triple agonist"],
+          ["Length", "39 amino acids", "39 amino acids"],
+          ["Backbone", "GIP", "GIP"],
+          ["Half-life extension", "C20 fatty diacid", "C20 fatty diacid"],
+          ["Approx. molecular weight", "4,813 Da", "4,731 Da"],
+          [
+            "Main research use",
+            "Combined incretin signalling",
+            "Glucagon contribution to energy balance",
+          ],
+        ],
+      },
+      { type: "h", text: "Why glucagon is the interesting part" },
+      {
+        type: "p",
+        text: "Glucagon receptor activation raises energy expenditure and drives hepatic lipid handling, which is a different lever from incretin signalling. Adding it to a dual agonist gives a compound that acts on three pathways at once, and it makes retatrutide the tool of choice when a study is asking what glucagon receptor agonism contributes beyond GIP and GLP-1. Tirzepatide cannot answer that question on its own, because it has no glucagon activity.",
+      },
+      { type: "h", text: "What the two have in common" },
+      {
+        type: "p",
+        text: "Both are 39 amino acids long, both are built on a GIP backbone, both carry a C20 fatty diacid for albumin binding, and both are supplied as lyophilised powder. In a laboratory they are handled the same way and stored the same way. The similarity is why they work as a controlled pair: the backbone and the half-life chemistry are held constant, so the observed difference can be attributed to the receptor profile rather than to the scaffold.",
+      },
+      { type: "h", text: "Identity checks matter more here" },
+      {
+        type: "p",
+        text: "Because the two molecules are close in size and share a backbone, a mix-up between them is plausible and hard to see. The molecular weights differ by about 82 Da, which mass spectrometry resolves easily but the eye cannot. If you are running a comparative study, confirm the reported mass on the certificate for each batch against 4,813 Da for tirzepatide and 4,731 Da for retatrutide before you start.",
+      },
+      { type: "h", text: "Choosing between them" },
+      {
+        type: "list",
+        items: [
+          "Studying combined incretin effects without glucagon: tirzepatide",
+          "Studying the glucagon receptor contribution: retatrutide, with tirzepatide as the dual agonist control",
+          "Separating GLP-1 receptor effects from everything else: semaglutide as the selective comparator",
+          "Running all three in one model: keep the same batch and the same reconstitution protocol across arms",
+        ],
+      },
+      {
+        type: "p",
+        text: "Published phase 2 data exist for both compounds and phase 3 programmes are running, so the literature is growing quickly in both directions. Neither is a licensed medicine in the UK, and both are supplied here for laboratory research.",
+      },
+      {
+        type: "note",
+        text: "Products are supplied for laboratory research use only. Not for human or veterinary use. This guide compares published pharmacology and is not guidance on use.",
+      },
+    ],
+  },
+  {
+    slug: "peptide-purity-testing",
+    title: "Peptide purity testing: what HPLC and mass spectrometry actually measure",
+    seoTitle: "Peptide Purity Testing: HPLC and Mass Spec",
+    description:
+      "What HPLC and mass spectrometry each prove about a peptide, why purity is not content, and what neither catches.",
+    updated: "2026-10-27",
+    readMins: 8,
+    compounds: ["bpc-157", "retatrutide", "tb-500"],
+    body: [
+      {
+        type: "p",
+        text: "Purity is the most quoted number in peptide supply and the most misunderstood. It answers a narrow question, how much of the detectable material is the target molecule, and it says nothing about identity, quantity or sterility on its own. Understanding what the methods do and do not show is what lets you read a report properly.",
+      },
+      { type: "h", text: "Two methods, two different questions" },
+      {
+        type: "p",
+        text: "Purity and identity are separate questions and need separate methods. HPLC answers the first. Mass spectrometry answers the second. A report carrying only one of them is only half a report.",
+      },
+      { type: "h", text: "How HPLC works" },
+      {
+        type: "p",
+        text: "High-performance liquid chromatography pushes the sample through a packed column under pressure. Different components travel at different speeds depending on how they interact with the stationary phase and the mobile phase, so they elute at different times and are detected separately, usually by UV absorbance. The output is a chromatogram: a baseline with peaks on it.",
+      },
+      {
+        type: "p",
+        text: "Purity is calculated as the area under the main peak divided by the total area under all peaks, expressed as a percentage. A 98% figure means 98% of the UV-absorbing material that came off the column was the target peptide. The remaining 2% is other UV-absorbing material: truncated sequences, deletion peptides, oxidised variants, diastereomers.",
+      },
+      { type: "h", text: "What a chromatogram tells you that a number cannot" },
+      {
+        type: "list",
+        items: [
+          "Whether the main peak is sharp and symmetrical, or broad and tailing",
+          "Whether impurities elute close to the main peak, which makes the separation harder and the number less meaningful",
+          "Whether the baseline is flat or noisy",
+          "Whether the peak shape is consistent with a single species",
+        ],
+      },
+      {
+        type: "p",
+        text: "A purity figure with no chromatogram attached cannot be checked at all. The chromatogram is the evidence; the percentage is a summary of it.",
+      },
+      { type: "h", text: "How mass spectrometry works" },
+      {
+        type: "p",
+        text: "Mass spectrometry ionises the sample and measures the mass to charge ratio of the ions, which gives the molecular mass of the molecule. Comparing that against the theoretical mass for the sequence confirms the compound is what the label says. For retatrutide the theoretical value is about 4,731 Da and for BPC-157 about 1,419 Da. A result within a fraction of a dalton of the theoretical figure is confirmation. A result tens of daltons away is a different molecule.",
+      },
+      { type: "h", text: "Purity is not content" },
+      {
+        type: "p",
+        text: "Purity is a percentage of what the detector saw. It is blind to water, residual salts, counter-ions and solvent, none of which absorb at the wavelengths used. A vial can be 99% pure and still contain well under the labelled amount of peptide if it holds 20% water and salt by weight. That is why net peptide content is reported separately, and why a certificate without a content figure does not establish the fill.",
+      },
+      {
+        type: "table",
+        head: ["Question", "Method", "What it establishes"],
+        rows: [
+          ["Is it the right molecule?", "Mass spectrometry", "Identity against theoretical mass"],
+          ["How much else is in it?", "HPLC", "Purity as a percentage of detected material"],
+          ["How much peptide is in the vial?", "Net peptide content", "Fill, after water and salt"],
+          ["Is it sterile?", "Not established by either", "Nothing, unless tested separately"],
+        ],
+      },
+      { type: "h", text: "What neither method catches" },
+      {
+        type: "list",
+        items: [
+          "Water and salt content, which only a content assay addresses",
+          "Sterility and endotoxin, which need separate microbiology",
+          "Residual solvents from synthesis, which need gas chromatography",
+          "Whether the material was handled cleanly after testing",
+          "Whether the vial you were sent came from the batch that was tested",
+        ],
+      },
+      {
+        type: "p",
+        text: "The last point is the one buyers can control. Matching the batch number on your vial to the batch number on the report is the step that connects the laboratory result to the object in your hand. Without that match, a genuine report proves only that some material, somewhere, was tested.",
+      },
+      { type: "h", text: "Reading a report in order" },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "Laboratory name and report number, so the result is traceable to a source",
+          "Batch number, checked against your vial",
+          "Compound and labelled strength",
+          "Mass spectrometry result against the theoretical mass",
+          "HPLC purity with the chromatogram, and a look at the peak shape",
+          "Net peptide content, if the fill matters to your work",
+          "Test date, to confirm the report belongs to the current batch",
+        ],
+      },
+      {
+        type: "note",
+        text: "Every Vyrax Labs batch certificate is published on the Lab Reports page and can be looked up by the batch number printed on the vial. Products are for laboratory research use only.",
       },
     ],
   },

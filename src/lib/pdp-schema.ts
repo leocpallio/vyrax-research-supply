@@ -1,4 +1,12 @@
-import { chem, getCategory, productImage, stockOf, type Compound, type Strength } from "./catalog";
+import {
+  chem,
+  getCategory,
+  getCompound,
+  productImage,
+  stockOf,
+  type Compound,
+  type Strength,
+} from "./catalog";
 import { abs, site } from "../data/site";
 import { faqJsonLd, type QA } from "../data/faq";
 import { sectionFor } from "../data/shop-sections";
@@ -19,16 +27,39 @@ export function listingFor(c: Compound) {
 
 export const productHeading = (c: Compound, s: Strength) => `${c.name} ${s.label}`;
 
+/** Short form word used in titles, H1 and descriptions: "Lyophilised Powder", "Solution". */
+export const productForm = (c: Compound) =>
+  c.form ?? (c.kind === "supply" ? "Solution" : "Lyophilised Powder");
+
+/**
+ * A second search term for the title. Aliases are the synonyms buyers actually type ("GLP-3",
+ * "BPC 157", "afamelanotide"), so the first usable one is appended when it fits the SERP limit.
+ */
+const titleSynonym = (c: Compound) => {
+  const a = c.aliases.find((x) => /^[A-Za-z0-9][A-Za-z0-9 -]{2,}$/.test(x));
+  return a ? a.trim() : "";
+};
+
 export const productTitle = (c: Compound, s: Strength) => {
+  const kind = c.kind === "supply" ? "Lab Supply" : "Research Peptide";
   const base = `Buy ${c.name} ${s.label} UK`;
-  const full = `${base} | ${c.kind === "supply" ? "Lab Supply" : "Research Peptide"} | ${site.name}`;
+  const syn = titleSynonym(c);
+  const withSyn = syn ? `${base} | ${syn} | ${site.name}` : "";
+  if (withSyn && withSyn.length <= 60) return withSyn;
+  const full = `${base} | ${kind} | ${site.name}`;
   return full.length <= 60 ? full : `${base} | ${site.name}`;
 };
 
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
-  const base = `${c.name} ${s.label} from ${site.name}. ${first}`;
+  const syn = c.aliases.slice(0, 2).join(", ");
+  const lead = `${c.name} ${s.label} ${productForm(c).toLowerCase()} for laboratory research, UK supplied.`;
   const room = 155 - " Research use only.".length;
+  // Summary first so the sentence that survives truncation is the informative one; aliases only
+  // pad the tail when there is room left over.
+  const base = `${lead} ${first}`;
+  const withSyn = syn ? `${base} Also known as ${syn}.` : base;
+  if (withSyn.length <= room) return `${withSyn} Research use only.`;
   const clipped = base.length > room ? base.slice(0, room - 1).replace(/\s+\S*$/, "") + "…" : base;
   return `${clipped} Research use only.`;
 };
@@ -67,6 +98,29 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
     list.push([
       `Do I need bacteriostatic water for ${c.name}?`,
       "The listed form is lyophilised powder. Laboratories may use a suitable diluent according to their own protocols. Bacteriostatic water is listed separately. Our calculator works out a resulting concentration from your inputs.",
+    ]);
+  list.push([
+    `Where can I buy ${c.name} in the UK?`,
+    `${c.name} ${s.label} is listed here and dispatched from the UK. ${
+      site.paymentMethods.length
+        ? "Checkout takes the payment methods shown at the basket."
+        : "Ordering runs through the basket."
+    } Stock status is shown on this page and is not a delivery guarantee.`,
+  ]);
+  if (c.compare) {
+    const other = getCompound(c.compare.slug);
+    if (other)
+      list.push([
+        `What is the difference between ${c.name} and ${other.name}?`,
+        `${c.compare.text} Both are listed separately, so the specifications can be compared side by side.`,
+      ]);
+  }
+  if (c.aliases.length)
+    list.push([
+      `Is ${c.name} the same as ${c.aliases[0]}?`,
+      `${c.aliases[0]} is another name for ${c.name}. ${
+        c.aliases.length > 1 ? `It is also written as ${c.aliases.slice(1, 3).join(" or ")}. ` : ""
+      }The synonym is listed under the product name on this page.`,
     ]);
   return list;
 }
@@ -114,7 +168,10 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
               "@type": "OfferShippingDetails",
               shippingRate: {
                 "@type": "MonetaryAmount",
-                value: s.price >= site.freeDeliveryThreshold ? "0.00" : site.standardDeliveryFee.toFixed(2),
+                value:
+                  s.price >= site.freeDeliveryThreshold
+                    ? "0.00"
+                    : site.standardDeliveryFee.toFixed(2),
                 currency: "GBP",
               },
               shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },

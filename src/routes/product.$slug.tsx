@@ -36,6 +36,7 @@ import {
   productDescription,
   productFaqs,
   productJsonLd,
+  productForm,
   productTitle,
 } from "@/lib/pdp-schema";
 import { ProductGallery } from "@/components/ProductGallery";
@@ -67,7 +68,9 @@ export const Route = createFileRoute("/product/$slug")({
     if (!c || !s) return {};
     const url = abs(`/product/${loaderData.slug}`);
     const imgUrl = abs(
-      productImage(c.slug, s.label).isRender ? ogImageFor(`/product/${c.slug}`, s.label) : DEFAULT_OG_IMAGE,
+      productImage(c.slug, s.label).isRender
+        ? ogImageFor(`/product/${c.slug}`, s.label)
+        : DEFAULT_OG_IMAGE,
     );
     const title = productTitle(c, s);
     const desc = productDescription(c, s);
@@ -126,8 +129,8 @@ function ProductPage() {
   const orderable = stock !== "out" && stock !== "preorder";
   const packs = packOptions(c, s);
   const chosen = packs.find((p) => p.count === pack) ?? packs[0]!;
-  const heading = `${c.name} ${s.label}`;
-  const form = c.form ?? (c.kind === "supply" ? "Solution" : "Lyophilised powder");
+  const heading = `${c.name} ${s.label} ${productForm(c)}`;
+  const form = productForm(c);
   const composition = s.composition ?? c.composition;
   const faqs = productFaqs(c, s);
   const related = compoundsIn(c.category)
@@ -140,7 +143,11 @@ function ProductPage() {
     ...(bac?.strengths[0] ? [{ c: bac, s: bac.strengths[0] }] : []),
     ...(pair?.strengths[0] && pair.slug !== c.slug ? [{ c: pair, s: pair.strengths[0] }] : []),
   ];
-  const relatedGuides = guides.filter((g) => g.compounds.includes(c.slug)).slice(0, 2);
+  // Newest first, so a fresh guide outranks an older one for the same compound.
+  const relatedGuides = guides
+    .filter((g) => g.compounds.includes(c.slug))
+    .sort((a, b) => b.updated.localeCompare(a.updated))
+    .slice(0, 2);
   const dispatchLine = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
 
@@ -209,7 +216,11 @@ function ProductPage() {
               image={img}
               name={heading}
               fallbackLabel={heading}
-              report={coa?.file?.endsWith(".png") ? { src: coa.file, batch: coa.batch, verifyUrl: coa.verifyUrl } : undefined}
+              report={
+                coa?.file?.endsWith(".png")
+                  ? { src: coa.file, batch: coa.batch, verifyUrl: coa.verifyUrl }
+                  : undefined
+              }
             />
           </div>
 
@@ -232,6 +243,11 @@ function ProductPage() {
                 Also known as {c.aliases.slice(0, 3).join(", ")}
               </p>
             )}
+            <p className="text-sm text-muted-foreground mt-2 max-w-[60ch]">
+              Buy {c.name} {s.label} in the UK as {form.toLowerCase()}
+              {c.aliases.length > 0 ? `, also sold as ${c.aliases[0]}` : ""}. Supplied for
+              laboratory research, dispatched from stock held in the UK.
+            </p>
 
             <PurityStatBlock stat={stat} productName={heading} />
 

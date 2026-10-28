@@ -61,7 +61,7 @@ export function ogImageFor(path: string, productStrength?: string): string {
 export const RUO_TAIL = "Research use only.";
 /** Last catalogue/trust-content change (ISO date). Bump when compounds, prices, categories or policy
  *  pages change; sitemap lastmod reads it. A request date is not a content change date. */
-export const CONTENT_UPDATED = "2026-10-27";
+export const CONTENT_UPDATED = "2026-10-28";
 /** Trust and legal pages every crawler should find (path, priority, changefreq). */
 export const TRUST_PAGES = [
   ["/lab-reports", "0.8", "weekly"],

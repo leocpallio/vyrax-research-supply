@@ -105,7 +105,10 @@ function GuidePage() {
   const g = guideBySlug(slug);
   if (!g) return null;
   const related = g.compounds.map(getCompound).filter((c): c is Compound => Boolean(c));
-  const more = guides.filter((x) => x.slug !== g.slug).slice(0, 3);
+  const more = guides
+    .filter((x) => x.slug !== g.slug)
+    .sort((a, b) => b.updated.localeCompare(a.updated))
+    .slice(0, 3);
   return (
     <StoreShell>
       <article className="container-main py-8 md:py-12">
