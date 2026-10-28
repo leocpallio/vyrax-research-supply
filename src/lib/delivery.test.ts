@@ -14,8 +14,11 @@ describe("Vyrax fulfilment copy", () => {
   test("describes cold-chain packing without promising a transit temperature", () => {
     expect(claimText("delivery.cold-chain-packing")).toContain("cold-chain protection");
     const email = renderEmail({
-      kind: "orderConfirmation", name: "Research customer", reference: "VX-TEST",
-      lines: [{ name: "Test", strength: "5mg", quantity: 1, lineTotal: 20 }], total: 20,
+      kind: "orderConfirmation",
+      name: "Research customer",
+      reference: "VX-TEST",
+      lines: [{ name: "Test", strength: "5mg", quantity: 1, lineTotal: 20 }],
+      total: 20,
     });
     expect(email.text).toContain("cold-chain protection");
     expect(email.text).toContain("transit temperature is not monitored");

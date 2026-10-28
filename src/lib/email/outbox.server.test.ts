@@ -17,10 +17,12 @@ function database(reply: unknown, error: unknown = null) {
 test("enqueue delegates to atomic service-role RPC and returns durable row id", async () => {
   const db = database(id);
   expect(await enqueueOrderEmail(db, order, "orderConfirmation", "payment:123")).toBe(id);
-  expect(db.calls).toEqual([{
-    name: "enqueue_order_email",
-    args: { p_order_id: order, p_kind: "orderConfirmation", p_event_key: "payment:123" },
-  }]);
+  expect(db.calls).toEqual([
+    {
+      name: "enqueue_order_email",
+      args: { p_order_id: order, p_kind: "orderConfirmation", p_event_key: "payment:123" },
+    },
+  ]);
 });
 
 test("claim is one RPC, no read-then-update race", async () => {
@@ -32,9 +34,16 @@ test("claim is one RPC, no read-then-update race", async () => {
 test("finish includes the claim token and provider id", async () => {
   const db = database(true);
   expect(await finishOutbox(db, id, order, "sent", "resend-id")).toBe(true);
-  expect(db.calls[0]).toEqual({ name: "finish_email_outbox", args: {
-    p_id: id, p_claim_token: order, p_success: true, p_provider_id: "resend-id", p_error: null,
-  } });
+  expect(db.calls[0]).toEqual({
+    name: "finish_email_outbox",
+    args: {
+      p_id: id,
+      p_claim_token: order,
+      p_success: true,
+      p_provider_id: "resend-id",
+      p_error: null,
+    },
+  });
 });
 
 test("database failure never silently acknowledges enqueue", async () => {

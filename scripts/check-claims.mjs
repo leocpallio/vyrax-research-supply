@@ -43,18 +43,62 @@ const { evidence, evidenceSummary, describeRequirement } = await import(
 
 /** Assertion phrases that may only ever render through the registry. */
 const FORBIDDEN = [
-  { id: "hplc-tested", re: /\bHPLC\s+(?:and\s+(?:MS|mass\s+spectrometry)\s+)?tested\b/i, why: "HPLC testing is asserted" },
+  {
+    id: "hplc-tested",
+    re: /\bHPLC\s+(?:and\s+(?:MS|mass\s+spectrometry)\s+)?tested\b/i,
+    why: "HPLC testing is asserted",
+  },
   { id: "lab-tested", re: /\blab(?:oratory)?[\s-]+tested\b/i, why: "lab-tested is asserted" },
-  { id: "third-party-tested", re: /\bthird[\s-]party\s+(?:lab(?:oratory|s)?\s+)?test(?:ed|ing)\b/i, why: "third-party testing is asserted" },
-  { id: "third-party-lab", re: /\bthird[\s-]party\s+laborator(?:y|ies)\b|\bthird[\s-]party\s+labs?\b/i, why: "a third-party laboratory is asserted" },
-  { id: "independent-lab", re: /\bindependent\s+(?:lab(?:oratory)?|testing|analysis|purity|verification)\b/i, why: "independent testing is asserted" },
-  { id: "independently-verified", re: /\bindependently\s+(?:tested|verified|confirmed|validated|analysed|analyzed)\b/i, why: "independent verification is asserted" },
-  { id: "tested-by-independent", re: /\btested\s+by\s+(?:an?\s+)?(?:independent|third[\s-]party)\b/i, why: "testing by an independent body is asserted" },
-  { id: "batch-by-batch", re: /\bbatch[\s-]+by[\s-]+batch\b/i, why: "batch-by-batch testing is asserted" },
-  { id: "clinically-proven", re: /\bclinic(?:al|ally)[\s-]+proven\b/i, why: "clinical proof is asserted" },
-  { id: "every-batch-tested", re: /\bevery\s+batch\s+(?:is\s+|was\s+)?(?:tested|sent|submitted|analysed|analyzed)\b/i, why: "batch testing is asserted" },
-  { id: "each-batch-tested", re: /\beach\s+batch\s+(?:is\s+|was\s+)?(?:tested|sent|submitted|analysed|analyzed)\b/i, why: "batch testing is asserted" },
-  { id: "verified-by-independent", re: /\bverified\s+by\s+(?:an?\s+)?(?:independent|third[\s-]party)\b/i, why: "independent verification is asserted" },
+  {
+    id: "third-party-tested",
+    re: /\bthird[\s-]party\s+(?:lab(?:oratory|s)?\s+)?test(?:ed|ing)\b/i,
+    why: "third-party testing is asserted",
+  },
+  {
+    id: "third-party-lab",
+    re: /\bthird[\s-]party\s+laborator(?:y|ies)\b|\bthird[\s-]party\s+labs?\b/i,
+    why: "a third-party laboratory is asserted",
+  },
+  {
+    id: "independent-lab",
+    re: /\bindependent\s+(?:lab(?:oratory)?|testing|analysis|purity|verification)\b/i,
+    why: "independent testing is asserted",
+  },
+  {
+    id: "independently-verified",
+    re: /\bindependently\s+(?:tested|verified|confirmed|validated|analysed|analyzed)\b/i,
+    why: "independent verification is asserted",
+  },
+  {
+    id: "tested-by-independent",
+    re: /\btested\s+by\s+(?:an?\s+)?(?:independent|third[\s-]party)\b/i,
+    why: "testing by an independent body is asserted",
+  },
+  {
+    id: "batch-by-batch",
+    re: /\bbatch[\s-]+by[\s-]+batch\b/i,
+    why: "batch-by-batch testing is asserted",
+  },
+  {
+    id: "clinically-proven",
+    re: /\bclinic(?:al|ally)[\s-]+proven\b/i,
+    why: "clinical proof is asserted",
+  },
+  {
+    id: "every-batch-tested",
+    re: /\bevery\s+batch\s+(?:is\s+|was\s+)?(?:tested|sent|submitted|analysed|analyzed)\b/i,
+    why: "batch testing is asserted",
+  },
+  {
+    id: "each-batch-tested",
+    re: /\beach\s+batch\s+(?:is\s+|was\s+)?(?:tested|sent|submitted|analysed|analyzed)\b/i,
+    why: "batch testing is asserted",
+  },
+  {
+    id: "verified-by-independent",
+    re: /\bverified\s+by\s+(?:an?\s+)?(?:independent|third[\s-]party)\b/i,
+    why: "independent verification is asserted",
+  },
 ];
 
 const normalise = (s) => s.replace(/\s+/g, " ").trim().toLowerCase();
@@ -82,7 +126,8 @@ const add = (rule, where, message) => violations.push({ rule, where, message });
 // ---------------------------------------------------------------------------------------------
 const seen = new Set();
 for (const claim of claimRegistry) {
-  if (seen.has(claim.id)) add("registry-integrity", CLAIMS_FILE, `duplicate claim id "${claim.id}"`);
+  if (seen.has(claim.id))
+    add("registry-integrity", CLAIMS_FILE, `duplicate claim id "${claim.id}"`);
   seen.add(claim.id);
   if (claim.surfaces.length === 0) add("registry-integrity", claim.id, "no surface declared");
   for (const requirement of claim.requires) {
@@ -186,8 +231,12 @@ line("claim resolution");
 line(`  allowed       ${tally.allowed}`);
 line(`  honest-empty  ${tally["honest-empty"]}`);
 line(`  hidden        ${tally.hidden}`);
-line(`  bound to      ${[...new Set(claimRegistry.flatMap((c) => c.requires.map((r) => r.key)))].length} evidence keys`);
-line(`  detail        ${claimRegistry.flatMap((c) => c.requires.map(describeRequirement)).length} requirement bindings`);
+line(
+  `  bound to      ${[...new Set(claimRegistry.flatMap((c) => c.requires.map((r) => r.key)))].length} evidence keys`,
+);
+line(
+  `  detail        ${claimRegistry.flatMap((c) => c.requires.map(describeRequirement)).length} requirement bindings`,
+);
 line();
 
 if (violations.length === 0) {

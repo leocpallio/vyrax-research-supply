@@ -20,7 +20,7 @@ export const Route = createFileRoute("/basket")({
   head: () => ({
     meta: [
       { title: "Your Basket | Vyrax Labs" },
-      { name: "description", content: "Review the research compounds in your Vyrax Labs basket." },
+      { name: "description", content: "Review the compounds in your Vyrax Labs basket." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -89,7 +89,7 @@ function Basket() {
             </p>
             <Button asChild className="rounded-full">
               <Link to="/shop">
-                Browse research peptides <ArrowRight />
+                Browse peptides <ArrowRight />
               </Link>
             </Button>
           </div>
@@ -258,7 +258,7 @@ function Basket() {
                   : "The site is not live yet; no contact details are collected."}
               </p>
               <p className="text-xs text-muted-foreground mt-3">
-                For research use only. Not for human consumption.
+                Research compounds, not a licensed medicine. UK supplied.
               </p>
             </aside>
           </div>

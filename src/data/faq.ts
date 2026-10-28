@@ -15,7 +15,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "Who can order from Vyrax Labs?",
-        "Adults aged 18 or over buying for legitimate laboratory, analytical or educational research. These products are not medicines, foods or cosmetics and are not for human or veterinary use. See the Research use policy.",
+        "Adults aged 18 or over. Most buyers use these themselves. They are sold as research compounds, not as licensed medicines, foods or cosmetics, and the label carries no dose. See the Research use policy.",
       ],
       [
         "How do I pay?",
@@ -63,7 +63,7 @@ export const faqGroups: FaqGroup[] = [
       ],
       [
         "What form are the peptides supplied in, and can they be used in humans?",
-        "Check each product page for the stated form and contents. These materials are for laboratory research only, not for human or veterinary use. They are not medicines.",
+        "Check each product page for the stated form and contents. They are research compounds, not licensed medicines, and no dose is printed on the label.",
       ],
     ],
   },

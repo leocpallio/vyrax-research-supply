@@ -11,7 +11,7 @@ export const Route = createFileRoute("/account")({
       { title: "My Account | Vyrax Labs" },
       { name: "description", content: "Sign in to Vyrax Labs and view linked orders." },
       { property: "og:title", content: "My Account | Vyrax Labs" },
-      { property: "og:description", content: "Manage your Vyrax Labs research orders." },
+      { property: "og:description", content: "Manage your Vyrax Labs orders." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

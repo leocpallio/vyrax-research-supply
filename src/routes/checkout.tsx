@@ -14,7 +14,7 @@ export const Route = createFileRoute("/checkout")({
       {
         name: "description",
         content: paymentEnabled
-          ? "Review your research order before continuing to hosted payment."
+          ? "Review your order before continuing to hosted payment."
           : "Vyrax Labs is not live yet. No orders or payments are taken.",
       },
       { name: "robots", content: "noindex" },

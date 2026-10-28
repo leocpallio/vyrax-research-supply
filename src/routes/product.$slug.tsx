@@ -245,8 +245,8 @@ function ProductPage() {
             )}
             <p className="text-sm text-muted-foreground mt-2 max-w-[60ch]">
               Buy {c.name} {s.label} in the UK as {form.toLowerCase()}
-              {c.aliases.length > 0 ? `, also sold as ${c.aliases[0]}` : ""}. Supplied for
-              laboratory research, dispatched from stock held in the UK.
+              {c.aliases.length > 0 ? `, also sold as ${c.aliases[0]}` : ""}. Dispatched from stock
+              held in the UK.
             </p>
 
             <PurityStatBlock stat={stat} productName={heading} />
@@ -364,7 +364,7 @@ function ProductPage() {
                 ))}
                 {c.applications.length > 0 && (
                   <>
-                    <h2>What does the research on {c.name} investigate?</h2>
+                    <h2>What does {c.name} do?</h2>
                     <ul className="list-disc ml-5 space-y-1.5 mt-2">
                       {c.applications.map((a) => (
                         <li key={a}>{a}</li>
@@ -387,7 +387,7 @@ function ProductPage() {
                 {cites.length > 0 && (
                   <>
                     <h3 className="font-heading font-semibold text-foreground mt-8 mb-2">
-                      External resources for researchers
+                      External resources
                     </h3>
                     <ol className="space-y-2.5 text-sm">
                       {cites.map((ct) => (

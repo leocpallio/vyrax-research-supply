@@ -47,11 +47,11 @@ export function GuideSignup() {
             id="research-guide-heading"
             className="font-heading text-3xl md:text-4xl font-semibold leading-tight mt-4"
           >
-            A practical guide to research peptide reconstitution.
+            A practical guide to peptide reconstitution.
           </h2>
           <p className="mt-5 text-muted-foreground leading-relaxed max-w-xl">
-            A concise PDF for in-vitro laboratory work: preparation, concentration calculations,
-            sample labels and traceability. No administration or dosing instructions.
+            A concise PDF: preparation, concentration calculations, sample labels and traceability.
+            No administration or dosing instructions.
           </p>
           <div className="mt-7 grid sm:grid-cols-2 gap-3 text-sm">
             <p className="flex items-start gap-2">
@@ -71,9 +71,7 @@ export function GuideSignup() {
         <div className="rounded-2xl bg-background border border-border shadow-sm p-6 md:p-8">
           <Mail size={24} className="text-primary" aria-hidden="true" />
           <h3 className="font-heading text-xl font-semibold mt-3">
-            {signupOpen
-              ? "Get the guide and research updates"
-              : "Download the free laboratory guide"}
+            {signupOpen ? "Get the guide and email updates" : "Download the free guide"}
           </h3>
           <p className="text-sm text-muted-foreground mt-2">
             {signupOpen
@@ -120,7 +118,7 @@ export function GuideSignup() {
                   required
                   className="mt-1 accent-primary"
                 />{" "}
-                I agree to receive Vyrax research updates and occasional marketing emails.
+                I agree to receive Vyrax emails and occasional marketing.
               </label>
               <button
                 type="submit"

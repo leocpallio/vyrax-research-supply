@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { StoreShell, Disclaimer, Breadcrumbs, ProductGrid, SectionTitle } from "@/components/Store";
 import { guideBySlug, guides, type Block } from "@/data/guides";
 import { getCompound, productPath, type Compound } from "@/lib/catalog";
-import { ORG_ID, breadcrumbListJsonLd, buildHead, titles, withRuoTail } from "@/lib/seo";
+import { ORG_ID, breadcrumbListJsonLd, buildHead, titles, withDescTail } from "@/lib/seo";
 import { abs, site } from "@/data/site";
 
 export const Route = createFileRoute("/guides/$slug")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/guides/$slug")({
     };
     return buildHead({
       title: titles.guide(g.seoTitle),
-      description: withRuoTail(g.description),
+      description: withDescTail(g.description),
       path,
       type: "article",
       jsonLd: [
@@ -146,8 +146,8 @@ function GuidePage() {
             ))}
           </div>
           <div className="note-box mt-10">
-            This guide is for laboratory research purposes. Vyrax Labs products are not for human or
-            veterinary use, and nothing here is medical advice.
+            This guide covers general peptide chemistry. Vyrax Labs products are sold as research
+            compounds, and nothing here is medical advice.
           </div>
         </div>
         {related.length > 0 && (

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/contact")({
     pageHead(
       "/contact",
       titles.info("Contact Us"),
-      "Contact Vyrax Labs by email or phone about research peptide orders, UK delivery, returns and batch documentation. Research use only.",
+      "Contact Vyrax Labs by email or phone about peptide orders, UK delivery, returns and batch documentation.",
       { crumb: "Contact" },
     ),
   component: Contact,
@@ -61,7 +61,7 @@ function Contact() {
           <Link to="/faq" className="text-primary underline">
             FAQ
           </Link>
-          . We do not give dosing or human-use advice.
+          . We do not give dosing advice.
         </p>
         <div className="grid lg:grid-cols-[1fr_360px] gap-12 mt-10">
           {site.email ? (

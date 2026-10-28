@@ -81,7 +81,7 @@ export function ListingPage({
   list,
   content,
   pillsLabel,
-  emptyText = "Nothing in this range yet. Browse all research peptides on the shop page.",
+  emptyText = "Nothing in this range yet. Browse all peptides on the shop page.",
   children,
 }: {
   title: string;
@@ -138,7 +138,10 @@ export function ListingPage({
                 .flatMap((c) =>
                   c.strengths.map((st) => (
                     <li key={`${c.slug}-${st.label}`}>
-                      <Link to={productPath(c.slug, st.label)} className="underline-offset-2 hover:underline">
+                      <Link
+                        to={productPath(c.slug, st.label)}
+                        className="underline-offset-2 hover:underline"
+                      >
                         {c.name} {st.label}
                       </Link>
                     </li>

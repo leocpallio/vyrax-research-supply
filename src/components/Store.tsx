@@ -27,7 +27,6 @@ import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/
 
 export { openCartDrawer };
 
-
 // ---------------------------------------------------------------- Added-to-basket toast
 function AddedToast() {
   const [item, setItem] = useState<CartItem | null>(null);

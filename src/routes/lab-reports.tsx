@@ -33,7 +33,7 @@ export const Route = createFileRoute("/lab-reports")({
                 "@context": "https://schema.org",
                 "@type": "Dataset",
                 name: "Vyrax Labs published sample reports",
-                description: `Third-party Janoshik assay reports for ${coas.length} Vyrax Labs research compound batches, listing batch number, measured purity by HPLC and measured quantity. Published sample reports for laboratory research materials.`,
+                description: `Third-party Janoshik assay reports for ${coas.length} Vyrax Labs batches, listing batch number, measured purity by HPLC and measured quantity.`,
                 url: "https://vyraxlabs.co.uk/lab-reports",
                 creator: { "@id": ORG_ID },
                 publisher: { "@id": ORG_ID },
@@ -305,7 +305,7 @@ function Reports() {
                     ],
                     [
                       "Research use",
-                      "Research-use-only policy on every page; no dosing or administration guidance anywhere on the site.",
+                      "Sold as a research compound; no dose on the label and no dosing guidance anywhere on the site.",
                       "Dosing tables or wellness language alongside the listing.",
                     ],
                   ] as const

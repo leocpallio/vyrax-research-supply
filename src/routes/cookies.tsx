@@ -40,7 +40,7 @@ function Cookies() {
             </tr>
             <tr>
               <td className="p-4 font-mono">vyrax-age</td>
-              <td className="p-4">Remembers that you confirmed you are 18+ and a researcher</td>
+              <td className="p-4">Remembers that you confirmed you are 18+</td>
               <td className="p-4">30 days</td>
             </tr>
             <tr>

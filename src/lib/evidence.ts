@@ -91,7 +91,7 @@ export const knownOrNull = <T>(field: EvidenceField<T>): T | null =>
 // ---------------------------------------------------------------------------------------------
 
 const labs: readonly string[] = [...new Set(coas.map((c) => c.lab).filter((l) => l.length > 0))];
-const singleLab = labs.length === 1 ? labs[0] ?? null : null;
+const singleLab = labs.length === 1 ? (labs[0] ?? null) : null;
 
 const REVIEWS_NOTE =
   "Reviews render from a runtime Supabase query on the product page; no count is recorded in the source tree, so the site cannot assert a rating.";
@@ -146,7 +146,7 @@ export const evidence: EvidenceManifest = {
     "No MHRA licence or trading registration number is configured; no registration may be claimed",
   ),
   regulatoryStatus: known(
-    "All products are sold strictly for laboratory research use only. Not for human or veterinary use; not a medicine, food, cosmetic or supplement.",
+    "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement.",
   ),
 };
 
@@ -201,7 +201,11 @@ export function describeRequirement(requirement: Requirement): string {
 }
 
 /** Serialisable snapshot of the manifest for the CLI checker. */
-export function evidenceSummary(): { key: EvidenceKey; state: "known" | "unknown"; detail: string }[] {
+export function evidenceSummary(): {
+  key: EvidenceKey;
+  state: "known" | "unknown";
+  detail: string;
+}[] {
   return (Object.keys(evidence) as EvidenceKey[]).map((key) => {
     const field = evidence[key] as EvidenceField<unknown>;
     return field.state === "known"

@@ -11,8 +11,8 @@ export const Route = createFileRoute("/about")({
   head: () =>
     pageHead(
       "/about",
-      "About Vyrax Labs | UK Research Peptide Supplier",
-      "Who Vyrax Labs is, how we supply research peptides from the UK with same-day dispatch, and where to find published lab reports. Research use only.",
+      "About Vyrax Labs | UK Peptide Supplier",
+      "Who Vyrax Labs is, how we supply peptides from the UK with same-day dispatch, and where to find published lab reports.",
       { crumb: "About" },
     ),
   component: About,
@@ -40,8 +40,8 @@ function About() {
     ],
     [
       ShieldCheck,
-      "Research only",
-      "Supplied strictly for laboratory research, never for human use.",
+      "Batch documentation",
+      "A certificate for every batch, published and searchable by batch number.",
     ],
   ];
   return (
@@ -49,7 +49,7 @@ function About() {
       <div className="container-main py-8 md:py-12">
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "About us" }]} />
         <p className="eyebrow">ABOUT VYRAX LABS</p>
-        <h1 className="page-title max-w-3xl">Research compounds for laboratory use.</h1>
+        <h1 className="page-title max-w-3xl">Peptides, documented by batch.</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
           Check the specification and the certificate for a batch before you buy. Browsing or saving
           a basket does not reserve stock.
@@ -71,8 +71,8 @@ function About() {
         <div className="grid md:grid-cols-2 gap-12 mt-10 items-center">
           <div className="text-muted-foreground leading-relaxed space-y-4">
             <p>
-              Vyrax Labs supplies research peptides for laboratory, analytical and educational
-              research, with UK delivery.
+              Vyrax Labs supplies peptides and lab supplies with UK delivery, for people who want
+              the specification and the certificate before they buy.
             </p>
             <p>
               Product pages show the listed specification. A specification is not a certificate of
@@ -83,8 +83,8 @@ function About() {
               , and each one applies only to the batch it names.
             </p>
             <p>
-              Browse {count} research compounds and the supplies that go with them. Everything we
-              sell is for research use only, not for human or veterinary use.
+              Browse {count} compounds and the supplies that go with them. Everything we sell is a
+              research compound: not a licensed medicine, and not sold with a dose on the label.
             </p>
           </div>
           <img

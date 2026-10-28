@@ -62,7 +62,7 @@ describe("Vyrax paid-checkout emails", () => {
       expect(mail.html).toContain("<!doctype html>");
       expect(mail.html).toContain("Vyrax Labs");
       expect(mail.text).toContain(
-        "Research-use policy: https://vyraxlabs.co.uk/research-use-policy",
+        "Research use policy: https://vyraxlabs.co.uk/research-use-policy",
       );
       for (const body of [mail.html, mail.text]) {
         expect(body).not.toMatch(/Oraxis|Leo|company number|VAT number|\u2014/);
@@ -73,7 +73,7 @@ describe("Vyrax paid-checkout emails", () => {
         )
       ) {
         expect(mail.html).toContain(`href="${unsubscribeUrl}"`);
-        expect(mail.text).toContain(`Unsubscribe from research updates: ${unsubscribeUrl}`);
+        expect(mail.text).toContain(`Unsubscribe: ${unsubscribeUrl}`);
       } else {
         expect(mail.html).not.toContain("Unsubscribe from research updates");
       }
@@ -170,7 +170,7 @@ describe("Vyrax paid-checkout emails", () => {
       for (const part of [m.html, m.text]) {
         expect(part).toContain("support@vyraxlabs.co.uk");
         expect(part).not.toContain("Oraxis");
-        expect(part).toContain("Not for human or veterinary use");
+        expect(part.toLowerCase()).toContain("not a licensed medicine");
         expect(part).not.toContain("\u2014");
         expect(part.toLowerCase()).not.toContain("enquiry");
         expect(part).not.toMatch(/delivered (by|on)|arrives|next.day|guarantee/i);

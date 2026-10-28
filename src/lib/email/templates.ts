@@ -34,7 +34,8 @@ export type RenderedEmail = { subject: string; html: string; text: string };
 
 export const SUPPORT_EMAIL = site.email;
 export const LEGAL_FOOTER = site.name;
-export const RESEARCH_NOTICE = "For laboratory research use only. Not for human or veterinary use.";
+export const RESEARCH_NOTICE =
+  "Research compound, not a licensed medicine. No dose is on the label.";
 const CARRIER = site.carrier;
 const GUIDE_URL = `${SITE_URL}/guides/reconstitution-lab-guide.pdf`;
 const STORAGE_URL = `${SITE_URL}/guides/peptide-storage-guide`;
@@ -188,7 +189,12 @@ type Content = {
 };
 const longDate = (d?: string) => {
   if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d;
-  return new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  return new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 };
 function wrap(c: Content): RenderedEmail {
   c = { ...c, orderDate: longDate(c.orderDate) };
@@ -212,7 +218,7 @@ function wrap(c: Content): RenderedEmail {
   const metaHtml = c.reference
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#040825">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#040825">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:20px;font-weight:800;letter-spacing:.14em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:14px;color:#5B5F73">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research-use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? `<br>${link("Unsubscribe from research updates", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:20px;font-weight:800;letter-spacing:.14em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:14px;color:#5B5F73">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? `<br>${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -227,9 +233,9 @@ function wrap(c: Content): RenderedEmail {
     `Questions? ${SUPPORT_EMAIL}${site.phone ? ` · ${site.phone}` : ""}`,
     "",
     RESEARCH_NOTICE,
-    `Research-use policy: ${POLICY_URL}`,
+    `Research use policy: ${POLICY_URL}`,
     LEGAL_FOOTER,
-    ...(unsubscribe ? [`Unsubscribe from research updates: ${unsubscribe}`] : []),
+    ...(unsubscribe ? [`Unsubscribe: ${unsubscribe}`] : []),
   ].join("\n");
   return { subject: oneLine(c.subject), html, text };
 }
@@ -329,26 +335,26 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     }
     case "guideWelcome":
       return wrap({
-        heading: "Your laboratory preparation guide",
-        preheader: "Download the laboratory guide you requested.",
-        subject: subject("Your laboratory preparation guide"),
+        heading: "Your peptide preparation guide",
+        preheader: "Download the preparation guide you requested.",
+        subject: subject("Your peptide preparation guide"),
         paragraphs: [
           hello,
-          "Thank you for signing up for Vyrax research updates. Your laboratory preparation guide is ready to download.",
-          "This guide is intended only for laboratory research and is not guidance for human or veterinary use.",
+          "Thank you for signing up. Your peptide preparation guide is ready to download.",
+          "This guide describes general peptide chemistry and is not a dosing protocol.",
         ],
-        action: { label: "Download the laboratory guide", url: GUIDE_URL },
+        action: { label: "Download the guide", url: GUIDE_URL },
         unsubscribeUrl: event.unsubscribeUrl,
       });
     case "postPurchase":
       return wrap({
         ...base,
-        heading: "Research resources for your order",
-        preheader: "Read the handling and storage guide for your research materials.",
-        subject: subject("Research resources for order"),
+        heading: "Handling notes for your order",
+        preheader: "Read the handling and storage guide before your vials arrive.",
+        subject: subject("Handling notes for order"),
         paragraphs: [
           hello,
-          "Thank you for ordering from Vyrax Labs. Our storage guide covers handling of research materials on arrival. Check the product label and any supplied instructions for your specific item.",
+          "Thank you for ordering from Vyrax Labs. Our storage guide covers what to do with a vial on arrival. Check the product label and any supplied instructions for your specific item.",
         ],
         action: { label: "Read the storage guide", url: STORAGE_URL },
         unsubscribeUrl: event.unsubscribeUrl,
@@ -362,7 +368,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
         paragraphs: [
           hello,
           "If your order has arrived, we would welcome honest feedback about your ordering experience. There is no reward for a review, and positive feedback is not expected.",
-          `You can email ${SUPPORT_EMAIL} with your feedback and order reference. Please do not include medical or human-use claims.`,
+          `You can email ${SUPPORT_EMAIL} with your feedback and order reference.`,
         ],
         action: { label: "Contact Vyrax Labs", url: CONTACT_URL },
         unsubscribeUrl: event.unsubscribeUrl,
@@ -370,14 +376,14 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     case "reorder":
       return wrap({
         ...base,
-        heading: "Research supplies when you need them",
-        preheader: "Browse current research materials if you need to restock.",
-        subject: subject("Research supplies"),
+        heading: "Restock when you need to",
+        preheader: "Browse the current catalogue if you need to restock.",
+        subject: subject("Restock your shelf"),
         paragraphs: [
           hello,
-          "If your laboratory needs further research materials, you can browse the current catalogue. Availability and pricing are shown at checkout. There is no obligation to order again.",
+          "If you need more, the current catalogue is live. Availability and pricing are shown at checkout. There is no obligation to order again.",
         ],
-        action: { label: "Browse research supplies", url: SHOP_URL },
+        action: { label: "Browse the catalogue", url: SHOP_URL },
         unsubscribeUrl: event.unsubscribeUrl,
       });
     case "paymentRecovery":

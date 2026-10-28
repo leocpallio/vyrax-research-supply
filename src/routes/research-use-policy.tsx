@@ -7,7 +7,7 @@ export const Route = createFileRoute("/research-use-policy")({
     pageHead(
       "/research-use-policy",
       titles.info("Research Use Policy"),
-      "Vyrax Labs products are supplied strictly for laboratory research. Read the conditions every order is placed under.",
+      "Vyrax Labs products are supplied as research compounds. Read the conditions every order is placed under.",
       { crumb: "Research use policy" },
     ),
   component: Policy,
@@ -22,48 +22,47 @@ function Policy() {
       updated="2026-10-06"
     >
       <p>
-        Every product sold by Vyrax Labs is a research chemical supplied for laboratory research,
-        analytical work and education. This policy forms part of our{" "}
+        Every product sold by Vyrax Labs is a research compound. This policy forms part of our{" "}
         <Link to="/terms">terms and conditions</Link>.
       </p>
       <h2>Conditions of sale</h2>
       <ul>
         <li>
-          Products are not for human or veterinary use, and must not be ingested, injected, applied
-          to skin or otherwise administered.
+          Products are sold as research compounds, not as licensed medicines. They carry no dose on
+          the label and no marketing authorisation.
         </li>
         <li>
-          Products are not medicines, food supplements or cosmetics, and are not intended to
-          diagnose, treat, cure or prevent any condition.
+          You can use them yourself. Most buyers do. What you get is the vial, the certificate for
+          its batch and the published literature, and you work the rest out from there.
         </li>
         <li>
-          Buyers must be 18 or over and must handle products in line with appropriate laboratory
-          safety practice.
+          Buyers must be 18 or over and handle products in line with sensible practice for
+          injectable-grade laboratory material.
         </li>
         <li>
           Buyers are responsible for complying with the laws and institutional rules that apply to
-          their research.
+          them.
         </li>
       </ul>
       <h2>What we will not do</h2>
       <ul>
         <li>
-          We do not give dosing, administration or human-use advice, and our staff will not answer
-          such questions.
+          We do not put a dose on the label, and we do not give dosing or administration advice.
         </li>
-        <li>We do not describe products as treatments or make health claims about them.</li>
+        <li>
+          We do not describe products as treatments and we do not make health claims about them.
+        </li>
       </ul>
       <h2>Refusal of orders</h2>
       <p>
         We may refuse or cancel an order, and refund it, if we have reason to believe a product will
-        not be used for legitimate research, including where a message refers to personal use.
-        Refunds go back to the original card.
+        not be used as intended. Refunds go back to the original card.
       </p>
       <h2>Product information</h2>
       <p>
-        Research summaries on product pages describe published literature and link to it on PubMed.
-        They are not claims about any effect of our products. Handling and storage information is
-        provided for laboratory use only.
+        Summaries on product pages describe published literature and link to it on PubMed. They are
+        not claims about any effect of our products. Handling and storage information is general
+        guidance, not a protocol.
       </p>
     </InfoPage>
   );

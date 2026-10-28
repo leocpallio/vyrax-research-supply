@@ -1,8 +1,7 @@
 import { guides, type Block, type Guide } from "../data/guides";
 import { SITE_URL } from "../data/site";
 
-const RUO =
-  "For laboratory research only. Not for human or veterinary use. No dosing or administration guidance is provided.";
+const RUO = "Research compounds, not a licensed medicine. No dose is on the label.";
 
 function block(b: Block): string {
   switch (b.type) {
@@ -35,7 +34,7 @@ export function buildGuideMd(g: Guide): string {
     `updated: ${g.updated}`,
     ...(g.changed ? [`changed: "${g.changed.replace(/"/g, '\\"')}"`] : []),
     `canonical: ${SITE_URL}/guides/${g.slug}`,
-    `research_use_only: true`,
+    `research_use_only: false`,
     "---",
     "",
   ];

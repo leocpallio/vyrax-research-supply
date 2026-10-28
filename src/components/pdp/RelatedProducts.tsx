@@ -16,7 +16,7 @@ function RelatedCard({ c }: { c: Compound }) {
       <div className="aspect-square bg-surface overflow-hidden">
         <img
           src={img.small ?? img.src}
-          alt={`${c.name} research vial`}
+          alt={`${c.name} vial`}
           width={640}
           height={640}
           loading="lazy"
@@ -39,7 +39,7 @@ export function RelatedProducts({ list, eyebrow }: { list: Compound[]; eyebrow: 
   return (
     <section data-testid="related-products-container" className="mt-16">
       <p className="text-[11px] font-bold tracking-[0.08em] text-muted-foreground">{eyebrow}</p>
-      <h2 className="font-heading text-2xl font-semibold mt-1 mb-5">Related research compounds</h2>
+      <h2 className="font-heading text-2xl font-semibold mt-1 mb-5">Related compounds</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {list.map((c) => (
           <RelatedCard key={c.slug} c={c} />

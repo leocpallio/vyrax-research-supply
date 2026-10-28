@@ -19,9 +19,11 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Research Peptides UK · ${modifier}Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK · ${modifier}Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
-    const desc = clampDescription(`Browse ${compounds.length} research compounds for laboratory use: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu.${batchTesting ? ` ${batchTesting}.` : ""} ${site.checkoutOpen ? "See delivery options before you order." : "The site is not live yet; no orders or payments are taken."} Research use only.`);
+    const desc = clampDescription(
+      `Buy peptides in the UK: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
+    );
     const org = {
       "@context": "https://schema.org",
       "@type": "OnlineStore",
@@ -132,17 +134,17 @@ function Home() {
       <section className="container-main pt-14 pb-10 md:pt-24 md:pb-16 grid lg:grid-cols-[1fr_minmax(0,460px)] gap-10 items-center">
         <div className="max-w-[760px]">
           <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
-            Research peptides · UK dispatch
+            Peptides · UK dispatch
           </p>
           <h1
             data-testid="hero-title"
             className="mt-4 font-heading text-[40px] md:text-[64px] font-semibold leading-[1.02] tracking-tight"
           >
-            Research peptides, documented by batch.
+            Peptides, documented by batch.
           </h1>
           <p className="mt-6 text-lg md:text-xl text-[#040825]/70 leading-relaxed max-w-[600px]">
-            {compounds.length} research compounds across {strengthCount} strengths, each with CAS
-            numbers, literature references and per-mg pricing.{" "}
+            {compounds.length} compounds across {strengthCount} strengths, each with CAS numbers,
+            literature references and per-mg pricing.{" "}
             {site.checkoutOpen
               ? "Card checkout on a secure hosted payment page."
               : "The site is not live yet; no orders or payments are taken."}
@@ -167,7 +169,7 @@ function Home() {
         <div className="hidden lg:block rounded-[24px] bg-[#EAE6DC] p-10" data-testid="hero-visual">
           <img
             src={heroImage}
-            alt="Vyrax Labs research peptide vial with batch label"
+            alt="Vyrax Labs peptide vial with batch label"
             width={1000}
             height={1000}
             fetchPriority="high"
@@ -224,7 +226,7 @@ function Home() {
           Browse by range
         </p>
         <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
-          Research ranges
+          Ranges
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" data-testid="range-tiles">
           {ranges.map((r) => (

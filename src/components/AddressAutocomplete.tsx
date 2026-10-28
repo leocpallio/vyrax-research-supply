@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 
 // Public browser key, restricted by HTTP referrer to vyraxlabs.co.uk. Not a secret.
-const KEY = (import.meta as unknown as { env?: Record<string, string> }).env?.["VITE_GOOGLE_PLACES_KEY"];
+const KEY = (import.meta as unknown as { env?: Record<string, string> }).env?.[
+  "VITE_GOOGLE_PLACES_KEY"
+];
 
 type Sug = { placeId: string; main: string; secondary: string };
 export type Resolved = { address: string; address2: string; city: string; postcode: string };
@@ -44,17 +46,35 @@ export function AddressAutocomplete({ value, onValue, onResolve, onChange: _c, .
         const r = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-Goog-Api-Key": KEY },
-          body: JSON.stringify({ input: q, sessionToken: tok.current, includedRegionCodes: ["gb"] }),
+          body: JSON.stringify({
+            input: q,
+            sessionToken: tok.current,
+            includedRegionCodes: ["gb"],
+          }),
         });
         if (!r.ok) throw new Error(String(r.status));
         const j = await r.json();
         const out: Sug[] = (j.suggestions ?? [])
           .filter((s: { placePrediction?: unknown }) => s.placePrediction)
-          .map((s: { placePrediction: { placeId: string; text?: { text?: string }; structuredFormat?: { mainText?: { text?: string }; secondaryText?: { text?: string } } } }) => ({
-            placeId: s.placePrediction.placeId,
-            main: s.placePrediction.structuredFormat?.mainText?.text ?? s.placePrediction.text?.text ?? "",
-            secondary: s.placePrediction.structuredFormat?.secondaryText?.text ?? "",
-          }));
+          .map(
+            (s: {
+              placePrediction: {
+                placeId: string;
+                text?: { text?: string };
+                structuredFormat?: {
+                  mainText?: { text?: string };
+                  secondaryText?: { text?: string };
+                };
+              };
+            }) => ({
+              placeId: s.placePrediction.placeId,
+              main:
+                s.placePrediction.structuredFormat?.mainText?.text ??
+                s.placePrediction.text?.text ??
+                "",
+              secondary: s.placePrediction.structuredFormat?.secondaryText?.text ?? "",
+            }),
+          );
         setSugs(out);
         setOpen(out.length > 0);
         setHi(0);
@@ -76,7 +96,8 @@ export function AddressAutocomplete({ value, onValue, onResolve, onChange: _c, .
         );
         if (!r.ok) throw new Error(String(r.status));
         const j = await r.json();
-        const comps: { longText?: string; shortText?: string; types?: string[] }[] = j.addressComponents ?? [];
+        const comps: { longText?: string; shortText?: string; types?: string[] }[] =
+          j.addressComponents ?? [];
         const get = (...t: string[]) => comps.find((c) => c.types?.some((x) => t.includes(x)));
         const num = get("street_number")?.shortText ?? "";
         const route = get("route")?.longText ?? "";
@@ -116,20 +137,32 @@ export function AddressAutocomplete({ value, onValue, onResolve, onChange: _c, .
         onFocus={() => sugs.length > 0 && setOpen(true)}
         onKeyDown={(e) => {
           if (!open || !sugs.length) return;
-          if (e.key === "ArrowDown") { e.preventDefault(); setHi((h) => Math.min(h + 1, sugs.length - 1)); }
-          else if (e.key === "ArrowUp") { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
-          else if (e.key === "Enter") { e.preventDefault(); void pick(sugs[hi]!); }
-          else if (e.key === "Escape") setOpen(false);
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHi((h) => Math.min(h + 1, sugs.length - 1));
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHi((h) => Math.max(h - 1, 0));
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            void pick(sugs[hi]!);
+          } else if (e.key === "Escape") setOpen(false);
         }}
       />
       {open && (
-        <ul role="listbox" className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-line bg-white shadow-lg">
+        <ul
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-line bg-white shadow-lg"
+        >
           {sugs.map((s, i) => (
             <li
               key={s.placeId}
               role="option"
               aria-selected={i === hi}
-              onMouseDown={(e) => { e.preventDefault(); void pick(s); }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                void pick(s);
+              }}
               onMouseEnter={() => setHi(i)}
               className={`cursor-pointer border-b border-line px-3 py-2.5 last:border-b-0 ${i === hi ? "bg-paper" : ""}`}
             >

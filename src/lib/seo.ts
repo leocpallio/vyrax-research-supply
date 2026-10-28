@@ -6,7 +6,7 @@
  * buildHead({ title, description, path, image?, type?, noindex?, jsonLd? })
  *   -> { meta, links, scripts } ready to return from a route's head().
  *   - title: full <title>. Use the title patterns below. Appends nothing.
- *   - description: 140-160 chars, ends with "Research use only." where sensible.
+ *   - description: 140-160 chars, ends with DESC_TAIL where sensible.
  *   - path: site-relative ("/shop", "/product/bpc-157"). Canonical + og:url are built from it.
  *   - image: site-relative or absolute. Defaults to DEFAULT_OG_IMAGE (1200x630).
  *   - type: og:type, "website" (default) | "article" | "product".
@@ -16,10 +16,10 @@
  *   twitter card, robots + googlebot "index, follow, max-image-preview:large", theme-color.
  *
  * Title patterns (kova section 9, adapted):
- *   Home      titles.home()                  "Vyrax Labs | UK Research Peptides | <claim-gated modifier>, Same-Day Dispatch"
- *   PDP       titles.product(name, strength) "Buy BPC-157 5mg UK | Research Peptide | Vyrax Labs"
- *   Category  titles.category(seoName)       "Buy Metabolic Research Peptides UK | Research Grade | Vyrax Labs"
- *   Store     titles.shop()                  "Shop UK Research Peptides | BPC-157 & Retatrutide | Vyrax Labs"
+ *   Home      titles.home()                  "Buy Peptides UK | <claim-gated modifier>, Same-Day Dispatch | Vyrax"
+ *   PDP       titles.product(name, strength) "Buy BPC-157 5mg UK | BPC 157 | Vyrax Labs"
+ *   Category  titles.category(seoName)       "Buy Metabolic Peptides UK | Vyrax Labs"
+ *   Store     titles.shop()                  "Buy Peptides UK | Full Catalogue | Vyrax Labs"
  *   Info      titles.info("Returns & Replacements") "Returns & Replacements | Vyrax Labs UK"
  *
  * JSON-LD builders (each returns a plain object; pass to buildHead({ jsonLd })):
@@ -42,10 +42,25 @@ export const THEME_COLOR = "#F5F0E5";
 export const DEFAULT_OG_IMAGE = "/og/default.jpg";
 
 const OG_PAGES = new Set([
-  "shop", "lab-reports", "guides", "faq", "about", "contact", "calculator",
-  "shipping", "returns", "terms", "privacy", "cookies", "verify",
+  "shop",
+  "lab-reports",
+  "guides",
+  "faq",
+  "about",
+  "contact",
+  "calculator",
+  "shipping",
+  "returns",
+  "terms",
+  "privacy",
+  "cookies",
+  "verify",
 ]);
-export const ogKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export const ogKey = (label: string) =>
+  label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 /** Per-page 1200x630 link-preview card built by scripts/build-og.py (public/og/). */
 export function ogImageFor(path: string, productStrength?: string): string {
   const parts = path.split("?")[0]!.split("/").filter(Boolean);
@@ -58,7 +73,8 @@ export function ogImageFor(path: string, productStrength?: string): string {
   if (parts.length === 1 && OG_PAGES.has(a!)) return `/og/page/${a}.jpg`;
   return DEFAULT_OG_IMAGE;
 }
-export const RUO_TAIL = "Research use only.";
+/** Tail appended to meta descriptions. Short, keyword-bearing, and leaves room for the body copy. */
+export const DESC_TAIL = "UK supplied.";
 /** Last catalogue/trust-content change (ISO date). Bump when compounds, prices, categories or policy
  *  pages change; sitemap lastmod reads it. A request date is not a content change date. */
 export const CONTENT_UPDATED = "2026-10-28";
@@ -116,27 +132,24 @@ export function clampDescription(text: string, max = 155): string {
   return clampText(t, max);
 }
 
-/** Append the RUO tail if the description does not already end with an RUO statement. */
-export function withRuoTail(description: string): string {
+/** Append the description tail unless the copy already ends with it. */
+export function withDescTail(description: string): string {
   const d = description.trim();
-  return /research use only\.?$|\bRUO\.?$/i.test(d) ? d : `${d} ${RUO_TAIL}`;
+  return /uk supplied\.?$/i.test(d) ? d : `${d} ${DESC_TAIL}`;
 }
 
 export const titles = {
-  // The testing modifier comes from the claims registry: "Research Grade" until certificates exist.
+  // The testing modifier comes from the claims registry: "Lab-Tested" until certificates exist.
   home: () =>
-    `${SITE_NAME} | UK Research Peptides | ${claimGate("testing.page-title")}, Same-Day Dispatch`,
+    `Buy Peptides UK | ${claimGate("testing.page-title")} | Same-Day Dispatch | ${SITE_NAME}`,
   /** "Lab-Tested" only when claim-gated evidence exists, otherwise empty string. */
   testingModifier: () =>
     isClaimAllowed("testing.page-title") ? claimGate("testing.page-title") : "",
-  shop: () => `Shop UK Research Peptides | BPC-157 & Retatrutide | ${SITE_NAME}`,
-  product: (name: string, strength?: string) => {
-    const base = `Buy ${name}${strength ? ` ${strength}` : ""} UK`;
-    const full = `${base} | Research Peptide | ${SITE_NAME}`;
-    return full.length <= 60 ? full : `${base} | ${SITE_NAME}`;
-  },
-  category: (seoName: string) => `Buy ${seoName} UK | Research Grade | ${SITE_NAME}`,
-  collection: (name: string) => `${name} Research Peptides UK | ${SITE_NAME}`,
+  shop: () => `Buy Peptides UK | Full Catalogue | ${SITE_NAME}`,
+  product: (name: string, strength?: string) =>
+    `Buy ${name}${strength ? ` ${strength}` : ""} UK | ${SITE_NAME}`,
+  category: (seoName: string) => `Buy ${seoName} UK | ${SITE_NAME}`,
+  collection: (name: string) => `${name} UK | ${SITE_NAME}`,
   labReports: () => `Lab Results & Certificates of Analysis | ${SITE_NAME} UK`,
   guide: (seoTitle: string) => `${seoTitle} | ${SITE_NAME}`,
   info: (name: string) => `${name} | ${SITE_NAME} UK`,
@@ -218,11 +231,12 @@ export function organizationJsonLd(): Record<string, unknown> {
     currenciesAccepted: "GBP",
     priceRange: "££",
     knowsAbout: [
-      "research peptides",
+      "peptides",
+      "buying peptides in the UK",
       "certificates of analysis",
       "HPLC purity testing",
       "peptide reconstitution",
-      "laboratory supplies",
+      "peptide storage",
     ],
   };
 }

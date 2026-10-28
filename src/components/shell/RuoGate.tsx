@@ -65,20 +65,17 @@ export function RuoGate() {
         {state === "ask" ? (
           <>
             <p className="eyebrow mb-3 flex items-center gap-2">
-              <FlaskConical size={14} /> Research use only
+              <FlaskConical size={14} /> 18+ only
             </p>
             <h2 id="ruo-gate-title" className="text-2xl font-bold leading-tight">
               Before you continue.
             </h2>
             <div id="ruo-gate-body" className="text-sm text-muted-foreground mt-3 space-y-3">
               <p>
-                {site.name} supplies research-grade peptides for laboratory use only. They are not
-                medicines, are not for human or veterinary use, and are supplied with no dosing or
-                medical guidance.
+                {site.name} sells peptides in sealed vials, with a certificate for every batch. They
+                are not licensed medicines, so the label carries no dose.
               </p>
-              <p>
-                You must be 18 or over and purchasing solely for legitimate scientific research.
-              </p>
+              <p>You must be 18 or over to order.</p>
               <p>
                 Selecting "I agree" confirms the above and your acceptance of our{" "}
                 <Link
@@ -123,12 +120,11 @@ export function RuoGate() {
         ) : (
           <div data-testid="ruo-gate-refused">
             <h2 id="ruo-gate-title" className="text-2xl font-bold leading-tight">
-              This site is for researchers only.
+              You need to be 18 or over.
             </h2>
             <p id="ruo-gate-body" className="text-sm text-muted-foreground mt-3">
-              {site.name} products are supplied strictly for laboratory research. If you are not 18
-              or over, or are not buying for research, you cannot use this site. If you selected the
-              wrong option you can go back.
+              {site.name} sells peptides to adults in the UK. If you are under 18 you can still
+              browse, but you cannot order. If you selected the wrong option you can go back.
             </p>
             <div className="mt-6 grid gap-2">
               <button

@@ -82,4 +82,3 @@ export function PairsWith({ product, onAdd }: { product: Compound; onAdd: () => 
     </section>
   );
 }
-

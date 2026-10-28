@@ -243,9 +243,7 @@ export function PaymentCheckout() {
     <StoreShell>
       <div className="container-main py-8 md:py-12 max-w-5xl min-h-[60vh]" ref={summaryRef}>
         <h1 className="page-title">Checkout</h1>
-        <p className="mt-3 text-muted-foreground">
-          Guest checkout, no account needed.
-        </p>
+        <p className="mt-3 text-muted-foreground">Guest checkout, no account needed.</p>
         {!loaded ? (
           <p className="mt-8 text-muted-foreground" role="status">
             Loading your basket...
@@ -282,53 +280,58 @@ export function PaymentCheckout() {
                           <span className="font-normal text-muted-foreground"> (optional)</span>
                         )}
                       </label>
-{f.key === "address" ? (
-                      <AddressAutocomplete
-                        id={id}
-                        name={f.key}
-                        className="mt-2 h-11 text-base"
-                        type={f.type ?? "text"}
-                        inputMode={f.inputMode}
-                        autoComplete={f.autoComplete}
-                                                                        required={!f.optional}
-                        aria-required={!f.optional}
-                        aria-invalid={err ? true : undefined}
-                        aria-describedby={err ? `${id}-err` : f.hint ? `${id}-hint` : undefined}
-                        maxLength={200}
-                        value={form[f.key]}
-                        disabled={busy}
-                        onValue={(v) => set(f.key, v)}
-                        onResolve={(a) => { set("address", a.address); set("address2", a.address2); if (a.city) set("city", a.city); if (a.postcode) set("postcode", formatPostcode(a.postcode)); }}
-                        onBlur={() => {
-                          if (f.key === "postcode" && form.postcode)
-                            set("postcode", formatPostcode(form.postcode));
-                          if (form[f.key] || errors[f.key]) validateOne(f.key);
-                        }}
-                      />
+                      {f.key === "address" ? (
+                        <AddressAutocomplete
+                          id={id}
+                          name={f.key}
+                          className="mt-2 h-11 text-base"
+                          type={f.type ?? "text"}
+                          inputMode={f.inputMode}
+                          autoComplete={f.autoComplete}
+                          required={!f.optional}
+                          aria-required={!f.optional}
+                          aria-invalid={err ? true : undefined}
+                          aria-describedby={err ? `${id}-err` : f.hint ? `${id}-hint` : undefined}
+                          maxLength={200}
+                          value={form[f.key]}
+                          disabled={busy}
+                          onValue={(v) => set(f.key, v)}
+                          onResolve={(a) => {
+                            set("address", a.address);
+                            set("address2", a.address2);
+                            if (a.city) set("city", a.city);
+                            if (a.postcode) set("postcode", formatPostcode(a.postcode));
+                          }}
+                          onBlur={() => {
+                            if (f.key === "postcode" && form.postcode)
+                              set("postcode", formatPostcode(form.postcode));
+                            if (form[f.key] || errors[f.key]) validateOne(f.key);
+                          }}
+                        />
                       ) : (
-                      <Input
-                        id={id}
-                        name={f.key}
-                        className="mt-2 h-11 text-base"
-                        type={f.type ?? "text"}
-                        inputMode={f.inputMode}
-                        autoComplete={f.autoComplete}
-                        autoCapitalize={f.key === "postcode" ? "characters" : undefined}
-                        spellCheck={f.key === "email" || f.key === "postcode" ? false : undefined}
-                        required={!f.optional}
-                        aria-required={!f.optional}
-                        aria-invalid={err ? true : undefined}
-                        aria-describedby={err ? `${id}-err` : f.hint ? `${id}-hint` : undefined}
-                        maxLength={f.key === "email" ? 254 : f.key === "postcode" ? 12 : 200}
-                        value={form[f.key]}
-                        disabled={busy}
-                        onChange={(e) => set(f.key, e.target.value)}
-                        onBlur={() => {
-                          if (f.key === "postcode" && form.postcode)
-                            set("postcode", formatPostcode(form.postcode));
-                          if (form[f.key] || errors[f.key]) validateOne(f.key);
-                        }}
-                      />
+                        <Input
+                          id={id}
+                          name={f.key}
+                          className="mt-2 h-11 text-base"
+                          type={f.type ?? "text"}
+                          inputMode={f.inputMode}
+                          autoComplete={f.autoComplete}
+                          autoCapitalize={f.key === "postcode" ? "characters" : undefined}
+                          spellCheck={f.key === "email" || f.key === "postcode" ? false : undefined}
+                          required={!f.optional}
+                          aria-required={!f.optional}
+                          aria-invalid={err ? true : undefined}
+                          aria-describedby={err ? `${id}-err` : f.hint ? `${id}-hint` : undefined}
+                          maxLength={f.key === "email" ? 254 : f.key === "postcode" ? 12 : 200}
+                          value={form[f.key]}
+                          disabled={busy}
+                          onChange={(e) => set(f.key, e.target.value)}
+                          onBlur={() => {
+                            if (f.key === "postcode" && form.postcode)
+                              set("postcode", formatPostcode(form.postcode));
+                            if (form[f.key] || errors[f.key]) validateOne(f.key);
+                          }}
+                        />
                       )}
                       {err ? (
                         <p id={`${id}-err`} className="mt-1.5 text-sm text-destructive">
@@ -363,8 +366,7 @@ export function PaymentCheckout() {
                     className="accent-primary mt-0.5 h-5 w-5 shrink-0"
                   />
                   <span>
-                    I am 18 or over, purchasing solely for legitimate laboratory research and accept
-                    the{" "}
+                    I am 18 or over and accept the{" "}
                     <Link to="/terms" className="underline">
                       terms
                     </Link>{" "}

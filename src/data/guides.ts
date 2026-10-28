@@ -1,4 +1,4 @@
-// Education hub articles. Research register only: no dosing, no human-use guidance.
+// Education hub articles. No dosing, no human-use guidance.
 export type Block =
   | { type: "p"; text: string }
   | { type: "h"; text: string }
@@ -27,14 +27,14 @@ export const guides: Guide[] = [
     title: "How to reconstitute lyophilised peptides",
     seoTitle: "How to Reconstitute Peptides: Lab Guide UK",
     description:
-      "A step-by-step laboratory guide to reconstituting lyophilised research peptides with bacteriostatic water, including concentration maths and handling tips.",
+      "How to reconstitute a lyophilised peptide vial with bacteriostatic water: step by step, with the concentration maths worked through.",
     updated: "2026-09-28",
     readMins: 6,
     compounds: ["bacteriostatic-water", "bpc-157", "retatrutide"],
     body: [
       {
         type: "p",
-        text: "Research peptides are supplied as a lyophilised (freeze-dried) powder because peptides are far more stable dry than in solution. Before use in an assay they must be dissolved in a suitable diluent, a process called reconstitution. Done carefully, it gives a solution of known concentration without damaging the peptide.",
+        text: "Peptides are supplied as a lyophilised (freeze-dried) powder because peptides are far more stable dry than in solution. Before use they must be dissolved in a suitable diluent, a process called reconstitution. Done carefully, it gives a solution of known concentration without damaging the peptide.",
       },
       { type: "h", text: "What you need" },
       {
@@ -42,7 +42,7 @@ export const guides: Guide[] = [
         items: [
           "The sealed peptide vial, brought to room temperature before opening",
           "A sterile diluent. Bacteriostatic water (sterile water with 0.9% benzyl alcohol) is the usual choice for multi-access vials; sterile water or a buffer may be specified by your protocol",
-          "Sterile single-use laboratory syringes or calibrated pipettes",
+          "Sterile single-use syringes or calibrated pipettes",
           "Alcohol wipes for the vial stoppers",
           "A clean, low-draught work surface and appropriate PPE",
         ],
@@ -94,14 +94,14 @@ export const guides: Guide[] = [
     title: "Peptide storage and handling guide",
     seoTitle: "Peptide Storage Guide: Temperature & Light",
     description:
-      "How to store lyophilised and reconstituted research peptides: temperatures, light, moisture, freeze-thaw cycles and shelf-life considerations.",
+      "How to store peptides: fridge and freezer temperatures, light, moisture, freeze-thaw cycles and how long a reconstituted vial keeps.",
     updated: "2026-09-28",
     readMins: 5,
     compounds: ["bpc-157", "ghk-cu", "nad-plus"],
     body: [
       {
         type: "p",
-        text: "Peptides degrade through several routes: hydrolysis, oxidation (particularly methionine, cysteine and tryptophan residues), deamidation and aggregation. Good storage slows every one of them. The rules below apply to most research peptides; always check compound-specific data where it exists.",
+        text: "Peptides degrade through several routes: hydrolysis, oxidation (particularly methionine, cysteine and tryptophan residues), deamidation and aggregation. Good storage slows every one of them. The rules below apply to most peptides; always check compound-specific data where it exists.",
       },
       { type: "h", text: "Lyophilised (powder) peptides" },
       {
@@ -154,7 +154,7 @@ export const guides: Guide[] = [
     body: [
       {
         type: "p",
-        text: "A certificate of analysis (CoA) is the laboratory report that shows what is actually in a batch. For research peptides, a useful CoA answers three questions: is it the right molecule, how pure is it, and how much is in the vial?",
+        text: "A certificate of analysis (CoA) is the laboratory report that shows what is actually in a batch. For a peptide, a useful CoA answers three questions: is it the right molecule, how pure is it, and how much is in the vial?",
       },
       { type: "h", text: "What a good CoA includes" },
       {
@@ -201,7 +201,7 @@ export const guides: Guide[] = [
     title: "BPC-157 vs TB-500: how the research compares",
     seoTitle: "BPC-157 vs TB-500: Research Differences",
     description:
-      "BPC-157 and TB-500 compared: structure, proposed mechanisms, research models and why they are often studied together.",
+      "BPC-157 and TB-500 compared: structure, proposed mechanisms, what the studies looked at and why the two get paired.",
     updated: "2026-09-28",
     readMins: 6,
     compounds: ["bpc-157", "tb-500", "wolverine-stack"],
@@ -255,7 +255,7 @@ export const guides: Guide[] = [
     title: "Retatrutide vs tirzepatide vs semaglutide: receptor pharmacology compared",
     seoTitle: "Retatrutide vs Tirzepatide vs Semaglutide",
     description:
-      "How the single, dual and triple incretin agonists differ in receptor targets, structure and research use.",
+      "Semaglutide, tirzepatide and retatrutide compared: receptor targets, structure, half-life chemistry and what separates them.",
     updated: "2026-09-28",
     readMins: 7,
     compounds: ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"],
@@ -340,7 +340,7 @@ export const guides: Guide[] = [
       },
       {
         type: "note",
-        text: "Products are supplied for laboratory research use only. This guide describes general peptide chemistry and is not guidance on using any product in people or animals.",
+        text: "Products are sold as research compounds. This guide describes general peptide chemistry and is not a dosing protocol.",
       },
     ],
   },
@@ -349,7 +349,7 @@ export const guides: Guide[] = [
     title: "Melanotan 1 vs melanotan 2: how the research compares",
     seoTitle: "Melanotan 1 vs Melanotan 2: Research Compared",
     description:
-      "Melanotan 1 (afamelanotide) and melanotan 2 compared: structure, receptor selectivity, molecular weight and regulatory status in research.",
+      "Melanotan 1 (afamelanotide) and melanotan 2 compared: structure, receptor selectivity, molecular weight and what each is licensed for.",
     updated: "2026-10-28",
     readMins: 5,
     compounds: ["melanotan-1", "melanotan-2"],
@@ -381,11 +381,11 @@ export const guides: Guide[] = [
       { type: "h", text: "Regulatory status" },
       {
         type: "p",
-        text: "Afamelanotide has been licensed in some jurisdictions as a medicine for one rare condition, erythropoietic protoporphyria. Melanotan 2 has no marketing authorisation in the UK, and the MHRA has warned against unlicensed products sold for tanning. Vyrax Labs supplies these compounds for laboratory research only.",
+        text: "Afamelanotide is a licensed medicine in some jurisdictions for one rare condition, erythropoietic protoporphyria. Melanotan 2 has no marketing authorisation in the UK, and the MHRA has warned about unlicensed products sold for tanning. Vyrax Labs supplies both as research compounds.",
       },
       {
         type: "note",
-        text: "Products are supplied for laboratory research use only. Not for human or veterinary use. This guide compares published chemistry and is not guidance on use.",
+        text: "Products are sold as research compounds. This guide compares published chemistry and is not a dosing protocol.",
       },
     ],
   },
@@ -401,7 +401,7 @@ export const guides: Guide[] = [
     body: [
       {
         type: "p",
-        text: "Retatrutide is one of the most searched research peptides in the UK and one of the most inconsistently supplied. The molecule is a 39 amino acid triple agonist at the GIP, GLP-1 and glucagon receptors, and it is sold as a lyophilised powder in sealed vials. Because it is supplied for laboratory research rather than as a licensed medicine, the buyer carries the checking. This page sets out what to look at before paying, and what to compare between sellers.",
+        text: "Retatrutide is one of the most searched peptides in the UK and one of the most inconsistently supplied. The molecule is a 39 amino acid triple agonist at the GIP, GLP-1 and glucagon receptors, and it is sold as a lyophilised powder in sealed vials. Because it is sold as a research compound rather than a licensed medicine, the buyer carries the checking. This page sets out what to look at before paying, and what to compare between sellers.",
       },
       { type: "h", text: "What is actually in the vial" },
       {
@@ -475,7 +475,7 @@ export const guides: Guide[] = [
       },
       {
         type: "note",
-        text: "Vyrax Labs supplies retatrutide as a lyophilised powder in 10mg, 20mg and 30mg vials, with a certificate published for each batch on the Lab Reports page. Products are for laboratory research use only and not for human or veterinary use.",
+        text: "Vyrax Labs supplies retatrutide as a lyophilised powder in 10mg, 20mg and 30mg vials, with a certificate published for each batch on the Lab Reports page. It is sold as a research compound, not a licensed medicine.",
       },
     ],
   },
@@ -537,11 +537,11 @@ export const guides: Guide[] = [
       },
       {
         type: "p",
-        text: "Published phase 2 data exist for both compounds and phase 3 programmes are running, so the literature is growing quickly in both directions. Neither is a licensed medicine in the UK, and both are supplied here for laboratory research.",
+        text: "Published phase 2 data exist for both compounds and phase 3 programmes are running, so the literature is growing quickly in both directions. Neither is a licensed medicine in the UK, and both are sold here as research compounds.",
       },
       {
         type: "note",
-        text: "Products are supplied for laboratory research use only. Not for human or veterinary use. This guide compares published pharmacology and is not guidance on use.",
+        text: "Products are sold as research compounds. This guide compares published pharmacology and is not a dosing protocol.",
       },
     ],
   },
@@ -638,7 +638,7 @@ export const guides: Guide[] = [
       },
       {
         type: "note",
-        text: "Every Vyrax Labs batch certificate is published on the Lab Reports page and can be looked up by the batch number printed on the vial. Products are for laboratory research use only.",
+        text: "Every Vyrax Labs batch certificate is published on the Lab Reports page and can be looked up by the batch number printed on the vial. Products are sold as research compounds.",
       },
     ],
   },

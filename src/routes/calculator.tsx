@@ -36,7 +36,7 @@ export const Route = createFileRoute("/calculator")({
   head: () => {
     const title = "Peptide Reconstitution Calculator | Vyrax Labs";
     const description =
-      "Free peptide reconstitution calculator for laboratory research: stock concentration in mg/ml and µg/ml, molar concentration from molecular weight, and C1V1 = C2V2 working dilutions. Research use only.";
+      "Free peptide reconstitution calculator: stock concentration in mg/ml and µg/ml, molar concentration from molecular weight, and C1V1 = C2V2 working dilutions.";
     return buildHead({
       title,
       description,
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/calculator")({
         howToJsonLd({
           name: "How to calculate the concentration of a reconstituted peptide",
           description:
-            "Work out stock concentration, molar concentration and a working dilution for a lyophilised research peptide.",
+            "Work out stock concentration, molar concentration and a working dilution for a lyophilised peptide.",
           path: "/calculator",
           totalTime: "PT2M",
           steps: [
@@ -146,8 +146,8 @@ function CalculatorPage() {
         <p className="eyebrow">LAB TOOL</p>
         <h1 className="page-title">Peptide reconstitution calculator</h1>
         <p className="text-muted-foreground mt-4 max-w-2xl">
-          Work out the concentration of a reconstituted research vial. Enter the amount of peptide
-          in the vial and the volume of diluent you add.
+          Work out the concentration of a reconstituted vial. Enter the amount of peptide in the
+          vial and the volume of diluent you add.
         </p>
 
         <div className="grid lg:grid-cols-2 gap-8 mt-10">
@@ -276,8 +276,7 @@ function CalculatorPage() {
               </p>
             )}
             <p className="text-xs text-ink-muted mt-6">
-              Arithmetic only. Verify all preparations against your laboratory's validated
-              procedures. Not for human or veterinary use.
+              Arithmetic only. Verify all preparations against your own validated procedures.
             </p>
           </div>
         </div>

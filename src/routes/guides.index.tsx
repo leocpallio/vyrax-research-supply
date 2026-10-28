@@ -7,9 +7,9 @@ import { breadcrumbListJsonLd, buildHead, collectionPageJsonLd } from "@/lib/seo
 export const Route = createFileRoute("/guides/")({
   head: () =>
     buildHead({
-      title: "Peptide Research Guides UK | Vyrax Labs",
+      title: "Peptide Guides UK | Vyrax Labs",
       description:
-        "Laboratory guides for research peptides: how to reconstitute lyophilised peptides, storage temperatures, reading a certificate of analysis and compound comparisons. Research use only.",
+        "Guides to peptides: how to reconstitute a lyophilised vial, storage temperatures, reading a certificate of analysis and compound comparisons.",
       path: "/guides",
       jsonLd: [
         breadcrumbListJsonLd([
@@ -17,8 +17,8 @@ export const Route = createFileRoute("/guides/")({
           { name: "Guides", path: "/guides" },
         ]),
         collectionPageJsonLd({
-          name: "Research guides",
-          description: "Laboratory guides for research peptides from Vyrax Labs.",
+          name: "Guides",
+          description: "Practical guides to peptides from Vyrax Labs.",
           path: "/guides",
           items: guides.map((g) => ({ name: g.title, path: `/guides/${g.slug}` })),
         }),
@@ -32,11 +32,11 @@ function Guides() {
     <StoreShell>
       <div className="container-main py-8 md:py-12">
         <Breadcrumbs items={[{ name: "Home", to: "/" }, { name: "Guides" }]} />
-        <p className="eyebrow">LABORATORY NOTES</p>
-        <h1 className="page-title">Research guides</h1>
+        <p className="eyebrow">GUIDES</p>
+        <h1 className="page-title">Guides</h1>
         <p className="text-muted-foreground mt-4 max-w-2xl">
-          Practical laboratory notes on handling research peptides. Research register only: we do
-          not provide dosing or administration guidance.
+          Practical notes on handling peptides. No dosing: we do not provide dosing or
+          administration guidance.
         </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
           {[...guides]

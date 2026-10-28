@@ -243,11 +243,11 @@ const DEFS = {
     surfaces: ["src/routes/lab-reports.tsx"],
   },
   "testing.lab-reports-meta": {
-    text: "Public certificates of analysis for Vyrax Labs research peptides. HPLC purity and mass spectrometry identity results by batch, with batch number lookup.",
+    text: "Public certificates of analysis for Vyrax Labs peptides. HPLC purity and mass spectrometry identity results by batch, with batch number lookup.",
     requires: CERT_REQUIRED,
     coverage: "hplc-ms",
     honestEmpty:
-      "Quality documentation for Vyrax Labs research peptides: how each batch is documented, the current status of every batch, and batch number lookup.",
+      "Quality documentation for Vyrax Labs peptides: how each batch is documented, the current status of every batch, and batch number lookup.",
     assertion: true,
     surfaces: ["src/routes/lab-reports.tsx"],
   },
@@ -278,7 +278,7 @@ const DEFS = {
     text: ">99% HPLC Tested",
     requires: CERT_REQUIRED,
     coverage: "hplc-ms",
-    honestEmpty: "Research Grade",
+    honestEmpty: "Batch Documented",
     assertion: true,
     surfaces: ["src/lib/catalog.ts"],
   },
@@ -286,7 +286,7 @@ const DEFS = {
     text: "Lab-Tested",
     requires: CERT_REQUIRED,
     coverage: "catalogue",
-    honestEmpty: "Research Grade",
+    honestEmpty: "Batch Documented",
     assertion: true,
     surfaces: [
       "src/routes/index.tsx",
@@ -520,7 +520,7 @@ const DEFS = {
   // Regulatory position and trading registration.
   // -------------------------------------------------------------------------------------------
   "regulatory.research-use-only": {
-    text: "All products are sold strictly for laboratory research use only. Not for human or veterinary use; not a medicine, food, cosmetic or supplement.",
+    text: "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement.",
     requires: [{ key: "regulatoryStatus", kind: "present" }],
     assertion: false,
     surfaces: ["src/components/Store.tsx", "src/routes/research-use-policy.tsx"],

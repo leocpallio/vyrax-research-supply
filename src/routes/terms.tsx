@@ -10,7 +10,7 @@ export const Route = createFileRoute("/terms")({
     pageHead(
       "/terms",
       titles.info("Terms & Conditions"),
-      "Terms and conditions for ordering research peptides and laboratory supplies from Vyrax Labs in the UK. Research use only.",
+      "Terms and conditions for ordering peptides and lab supplies from Vyrax Labs in the UK.",
       { crumb: "Terms" },
     ),
   component: Terms,
@@ -21,13 +21,13 @@ function Terms() {
     <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-10-06">
       <h2>1. About us</h2>
       <p>This website is operated under the trading name {site.name}.</p>
-      <h2>2. Research use only</h2>
+      <h2>2. What you are buying</h2>
       <p>
-        All products are for laboratory, analytical and educational research. They are not
-        medicines, food, supplements or cosmetics, and are not for human or veterinary use. By
-        ordering you confirm you are 18 or over and will use products only for legitimate research,
-        in line with our <Link to="/research-use-policy">research use policy</Link>. We may decline
-        or cancel an order, and refund it, if we believe this condition is not met.
+        All products are research compounds. They are not licensed medicines, food supplements or
+        cosmetics, and they are not sold with a dose on the label. By ordering you confirm you are
+        18 or over and accept the conditions in our{" "}
+        <Link to="/research-use-policy">research use policy</Link>. We may decline or cancel an
+        order, and refund it, if we believe those conditions are not met.
       </p>
       <h2>3. Orders and contract</h2>
       <p>
@@ -57,16 +57,16 @@ function Terms() {
       </p>
       <h2>7. Product information</h2>
       <p>
-        Product descriptions summarise published research for information only and make no claim
-        about the effect of any product in humans. Chemical data are provided for identification.
-        Only batches with a published certificate in the{" "}
-        <Link to="/lab-reports">lab reports register</Link> have a result available to check here.
+        Product descriptions summarise published literature for information only and make no claim
+        about the effect of any product. Chemical data are provided for identification. Only batches
+        with a published certificate in the <Link to="/lab-reports">lab reports register</Link> have
+        a result available to check here.
       </p>
       <h2>8. Liability</h2>
       <p>
-        Products are not intended for use in or on humans or animals. Nothing in these terms limits
-        liability for death or personal injury caused by negligence, fraud, or any liability that
-        cannot be limited by law. Your statutory rights remain unaffected.
+        Products are sold as research compounds. Nothing in these terms limits liability for death
+        or personal injury caused by negligence, fraud, or any liability that cannot be limited by
+        law. Your statutory rights remain unaffected.
       </p>
       <h2>9. Governing law</h2>
       <p>

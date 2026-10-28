@@ -20,8 +20,10 @@ export const Route = createFileRoute("/collections/$slug")({
     const list = productsInSection(compounds, section.slug);
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const content = sectionSeo(section.slug);
-    const title = `${section.name} Research Peptides UK | Vyrax Labs`;
-    const desc = clampDescription(`${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. Research use only.`);
+    const title = `${section.name} UK | Vyrax Labs`;
+    const desc = clampDescription(
+      `${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
+    );
     const url = abs(`/collections/${section.slug}`);
     const itemList = {
       "@context": "https://schema.org",

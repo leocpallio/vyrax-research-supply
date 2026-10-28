@@ -46,8 +46,8 @@ export function Footer() {
         <div className="md:col-span-2 lg:col-span-1">
           <Wordmark tone="light" title={site.name} className="h-[44px] w-auto" />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-sm">
-            Research peptides supplied from the UK for laboratory use. Read the specification and
-            the certificate for a batch before you order.
+            Peptides dispatched from the UK. Check the specification and the certificate for a batch
+            before you order.
           </p>
           <p className="mt-4 text-sm">
             <a href={`mailto:${site.email}`} className="underline underline-offset-2">
@@ -89,7 +89,7 @@ export function Footer() {
         <Col title="Learn">
           <L to="/guides">Guides</L>
           <L to="/calculator">Reconstitution calculator</L>
-          <L href="/guides/reconstitution-lab-guide.pdf">Laboratory preparation PDF</L>
+          <L href="/guides/reconstitution-lab-guide.pdf">Preparation PDF</L>
           <L to="/shipping">Shipping</L>
           <L to="/returns">Returns</L>
           <L to="/faq">FAQ</L>

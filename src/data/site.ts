@@ -10,7 +10,7 @@ const checkoutOpen =
 export const site = {
   name: "Vyrax Labs",
   url: SITE_URL,
-  tagline: "Research peptides dispatched from the UK",
+  tagline: "Peptides dispatched from the UK",
   // Business details: fill these in before launch. Null values are shown as pending.
   legalName: null as string | null,
   companyNumber: null as string | null,

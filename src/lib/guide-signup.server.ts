@@ -55,7 +55,7 @@ export async function subscribeToGuide(
   if (email.length > 254 || !EMAIL.test(email) || /[\r\n]/.test(email))
     return json("Enter a valid email address", 400);
   if (data["adult"] !== true || data["consent"] !== true)
-    return json("Please confirm you are 18+ and agree to research updates", 400);
+    return json("Please confirm you are 18+ and accept the terms", 400);
   const env = deps.env ?? process.env;
   if (env["VYRAX_GUIDE_SIGNUP_ENABLED"] !== "true")
     return json("Email signup is temporarily unavailable. You can download the guide below.", 503);

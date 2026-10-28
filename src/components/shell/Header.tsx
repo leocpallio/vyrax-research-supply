@@ -59,7 +59,7 @@ const NAV: NavGroup[] = [
         hint: "Dispatch and delivery",
         testid: "nav-learn-shipping",
       },
-      { label: "FAQ", to: "/faq", hint: "Ordering and research use", testid: "nav-learn-faq" },
+      { label: "FAQ", to: "/faq", hint: "Ordering and delivery", testid: "nav-learn-faq" },
     ],
   },
 ];

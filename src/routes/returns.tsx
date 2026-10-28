@@ -55,11 +55,11 @@ function Returns() {
         law requires it, and we do so within the legal time limit after we receive the goods or
         proof that you sent them.
       </p>
-      <h2>Research use</h2>
+      <h2>What you can expect</h2>
       <p>
-        Products are for laboratory research only (see the{" "}
+        Products are research compounds (see the{" "}
         <Link to="/research-use-policy">research use policy</Link>). We may cancel and refund an
-        order if we believe it is not for research.
+        order if we believe it has been used.
       </p>
       <h2>How to reach us</h2>
       <p>

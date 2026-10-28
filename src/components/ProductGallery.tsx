@@ -27,7 +27,12 @@ export function ProductGallery({
         className={`relative overflow-hidden bg-white ${showReport ? "" : "aspect-square"}`}
       >
         {showReport && report ? (
-          <a href={report.src} target="_blank" rel="noreferrer" aria-label={`Open the Janoshik lab report for batch ${report.batch}`}>
+          <a
+            href={report.src}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open the Janoshik lab report for batch ${report.batch}`}
+          >
             <img
               src={report.src}
               alt={`Janoshik test report for ${name}, batch ${report.batch}`}
@@ -42,7 +47,7 @@ export function ProductGallery({
             src={image.src}
             srcSet={image.srcSet}
             sizes="(min-width: 1024px) 1200px, 100vw"
-            alt={`${name} research vial, illustrative front render`}
+            alt={`${name} vial, illustrative front render`}
             width={1024}
             height={1024}
             fetchPriority="high"
@@ -66,7 +71,13 @@ export function ProductGallery({
             onClick={() => setView("vial")}
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "vial" ? "border-primary" : "border-border"}`}
           >
-            <img src={image.src} alt="" width={64} height={64} className="h-full w-full object-cover" />
+            <img
+              src={image.src}
+              alt=""
+              width={64}
+              height={64}
+              className="h-full w-full object-cover"
+            />
           </button>
           <button
             type="button"
@@ -76,14 +87,27 @@ export function ProductGallery({
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "report" ? "border-primary" : "border-border"}`}
             aria-label="Lab report"
           >
-            <img src={report.src} alt="" width={64} height={64} loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
+            <img
+              src={report.src}
+              alt=""
+              width={64}
+              height={64}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-top"
+            />
           </button>
         </div>
       )}
       {report?.verifyUrl && (
         <p className="mt-3 text-sm text-muted-foreground">
           Third-party report from Janoshik, batch {report.batch}.{" "}
-          <a href={report.verifyUrl} target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 text-foreground">
+          <a
+            href={report.verifyUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="underline underline-offset-2 text-foreground"
+          >
             Verify on Janoshik
           </a>
         </p>

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/category/$slug")({
       ? `${claimGate("testing.page-title")} | `
       : "";
     const title = `${c.seoName} UK | ${titleTag}Vyrax Labs`;
-    const desc = `${c.blurb} Browse ${list.length} research compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. Research use only.`;
+    const desc = `${c.blurb} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`;
     const itemList = {
       "@context": "https://schema.org",
       "@type": "ItemList",
@@ -87,7 +87,7 @@ function CategoryPage() {
       lede={c.blurb}
       crumbs={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: c.name }]}
       pills={categoryPills(c.slug)}
-      pillsLabel="Browse by research category"
+      pillsLabel="Browse by category"
       list={list}
       content={content}
     />

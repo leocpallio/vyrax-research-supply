@@ -30,34 +30,39 @@ export function AnnouncementBar() {
   const current = strings[n] ?? strings[0] ?? "";
   return (
     <>
-    {site.whatsapp && (
-      <a
-        href={`https://wa.me/${site.whatsapp}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block bg-[#AC4821] text-white text-sm sm:text-[15px] font-semibold hover:brightness-95"
-        data-testid="whatsapp-banner"
-      >
-        <div className="container-main min-h-11 py-2 flex items-center justify-center text-center">
-          <p><span className="sm:hidden">WhatsApp support: +44 7575 894339</span><span className="hidden sm:inline">Message us on WhatsApp for product or order support: +44 7575 894339</span></p>
-        </div>
-      </a>
-    )}
-    <div
-      className="bg-ink text-ink-foreground text-[13px] font-medium"
-      data-testid="announcement-bar"
-    >
-      <div className="container-main h-9 flex items-center justify-center text-center">
-        <p
-          key={current}
-          aria-live="polite"
-          className="truncate animate-in fade-in duration-200"
-          data-testid="announcement-text"
+      {site.whatsapp && (
+        <a
+          href={`https://wa.me/${site.whatsapp}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-[#AC4821] text-white text-sm sm:text-[15px] font-semibold hover:brightness-95"
+          data-testid="whatsapp-banner"
         >
-          {current}
-        </p>
+          <div className="container-main min-h-11 py-2 flex items-center justify-center text-center">
+            <p>
+              <span className="sm:hidden">WhatsApp support: +44 7575 894339</span>
+              <span className="hidden sm:inline">
+                Message us on WhatsApp for product or order support: +44 7575 894339
+              </span>
+            </p>
+          </div>
+        </a>
+      )}
+      <div
+        className="bg-ink text-ink-foreground text-[13px] font-medium"
+        data-testid="announcement-bar"
+      >
+        <div className="container-main h-9 flex items-center justify-center text-center">
+          <p
+            key={current}
+            aria-live="polite"
+            className="truncate animate-in fade-in duration-200"
+            data-testid="announcement-text"
+          >
+            {current}
+          </p>
+        </div>
       </div>
-    </div>
     </>
   );
 }

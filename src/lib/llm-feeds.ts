@@ -10,7 +10,7 @@ import { dispatchCutoffLabel } from "./delivery";
 import { CONTENT_UPDATED, TRUST_PAGES } from "./seo";
 
 const RUO =
-  "All products are supplied for laboratory research only. Not for human or veterinary use. No dosing or administration guidance is provided.";
+  "All products are sold as research compounds. Not a licensed medicine, food, cosmetic or supplement. No dose is on the label.";
 const url = (p: string) => SITE_URL + p;
 const sellable = (c: Compound) => c.strengths.length > 0;
 
@@ -19,7 +19,7 @@ export function buildLlmsTxt(): string {
   lines.push(`# ${site.name}`, "");
   lines.push(`> ${site.tagline}. ${RUO}`, "");
   lines.push(
-    `${site.name} is a UK online store for research peptides, peptide blends and laboratory supplies. Prices are in GBP and include UK delivery over £${site.freeDeliveryThreshold}. ${dispatchPromise()} Published certificates of analysis, where available, are listed at ${url("/lab-reports")} and each batch can be checked at ${url("/verify/<batch>")}. Content last updated ${CONTENT_UPDATED}.`,
+    `${site.name} is a UK online store for peptides, peptide blends and lab supplies. Prices are in GBP and include UK delivery over £${site.freeDeliveryThreshold}. ${dispatchPromise()} Published certificates of analysis, where available, are listed at ${url("/lab-reports")} and each batch can be checked at ${url("/verify/<batch>")}. Content last updated ${CONTENT_UPDATED}.`,
     "",
   );
   lines.push("## Catalogue", "");
@@ -48,7 +48,7 @@ export function buildLlmsTxt(): string {
   const names: Record<string, string> = {
     "/lab-reports": "Lab reports and certificates of analysis",
     "/calculator": "Peptide reconstitution calculator",
-    "/guides": "Research guides",
+    "/guides": "Guides",
     "/faq": "Frequently asked questions",
     "/about": "About Vyrax Labs",
     "/contact": "Contact",
@@ -104,7 +104,7 @@ export function buildPricingMd(): string {
         );
     lines.push("");
   }
-  lines.push(`Source: ${url("/shop")}. Research use only.`, "");
+  lines.push(`Source: ${url("/shop")}. Research compounds, UK supplied.`, "");
   return lines.join("\n");
 }
 

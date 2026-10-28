@@ -7,7 +7,7 @@ import { SITE_URL, site } from "../../data/site";
 import { lineMedia } from "./order-email.server";
 
 const who = {
-  name: "Alex Researcher",
+  name: "Alex Buyer",
   reference: "VX-PREVIEW",
   address: "12 Example Road, London, SW1A 1AA",
   orderDate: "2026-10-06",

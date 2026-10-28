@@ -37,7 +37,7 @@ export function validateFields(f: CheckoutFields, agree: boolean): FieldErrors {
   if (!f.city.trim()) e.city = "Enter your town or city.";
   if (!f.postcode.trim()) e.postcode = "Enter your postcode.";
   else if (!isUkPostcode(f.postcode)) e.postcode = "Enter a valid UK postcode, e.g. SW1A 1AA.";
-  if (!agree) e.agree = "Confirm the research-use statement to continue.";
+  if (!agree) e.agree = "Confirm the statement to continue.";
   return e;
 }
 

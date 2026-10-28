@@ -12,7 +12,7 @@ import {
   serializeJsonLd,
   titles,
   webSiteJsonLd,
-  withRuoTail,
+  withDescTail,
   ogImageFor,
 } from "./seo";
 import { site } from "../data/site";
@@ -79,17 +79,13 @@ describe("text helpers", () => {
     expect(t.length).toBeLessThanOrEqual(60);
     expect(t.endsWith("\u2026")).toBe(true);
   });
-  test("withRuoTail", () => {
-    expect(withRuoTail("A guide.")).toBe("A guide. Research use only.");
-    expect(withRuoTail("Already. Research use only.")).toBe("Already. Research use only.");
+  test("withDescTail", () => {
+    expect(withDescTail("A guide.")).toBe("A guide. UK supplied.");
+    expect(withDescTail("Already. UK supplied.")).toBe("Already. UK supplied.");
   });
   test("title patterns", () => {
-    expect(titles.product("BPC-157", "5mg")).toBe(
-      "Buy BPC-157 5mg UK | Research Peptide | Vyrax Labs",
-    );
-    expect(titles.category("Metabolic Research Peptides")).toBe(
-      "Buy Metabolic Research Peptides UK | Research Grade | Vyrax Labs",
-    );
+    expect(titles.product("BPC-157", "5mg")).toBe("Buy BPC-157 5mg UK | Vyrax Labs");
+    expect(titles.category("Metabolic Peptides")).toBe("Buy Metabolic Peptides UK | Vyrax Labs");
     expect(titles.info("Returns & Replacements")).toBe("Returns & Replacements | Vyrax Labs UK");
     for (const t of [titles.home(), titles.shop(), titles.labReports()])
       expect(t.length).toBeLessThanOrEqual(70);

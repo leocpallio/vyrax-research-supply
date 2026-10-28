@@ -12,6 +12,7 @@ import { faqJsonLd, type QA } from "../data/faq";
 import { sectionFor } from "../data/shop-sections";
 import { purityStat } from "./pdp-coa";
 import { claimGate } from "./claims";
+import { DESC_TAIL } from "./seo";
 
 /** Listing a product belongs to for breadcrumbs: its shop section when it has one, else its category. */
 export function listingFor(c: Compound) {
@@ -41,27 +42,26 @@ const titleSynonym = (c: Compound) => {
 };
 
 export const productTitle = (c: Compound, s: Strength) => {
-  const kind = c.kind === "supply" ? "Lab Supply" : "Research Peptide";
   const base = `Buy ${c.name} ${s.label} UK`;
   const syn = titleSynonym(c);
   const withSyn = syn ? `${base} | ${syn} | ${site.name}` : "";
   if (withSyn && withSyn.length <= 60) return withSyn;
-  const full = `${base} | ${kind} | ${site.name}`;
+  const full = `${base} | ${site.name}`;
   return full.length <= 60 ? full : `${base} | ${site.name}`;
 };
 
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
   const syn = c.aliases.slice(0, 2).join(", ");
-  const lead = `${c.name} ${s.label} ${productForm(c).toLowerCase()} for laboratory research, UK supplied.`;
-  const room = 155 - " Research use only.".length;
+  const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK.`;
+  const room = 155 - ` ${DESC_TAIL}`.length;
   // Summary first so the sentence that survives truncation is the informative one; aliases only
   // pad the tail when there is room left over.
   const base = `${lead} ${first}`;
-  const withSyn = syn ? `${base} Also known as ${syn}.` : base;
-  if (withSyn.length <= room) return `${withSyn} Research use only.`;
+  const withSyn = syn ? `${base} Also sold as ${syn}.` : base;
+  if (withSyn.length <= room) return `${withSyn} ${DESC_TAIL}`;
   const clipped = base.length > room ? base.slice(0, room - 1).replace(/\s+\S*$/, "") + "…" : base;
-  return `${clipped} Research use only.`;
+  return `${clipped} ${DESC_TAIL}`;
 };
 
 /** Per-product questions, rendered in the Common questions accordion and as FAQPage JSON-LD. */
@@ -69,8 +69,8 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
   const stat = purityStat(c.slug, s.label);
   const list: QA[] = [
     [
-      `Is ${c.name} for human use?`,
-      `No. ${c.name} is supplied strictly for laboratory research. It is not a medicine, food, supplement or cosmetic and must not be used in humans or animals.`,
+      `Can I use ${c.name} myself?`,
+      `Yes. ${c.name} is sold as a ${productForm(c).toLowerCase()} in a sealed vial, and most buyers reconstitute and use it themselves. It is not a licensed medicine, so the label carries no dose: the vial, the certificate and the published literature are what you work from.`,
     ],
     [
       `How is ${c.name} ${s.label} tested?`,
@@ -81,8 +81,8 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
     [
       `How should ${c.name} be stored?`,
       c.kind === "supply"
-        ? "Store sealed at room temperature away from direct light. Once the stopper has been punctured, keep refrigerated at 2 to 8°C and follow your laboratory procedures for multi-use vials."
-        : "Lyophilised material should be stored sealed, dry and protected from light, ideally at -20°C for long-term storage. After reconstitution, laboratories typically store solutions at 2 to 8°C and avoid repeated freeze-thaw cycles.",
+        ? "Store sealed at room temperature away from direct light. Once the stopper has been punctured, keep it at 2 to 8°C."
+        : "Store the vial sealed, dry and out of light, ideally at -20°C for long-term storage. Once reconstituted, keep it at 2 to 8°C and avoid repeated freeze-thaw cycles.",
     ],
     [
       `When is ${c.name} dispatched?`,
@@ -97,7 +97,7 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
   if (c.kind !== "supply")
     list.push([
       `Do I need bacteriostatic water for ${c.name}?`,
-      "The listed form is lyophilised powder. Laboratories may use a suitable diluent according to their own protocols. Bacteriostatic water is listed separately. Our calculator works out a resulting concentration from your inputs.",
+      "Yes, if you plan to reconstitute it. The listed form is a lyophilised powder, so it needs a diluent to go into solution. Bacteriostatic water is listed separately, and our calculator works out the resulting concentration from the volume you add.",
     ]);
   list.push([
     `Where can I buy ${c.name} in the UK?`,
