@@ -10,7 +10,7 @@ import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import { SHELF_LIFE_MONTHS } from "@/data/coa";
-import { breadcrumbListJsonLd, buildHead, titles } from "@/lib/seo";
+import { CONTENT_UPDATED, ORG_ID, breadcrumbListJsonLd, buildHead, titles } from "@/lib/seo";
 
 export const Route = createFileRoute("/lab-reports")({
   head: () => {
@@ -22,10 +22,30 @@ export const Route = createFileRoute("/lab-reports")({
       title,
       description: desc,
       path: "/lab-reports",
-      jsonLd: breadcrumbListJsonLd([
-        { name: "Home", path: "/" },
-        { name: "Lab reports", path: "/lab-reports" },
-      ]),
+      jsonLd: [
+        breadcrumbListJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Lab reports", path: "/lab-reports" },
+        ]),
+        ...(coas.length
+          ? [
+              {
+                "@context": "https://schema.org",
+                "@type": "Dataset",
+                name: "Vyrax Labs published sample reports",
+                description: `Third-party Janoshik assay reports for ${coas.length} Vyrax Labs research compound batches, listing batch number, measured purity by HPLC and measured quantity. Published sample reports for laboratory research materials.`,
+                url: "https://vyraxlabs.co.uk/lab-reports",
+                creator: { "@id": ORG_ID },
+                publisher: { "@id": ORG_ID },
+                license: "https://vyraxlabs.co.uk/terms",
+                isAccessibleForFree: true,
+                inLanguage: "en-GB",
+                dateModified: CONTENT_UPDATED,
+                variableMeasured: ["Purity (HPLC, %)", "Measured quantity (mg)", "Batch number"],
+              },
+            ]
+          : []),
+      ],
     });
   },
   component: Reports,
