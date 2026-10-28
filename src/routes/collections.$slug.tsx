@@ -21,8 +21,11 @@ export const Route = createFileRoute("/collections/$slug")({
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const content = sectionSeo(section.slug);
     const title = `${section.seoName} UK | Vyrax Labs`;
+    // The lede is long enough to eat the whole 155-char budget, so trim it before the price and the
+    // tail are appended. Otherwise clampDescription cuts at the lede's full stop and drops both.
+    const lede = content.lede.replace(/\.$/, "");
     const desc = clampDescription(
-      `${content.lede} ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
+      `${lede.length > 95 ? `${lede.slice(0, 95).replace(/[,;:]?\s+\S*$/, "")}` : lede}. ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
     );
     const url = abs(`/collections/${section.slug}`);
     const itemList = {
