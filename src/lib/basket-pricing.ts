@@ -29,6 +29,16 @@ export function priceBasket(items: CartItem[]) {
     items.length === 0 || goodsP >= thresholdP ? 0 : Math.round(site.standardDeliveryFee * 100);
   const next = [...tiers].reverse().find((t) => afterP < t.over * 100);
   const gbpOf = (p: number) => p / 100;
+  const giftRule = site.firstOrderGift;
+  const hasGiftAlready = giftRule
+    ? items.some((i) => i.slug === giftRule.slug && i.strength === giftRule.strength)
+    : false;
+  const gift =
+    giftRule && !hasGiftAlready && goodsP >= giftRule.over * 100
+      ? { label: giftRule.label, value: giftRule.value }
+      : undefined;
+  const giftGap =
+    giftRule && !hasGiftAlready ? gbpOf(Math.max(0, giftRule.over * 100 - goodsP)) : undefined;
   return {
     subtotal: gbpOf(subtotalP),
     freeVials: gbpOf(freeP),
@@ -38,6 +48,8 @@ export function priceBasket(items: CartItem[]) {
     delivery: gbpOf(deliveryP),
     total: gbpOf(goodsP + deliveryP),
     freeDeliveryGap: items.length ? gbpOf(Math.max(0, thresholdP - goodsP)) : 0,
+    gift,
+    giftGap,
     nextTier: next
       ? { over: next.over, rate: next.rate, gap: gbpOf(next.over * 100 - afterP) }
       : undefined,

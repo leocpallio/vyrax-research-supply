@@ -128,6 +128,17 @@ function Basket() {
                     style={{ width: `${shipPct}%` }}
                   />
                 </div>
+                {p.gift && (
+                  <p className="text-xs text-verify mt-3 flex items-center gap-1.5">
+                    <Tag size={13} /> Free {p.gift.label} worth £{p.gift.value.toFixed(2)} added
+                  </p>
+                )}
+                {!p.gift && p.giftGap !== undefined && p.giftGap > 0 && site.firstOrderGift && (
+                  <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
+                    <Tag size={13} /> Add {gbp(p.giftGap)} more for a free{" "}
+                    {site.firstOrderGift.label}
+                  </p>
+                )}
                 {p.nextTier && (
                   <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
                     <Tag size={13} /> Add {gbp(p.nextTier.gap)} more for a{" "}

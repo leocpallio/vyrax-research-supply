@@ -247,6 +247,11 @@ export function PaymentCheckout() {
           <dd className="tabular-nums">{gbp(quote.total)}</dd>
         </div>
       </dl>
+      {quote.gift && (
+        <p className="mt-3 text-xs font-semibold text-verify">
+          Free {quote.gift.label} worth £{quote.gift.value.toFixed(2)} included with this order
+        </p>
+      )}
       {quote.freeDeliveryGap > 0 && (
         <p className="mt-3 text-xs text-muted-foreground">
           Free UK delivery on orders of {gbp(site.freeDeliveryThreshold)} or more after savings.
