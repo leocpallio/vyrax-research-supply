@@ -361,7 +361,7 @@ export function PaymentCheckout() {
               <p className="text-sm text-muted-foreground">Delivery is to a UK address only.</p>
 
               <div>
-                <label className="flex gap-3 text-sm">
+                <label className="-m-2 flex cursor-pointer items-start gap-3 rounded-lg p-2 text-sm">
                   <input
                     id="co-agree"
                     type="checkbox"
@@ -375,7 +375,7 @@ export function PaymentCheckout() {
                       setAgree(e.target.checked);
                       if (e.target.checked) setErrors((x) => ({ ...x, agree: undefined }));
                     }}
-                    className="accent-primary mt-0.5 h-5 w-5 shrink-0"
+                    className="mt-0.5 size-5 shrink-0 accent-primary sm:size-5"
                   />
                   <span>
                     I am 18 or over, buying for research use only, and accept the{" "}
@@ -447,7 +447,6 @@ export function PaymentCheckout() {
                   </li>
                 )}
                 <li>No account is created. Guest checkout only.</li>
-                <li>The total is calculated on our server, not in your browser.</li>
                 <li>
                   Questions before paying? Email{" "}
                   <a className="underline" href={`mailto:${site.email}`}>
