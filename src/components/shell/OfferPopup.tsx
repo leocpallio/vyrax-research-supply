@@ -99,21 +99,21 @@ export function OfferPopup() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="offer-title"
-            className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl"
+            className="flex max-h-[86vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl"
           >
-            <div className="overflow-y-auto p-6 text-center sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#15191e]/60">
+            <div className="overflow-y-auto px-5 py-4 text-center sm:px-6 sm:py-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#15191e]/60">
               Get up to
             </p>
-            <p className="mt-1 text-[2.75rem] font-black leading-none text-[#b45309]">
+            <p className="mt-0.5 text-[2rem] font-black leading-none text-[#b45309]">
               {topOfferPct}% off
             </p>
-            <p className="mt-1.5 text-lg font-semibold text-[#15191e]">on your order</p>
+            <p className="mt-1 text-sm font-semibold text-[#15191e]">on your order</p>
             <p className="mt-0.5 text-xs uppercase tracking-[0.18em] text-[#15191e]/50">plus</p>
 
             {offerGift && (
-              <div className="mt-3 rounded-xl bg-[#15191e] px-4 py-3.5 text-[#faf6ef]">
-                <p className="text-sm font-semibold">1× {offerGift.label} free</p>
+              <div className="mt-2.5 rounded-xl bg-[#15191e] px-3 py-2.5 text-[#faf6ef]">
+                <p className="text-[13px] font-semibold">1× {offerGift.label} free</p>
                 <p className="mt-0.5 text-xs text-[#faf6ef]/70">
                   Worth £{offerGift.value.toFixed(2)} · on orders over £{offerGift.over}, added
                   automatically
@@ -121,7 +121,7 @@ export function OfferPopup() {
               </div>
             )}
 
-            <p className="mx-auto mt-4 max-w-[19rem] text-sm leading-relaxed text-[#15191e]/75">
+            <p className="mx-auto mt-3 max-w-[19rem] text-[13px] leading-snug text-[#15191e]/75">
               {[...offerTiers]
                 .sort((a, b) => a.over - b.over)
                 .map((t) => `${Math.round(t.rate * 100)}% over £${t.over}`)
@@ -131,11 +131,11 @@ export function OfferPopup() {
               Free tracked delivery over £{site.freeDeliveryThreshold} · applied automatically, no
               code needed
             </p>
-            <div className="mt-4 rounded-xl border border-dashed border-[#15191e]/25 bg-white/60 px-4 py-3 text-center">
+            <div className="mt-3 rounded-xl border border-dashed border-[#15191e]/25 bg-white/60 px-3 py-2 text-center">
               <p className="text-[11px] uppercase tracking-[0.14em] text-[#15191e]/60">
                 First order discount
               </p>
-              <p className="mt-1 font-heading text-lg font-semibold tracking-[0.08em] text-[#15191e]">
+              <p className="font-heading text-base font-semibold tracking-[0.08em] text-[#15191e]">
                 FIRST10
               </p>
               <p className="mt-0.5 text-[11px] text-[#15191e]/60">
@@ -143,27 +143,27 @@ export function OfferPopup() {
               </p>
             </div>
 
-            <p className="mt-6 text-base font-semibold text-[#15191e]">
+            <p className="mt-4 text-[13px] font-semibold text-[#15191e]">
               Just tell us what you&rsquo;re researching
             </p>
-            <div className="mt-3 space-y-2">
+            <div className="mt-2 grid grid-cols-2 gap-2">
               {researchIntents.map((intent) => (
                 <button
                   key={intent.id}
                   type="button"
                   onClick={() => pick(intent.id, intent.to)}
-                  className="min-h-12 w-full rounded-full bg-[#15191e] px-4 py-3 text-sm font-semibold text-[#faf6ef] transition hover:bg-[#2a3138]"
+                  className="min-h-9 w-full rounded-full bg-[#15191e] px-2 py-2 text-[12px] font-semibold text-[#faf6ef] transition hover:bg-[#2a3138]"
                 >
                   {intent.label}
                 </button>
               ))}
             </div>
             </div>
-            <div className="border-t border-[#15191e]/10 px-6 py-1.5">
+            <div className="border-t border-[#15191e]/10 px-5 py-1">
               <button
                 type="button"
                 onClick={() => dismiss(true)}
-                className="min-h-11 w-full text-sm text-[#15191e]/55 underline underline-offset-2"
+                className="min-h-10 w-full text-[13px] text-[#15191e]/55 underline underline-offset-2"
               >
                 No thanks, I&rsquo;ll pay full price
               </button>

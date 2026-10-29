@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { quoteCheckout } from "./checkout-pricing";
 import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
+import { sendSaleAlert } from "./email/admin-alert.server";
 import { validatePaymentEvent, verifySignature } from "./spicepay";
 
 const json = (value: unknown, status = 200) =>
@@ -288,6 +289,28 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     } else {
       const legacyKind = applied === "paid" ? "orderConfirmation" : mailKind;
       if (legacyKind) await sendOrderEmail(legacyKind, order, String(event["event_id"]));
+    }
+    if (applied === "paid") {
+      // Owner alert first: the sale must never depend on the outbox drain.
+      await sendSaleAlert(order as never, String(event["event_id"]));
+      // Drain inline. There is no reliable cron on this worker, and a paid receipt that sits queued
+      // is worse than a slower webhook.
+      if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true") {
+        const secret = process.env["VYRAX_EMAIL_CRON_SECRET"] ?? "";
+        if (secret) {
+          try {
+            const { runEmailAutomation } = await import("./email/automation.server");
+            await runEmailAutomation(
+              new Request("https://vyraxlabs.co.uk/api/email-automation", {
+                method: "POST",
+                headers: { "x-vyrax-cron-secret": secret },
+              }),
+            );
+          } catch (error) {
+            console.error("[vyrax drain]", error instanceof Error ? error.message : "unknown");
+          }
+        }
+      }
     }
     return json({ received: true, decision });
   } catch (error) {
