@@ -5,8 +5,8 @@ import type { Compound } from "./types";
 export const shopSections = [
   {
     slug: "weight-metabolic",
-    name: "Metabolic",
-    seoName: "Metabolic Research Peptides",
+    name: "Weight Loss",
+    seoName: "Weight Loss Peptides",
     products: [
       "retatrutide",
       "tirzepatide",

@@ -129,7 +129,7 @@ function ProductPage() {
   const orderable = stock !== "out" && stock !== "preorder";
   const packs = packOptions(c, s);
   const chosen = packs.find((p) => p.count === pack) ?? packs[0]!;
-  const heading = `${c.name} ${s.label}`;
+  const heading = `${c.name} ${s.label}${c.useCases?.[0] ? ` for ${c.useCases[0]}` : ""}`;
   const form = productForm(c);
   const composition = s.composition ?? c.composition;
   const faqs = productFaqs(c, s);

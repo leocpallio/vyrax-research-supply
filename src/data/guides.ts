@@ -252,7 +252,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "retatrutide-vs-tirzepatide-vs-semaglutide",
-    title: "Retatrutide vs tirzepatide vs semaglutide: how the incretins compare",
+    title: "Retatrutide vs tirzepatide vs semaglutide: weight loss peptides compared",
     seoTitle: "Retatrutide vs Tirzepatide vs Semaglutide",
     description:
       "Semaglutide, tirzepatide and retatrutide compared: receptor targets, structure, half-life chemistry and what separates them.",
@@ -391,7 +391,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "buy-retatrutide-uk",
-    title: "Buying retatrutide in the UK: what to check before you order",
+    title: "Buying retatrutide in the UK for weight loss: what to check",
     seoTitle: "Buy Retatrutide UK: Vial Sizes and Batch Checks",
     description:
       "Retatrutide UK buyer's checklist: vial sizes and cost per mg, what a certificate must show, fill and identity checks.",
@@ -481,7 +481,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "retatrutide-vs-tirzepatide",
-    title: "Retatrutide vs tirzepatide: the third receptor explained",
+    title: "Retatrutide vs tirzepatide: the third receptor and weight loss",
     seoTitle: "Retatrutide vs Tirzepatide: Receptors Compared",
     description:
       "Retatrutide vs tirzepatide compared: receptor targets, glucagon agonism, structure and molecular weight.",

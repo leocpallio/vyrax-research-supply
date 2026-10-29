@@ -36,7 +36,7 @@ const COMMON_FAQS: QA[] = [
 ];
 
 const shopContent: CategoryContent = {
-  lede: "Every peptide and lab supply we list, in one grid: metabolic, recovery, growth hormone, skin, sleep and more.",
+  lede: "Every peptide and lab supply we list, in one grid: weight loss, recovery, growth hormone, skin, sleep and more.",
   blocks: [
     {
       heading: "Browsing the full catalogue",
@@ -57,17 +57,17 @@ const shopContent: CategoryContent = {
 
 const SECTION: Record<string, CategoryContent> = {
   "weight-metabolic": {
-    lede: "Incretin, amylin and mitochondrial research compounds, grouped by the receptors they act on.",
+    lede: "Weight loss, fat loss and appetite control peptides: incretin, amylin and mitochondrial compounds, grouped by the receptors they act on.",
     blocks: [
       {
-        heading: "Incretin and metabolic peptides compared",
+        heading: "Weight loss peptides and how they differ",
         paragraphs: [
           "This range covers the incretin receptor agonists that dominate the current literature: the GLP-1 receptor agonist semaglutide, the dual GIP and GLP-1 agonist tirzepatide and the triple agonist retatrutide. Alongside them sit the amylin analogue cagrilintide, the growth hormone fragment AOD-9604 and its parent fragment 176-191, the NNMT inhibitor 5-Amino-1MQ and the mitochondrial-derived peptide MOTS-c.",
           "Each compound page sets out which receptors the molecule acts at and how it differs from its nearest relatives, with references to the primary literature, so you can pick the right compound for a comparison.",
         ],
       },
       {
-        heading: "Appetite signalling and energy metabolism",
+        heading: "Fat loss, appetite and metabolism",
         paragraphs: [
           "The incretins work on appetite signalling and gastric emptying. Cagrilintide acts on the amylin pathway, which is the satiety side of the same picture. AOD-9604 and the 176-191 fragment are growth hormone fragments studied for lipolysis rather than for growth. 5-Amino-1MQ and MOTS-c sit on the metabolic side: NNMT inhibition and mitochondrial peptide signalling respectively.",
           "That split is why the range is listed together. If you want the appetite route, look at the incretins and cagrilintide. If you want the fat oxidation or metabolic route, look at the fragments, 5-Amino-1MQ and MOTS-c.",

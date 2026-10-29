@@ -12,7 +12,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["LY3437943", "GLP-3", "triple agonist", "reta"],
     category: "metabolic-research",
     tags: ["Incretin", "Energy metabolism"],
-    useCases: ["Metabolic Research", "Appetite Signalling", "Adipocyte Research"],
+    useCases: ["Weight Loss", "Fat Loss", "Appetite Control"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 59.99 },
@@ -42,7 +42,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["GLP-2", "dual agonist", "tirz", "LY3298176"],
     category: "metabolic-research",
     tags: ["Incretin", "Glucose metabolism"],
-    useCases: ["Metabolic Research", "Appetite Signalling", "Adipocyte Research"],
+    useCases: ["Weight Loss", "Fat Loss", "Appetite Control"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 54.99 },
@@ -74,7 +74,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["GLP-1", "sema", "GLP-1 analogue"],
     category: "metabolic-research",
     tags: ["Incretin", "Appetite signalling"],
-    useCases: ["Metabolic Research", "Appetite Signalling", "Glycaemic Research"],
+    useCases: ["Weight Loss", "Appetite Control", "Blood Sugar"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 34.99 },
@@ -104,7 +104,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["amylin analogue", "cagri", "NN9838"],
     category: "metabolic-research",
     tags: ["Amylin", "Satiety signalling"],
-    useCases: ["Metabolic Research", "Appetite Signalling", "Satiety Signalling"],
+    useCases: ["Weight Loss", "Appetite Control", "Satiety"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 39.99 }],
     summary:
@@ -129,7 +129,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["AOD9604", "hGH fragment 176-191", "Tyr-hGH 177-191"],
     category: "metabolic-research",
     tags: ["Lipid metabolism", "GH fragment"],
-    useCases: ["Metabolic Research", "Lipolysis Research", "Adipocyte Research"],
+    useCases: ["Fat Loss", "Weight Loss", "Lipolysis"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 24.99 },
@@ -158,7 +158,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["5-amino-1-methylquinolinium", "NNMT inhibitor"],
     category: "metabolic-research",
     tags: ["NNMT", "NAD+ metabolism"],
-    useCases: ["Metabolic Research", "Energy Metabolism"],
+    useCases: ["Fat Loss", "Metabolism", "Weight Loss"],
     kind: "small-molecule",
     form: "Powder (iodide salt)",
     appearance: "Red-brown to dark brown solid",
@@ -189,7 +189,7 @@ export const metabolicAndRegenerative: Compound[] = [
     aliases: ["mitochondrial derived peptide", "MOTSc"],
     category: "metabolic-research",
     tags: ["Mitochondria", "AMPK signalling"],
-    useCases: ["Energy Metabolism", "Lipolysis Research"],
+    useCases: ["Metabolism", "Fat Loss", "Energy"],
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },

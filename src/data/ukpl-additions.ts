@@ -60,7 +60,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["hGH 176-191"],
     category: "metabolic-research",
     tags: ["Growth hormone fragment"],
-    useCases: ["Metabolic Research", "Lipolysis Research", "Adipocyte Research"],
+    useCases: ["Fat Loss", "Weight Loss", "Lipolysis"],
     kind: "peptide",
     strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 29.99 }],
     summary:
@@ -92,7 +92,7 @@ export const ukplAdditions: Compound[] = [
     aliases: ["levocarnitine"],
     category: "metabolic-research",
     tags: ["Fatty acid transport"],
-    useCases: ["Metabolic Research", "Energy Metabolism", "Recovery Research"],
+    useCases: ["Fat Loss", "Energy", "Recovery"],
     kind: "small-molecule",
     form: "Solution; 600mg/ml, 10ml",
     appearance: "Solution",

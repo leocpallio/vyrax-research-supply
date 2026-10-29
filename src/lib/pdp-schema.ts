@@ -117,10 +117,10 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
   ]);
   if (c.useCases?.length)
     list.push([
-      `What is ${c.name} listed under?`,
-      `It is listed under ${c.useCases.join(", ").toLowerCase()}. ${
-        c.useCases[0] === "Metabolic Research"
-          ? "The incretin and metabolic peptides sit in our metabolic research group, and this page lists the vial sizes and the cost per mg so the options can be compared."
+      `What is ${c.name} used for?`,
+      `It is sold under ${c.useCases.join(", ").toLowerCase()}. ${
+        c.useCases[0] === "Weight Loss"
+          ? "The incretin and metabolic peptides are the ones people search for weight loss, and this page lists the vial sizes and the cost per mg so the options can be compared."
           : `It sits in the ${(c.useCases[0] ?? "").toLowerCase()} group in our catalogue, alongside the other compounds listed under the same heading.`
       }`,
     ]);

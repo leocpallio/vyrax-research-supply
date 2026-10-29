@@ -90,7 +90,7 @@ export const secretagoguesToSupplies: Compound[] = [
     aliases: ["TH9507", "GHRH analogue"],
     category: "gh-secretagogues",
     tags: ["GHRH analogue", "Visceral fat"],
-    useCases: ["Growth Hormone Research", "Lipolysis Research", "Adipose Research"],
+    useCases: ["Growth Hormone", "Fat Loss", "Visceral Fat"],
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
