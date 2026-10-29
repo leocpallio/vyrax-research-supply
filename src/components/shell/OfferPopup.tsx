@@ -97,27 +97,26 @@ export function OfferPopup() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="offer-title"
-            className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-[#faf6ef] p-6 text-center shadow-2xl sm:p-8"
+            className="flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl"
           >
+            <div className="overflow-y-auto p-6 text-center sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#15191e]/60">
               Get up to
             </p>
-            <p className="mt-1 text-5xl font-black leading-none text-[#b45309]">{topOfferPct}% off</p>
-            <p className="mt-2 text-lg font-semibold text-[#15191e]">on your order</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[#15191e]/50">plus</p>
+            <p className="mt-1 text-[2.75rem] font-black leading-none text-[#b45309]">
+              {topOfferPct}% off
+            </p>
+            <p className="mt-1.5 text-lg font-semibold text-[#15191e]">on your order</p>
+            <p className="mt-0.5 text-xs uppercase tracking-[0.18em] text-[#15191e]/50">plus</p>
 
             {offerGift && (
-              <>
-                <p className="mt-1 text-lg font-semibold text-[#b45309]">
-                  Free {offerGift.short} on orders over £{offerGift.over}
+              <div className="mt-3 rounded-xl bg-[#15191e] px-4 py-3.5 text-[#faf6ef]">
+                <p className="text-sm font-semibold">1× {offerGift.label} free</p>
+                <p className="mt-0.5 text-xs text-[#faf6ef]/70">
+                  Worth £{offerGift.value.toFixed(2)} · on orders over £{offerGift.over}, added
+                  automatically
                 </p>
-                <div className="mt-4 rounded-xl bg-[#15191e] px-4 py-4 text-[#faf6ef]">
-                  <p className="text-sm font-semibold">1× {offerGift.label}</p>
-                  <p className="mt-1 text-xs text-[#faf6ef]/70">
-                    Worth £{offerGift.value.toFixed(2)} · added to your order automatically
-                  </p>
-                </div>
-              </>
+              </div>
             )}
 
             <p className="mx-auto mt-4 max-w-[19rem] text-sm leading-relaxed text-[#15191e]/75">
@@ -157,13 +156,16 @@ export function OfferPopup() {
                 </button>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => dismiss(true)}
-              className="mt-4 min-h-11 w-full text-sm text-[#15191e]/55 underline underline-offset-2"
-            >
-              No thanks, I&rsquo;ll pay full price
-            </button>
+            </div>
+            <div className="border-t border-[#15191e]/10 px-6 py-1.5">
+              <button
+                type="button"
+                onClick={() => dismiss(true)}
+                className="min-h-11 w-full text-sm text-[#15191e]/55 underline underline-offset-2"
+              >
+                No thanks, I&rsquo;ll pay full price
+              </button>
+            </div>
           </div>
         </div>
       )}
