@@ -391,16 +391,21 @@ export function PaymentCheckout() {
                     className="mt-0.5 size-5 shrink-0 accent-primary sm:size-5"
                   />
                   <span>
-                    I am 18 or over, buying for research use only, and accept the{" "}
-                    <Link to="/terms" className="underline">
-                      terms
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/research-use-policy" className="underline">
-                      research use policy
-                    </Link>
+                    I am 18 or over, buying for research use only, and accept the terms and research
+                    use policy.
                   </span>
                 </label>
+                <div className="mt-1 flex flex-wrap gap-x-4 pl-8 text-sm">
+                  <Link to="/terms" className="inline-flex min-h-11 items-center underline underline-offset-2">
+                    Read the terms
+                  </Link>
+                  <Link
+                    to="/research-use-policy"
+                    className="inline-flex min-h-11 items-center underline underline-offset-2"
+                  >
+                    Research use policy
+                  </Link>
+                </div>
                 {errors.agree && (
                   <p id="co-agree-err" className="mt-1.5 text-sm text-destructive">
                     {errors.agree}
