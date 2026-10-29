@@ -4,7 +4,7 @@ import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { readCart, gbp, priceBasket, type CartItem } from "@/lib/catalog";
+import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { capture, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
@@ -185,14 +185,26 @@ export function PaymentCheckout() {
       </h2>
       <ul className="mt-3 divide-y divide-border">
         {items.map((i) => (
-          <li key={`${i.slug}:${i.strength}`} className="flex justify-between gap-3 py-2.5 text-sm">
-            <span>
-              {i.name} {i.strength}
-              <span className="block text-muted-foreground">
-                Qty {i.quantity} at {gbp(i.price)}
+          <li key={`${i.slug}:${i.strength}`} className="flex items-start justify-between gap-3 py-2.5 text-sm">
+            <span className="flex min-w-0 items-start gap-3">
+              <img
+                src={productImage(i.slug, i.strength).small ?? productImage(i.slug, i.strength).src}
+                alt=""
+                width={48}
+                height={48}
+                loading="lazy"
+                decoding="async"
+                aria-hidden="true"
+                className="size-12 shrink-0 rounded-lg border border-border bg-white object-cover"
+              />
+              <span className="min-w-0">
+                {i.name} {i.strength}
+                <span className="block text-muted-foreground">
+                  Qty {i.quantity} at {gbp(i.price)}
+                </span>
               </span>
             </span>
-            <span className="tabular-nums">{gbp(i.price * i.quantity)}</span>
+            <span className="shrink-0 tabular-nums">{gbp(i.price * i.quantity)}</span>
           </li>
         ))}
       </ul>
