@@ -16,6 +16,7 @@ import {
   type Strength,
 } from "@/lib/catalog";
 import { sectionFor } from "@/data/shop-sections";
+import { coaFor } from "@/data/coa";
 import { bestLadderPct, ladderSaving } from "@/lib/price-ladder";
 
 // Minimal card, kova pattern: stock pill, 1:1 render, round quick-add, name, category, "From £".
@@ -55,6 +56,7 @@ export function ProductCard({
   const s = product.strengths[0];
   const img = productImage(product.slug);
   const href = productPath(product.slug);
+  const hasReport = coaFor(product.slug).length > 0;
   const [added, setAdded] = useState(false);
   const [open, setOpen] = useState(false);
   if (!s) return null;
@@ -78,9 +80,9 @@ export function ProductCard({
   return (
     <article
       data-testid="product-wrapper"
-      className="group flex flex-col rounded-none border border-[#040825]/10 bg-[#F5F0E5] overflow-hidden transition-colors duration-200 hover:border-[#040825]/30"
+      className="group flex flex-col"
     >
-      <div className="relative aspect-square bg-[#EAE6DC] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
             src={img.small ?? img.src}
@@ -91,7 +93,7 @@ export function ProductCard({
             fetchPriority={priority ? "high" : undefined}
             width={640}
             height={640}
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         </a>
         <span
@@ -104,6 +106,15 @@ export function ProductCard({
         >
           {pill.text}
         </span>
+        {hasReport && (
+          <a
+            href={`${href}#lab-report`}
+            data-testid="card-coa-link"
+            className="absolute top-3 right-3 rounded-full bg-[#040825] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#F5F0E5] transition-colors hover:bg-[#AC4821]"
+          >
+            COA
+          </a>
+        )}
         <div className="absolute bottom-3 right-3">
           {multi ? (
             <Popover open={open} onOpenChange={setOpen}>
@@ -167,8 +178,8 @@ export function ProductCard({
           )}
         </div>
       </div>
-      <div className="p-3.5 md:p-4 flex flex-col gap-0.5">
-        <h3 className="font-heading font-semibold text-[15px] md:text-base leading-snug">
+      <div className="pt-3 px-0.5 flex flex-col gap-0.5">
+        <h3 className="font-heading font-bold text-[17px] md:text-[18px] leading-snug tracking-[-0.02em]">
           <a
             href={href}
             data-testid="product-title"
@@ -182,17 +193,17 @@ export function ProductCard({
             ? product.composition.join(" · ")
             : label}
         </p>
-        <p className="mt-1.5 flex items-baseline gap-1.5">
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
           {multi && <span className="text-xs text-[#040825]/60">From</span>}
-          <span data-testid="product-price" className="font-semibold tabular-nums">
+          <span data-testid="product-price" className="text-[16px] font-bold tabular-nums">
             {gbp(fromPrice(product))}
           </span>
           {bestPct && (
             <span
               data-testid="card-ladder-save"
-              className="text-xs font-semibold tabular-nums text-[#AC4821]"
+              className="shrink-0 whitespace-nowrap rounded-full bg-[#AC4821]/10 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[#AC4821] md:text-[11px]"
             >
-              Save up to {bestPct}% on larger vials
+              Save up to {bestPct}%
             </span>
           )}
         </p>
@@ -209,7 +220,7 @@ export function ProductCardGrid({
   priorityCount?: number;
 }) {
   return (
-    <div data-testid="product-grid" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+    <div data-testid="product-grid" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
       {list.map((p, i) => (
         <ProductCard key={p.slug} product={p} priority={i < priorityCount} />
       ))}

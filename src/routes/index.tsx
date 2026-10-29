@@ -138,7 +138,7 @@ function Home() {
           </p>
           <h1
             data-testid="hero-title"
-            className="mt-4 font-heading text-[40px] md:text-[64px] font-semibold leading-[1.02] tracking-tight"
+            className="mt-4 font-heading text-[40px] md:text-[64px] font-black leading-[1.02] tracking-[-0.04em]"
           >
             Peptides for weight loss, recovery and growth.
           </h1>
@@ -207,7 +207,7 @@ function Home() {
             <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
               Start here
             </p>
-            <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+            <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
               Featured compounds
             </h2>
           </div>
@@ -226,7 +226,7 @@ function Home() {
         <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
           Browse by range
         </p>
-        <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+        <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
           Ranges
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" data-testid="range-tiles">
@@ -270,7 +270,7 @@ function Home() {
               <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#F5F0E5]/60">
                 Lab reports
               </p>
-              <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-semibold leading-tight">
+              <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
                 {claimText("testing.home-certs-heading")}
               </h2>
             </div>
