@@ -106,7 +106,7 @@ export function ProductGallery({
             href={report.verifyUrl}
             target="_blank"
             rel="noreferrer noopener"
-            className="underline underline-offset-2 text-foreground"
+            className="inline-flex min-h-11 items-center underline underline-offset-2 text-foreground"
           >
             Verify on Janoshik
           </a>

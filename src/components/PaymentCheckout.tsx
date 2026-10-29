@@ -65,6 +65,7 @@ export function PaymentCheckout() {
     postcode: "",
   });
   const [agree, setAgree] = useState(false);
+  const [showItems, setShowItems] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -180,10 +181,22 @@ export function PaymentCheckout() {
       aria-labelledby="co-summary"
       className="order-first md:order-last md:sticky md:top-24 h-fit bg-surface rounded-2xl p-5 md:p-6"
     >
-      <h2 id="co-summary" className="font-heading text-xl font-semibold">
-        Order summary
-      </h2>
-      <ul className="mt-3 divide-y divide-border">
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="co-summary" className="font-heading text-xl font-semibold">
+          Order summary
+        </h2>
+        <button
+          type="button"
+          onClick={() => setShowItems((v) => !v)}
+          aria-expanded={showItems}
+          aria-controls="co-summary-items"
+          className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-3 text-sm font-medium md:hidden"
+        >
+          {showItems ? "Hide" : `${items.reduce((n, i) => n + i.quantity, 0)} item${items.reduce((n, i) => n + i.quantity, 0) === 1 ? "" : "s"}`}
+          <span aria-hidden className={showItems ? "rotate-180" : ""}>▾</span>
+        </button>
+      </div>
+      <ul id="co-summary-items" className={`mt-3 divide-y divide-border ${showItems ? "" : "hidden md:block"}`}>
         {items.map((i) => (
           <li key={`${i.slug}:${i.strength}`} className="flex items-start justify-between gap-3 py-2.5 text-sm">
             <span className="flex min-w-0 items-start gap-3">
@@ -434,22 +447,21 @@ export function PaymentCheckout() {
               >
                 <li>Card details are entered on our payment provider's secure page, not here.</li>
                 <li>
-                  Paid before {dispatchCutoffLabel()} on working days: same-day dispatch, subject to
-                  stock. Cold-chain packed; transit temperature is not guaranteed.
+                  Paid before {dispatchCutoffLabel()} on working days: same-day dispatch. Cold-chain
+                  packed; guest checkout only.
                 </li>
-                {site.phone && (
-                  <li>
-                    Need help?{" "}
-                    <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="underline">
-                      {site.phone}
-                    </a>{" "}
-                    ({site.supportHours}).
-                  </li>
-                )}
-                <li>No account is created. Guest checkout only.</li>
                 <li>
-                  Questions before paying? Email{" "}
-                  <a className="underline" href={`mailto:${site.email}`}>
+                  Need help?{" "}
+                  {site.phone ? (
+                    <a
+                      href={`tel:${site.phone.replace(/\s/g, "")}`}
+                      className="inline-flex min-h-11 items-center underline"
+                    >
+                      {site.phone}
+                    </a>
+                  ) : null}
+                  {site.phone ? " or " : "Email "}
+                  <a className="inline-flex min-h-11 items-center underline" href={`mailto:${site.email}`}>
                     {site.email}
                   </a>
                   .

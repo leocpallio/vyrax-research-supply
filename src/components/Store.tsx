@@ -287,11 +287,11 @@ export function Breadcrumbs({ items }: { items: { name: string; to?: string }[] 
           <li key={`${it.name}-${i}`} className="flex items-center gap-1.5">
             {i > 0 && <span aria-hidden>/</span>}
             {it.to ? (
-              <a href={it.to} className="hover:text-primary">
+              <a href={it.to} className="inline-flex min-h-11 items-center hover:text-primary">
                 {it.name}
               </a>
             ) : (
-              <span className="text-foreground">{it.name}</span>
+              <span className="inline-flex min-h-11 items-center text-foreground">{it.name}</span>
             )}
           </li>
         ))}

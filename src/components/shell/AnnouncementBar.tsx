@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { site } from "@/data/site";
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
@@ -19,6 +20,8 @@ export function announcementStrings(): string[] {
 }
 
 export function AnnouncementBar() {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const onCheckout = path.startsWith("/checkout");
   const strings = announcementStrings();
   const [n, setN] = useState(0);
   useEffect(() => {
@@ -30,7 +33,7 @@ export function AnnouncementBar() {
   const current = strings[n] ?? strings[0] ?? "";
   return (
     <>
-      {site.whatsapp && (
+      {site.whatsapp && !onCheckout && (
         <a
           href={`https://wa.me/${site.whatsapp}`}
           target="_blank"
