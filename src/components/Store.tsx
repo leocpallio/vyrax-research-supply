@@ -128,7 +128,7 @@ export function ProductCard({ product }: { product: Compound }) {
           loading="lazy"
           width={1024}
           height={1024}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="size-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
         />
         <span className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           {/* Scoped to the strength displayed on the card: the B2G1 offer only applies to specific

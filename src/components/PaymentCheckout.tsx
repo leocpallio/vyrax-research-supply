@@ -211,7 +211,7 @@ export function PaymentCheckout() {
                 loading="lazy"
                 decoding="async"
                 aria-hidden="true"
-                className="size-12 shrink-0 rounded-lg border border-border bg-white object-cover"
+                className="size-12 shrink-0 rounded-lg border border-border bg-white object-contain-cover"
               />
               <span className="min-w-0">
                 {i.name} {i.strength}

@@ -234,7 +234,7 @@ function ProductPage() {
             </Link>
             <h1
               data-testid="product-title"
-              className="font-heading text-3xl sm:text-4xl font-semibold leading-tight mt-2"
+              className="font-heading text-[32px] sm:text-[42px] font-black leading-[1.05] tracking-[-0.035em] mt-2"
             >
               {heading}
             </h1>
@@ -313,7 +313,7 @@ function ProductPage() {
               data-testid="add-product-button"
               disabled={!orderable}
               onClick={add}
-              className="mt-6 w-full h-12 rounded-md bg-[var(--warm,#AC4821)] text-white font-semibold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="mt-6 w-full h-12 rounded-full bg-[#040825] text-[#F5F0E5] font-bold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {!orderable
                 ? stockLabel[stock]
@@ -324,7 +324,7 @@ function ProductPage() {
             <Link
               to="/lab-reports"
               data-testid="check-lab-report"
-              className="mt-2 w-full h-11 inline-flex items-center justify-center rounded-md border border-foreground text-sm font-semibold transition-colors duration-150 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="mt-2 w-full h-11 inline-flex items-center justify-center rounded-full border border-[#040825]/25 text-sm font-bold transition-colors duration-150 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Check lab report
             </Link>
@@ -481,7 +481,7 @@ function ProductPage() {
           type="button"
           disabled={!orderable}
           onClick={add}
-          className="h-11 rounded-md bg-[var(--warm,#AC4821)] text-white px-5 text-sm font-semibold disabled:opacity-40"
+          className="h-11 rounded-full bg-[#040825] text-[#F5F0E5] px-6 text-sm font-bold disabled:opacity-40"
         >
           {!orderable ? stockLabel[stock] : "Add to basket"}
         </button>

@@ -13,14 +13,14 @@ function RelatedCard({ c }: { c: Compound }) {
       data-testid="related-product-card"
       className="group block rounded-2xl border border-border overflow-hidden bg-background transition-colors duration-150 hover:bg-tint"
     >
-      <div className="aspect-square bg-surface overflow-hidden">
+      <div className="aspect-[4/5] rounded-[20px] bg-white ring-1 ring-[#040825]/10 overflow-hidden">
         <img
           src={img.small ?? img.src}
           alt={`${c.name} vial`}
           width={640}
           height={640}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+          className="size-full object-contain p-3 transition-transform duration-200 group-hover:scale-[1.03]"
         />
       </div>
       <div className="p-3">

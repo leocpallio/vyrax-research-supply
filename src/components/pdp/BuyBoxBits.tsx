@@ -58,7 +58,7 @@ export function PairsWith({ product, onAdd }: { product: Compound; onAdd: () => 
             width={56}
             height={56}
             loading="lazy"
-            className="size-14 rounded-xl object-cover bg-surface"
+            className="size-14 rounded-xl object-contain bg-white"
           />
         </Link>
         <div className="flex-1 min-w-0 text-sm">

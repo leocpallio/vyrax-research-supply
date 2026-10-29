@@ -89,7 +89,7 @@ function BacWaterUpsell({ items }: { items: CartItem[] }) {
         alt=""
         width={48}
         height={48}
-        className="size-12 rounded-lg object-cover bg-tint shrink-0"
+        className="size-12 rounded-lg object-contain bg-white shrink-0"
       />
       <div className="flex-1 min-w-0 text-sm">
         <p className="font-semibold truncate">{bac.name}</p>
@@ -120,7 +120,7 @@ function CartLineRow({ line, items }: { line: CartItem; items: CartItem[] }) {
           alt=""
           width={72}
           height={72}
-          className="size-[72px] rounded-xl object-cover bg-tint"
+          className="size-[72px] rounded-xl object-contain bg-white"
         />
       </a>
       <div className="flex-1 min-w-0">

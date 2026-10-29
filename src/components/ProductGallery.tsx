@@ -24,7 +24,7 @@ export function ProductGallery({
       <figure
         data-testid="pdp-gallery"
         data-pdp-gallery
-        className={`relative overflow-hidden bg-white ${showReport ? "" : "aspect-square"}`}
+        className={`relative overflow-hidden rounded-[20px] bg-[#EAE6DC] ${showReport ? "" : "aspect-[4/5]"}`}
       >
         {showReport && report ? (
           <a
@@ -39,7 +39,7 @@ export function ProductGallery({
               width={1600}
               height={2360}
               decoding="async"
-              className="w-full h-auto select-none border border-border"
+              className="size-full select-none object-contain p-6"
             />
           </a>
         ) : (
@@ -53,7 +53,7 @@ export function ProductGallery({
             fetchPriority="high"
             decoding="async"
             draggable={false}
-            className="w-full h-full object-cover select-none"
+            className="size-full object-contain select-none"
           />
         )}
         {!showReport && !image.isRender && fallbackLabel && (
@@ -76,7 +76,7 @@ export function ProductGallery({
               alt=""
               width={64}
               height={64}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           </button>
           <button
@@ -94,7 +94,7 @@ export function ProductGallery({
               height={64}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover object-top"
+              className="h-full w-full object-contain"
             />
           </button>
         </div>

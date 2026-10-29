@@ -136,7 +136,7 @@ export function SearchDialog({
                       alt=""
                       width={44}
                       height={44}
-                      className="size-11 rounded-lg object-cover bg-tint"
+                      className="size-11 rounded-lg object-contain bg-white"
                     />
                     <span className="flex-1 min-w-0">
                       <span className="block font-semibold truncate">{c.name}</span>

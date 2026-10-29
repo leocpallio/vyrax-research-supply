@@ -82,7 +82,7 @@ export function ProductCard({
       data-testid="product-wrapper"
       className="group flex flex-col"
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#EAE6DC] ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
             src={img.small ?? img.src}
@@ -93,7 +93,7 @@ export function ProductCard({
             fetchPriority={priority ? "high" : undefined}
             width={640}
             height={640}
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+            className="size-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.04]"
           />
         </a>
         <span

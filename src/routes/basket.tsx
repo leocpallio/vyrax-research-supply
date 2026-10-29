@@ -102,13 +102,13 @@ function Basket() {
           <div className="grid lg:grid-cols-[1fr_370px] gap-10 mt-8">
             <div>
               {unavailable.length > 0 && (
-                <p role="alert" className="border border-destructive rounded-2xl p-4 mb-6 text-sm">
+                <p role="alert" className="border border-destructive rounded-[20px] p-4 mb-6 text-sm">
                   Not currently available:{" "}
                   {unavailable.map((i) => `${i.name} ${i.strength}`).join(", ")}. Remove{" "}
                   {unavailable.length > 1 ? "them" : "it"} before checkout.
                 </p>
               )}
-              <div className="border border-border rounded-2xl p-4 mb-6">
+              <div className="border border-border rounded-[20px] p-4 mb-6">
                 <p className="text-sm font-semibold flex items-center gap-2">
                   <Truck size={16} className="text-primary" />
                   {p.freeDeliveryGap > 0 ? (
@@ -170,7 +170,7 @@ function Basket() {
                         alt=""
                         width={64}
                         height={64}
-                        className="size-16 object-cover bg-surface rounded-xl"
+                        className="size-16 object-contain bg-white rounded-xl"
                       />
                       <div className="flex-1 min-w-[calc(100%-8rem)] sm:min-w-0">
                         <a
@@ -222,7 +222,7 @@ function Basket() {
                 })}
               </div>
             </div>
-            <aside className="bg-surface p-7 rounded-2xl h-fit">
+            <aside className="bg-surface p-7 rounded-[20px] h-fit">
               <h2 className="font-heading text-xl font-semibold">
                 {paymentEnabled ? "Basket estimate" : "Indicative estimate"}
               </h2>
