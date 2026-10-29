@@ -46,6 +46,8 @@ import { TrustBlock } from "@/components/pdp/BuyBoxBits";
 import { TestingReportCard } from "@/components/pdp/TestingReportCard";
 import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
 import { BoughtTogether, BuyBoxTrustStrip, PriceBlock } from "@/components/pdp/PortMoves";
+import { DispatchCountdown } from "@/components/pdp/DispatchCountdown";
+import { ReconstitutionAddon } from "@/components/pdp/ReconstitutionAddon";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -328,6 +330,10 @@ function ProductPage() {
             >
               Check lab report
             </Link>
+            <ReconstitutionAddon show={c.kind !== "supply" && !/water|solution/i.test(form ?? "")} />
+
+            <DispatchCountdown className="mt-3" />
+
             <p className="sr-only" aria-live="polite">
               {added ? `${heading} added to basket` : ""}
             </p>

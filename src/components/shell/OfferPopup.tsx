@@ -71,6 +71,8 @@ export function OfferPopup() {
     void navigate({ to });
   }
 
+  const onProduct = path.startsWith("/product");
+
   if (suppressed) return null;
 
   return (
@@ -79,7 +81,7 @@ export function OfferPopup() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 z-40 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg sm:left-5"
+          className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 z-40 ${onProduct ? "max-md:hidden" : ""} rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg sm:left-5`}
         >
           Get up to {topOfferPct}% off
         </button>

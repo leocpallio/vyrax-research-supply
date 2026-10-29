@@ -48,8 +48,8 @@ export function ProductGallery({
             srcSet={image.srcSet}
             sizes="(min-width: 1024px) 1200px, 100vw"
             alt={`${name} vial, illustrative front render`}
-            width={1024}
-            height={1024}
+            width={760}
+            height={1400}
             fetchPriority="high"
             decoding="async"
             draggable={false}
@@ -87,15 +87,10 @@ export function ProductGallery({
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "report" ? "border-primary" : "border-border"}`}
             aria-label="Lab report"
           >
-            <img
-              src={report.src}
-              alt=""
-              width={64}
-              height={64}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-contain"
-            />
+            <span className="flex h-full w-full flex-col items-center justify-center gap-0.5 bg-[#EAE6DC] text-[#040825]">
+              <span className="font-heading text-[13px] font-black leading-none">COA</span>
+              <span className="text-[8px] font-semibold uppercase tracking-[0.06em] opacity-60">Janoshik</span>
+            </span>
           </button>
         </div>
       )}
