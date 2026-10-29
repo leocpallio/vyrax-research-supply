@@ -50,7 +50,7 @@ export function Footer() {
             before you order.
           </p>
           <p className="mt-4 text-sm">
-            <a href={`mailto:${site.email}`} className="underline underline-offset-2">
+            <a href={`mailto:${site.email}`} className="inline-flex min-h-11 items-center underline underline-offset-2">
               {site.email}
             </a>
           </p>
@@ -79,7 +79,7 @@ export function Footer() {
               <Link
                 to="/collections/$slug"
                 params={{ slug: s.slug }}
-                className="text-sm text-ink-foreground/85 hover:text-ink-foreground transition-colors duration-150"
+                className="inline-flex min-h-11 items-center text-sm text-ink-foreground/85 hover:text-ink-foreground transition-colors duration-150"
               >
                 {s.name}
               </Link>

@@ -286,8 +286,8 @@ h4 {
 }
 @layer components {
   .icon-link {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: grid;
     place-items: center;
     border-radius: 999px;

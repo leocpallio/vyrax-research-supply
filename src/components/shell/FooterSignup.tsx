@@ -32,7 +32,7 @@ export function FooterSignup() {
         <button
           type="button"
           onClick={decline}
-          className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          className="inline-flex min-h-11 items-center px-2 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
         >
           No thanks
         </button>
