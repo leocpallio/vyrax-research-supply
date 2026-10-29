@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
+import { readPromo } from "@/lib/promo-client";
 import { capture, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
@@ -87,7 +88,8 @@ export function PaymentCheckout() {
     return () => window.removeEventListener("pageshow", reset);
   }, []);
 
-  const quote = priceBasket(items);
+  const code = readPromo();
+  const quote = priceBasket(items, code);
 
   function set(key: FieldKey, value: string) {
     if (!addressStarted.current) {
@@ -124,6 +126,7 @@ export function PaymentCheckout() {
           ...form,
           postcode: formatPostcode(form.postcode),
           researchAgreement: agree,
+          code,
           items: items.map(({ slug, strength, quantity }) => ({ slug, strength, quantity })),
         }),
       });
@@ -236,6 +239,12 @@ export function PaymentCheckout() {
           <div className="flex justify-between">
             <dt>Spend saving</dt>
             <dd className="tabular-nums">-{gbp(quote.tierDiscount)}</dd>
+          </div>
+        )}
+        {quote.promo && (
+          <div className="flex justify-between text-verify">
+            <dt>Discount ({quote.promo.code})</dt>
+            <dd className="tabular-nums">-{gbp(quote.promo.amount)}</dd>
           </div>
         )}
         <div className="flex justify-between">

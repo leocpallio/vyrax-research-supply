@@ -130,6 +130,17 @@ export function OfferPopup() {
               Free tracked delivery over £{site.freeDeliveryThreshold} · applied automatically, no
               code needed
             </p>
+            <div className="mt-4 rounded-xl border border-dashed border-[#15191e]/25 bg-white/60 px-4 py-3 text-center">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-[#15191e]/60">
+                First order discount
+              </p>
+              <p className="mt-1 font-heading text-lg font-semibold tracking-[0.08em] text-[#15191e]">
+                FIRST10
+              </p>
+              <p className="mt-0.5 text-[11px] text-[#15191e]/60">
+                10% off baskets over £50, applied at the basket
+              </p>
+            </div>
 
             <p className="mt-6 text-base font-semibold text-[#15191e]">
               Just tell us what you&rsquo;re researching

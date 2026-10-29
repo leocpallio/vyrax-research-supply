@@ -114,10 +114,16 @@ export function Footer() {
               © {new Date().getFullYear()} {site.name}. All rights reserved.
             </p>
           </div>
-          <p className="md:text-right max-w-md md:justify-self-end" data-testid="footer-ruo">
-            Sold for research use only. Not a pharmacy. No dosing, medical, dietary or therapeutic
-            advice is offered.
-          </p>
+          <div className="md:text-right max-w-md md:justify-self-end space-y-2" data-testid="footer-ruo">
+            <p>
+              Sold strictly for laboratory research. Not for human or animal consumption.
+            </p>
+            <p>
+              Not a medicine: no UK marketing authorisation, and not presented to diagnose, treat,
+              cure, prevent or mitigate any condition. Not a pharmacy. No dosing, medical, dietary
+              or therapeutic advice is offered.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

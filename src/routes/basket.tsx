@@ -14,6 +14,8 @@ import {
   type CartItem,
 } from "@/lib/catalog";
 import { site } from "@/data/site";
+import { findPromo } from "@/data/promos";
+import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 
 export const Route = createFileRoute("/basket")({
@@ -55,8 +57,11 @@ function Basket() {
     setRemoved(null);
   };
   const unavailable = items.filter(isLineUnavailable);
+  const [code, setCode] = useState(readPromo());
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState("");
   const ctaLabel = paymentEnabled ? "Proceed to checkout" : "Site not live yet";
-  const p = priceBasket(items);
+  const p = priceBasket(items, code);
   const shipPct = Math.min(100, (p.goods / site.freeDeliveryThreshold) * 100);
   return (
     <StoreShell>
@@ -221,6 +226,66 @@ function Basket() {
               <h2 className="font-heading text-xl font-semibold">
                 {paymentEnabled ? "Basket estimate" : "Indicative estimate"}
               </h2>
+              <form
+                className="mt-5"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const promo = findPromo(codeInput);
+                  if (!promo) {
+                    setCodeError("That code isn't recognised.");
+                    return;
+                  }
+                  if (p.goods < promo.minSpend) {
+                    setCodeError(`Spend ${gbp(promo.minSpend)} to use ${promo.code}.`);
+                    return;
+                  }
+                  setCodeError("");
+                  savePromo(promo.code);
+                  setCode(promo.code);
+                  setCodeInput("");
+                }}
+              >
+                {code && p.promo ? (
+                  <div className="flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
+                    <span className="font-medium text-verify">
+                      {p.promo.code} applied · {p.promo.pct}% off
+                    </span>
+                    <button
+                      type="button"
+                      className="text-xs underline underline-offset-2"
+                      onClick={() => {
+                        savePromo("");
+                        setCode("");
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <label htmlFor="promo" className="text-sm font-medium">
+                      Discount code
+                    </label>
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        id="promo"
+                        value={codeInput}
+                        onChange={(e) => {
+                          setCodeInput(e.target.value);
+                          setCodeError("");
+                        }}
+                        placeholder="Enter code"
+                        autoComplete="off"
+                        className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
+                      />
+                      <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
+                        Apply
+                      </Button>
+                    </div>
+                    {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+                  </>
+                )}
+              </form>
               <div className="flex justify-between mt-6">
                 <span>Subtotal</span>
                 <strong className="tabular-nums">{gbp(p.subtotal)}</strong>
@@ -235,6 +300,12 @@ function Basket() {
                 <div className="flex justify-between mt-3 text-sm text-verify">
                   <span>Spend saving ({Math.round(p.rate * 100)}%)</span>
                   <span className="tabular-nums">-{gbp(p.tierDiscount)}</span>
+                </div>
+              )}
+              {p.promo && (
+                <div className="flex justify-between mt-3 text-sm text-verify">
+                  <span>Discount ({p.promo.code})</span>
+                  <span className="tabular-nums">-{gbp(p.promo.amount)}</span>
                 </div>
               )}
               <div className="flex justify-between mt-3 text-sm">

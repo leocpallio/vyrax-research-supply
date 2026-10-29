@@ -1,4 +1,5 @@
 import { site } from "../data/site";
+import { findPromo, normaliseCode, promoDiscountPence } from "../data/promos";
 
 export type CartItem = {
   slug: string;
@@ -11,7 +12,7 @@ export type CartItem = {
 const isB2G1 = (slug: string, strength: string) =>
   site.b2g1.some((o) => o.slug === slug && o.strength === strength);
 
-export function priceBasket(items: CartItem[]) {
+export function priceBasket(items: CartItem[], code?: string | null) {
   // Integer pence, mirroring quoteCheckout in checkout-pricing.ts exactly (server is authoritative).
   const pence = (n: number) => Math.round(n * 100);
   const subtotalP = items.reduce((n, i) => n + pence(i.price) * i.quantity, 0);
@@ -24,6 +25,9 @@ export function priceBasket(items: CartItem[]) {
   const rate = tiers.find((t) => afterP >= t.over * 100)?.rate ?? 0;
   const tierP = Math.round(afterP * rate);
   const goodsP = afterP - tierP;
+  const promoP = promoDiscountPence(code, goodsP);
+  const promo = findPromo(code);
+  const netGoodsP = goodsP - promoP;
   const thresholdP = site.freeDeliveryThreshold * 100;
   const deliveryP =
     items.length === 0 || goodsP >= thresholdP ? 0 : Math.round(site.standardDeliveryFee * 100);
@@ -46,7 +50,11 @@ export function priceBasket(items: CartItem[]) {
     tierDiscount: gbpOf(tierP),
     goods: gbpOf(goodsP),
     delivery: gbpOf(deliveryP),
-    total: gbpOf(goodsP + deliveryP),
+    total: gbpOf(netGoodsP + deliveryP),
+    promo:
+      promo && promoP > 0
+        ? { code: normaliseCode(code), pct: promo.pct, amount: gbpOf(promoP) }
+        : undefined,
     freeDeliveryGap: items.length ? gbpOf(Math.max(0, thresholdP - goodsP)) : 0,
     gift,
     giftGap,

@@ -110,7 +110,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       body["researchAgreement"] !== true
     )
       return fail("Check your contact and UK delivery details", 400);
-    const quote = quoteCheckout(body["items"]);
+    const quote = quoteCheckout(body["items"], typeof body["code"] === "string" ? body["code"] : null);
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
     const { data: order, error: insertError } = await store

@@ -2,11 +2,12 @@ import { metabolicAndRegenerative } from "../data/compounds-a";
 import { secretagoguesToSupplies } from "../data/compounds-b";
 import { ukplAdditions } from "../data/ukpl-additions";
 import { site } from "../data/site";
+import { findPromo, normaliseCode, promoDiscountPence } from "../data/promos";
 
 const catalog = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...ukplAdditions];
 export type CheckoutLine = { slug: string; strength: string; quantity: number };
 
-export function quoteCheckout(input: unknown) {
+export function quoteCheckout(input: unknown, code?: string | null) {
   if (!Array.isArray(input) || input.length < 1 || input.length > 30)
     throw new Error("Invalid basket");
   const seen = new Set<string>();
@@ -74,14 +75,25 @@ export function quoteCheckout(input: unknown) {
       }
     : undefined;
   const orderLines = giftLine ? [...items, giftLine] : items;
+  const promoPenceApplied = promoDiscountPence(code, goodsPence);
+  const promoApplied = findPromo(code);
+  const netGoodsPence = goodsPence - promoPenceApplied;
   const deliveryPence =
     goodsPence >= site.freeDeliveryThreshold * 100 ? 0 : Math.round(site.standardDeliveryFee * 100);
-  const totalPence = goodsPence + deliveryPence;
+  const totalPence = netGoodsPence + deliveryPence;
   if (!Number.isSafeInteger(totalPence) || totalPence < 1 || totalPence > 100_000_000)
     throw new Error("Invalid total");
   return {
     items: orderLines,
     gift: giftLine ? { name: giftLine.name, strength: giftLine.strength } : undefined,
+    promo:
+      promoApplied && promoPenceApplied > 0
+        ? {
+            code: normaliseCode(code),
+            pct: promoApplied.pct,
+            discountPence: promoPenceApplied,
+          }
+        : undefined,
     subtotalPence,
     freeVialsPence,
     tierDiscountPence,

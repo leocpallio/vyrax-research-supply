@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X, Minus, Plus, Trash2, ArrowRight, Lock } from "lucide-react";
 import { site } from "@/data/site";
+import { readPromo } from "@/lib/promo-client";
 import {
   gbp,
   getCompound,
@@ -36,7 +37,7 @@ function setQuantity(items: CartItem[], line: CartItem, quantity: number) {
 
 /** Free-delivery ladder: progress toward the configured threshold, then the next spend tier. */
 export function DeliveryLadder({ items }: { items: CartItem[] }) {
-  const quote = priceBasket(items);
+  const quote = priceBasket(items, readPromo());
   const threshold = site.freeDeliveryThreshold;
   const unlocked = items.length > 0 && quote.freeDeliveryGap === 0;
   const pct = items.length ? Math.min(100, Math.round((quote.goods / threshold) * 100)) : 0;
@@ -198,7 +199,7 @@ export function CartDrawer({
   onOpenChange: (v: boolean) => void;
 }) {
   const items = useCartItems();
-  const quote = priceBasket(items);
+  const quote = priceBasket(items, readPromo());
   const navigate = useNavigate();
   const [announce, setAnnounce] = useState("");
   const count = cartCount(items);
