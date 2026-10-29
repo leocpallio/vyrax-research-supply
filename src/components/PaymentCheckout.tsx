@@ -257,7 +257,7 @@ export function PaymentCheckout() {
         anything differs, the total on the payment page is the one that applies.
       </p>
       <p className="mt-2 text-xs text-muted-foreground">
-        <Link to="/basket" className="underline">
+        <Link to="/basket" className="inline-flex min-h-11 items-center underline">
           Edit basket
         </Link>
       </p>

@@ -17,7 +17,7 @@ function Col({ title, children }: { title: string; children: React.ReactNode }) 
 }
 function L({ to, children, href }: { to?: string; href?: string; children: React.ReactNode }) {
   const cls =
-    "text-sm text-ink-foreground/85 hover:text-ink-foreground transition-colors duration-150";
+    "inline-flex min-h-11 items-center text-sm text-ink-foreground/85 hover:text-ink-foreground transition-colors duration-150";
   return (
     <li>
       {href ? (
