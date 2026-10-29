@@ -4,8 +4,8 @@ export const categories: Category[] = [
   {
     slug: "metabolic-research",
     name: "Metabolic",
-    seoName: "Weight Loss Peptides",
-    blurb: "Weight loss, fat loss and appetite control peptides.",
+    seoName: "Metabolic Research Peptides",
+    blurb: "Incretin, amylin and mitochondrial research compounds.",
     intro: [
       "Our metabolic range covers the incretin receptor agonists that dominate current literature, from the single-receptor GLP-1 agonist semaglutide to the dual agonist tirzepatide and the triple agonist retatrutide. Each is offered in several vial strengths so you can match the vial to what you need and compare cost per mg.",
       "Alongside the incretins you will find the amylin analogue cagrilintide, the growth hormone fragment AOD-9604, the NNMT inhibitor 5-Amino-1MQ and the mitochondrial-derived peptide MOTS-c. Every compound page lists the CAS number, molecular formula, molecular weight and peer-reviewed PubMed references.",
