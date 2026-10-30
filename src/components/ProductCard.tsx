@@ -93,7 +93,7 @@ export function ProductCard({
             fetchPriority={priority ? "high" : undefined}
             width={640}
             height={640}
-            className="size-full object-contain p-9 [filter:drop-shadow(0_10px_12px_rgba(4,8,37,0.20))] transition-transform duration-500 group-hover:scale-[1.04]"
+            className="size-full object-contain scale-[1.08] mix-blend-multiply transition-transform duration-500 group-hover:scale-[1.04]"
           />
         </a>
         <span

@@ -20,7 +20,7 @@ function RelatedCard({ c }: { c: Compound }) {
           width={640}
           height={640}
           loading="lazy"
-          className="size-full object-contain p-3 transition-transform duration-200 group-hover:scale-[1.03]"
+          className="size-full object-contain scale-[1.15] mix-blend-multiply transition-transform duration-200 group-hover:scale-[1.03]"
         />
       </div>
       <div className="p-3">
