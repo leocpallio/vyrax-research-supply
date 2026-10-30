@@ -53,7 +53,7 @@ export function ProductGallery({
             fetchPriority="high"
             decoding="async"
             draggable={false}
-            className="size-full object-contain select-none"
+            className="size-full object-contain select-none mix-blend-multiply"
           />
         )}
         {!showReport && !image.isRender && fallbackLabel && (
@@ -87,10 +87,15 @@ export function ProductGallery({
             className={`h-16 w-16 overflow-hidden rounded-lg border bg-white ${view === "report" ? "border-primary" : "border-border"}`}
             aria-label="Lab report"
           >
-            <span className="flex h-full w-full flex-col items-center justify-center gap-0.5 bg-[#EAE6DC] text-[#040825]">
-              <span className="font-heading text-[13px] font-black leading-none">COA</span>
-              <span className="text-[8px] font-semibold uppercase tracking-[0.06em] opacity-60">Janoshik</span>
-            </span>
+            <img
+              src={report.src}
+              alt={`Janoshik report preview, batch ${report.batch}`}
+              width={64}
+              height={64}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-top"
+            />
           </button>
         </div>
       )}
