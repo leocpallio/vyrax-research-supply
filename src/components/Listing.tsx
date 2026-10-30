@@ -58,7 +58,7 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
             <AccordionItem key={q} value={`faq-${i}`} className="border-b border-[#040825]/10">
               <AccordionTrigger
                 data-testid="faq-question"
-                className="py-4 text-left font-heading font-semibold text-[15px] md:text-base hover:no-underline hover:text-[#AC4821] transition-colors duration-150"
+                className="py-4 text-left font-heading font-semibold text-[15px] md:text-base hover:no-underline hover:text-[#040825] transition-colors duration-150"
               >
                 {q}
               </AccordionTrigger>

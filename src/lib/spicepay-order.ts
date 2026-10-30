@@ -143,8 +143,9 @@ export async function spicepayOrderFields(
     merchant_order_reference_id: reference,
     customer_id: id,
     customer: { id, email: customer.email, name: customer.name, ...phone },
-    billing: { address: address(customer), email: customer.email, ...phone },
-    shipping: { address: address(customer), email: customer.email, ...phone },
+    // Phone stays on customer only: SpicePay 400s (IR_06) on a string phone inside billing/shipping (live, 30 Oct 2026).
+    billing: { address: address(customer), email: customer.email },
+    shipping: { address: address(customer), email: customer.email },
     ...(details ? { order_details: details } : {}),
     metadata: { order_id: orderId, order_number: reference },
   };

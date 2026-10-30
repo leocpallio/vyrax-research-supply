@@ -219,7 +219,7 @@ export function CartDrawer({
         <DialogPrimitive.Content
           aria-describedby={undefined}
           data-testid="cart-drawer"
-          className="fixed z-[81] inset-y-0 right-0 w-[92vw] sm:w-[440px] bg-[#F5F0E5] border-l border-[#DDD9D2] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-200"
+          className="fixed z-[81] inset-y-0 right-0 w-[92vw] sm:w-[440px] bg-white border-l border-[#DDD9D2] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-200"
         >
           <div className="relative flex items-center justify-between px-5 h-14 border-b border-line">
             <DialogPrimitive.Close

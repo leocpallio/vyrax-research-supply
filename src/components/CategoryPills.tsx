@@ -52,7 +52,7 @@ export function SortButton({
           type="button"
           data-testid="sort-button"
           aria-label={`Sort products, currently ${current.label}`}
-          className="shrink-0 inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-[#040825]/15 bg-[#F5F0E5] text-sm font-medium hover:bg-[#EAE6DC] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825]"
+          className="shrink-0 inline-flex items-center gap-2 h-9 px-3.5 rounded-full border border-[#040825]/15 bg-white text-sm font-medium hover:bg-[#F6F5F1] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825]"
         >
           <ArrowUpDown size={14} />
           <span className="hidden sm:inline">{current.label}</span>
@@ -61,7 +61,7 @@ export function SortButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="rounded-2xl border-[#040825]/10 bg-[#F5F0E5] p-1.5 min-w-48"
+        className="rounded-2xl border-[#040825]/10 bg-white p-1.5 min-w-48"
       >
         <DropdownMenuRadioGroup value={value} onValueChange={(v) => onChange(v as SortKey)}>
           {SORTS.map((s) => (
@@ -69,7 +69,7 @@ export function SortButton({
               key={s.key}
               value={s.key}
               data-testid={`sort-${s.key}`}
-              className="rounded-xl pl-3 pr-8 py-2 text-sm cursor-pointer focus:bg-[#EAE6DC] [&>span]:left-auto [&>span]:right-2"
+              className="rounded-xl pl-3 pr-8 py-2 text-sm cursor-pointer focus:bg-[#F6F5F1] [&>span]:left-auto [&>span]:right-2"
             >
               {s.label}
               {s.key === value && <Check size={14} className="ml-auto" />}
@@ -96,7 +96,7 @@ export function CategoryPills({
   return (
     <div
       data-testid="category-pills"
-      className="sticky top-[72px] z-30 -mx-5 px-5 bg-[#F5F0E5]/95 backdrop-blur border-b border-[#040825]/10"
+      className="sticky top-[72px] z-30 -mx-5 px-5 bg-white/95 backdrop-blur border-b border-[#040825]/10"
     >
       <div className="flex items-center gap-3 py-2.5">
         <nav
@@ -112,7 +112,7 @@ export function CategoryPills({
               className={`shrink-0 inline-flex items-center h-9 px-4 rounded-full border text-sm font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] ${
                 p.active
                   ? "bg-[#040825] text-[#F5F0E5] border-[#040825]"
-                  : "border-[#040825]/15 text-[#040825] hover:bg-[#EAE6DC]"
+                  : "border-[#040825]/15 text-[#040825] hover:bg-[#F6F5F1]"
               }`}
             >
               {p.name}

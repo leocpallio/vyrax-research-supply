@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { quoteCheckout } from "@/lib/checkout-pricing";
-import { orderDetails, spicepayCardUrl } from "@/lib/spicepay-order";
+import { orderDetails, spicepayCardUrl, spicepayOrderFields } from "@/lib/spicepay-order";
 import { site } from "@/data/site";
 import { findPromo } from "@/data/promos";
 
@@ -82,5 +82,26 @@ describe("SpicePay order_details", () => {
     expect(spicepayCardUrl({})).toBeNull();
     expect(spicepayCardUrl({ payment_link: { link: "https://evil.example/pay/x" } })).toBeNull();
     expect(spicepayCardUrl({ payment_link: null })).toBeNull();
+  });
+  it("keeps phone out of billing/shipping (SpicePay rejects a string phone there)", async () => {
+    const q = quoteCheckout([{ slug: "bpc-157", strength: "5mg", quantity: 1 }], null);
+    const f = await spicepayOrderFields(
+      q,
+      {
+        name: "A B",
+        email: "a@b.co",
+        phone: "07000000000",
+        address: "1 St",
+        address2: "",
+        city: "X",
+        postcode: "SW1A 1AA",
+      },
+      "VX-T",
+      "id",
+      site.b2g1,
+    );
+    expect((f["billing"] as Record<string, unknown>)["phone"]).toBeUndefined();
+    expect((f["shipping"] as Record<string, unknown>)["phone"]).toBeUndefined();
+    expect((f["customer"] as Record<string, unknown>)["phone"]).toBe("07000000000");
   });
 });

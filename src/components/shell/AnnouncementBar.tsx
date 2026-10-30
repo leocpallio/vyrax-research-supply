@@ -38,7 +38,7 @@ export function AnnouncementBar() {
           href={`https://wa.me/${site.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block bg-[#AC4821] text-white text-[13px] leading-tight sm:text-[15px] font-semibold hover:brightness-95"
+          className="block bg-[#040825] text-white text-[13px] leading-tight sm:text-[15px] font-semibold hover:brightness-95"
           data-testid="whatsapp-banner"
         >
           <div className="container-main min-h-10 py-1.5 sm:min-h-11 sm:py-2 flex items-center justify-center text-center">

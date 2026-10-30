@@ -167,7 +167,7 @@ function Home() {
             </Link>
           </div>
         </div>
-        <div className="hidden lg:block rounded-[24px] bg-[#EAE6DC] p-10" data-testid="hero-visual">
+        <div className="hidden lg:block rounded-[24px] bg-[#F6F5F1] p-10" data-testid="hero-visual">
           <img
             src={heroImage}
             alt="Vyrax Labs peptide vial with batch label"
@@ -187,7 +187,7 @@ function Home() {
               <Link
                 to={t.to as "/"}
                 data-testid={t.testId}
-                className="group flex h-full flex-col rounded-[18px] border border-[#040825]/10 bg-[#EAE6DC] p-5 md:p-6 transition-colors duration-200 hover:border-[#040825]/30"
+                className="group flex h-full flex-col rounded-[18px] border border-[#040825]/10 bg-white p-5 md:p-6 transition-colors duration-200 hover:border-[#040825]/30"
               >
                 <t.icon size={20} className="text-[#040825]/70" />
                 <p className="mt-5 font-heading text-lg md:text-xl font-semibold leading-tight tabular-nums">
@@ -236,7 +236,7 @@ function Home() {
               to="/collections/$slug"
               params={{ slug: r.slug }}
               data-testid="range-tile"
-              className="group flex flex-col rounded-[18px] border border-[#040825]/10 p-5 md:p-6 min-h-[164px] transition-colors duration-200 hover:bg-[#EAE6DC] hover:border-[#040825]/30"
+              className="group flex flex-col rounded-[18px] border border-[#040825]/10 p-5 md:p-6 min-h-[164px] transition-colors duration-200 hover:bg-[#F6F5F1] hover:border-[#040825]/30"
             >
               <h3 className="font-heading text-base md:text-lg font-semibold leading-snug">
                 {r.name}

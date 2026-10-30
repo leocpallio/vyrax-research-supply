@@ -79,7 +79,7 @@ export function OfferPopup() {
         role="dialog"
         aria-modal="true"
         aria-label="Offer"
-        className="offer-panel max-h-[92vh] w-full max-w-[390px] overflow-y-auto rounded-[24px] border border-[#DDD9D2] bg-[#F5F0E5] shadow-[0_24px_60px_rgba(4,8,37,0.28)]"
+        className="offer-panel max-h-[92vh] w-full max-w-[390px] overflow-y-auto rounded-[24px] border border-[#DDD9D2] bg-white shadow-[0_24px_60px_rgba(4,8,37,0.28)]"
       >
         {step === "claim" ? (
           <div className="px-6 pb-6 pt-7 text-center">

@@ -102,14 +102,14 @@ function Shop() {
           placeholder="Search by name or alias, e.g. GLP-3"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="h-11 w-full rounded-full border border-[#040825]/15 bg-[#F5F0E5] pl-10 pr-10 text-sm placeholder:text-[#040825]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] [&::-webkit-search-cancel-button]:hidden"
+          className="h-11 w-full rounded-full border border-[#040825]/15 bg-white pl-10 pr-10 text-sm placeholder:text-[#040825]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] [&::-webkit-search-cancel-button]:hidden"
         />
         {text && (
           <button
             type="button"
             aria-label="Clear search"
             onClick={() => setText("")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 size-8 grid place-items-center rounded-full hover:bg-[#EAE6DC]"
+            className="absolute right-2 top-1/2 -translate-y-1/2 size-8 grid place-items-center rounded-full hover:bg-[#F6F5F1]"
           >
             <X size={14} />
           </button>

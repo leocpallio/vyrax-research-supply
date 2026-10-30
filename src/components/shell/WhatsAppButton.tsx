@@ -34,7 +34,7 @@ export function WhatsAppButton() {
       rel="noopener noreferrer"
       aria-label="Message us on WhatsApp"
       data-testid="whatsapp-float"
-      className={`group fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-3 sm:right-5 z-40 h-12 w-12 items-center justify-center rounded-full bg-[#AC4821] md:gap-2.5 md:hover:w-auto md:hover:px-4 ${onPdp ? "hidden md:flex" : "flex"} text-white shadow-lg hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink`}
+      className={`group fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-3 sm:right-5 z-40 h-12 w-12 items-center justify-center rounded-full bg-[#040825] md:gap-2.5 md:hover:w-auto md:hover:px-4 ${onPdp ? "hidden md:flex" : "flex"} text-white shadow-lg hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink`}
     >
       <svg
         viewBox="0 0 24 24"

@@ -77,14 +77,14 @@ export function ProductCard({
   };
 
   const quickAddClass =
-    "size-11 rounded-full bg-[#F5F0E5] text-[#040825] ring-1 ring-[#040825]/15 shadow-[0_2px_10px_rgba(4,8,37,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#040825] hover:text-[#F5F0E5] hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
+    "size-11 rounded-full bg-white text-[#040825] ring-1 ring-[#040825]/15 shadow-[0_2px_10px_rgba(4,8,37,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#040825] hover:text-white hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
 
   return (
     <article
       data-testid="product-wrapper"
       className="group flex flex-col"
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#F0E7DC] ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
             src={img.small ?? img.src}
@@ -98,13 +98,13 @@ export function ProductCard({
             className="size-full object-contain object-center scale-[1.02] mix-blend-multiply transition-transform duration-500 group-hover:scale-[0.99]"
           />
         </a>
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#F0E7DC] to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-white to-transparent" />
         <span
           data-testid="card-stock-pill"
           data-stock={stock}
           title={stockLabel[stock]}
           className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${
-            pill.warm ? "bg-[#AC4821] text-[#F5F0E5]" : "bg-[#F5F0E5]/95 text-[#040825]"
+            pill.warm ? "bg-[#AC4821] text-[#F5F0E5]" : "bg-white/95 text-[#040825]"
           }`}
         >
           {pill.text}
@@ -127,7 +127,7 @@ export function ProductCard({
               <PopoverContent
                 align="end"
                 sideOffset={8}
-                className="w-56 rounded-2xl border-[#040825]/10 bg-[#F5F0E5] p-1.5 shadow-xl"
+                className="w-56 rounded-2xl border-[#040825]/10 bg-white p-1.5 shadow-xl"
               >
                 <p className="px-3 pt-1.5 pb-1 text-[11px] uppercase tracking-wider text-[#040825]/60">
                   Choose amount
@@ -140,7 +140,7 @@ export function ProductCard({
                         data-testid="quick-add-option"
                         disabled={!orderable(x)}
                         onClick={() => add(x)}
-                        className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm hover:bg-[#EAE6DC] disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-[#040825]"
+                        className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm hover:bg-[#F6F5F1] disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-[#040825]"
                       >
                         <span className="font-mono">{x.label}</span>
                         <span className="tabular-nums font-semibold">
@@ -192,7 +192,7 @@ export function ProductCard({
             <a
               href={`${href}#lab-report`}
               data-testid="card-coa-link"
-              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-[#F5F0E5]"
+              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
             >
               COA
             </a>
