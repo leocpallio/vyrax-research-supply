@@ -168,12 +168,14 @@ export async function createCheckout(request: Request): Promise<Response> {
         headers: { "api-key": c.apiKey, "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-    let response = await createPayment({ ...basePayment, ...orderFields });
-    // Order detail is display only: if SpicePay rejects it (4xx = no payment created), retry bare.
-    if (response.status === 400 || response.status === 422) {
-      console.warn("[vyrax checkout] order detail rejected", response.status);
-      response = await createPayment(basePayment);
-    }
+    // Full order only (Leo's SpicePay rule). No silent bare retry: a rejected payload is a bug to fix, not hide.
+    const response = await createPayment({ ...basePayment, ...orderFields });
+    if (!response.ok)
+      console.error(
+        "[vyrax checkout] SpicePay rejected the order",
+        response.status,
+        (await response.clone().text()).slice(0, 300),
+      );
     if (!response.ok) throw new Error(`Payment creation failed: ${response.status}`);
     const payment = (await response.json()) as Record<string, unknown>;
     if (
