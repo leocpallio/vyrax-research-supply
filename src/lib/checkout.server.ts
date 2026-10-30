@@ -4,6 +4,9 @@ import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { sendSaleAlert } from "./email/admin-alert.server";
 import { validatePaymentEvent, verifySignature } from "./spicepay";
+import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
+import { orderRef } from "./checkout-form";
+import { site } from "../data/site";
 
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -111,7 +114,10 @@ export async function createCheckout(request: Request): Promise<Response> {
       body["researchAgreement"] !== true
     )
       return fail("Check your contact and UK delivery details", 400);
-    const quote = quoteCheckout(body["items"], typeof body["code"] === "string" ? body["code"] : null);
+    const quote = quoteCheckout(
+      body["items"],
+      typeof body["code"] === "string" ? body["code"] : null,
+    );
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
     const { data: order, error: insertError } = await store
@@ -138,21 +144,36 @@ export async function createCheckout(request: Request): Promise<Response> {
       .select("id")
       .single();
     if (insertError || !order) throw new Error("Order insert failed");
-    const response = await fetch("https://api.spicepay.net/payments", {
-      method: "POST",
-      signal: AbortSignal.timeout(12000),
-      headers: { "api-key": c.apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: quote.totalPence,
-        currency: "GBP",
-        profile_id: c.profile,
-        payment_link: true,
-        customer: { email, name, ...(phone ? { phone } : {}) },
-        metadata: { order_id: order.id },
-        return_url: `${c.origin}/checkout/return?order=${encodeURIComponent(order.id)}`,
-        test_mode: c.testMode,
-      }),
-    });
+    const basePayment = {
+      amount: quote.totalPence,
+      currency: "GBP",
+      profile_id: c.profile,
+      payment_link: true,
+      customer: { email, name, ...(phone ? { phone } : {}) },
+      metadata: { order_id: order.id },
+      return_url: `${c.origin}/checkout/return?order=${encodeURIComponent(order.id)}`,
+      test_mode: c.testMode,
+    };
+    const orderFields = await spicepayOrderFields(
+      quote,
+      { name, email, phone, address, address2, city, postcode: postcode.toUpperCase() },
+      orderRef(order.id),
+      order.id,
+      site.b2g1,
+    );
+    const createPayment = (body: Record<string, unknown>) =>
+      fetch("https://api.spicepay.net/payments", {
+        method: "POST",
+        signal: AbortSignal.timeout(12000),
+        headers: { "api-key": c.apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    let response = await createPayment({ ...basePayment, ...orderFields });
+    // Order detail is display only: if SpicePay rejects it (4xx = no payment created), retry bare.
+    if (response.status === 400 || response.status === 422) {
+      console.warn("[vyrax checkout] order detail rejected", response.status);
+      response = await createPayment(basePayment);
+    }
     if (!response.ok) throw new Error(`Payment creation failed: ${response.status}`);
     const payment = (await response.json()) as Record<string, unknown>;
     if (
@@ -166,6 +187,8 @@ export async function createCheckout(request: Request): Promise<Response> {
     )
       throw new Error("Payment response mismatch");
     const paymentId = payment["payment_id"];
+    const checkoutUrl = spicepayCardUrl(payment);
+    if (!checkoutUrl) throw new Error("Payment link missing");
     const { data: stamped, error: stampError } = await store
       .from("orders")
       .update({ payment_id: paymentId, checkout_state: "pending" })
@@ -176,7 +199,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       .single();
     if (stampError || !stamped) throw new Error("Payment binding failed");
     return json({
-      checkout_url: `https://checkout.spicepay.net/pay/${encodeURIComponent(c.merchant)}/${encodeURIComponent(paymentId)}`,
+      checkout_url: checkoutUrl,
       order_id: order.id,
       guest_token: token,
       total_pence: quote.totalPence,
