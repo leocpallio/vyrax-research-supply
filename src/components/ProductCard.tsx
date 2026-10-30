@@ -84,7 +84,7 @@ export function ProductCard({
       data-testid="product-wrapper"
       className="group flex flex-col"
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#EAE6DC] ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-[#F0E7DC] ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
             src={img.small ?? img.src}
@@ -95,9 +95,10 @@ export function ProductCard({
             fetchPriority={priority ? "high" : undefined}
             width={640}
             height={640}
-            className="size-full object-contain scale-[1.08] mix-blend-multiply transition-transform duration-500 group-hover:scale-[1.04]"
+            className="size-full object-contain object-center scale-[1.02] mix-blend-multiply transition-transform duration-500 group-hover:scale-[0.99]"
           />
         </a>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#F0E7DC] to-transparent" />
         <span
           data-testid="card-stock-pill"
           data-stock={stock}
