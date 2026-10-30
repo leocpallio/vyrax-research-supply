@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { offerGift, offerTiers, researchIntents, topOfferPct } from "@/data/offers";
-import { site } from "@/data/site";
 
 const SEEN_KEY = "vyrax_offer_seen";
 const INTENT_KEY = "vyrax_intent";
@@ -89,7 +88,7 @@ export function OfferPopup() {
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 sm:items-center sm:p-6"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 offer-veil p-3 sm:items-center sm:p-6"
           onClick={(e) => {
             if (e.target === e.currentTarget) dismiss(false);
           }}
@@ -99,65 +98,67 @@ export function OfferPopup() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="offer-title"
-            className="flex max-h-[86vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl"
+            className="flex max-h-[86vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl offer-panel"
           >
-            <div className="overflow-y-auto px-5 py-4 text-center sm:px-6 sm:py-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#15191e]/60">
-              Get up to
-            </p>
-            <p className="mt-0.5 text-[2rem] font-black leading-none text-[#b45309]">
-              {topOfferPct}% off
-            </p>
-            <p className="mt-1 text-sm font-semibold text-[#15191e]">on your order</p>
-            <p className="mt-0.5 text-xs uppercase tracking-[0.18em] text-[#15191e]/50">plus</p>
+            <div className="px-5 pb-3 pt-5 text-center sm:px-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#15191e]/55">
+                First order
+              </p>
+              <p className="mt-1 font-heading text-[2rem] font-black leading-none text-[#b45309]">
+                Up to {topOfferPct}% off
+              </p>
 
-            {offerGift && (
-              <div className="mt-2.5 rounded-xl bg-[#15191e] px-3 py-2.5 text-[#faf6ef]">
-                <p className="text-[13px] font-semibold">1× {offerGift.label} free</p>
-                <p className="mt-0.5 text-xs text-[#faf6ef]/70">
-                  Worth £{offerGift.value.toFixed(2)} · on orders over £{offerGift.over}, added
-                  automatically
-                </p>
+              <dl className="mt-4 divide-y divide-[#15191e]/10 rounded-xl bg-white/70 text-left">
+                <div className="flex items-baseline justify-between gap-3 px-3 py-2">
+                  <dt className="text-[13px] font-semibold text-[#15191e]">
+                    {[...offerTiers]
+                      .sort((a, b) => a.over - b.over)
+                      .map((t) => `${Math.round(t.rate * 100)}%`)
+                      .join(" / ")}
+                  </dt>
+                  <dd className="text-right text-[11px] leading-tight text-[#15191e]/60">
+                    off £
+                    {[...offerTiers]
+                      .sort((a, b) => a.over - b.over)
+                      .map((t) => t.over)
+                      .join(" / £")}
+                  </dd>
+                </div>
+                {offerGift && (
+                  <div className="flex items-baseline justify-between gap-3 px-3 py-2">
+                    <dt className="text-[13px] font-semibold text-[#15191e]">
+                      Free {offerGift.label}
+                    </dt>
+                    <dd className="text-right text-[11px] leading-tight text-[#15191e]/60">
+                      over £{offerGift.over}
+                    </dd>
+                  </div>
+                )}
+                <div className="flex items-baseline justify-between gap-3 px-3 py-2">
+                  <dt className="text-[13px] font-semibold text-[#15191e]">Code FIRST10</dt>
+                  <dd className="text-right text-[11px] leading-tight text-[#15191e]/60">
+                    extra 10% over £50
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="px-5 pb-2">
+              <p className="text-center text-[13px] font-semibold text-[#15191e]">
+                What are you researching?
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {researchIntents.map((intent) => (
+                  <button
+                    key={intent.id}
+                    type="button"
+                    onClick={() => pick(intent.id, intent.to)}
+                    className="min-h-10 w-full rounded-full bg-[#15191e] px-2 py-2 text-[12px] font-semibold text-[#faf6ef] transition hover:bg-[#2a3138]"
+                  >
+                    {intent.label}
+                  </button>
+                ))}
               </div>
-            )}
-
-            <p className="mx-auto mt-3 max-w-[19rem] text-[13px] leading-snug text-[#15191e]/75">
-              {[...offerTiers]
-                .sort((a, b) => a.over - b.over)
-                .map((t) => `${Math.round(t.rate * 100)}% over £${t.over}`)
-                .join(" · ")}
-            </p>
-            <p className="mt-1 text-xs text-[#15191e]/55">
-              Free tracked delivery over £{site.freeDeliveryThreshold} · applied automatically, no
-              code needed
-            </p>
-            <div className="mt-3 rounded-xl border border-dashed border-[#15191e]/25 bg-white/60 px-3 py-2 text-center">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-[#15191e]/60">
-                First order discount
-              </p>
-              <p className="font-heading text-base font-semibold tracking-[0.08em] text-[#15191e]">
-                FIRST10
-              </p>
-              <p className="mt-0.5 text-[11px] text-[#15191e]/60">
-                10% off baskets over £50, applied at the basket
-              </p>
-            </div>
-
-            <p className="mt-4 text-[13px] font-semibold text-[#15191e]">
-              Just tell us what you&rsquo;re researching
-            </p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {researchIntents.map((intent) => (
-                <button
-                  key={intent.id}
-                  type="button"
-                  onClick={() => pick(intent.id, intent.to)}
-                  className="min-h-9 w-full rounded-full bg-[#15191e] px-2 py-2 text-[12px] font-semibold text-[#faf6ef] transition hover:bg-[#2a3138]"
-                >
-                  {intent.label}
-                </button>
-              ))}
-            </div>
             </div>
             <div className="border-t border-[#15191e]/10 px-5 py-1">
               <button
