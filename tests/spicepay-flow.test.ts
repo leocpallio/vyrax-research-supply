@@ -136,8 +136,8 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
       checkout_url: string;
     };
     expect(details.checkout_url).toBe("https://checkout.spicepay.net/pay/merchant_vyrax/pay_vyrax");
-    expect(inserted["total_pence"]).toBe(3697);
-    expect(payment["amount"]).toBe(3697);
+    expect(inserted["total_pence"]).toBe(3897);
+    expect(payment["amount"]).toBe(3897);
     expect(payment["test_mode"]).toBe(true);
     expect(String(payment["return_url"])).not.toContain(details.guest_token);
     const wrongToken = await orderStatus(
@@ -154,7 +154,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         type: "payment_details",
         object: {
           payment_id: "pay_vyrax",
-          amount: 3697,
+          amount: 3897,
           currency: "GBP",
           test_mode: true,
           status: "succeeded",

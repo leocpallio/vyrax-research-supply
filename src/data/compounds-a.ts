@@ -132,7 +132,7 @@ export const metabolicAndRegenerative: Compound[] = [
     useCases: ["Fat Loss", "Weight Loss", "Lipolysis"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 24.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 34.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 44.99 },
     ],
     summary:
@@ -193,7 +193,7 @@ export const metabolicAndRegenerative: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
-      { label: "40mg", amount: 40, unit: "mg", price: 46.99 },
+      { label: "40mg", amount: 40, unit: "mg", price: 69.99 },
     ],
     summary:
       "MOTS-c is a 16-amino-acid mitochondrial-derived peptide encoded within the 12S rRNA gene. Supplied as a lyophilised powder in sealed vials.",
@@ -223,7 +223,7 @@ export const metabolicAndRegenerative: Compound[] = [
     useCases: ["Recovery & Repair", "Gut Health", "Tendon & Joint"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 15.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 16.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 29.99 },
     ],
     summary:
@@ -252,8 +252,8 @@ export const metabolicAndRegenerative: Compound[] = [
     useCases: ["Recovery & Repair", "Flexibility", "Muscle Repair"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 21.99 },
-      { label: "10mg", amount: 10, unit: "mg", price: 37.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 23.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 39.99 },
     ],
     summary:
       "TB-500 is the name used for synthetic thymosin beta-4, a 43-amino-acid peptide involved in actin regulation and cell migration. Lyophilised powder.",
@@ -283,7 +283,7 @@ export const metabolicAndRegenerative: Compound[] = [
     kind: "peptide",
     appearance: "Blue lyophilised powder",
     strengths: [
-      { label: "50mg", amount: 50, unit: "mg", price: 19.99 },
+      { label: "50mg", amount: 50, unit: "mg", price: 23.99 },
       { label: "100mg", amount: 100, unit: "mg", price: 37.99 },
     ],
     summary:
@@ -311,7 +311,7 @@ export const metabolicAndRegenerative: Compound[] = [
     tags: ["Inflammation", "Gut"],
     useCases: ["Gut Health", "Recovery & Repair", "Inflammation"],
     kind: "peptide",
-    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 24.99 }],
+    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 28.99 }],
     summary:
       "KPV is the C-terminal tripeptide Lys-Pro-Val of alpha-melanocyte-stimulating hormone. Supplied as a lyophilised powder in sealed vials.",
     overview: [

@@ -18,8 +18,8 @@ describe("server checkout quote", () => {
   });
   test("ignores client prices and computes approved GBP pence", () => {
     const q = quoteCheckout([{ ...line, price: 0.01, name: "Fake" }]);
-    expect(q.items[0]?.unitPence).toBe(1599);
-    expect(q.totalPence).toBe(3697);
+    expect(q.items[0]?.unitPence).toBe(1699);
+    expect(q.totalPence).toBe(3897);
   });
   test("rejects invalid, out-of-stock, duplicate and oversized lines", () => {
     for (const lines of [

@@ -38,7 +38,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["GHRH analogue", "Long-acting peptides"],
     useCases: ["Growth Hormone", "Muscle Growth", "Anti-Ageing"],
     kind: "peptide",
-    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 34.99 }],
+    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 38.99 }],
     summary:
       "CJC-1295 DAC is a long-acting GHRH analogue carrying a drug affinity complex that binds serum albumin. Supplied as a lyophilised powder.",
     overview: [
@@ -64,7 +64,7 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Growth Hormone", "Muscle Growth", "Sleep"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 18.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 19.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 32.99 },
     ],
     summary:
@@ -93,7 +93,7 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Growth Hormone", "Fat Loss", "Visceral Fat"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 32.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 49.99 },
     ],
     summary:
@@ -149,8 +149,8 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Growth Hormone", "Appetite", "Muscle Growth"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 9.49 },
-      { label: "10mg", amount: 10, unit: "mg", price: 14.49 },
+      { label: "5mg", amount: 5, unit: "mg", price: 9.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 14.99 },
     ],
     summary:
       "GHRP-6 is a synthetic hexapeptide (His-D-Trp-Ala-Trp-D-Phe-Lys-NH2) and one of the first growth hormone releasing peptides.",
@@ -230,7 +230,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Growth factors", "Cell culture"],
     useCases: ["Muscle Growth", "Growth Hormone", "Recovery"],
     kind: "protein",
-    strengths: [{ label: "1mg", amount: 1, unit: "mg", price: 39.99 }],
+    strengths: [{ label: "1mg", amount: 1, unit: "mg", price: 49.99 }],
     summary:
       "IGF-1 LR3 is an 83-amino-acid analogue of insulin-like growth factor 1 with a 13-amino-acid N-terminal extension and an Arg3 substitution.",
     overview: [
@@ -255,7 +255,7 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "coenzyme",
     appearance: "White to off-white lyophilised powder",
     strengths: [
-      { label: "500mg", amount: 500, unit: "mg", price: 39.99 },
+      { label: "500mg", amount: 500, unit: "mg", price: 49.99 },
       { label: "1000mg", amount: 1000, unit: "mg", price: 84.99 },
     ],
     summary:
@@ -308,8 +308,8 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Mitochondria", "Energy", "Anti-Ageing"],
     kind: "peptide",
     strengths: [
-      { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
-      { label: "50mg", amount: 50, unit: "mg", price: 59.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 32.99 },
+      { label: "50mg", amount: 50, unit: "mg", price: 99.99 },
     ],
     summary:
       "SS-31 (elamipretide) is a mitochondria-targeted tetrapeptide that binds cardiolipin in the inner mitochondrial membrane. Lyophilised powder.",
@@ -337,7 +337,7 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 13.99 },
-      { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 27.99 },
     ],
     summary:
       "DSIP (delta sleep-inducing peptide) is a nonapeptide first isolated in 1977 from rabbit cerebral venous blood. Supplied as a lyophilised powder.",
@@ -360,7 +360,7 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Immune Support", "Longevity", "Recovery"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 21.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 28.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 44.99 },
     ],
     summary:
@@ -387,7 +387,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Bioregulators", "Thymic peptides"],
     useCases: ["Immune Support", "Longevity", "Anti-Ageing"],
     kind: "peptide",
-    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 21.99 }],
+    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 22.99 }],
     summary:
       "Thymalin is a complex of polypeptides extracted from thymus tissue, used as an immune bioregulator. Supplied as a lyophilised powder.",
     overview: [
@@ -516,7 +516,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Melanocortin", "MC4R signalling"],
     useCases: ["Libido", "Sexual Health", "Melanocortin"],
     kind: "peptide",
-    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 19.99 }],
+    strengths: [{ label: "10mg", amount: 10, unit: "mg", price: 20.99 }],
     summary:
       "PT-141 (bremelanotide) is a cyclic heptapeptide melanocortin receptor agonist and a metabolite of Melanotan 2. Lyophilised powder.",
     overview: [
@@ -571,7 +571,7 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "blend",
     composition: ["GHK-Cu 50mg", "BPC-157 10mg", "TB-500 10mg", "KPV 10mg"],
     appearance: "Pale blue lyophilised powder (from the GHK-Cu)",
-    strengths: [{ label: "80mg", amount: 80, unit: "mg", price: 67.99 }],
+    strengths: [{ label: "80mg", amount: 80, unit: "mg", price: 79.99 }],
     summary:
       "KLOW is an 80mg blend of GHK-Cu, BPC-157, TB-500 and KPV in a single lyophilised vial.",
     overview: [
