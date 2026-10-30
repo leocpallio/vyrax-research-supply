@@ -75,7 +75,7 @@ export function ProductCard({
   };
 
   const quickAddClass =
-    "size-11 rounded-full bg-[#040825] text-[#F5F0E5] grid place-items-center transition-[transform,opacity] duration-150 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
+    "size-11 rounded-full bg-[#F5F0E5] text-[#040825] ring-1 ring-[#040825]/15 shadow-[0_2px_10px_rgba(4,8,37,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#040825] hover:text-[#F5F0E5] hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
 
   return (
     <article
@@ -93,7 +93,7 @@ export function ProductCard({
             fetchPriority={priority ? "high" : undefined}
             width={640}
             height={640}
-            className="size-full object-contain p-7 [filter:drop-shadow(0_10px_12px_rgba(4,8,37,0.20))] transition-transform duration-500 group-hover:scale-[1.04]"
+            className="size-full object-contain p-9 [filter:drop-shadow(0_10px_12px_rgba(4,8,37,0.20))] transition-transform duration-500 group-hover:scale-[1.04]"
           />
         </a>
         <span
@@ -106,15 +106,6 @@ export function ProductCard({
         >
           {pill.text}
         </span>
-        {hasReport && (
-          <a
-            href={`${href}#lab-report`}
-            data-testid="card-coa-link"
-            className="absolute top-3 right-3 rounded-full bg-[#040825] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#F5F0E5] transition-colors hover:bg-[#AC4821]"
-          >
-            COA
-          </a>
-        )}
         <div className="absolute bottom-3 right-3">
           {multi ? (
             <Popover open={open} onOpenChange={setOpen}>
@@ -188,11 +179,22 @@ export function ProductCard({
             {product.name}
           </a>
         </h3>
-        <p className="text-xs text-[#040825]/60">
-          {product.kind === "blend" && product.composition?.length
-            ? product.composition.join(" · ")
-            : label}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-[#040825]/60">
+            {product.kind === "blend" && product.composition?.length
+              ? product.composition.join(" · ")
+              : label}
+          </p>
+          {hasReport && (
+            <a
+              href={`${href}#lab-report`}
+              data-testid="card-coa-link"
+              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-[#F5F0E5]"
+            >
+              COA
+            </a>
+          )}
+        </div>
         <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
           {multi && <span className="text-xs text-[#040825]/60">From</span>}
           <span data-testid="product-price" className="text-[16px] font-bold tabular-nums">
