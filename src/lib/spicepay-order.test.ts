@@ -48,10 +48,15 @@ describe("SpicePay order_details", () => {
           product_name: "Tracked delivery",
           amount: q.deliveryPence,
         });
-      if (q.gift)
-        expect(lines!.some((l) => l.product_name.startsWith("Free gift") && l.amount === 0)).toBe(
-          true,
-        );
+      if (q.gift) {
+        const gift = lines!.find((l) => l.product_name.startsWith("Free gift"));
+        expect(gift).toMatchObject({
+          product_name: "Free gift: Bacteriostatic Water 10ml",
+          quantity: 5,
+          amount: 0,
+          product_img_link: "https://vyraxlabs.co.uk/email-thumbs/bacteriostatic-water__10ml.jpg",
+        });
+      }
     });
   }
   it("folds a promo code into the lines", () => {

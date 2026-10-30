@@ -174,7 +174,10 @@ export async function createCheckout(request: Request): Promise<Response> {
       console.error(
         "[vyrax checkout] SpicePay rejected the order",
         response.status,
-        (await response.clone().text()).slice(0, 300),
+        // field names/codes only: SpicePay echoes payload values (names, addresses) in error bodies
+        (await response.clone().text())
+          .replace(/"[^"]*"\s*:\s*"[^"]*"/g, (m) => m.split(":")[0] + ':"…"')
+          .slice(0, 300),
       );
     if (!response.ok) throw new Error(`Payment creation failed: ${response.status}`);
     const payment = (await response.json()) as Record<string, unknown>;

@@ -87,7 +87,8 @@ export function orderDetails(
   for (const g of gifts) {
     const img = lineMedia(g.slug, g.strength).image;
     lines.push({
-      product_name: clip(`Free gift: ${g.name}`, 200),
+      // g.name is the pack label ("5 × Bac Water 10ml"); with quantity 5 that reads as 25 bottles.
+      product_name: clip(`Free gift: ${g.name.replace(/^\d+\s*[×x]\s*/i, "")}`, 200),
       quantity: g.quantity,
       amount: 0,
       ...(img?.startsWith("https://") ? { product_img_link: img } : {}),
