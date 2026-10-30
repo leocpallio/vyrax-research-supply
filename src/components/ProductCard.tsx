@@ -15,6 +15,7 @@ import {
   type StockState,
   type Strength,
 } from "@/lib/catalog";
+import { openCartDrawer } from "@/components/shell/cart-store";
 import { sectionFor } from "@/data/shop-sections";
 import { coaFor } from "@/data/coa";
 import { bestLadderPct, ladderSaving } from "@/lib/price-ladder";
@@ -68,7 +69,8 @@ export function ProductCard({
   const bestPct = bestLadderPct(product);
 
   const add = (strength: Strength) => {
-    addCart(cartLine(product, strength)); // writeCart fires basket_added through trackBasketChange.
+    addCart(cartLine(product, strength));
+    openCartDrawer(); // writeCart fires basket_added through trackBasketChange.
     setOpen(false);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);

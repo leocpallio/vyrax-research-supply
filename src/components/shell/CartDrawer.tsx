@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, Minus, Plus, Trash2, ArrowRight, Lock } from "lucide-react";
+import { ChevronLeft, Minus, Plus, Trash2, ArrowRight, Lock } from "lucide-react";
 import { site } from "@/data/site";
 import { readPromo } from "@/lib/promo-client";
 import {
@@ -21,6 +21,7 @@ import { claimFilled } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { capture } from "@/lib/analytics";
 import { cartCount, useCartItems } from "./cart-store";
+import { TierRail } from "./TierRail";
 
 const BAC_WATER_SLUG = "bacteriostatic-water";
 
@@ -220,41 +221,40 @@ export function CartDrawer({
           data-testid="cart-drawer"
           className="fixed z-[81] inset-y-0 right-0 w-full sm:max-w-md bg-paper border-l border-line shadow-2xl flex flex-col outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-200"
         >
-          <div className="flex items-center justify-between px-5 h-14 border-b border-line">
-            <DialogPrimitive.Title className="font-semibold text-base">
-              Basket{" "}
-              <span
-                className="text-muted-foreground font-normal tabular"
-                data-testid="cart-drawer-count"
-              >
-                ({count})
-              </span>
-            </DialogPrimitive.Title>
+          <div className="relative flex items-center justify-between px-5 h-14 border-b border-line">
             <DialogPrimitive.Close
-              className="icon-link -mr-2"
+              className="icon-link -ml-2"
               aria-label="Close basket"
               data-testid="cart-close"
             >
-              <X size={20} />
+              <ChevronLeft size={22} />
             </DialogPrimitive.Close>
+            <DialogPrimitive.Title className="text-[11px] font-bold uppercase tracking-[0.22em]">
+              Your cart
+              <span className="sr-only" data-testid="cart-drawer-count">({count})</span>
+            </DialogPrimitive.Title>
+            <span aria-hidden className="w-6" />
           </div>
           <p className="sr-only" aria-live="polite">
             {announce}
           </p>
-          <DeliveryLadder items={items} />
+          <TierRail items={items} />
           <div className="flex-1 overflow-y-auto">
             {items.length === 0 ? (
-              <div className="px-5 py-14 text-center" data-testid="cart-empty">
-                <p className="font-semibold">Your basket is empty</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Browse the catalogue and check the certificate for a batch before you buy.
-                </p>
+              <div className="px-5 py-12 text-center" data-testid="cart-empty">
+                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#AC4821]">Your basket is ready</p>
+                <p className="mt-2 font-heading text-[1.3rem] font-black leading-tight text-ink">Start with our most-ordered peptides</p>
                 <DialogPrimitive.Close asChild>
                   <Link
                     to="/shop"
-                    className="mt-5 inline-flex items-center gap-2 rounded-full bg-ink text-ink-foreground h-11 px-6 text-sm font-semibold hover:bg-ink/90 transition-colors duration-150"
+                    className="mt-5 inline-flex items-center justify-center rounded-full bg-ink text-ink-foreground h-12 px-7 text-sm font-semibold hover:bg-ink/90 transition-colors duration-150"
                   >
-                    Shop all peptides <ArrowRight size={16} />
+                    Shop best sellers
+                  </Link>
+                </DialogPrimitive.Close>
+                <DialogPrimitive.Close asChild>
+                  <Link to="/shop" className="mt-4 block text-sm underline underline-offset-4">
+                    Browse all peptides
                   </Link>
                 </DialogPrimitive.Close>
               </div>
@@ -269,7 +269,7 @@ export function CartDrawer({
               </>
             )}
           </div>
-          {items.length > 0 && (
+          {(
             <div
               className="border-t border-line px-5 pt-4 pb-5 bg-paper"
               data-testid="cart-summary"
