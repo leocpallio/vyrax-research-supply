@@ -40,10 +40,18 @@ export type OrderRow = {
 export function summarise(order: OrderRow) {
   const items = (Array.isArray(order.items) ? order.items : []) as Item[];
   const lines = items.map((i) => ({
-    name: i.name,
-    strength: i.strength,
-    quantity: i.quantity,
-    lineTotal: i.linePence / 100,
+    name: i.name || "Item",
+    strength: i.strength || "",
+    quantity: Number(i.quantity ?? (i as any).qty ?? 1) || 1,
+    lineTotal:
+      Number(
+        i.linePence ??
+          (typeof (i as any).pricePence === "number"
+            ? (i as any).pricePence * Number(i.quantity ?? (i as any).qty ?? 1)
+            : typeof (i as any).price_pence === "number"
+              ? (i as any).price_pence * Number((i as any).qty ?? 1)
+              : 0),
+      ) / 100,
     ...(i.slug ? lineMedia(i.slug, i.strength) : {}),
   }));
   const total = order.total_pence / 100;

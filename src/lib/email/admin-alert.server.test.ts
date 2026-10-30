@@ -61,4 +61,20 @@ describe("admin sale alert", () => {
     expect(seen!.body.subject).toContain("£106.98");
     expect(seen!.headers["Idempotency-Key"]).toBe("admin-sale-evt_42");
   });
+  it("renders items stored with qty/pricePence instead of quantity/linePence", () => {
+    const order = {
+      id: "evt_bad",
+      name: "Test",
+      email: "t@t.t",
+      address: "1 Test Street",
+      postcode: "BT6 0GQ",
+      total_pence: 2999,
+      payment_id: "pay_test",
+      items: [{ slug: "bpc-157", name: "BPC-157", strength: "10mg", qty: 1, pricePence: 2999 }],
+    } as any;
+    const mail = saleAlert(order);
+    expect(mail.subject).toContain("1 item");
+    expect(mail.html).not.toContain("undefined");
+    expect(mail.html).not.toContain("NaN");
+  });
 });

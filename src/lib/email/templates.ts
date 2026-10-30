@@ -1,4 +1,6 @@
 import { SITE_URL, site } from "../../data/site";
+import { promos } from "../../data/promos";
+const WELCOME_CODE = promos[0]?.code ?? "FIRST10";
 import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
 
@@ -218,7 +220,7 @@ function wrap(c: Content): RenderedEmail {
   const metaHtml = c.reference
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#040825">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#040825">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#040825">VYRAX</span> <span style="color:#AC4821">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#8C8779">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? `<br>${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#040825">VYRAX</span> <span style="color:#AC4821">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#8C8779">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -338,15 +340,17 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     }
     case "guideWelcome":
       return wrap({
-        heading: "Your peptide preparation guide",
-        preheader: "Download the preparation guide you requested.",
-        subject: subject("Your peptide preparation guide"),
+        heading: "Up to 20% off your first order",
+        preheader: "Your code is inside, plus the free goods you unlock as the basket grows.",
+        subject: subject("Your code for 10% off"),
         paragraphs: [
           hello,
-          "Thank you for signing up. Your peptide preparation guide is ready to download.",
-          "This guide describes general peptide chemistry and is not a dosing protocol.",
+          "Your code is below. It takes 10% off orders over £50, and the discount grows with the basket: 15% over £250, 20% over £400.",
+          "A free 10ml bacteriostatic water is added over £75, and any three vials make the cheapest one free.",
         ],
-        action: { label: "Download the guide", url: GUIDE_URL },
+        detail: { html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:2px 0 24px"><tr><td align="center" style="border:1px dashed #CFC5B4;border-radius:12px;padding:18px 12px;background:#FBF8F1"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8C8779">Your code</span><div style="margin-top:8px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:25px;font-weight:700;letter-spacing:.12em;color:#040825">${e(WELCOME_CODE)}</div></td></tr></table>`, text: [`Your code: ${WELCOME_CODE}`] },
+        action: { label: "Start shopping", url: SHOP_URL },
+        lines: ["Enter the code in the basket before checkout. It applies to the goods value, not delivery."],
         unsubscribeUrl: event.unsubscribeUrl,
       });
     case "postPurchase":
