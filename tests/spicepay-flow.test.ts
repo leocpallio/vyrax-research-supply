@@ -225,7 +225,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         method: "POST",
         headers: { origin: "https://vyraxlabs.co.uk", "content-type": "application/json" },
         body: JSON.stringify({
-          items: [{ slug: "bpc-157", strength: "5mg", quantity: 1 }],
+          items: [{ slug: "bpc-157", strength: "5mg", quantity: 2 }],
           name: "Researcher",
           email: "researcher@example.org",
           address: "1 Lab Road",

@@ -118,6 +118,8 @@ export async function createCheckout(request: Request): Promise<Response> {
       body["items"],
       typeof body["code"] === "string" ? body["code"] : null,
     );
+    if (quote.belowMinimum)
+      return fail(`Minimum order is £${Math.round(quote.minimumPence / 100)}`, 400);
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
     const { data: order, error: insertError } = await store

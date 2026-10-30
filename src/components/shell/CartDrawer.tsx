@@ -308,7 +308,7 @@ export function CartDrawer({
               <button
                 type="button"
                 data-testid="cart-checkout"
-                disabled={blocked || !site.checkoutOpen}
+                disabled={blocked || !site.checkoutOpen || quote.belowMinimum}
                 onClick={() => {
                   if (site.checkoutOpen)
                     capture("checkout_started", {
@@ -320,7 +320,12 @@ export function CartDrawer({
                 }}
                 className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-ink text-ink-foreground h-12 text-sm font-semibold hover:bg-ink/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
               >
-                <Lock size={15} /> {site.checkoutOpen ? "Checkout securely" : "Site not live yet"}
+                <Lock size={15} />{" "}
+                {!site.checkoutOpen
+                  ? "Site not live yet"
+                  : quote.belowMinimum
+                    ? `${gbp(quote.minimumGap)} away from ${gbp(quote.minimum)} minimum`
+                    : "Checkout securely"}
               </button>
               {blocked && (
                 <p className="text-xs text-warm mt-2">

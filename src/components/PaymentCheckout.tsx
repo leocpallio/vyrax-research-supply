@@ -508,10 +508,19 @@ export function PaymentCheckout() {
                   {error}
                 </div>
               )}
+              {quote.belowMinimum && (
+                <div
+                  role="alert"
+                  className="rounded-lg border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive"
+                >
+                  Minimum order is £{quote.minimum.toFixed(0)}. Add £{quote.minimumGap.toFixed(2)} more
+                  to continue.
+                </div>
+              )}
               <Button
                 type="submit"
-                disabled={busy}
-                aria-disabled={busy}
+                disabled={busy || quote.belowMinimum}
+                aria-disabled={busy || quote.belowMinimum}
                 className="rounded-full h-12 px-8 w-full text-base"
               >
                 {submitLabel}

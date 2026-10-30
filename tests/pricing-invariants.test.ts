@@ -157,3 +157,22 @@ describe("price rules", () => {
     expect(withPromo.promo?.discountPence).toBe(Math.round(goods * 0.1));
   });
 });
+
+describe("minimum order value", () => {
+  it("blocks a basket under £20 and reports the gap", () => {
+    const q = quoteCheckout([{ slug: "bacteriostatic-water", strength: "10ml", quantity: 1 }]);
+    expect(q.subtotalPence).toBe(599);
+    expect(q.minimumPence).toBe(2000);
+    expect(q.belowMinimum).toBe(true);
+    expect(q.minimumGapPence).toBe(1401);
+  });
+
+  it("allows a basket at or above £20", () => {
+    const at = quoteCheckout([{ slug: "bpc-157", strength: "5mg", quantity: 2 }]);
+    expect(at.subtotalPence).toBe(3398);
+    expect(at.belowMinimum).toBe(false);
+    const just = quoteCheckout([{ slug: "ghk-cu", strength: "50mg", quantity: 1 }]);
+    expect(just.subtotalPence).toBe(2399);
+    expect(just.belowMinimum).toBe(false);
+  });
+});

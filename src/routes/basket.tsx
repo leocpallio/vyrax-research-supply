@@ -316,8 +316,16 @@ function Basket() {
                 <span>Total</span>
                 <span className="tabular-nums">{gbp(p.total)}</span>
               </div>
-              <Button asChild className="w-full mt-6 rounded-full h-12 text-base">
-                <Link to="/checkout">
+              {p.belowMinimum && (
+                <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                  Minimum order is {gbp(p.minimum)}. Add {gbp(p.minimumGap)} more to check out.
+                </p>
+              )}
+              <Button
+                asChild
+                className={`w-full mt-6 rounded-full h-12 text-base ${p.belowMinimum ? "pointer-events-none opacity-60" : ""}`}
+              >
+                <Link to="/checkout" aria-disabled={p.belowMinimum}>
                   {ctaLabel} <ArrowRight />
                 </Link>
               </Button>

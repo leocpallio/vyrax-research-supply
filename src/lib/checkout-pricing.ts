@@ -78,6 +78,8 @@ export function quoteCheckout(input: unknown, code?: string | null) {
   const deliveryPence =
     goodsPence >= site.freeDeliveryThreshold * 100 ? 0 : Math.round(site.standardDeliveryFee * 100);
   const totalPence = netGoodsPence + deliveryPence;
+  const minimumPence = Math.round(site.minOrderValue * 100);
+  const belowMinimum = subtotalPence < minimumPence;
   if (!Number.isSafeInteger(totalPence) || totalPence < 1 || totalPence > 100_000_000)
     throw new Error("Invalid total");
   return {
@@ -98,6 +100,9 @@ export function quoteCheckout(input: unknown, code?: string | null) {
     tierDiscountPence,
     deliveryPence,
     totalPence,
+    minimumPence,
+    belowMinimum,
+    minimumGapPence: Math.max(0, minimumPence - subtotalPence),
     currency: "GBP" as const,
   };
 }

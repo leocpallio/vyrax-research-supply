@@ -41,8 +41,12 @@ export function priceBasket(items: CartItem[], code?: string | null) {
       ? { label: giftRule.label, quantity: giftRule.quantity, value: giftRule.value }
       : undefined;
   const giftGap = giftRule ? gbpOf(Math.max(0, giftRule.over * 100 - goodsP)) : undefined;
+  const minimumP = Math.round(site.minOrderValue * 100);
   return {
     subtotal: gbpOf(subtotalP),
+    minimum: gbpOf(minimumP),
+    belowMinimum: subtotalP < minimumP,
+    minimumGap: gbpOf(Math.max(0, minimumP - subtotalP)),
     freeVials: gbpOf(freeP),
     rate,
     tierDiscount: gbpOf(tierP),
