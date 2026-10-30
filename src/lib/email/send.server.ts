@@ -35,6 +35,14 @@ export async function sendTransactional(
       subject: message.mail.subject,
       html: message.mail.html,
       text: message.mail.text,
+      ...(message.mail.listUnsubscribe
+        ? {
+            headers: {
+              "List-Unsubscribe": `<${message.mail.listUnsubscribe}>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
+          }
+        : {}),
     }),
   });
   if (!response.ok) throw new Error(`Resend rejected email (${response.status})`);

@@ -32,7 +32,12 @@ export type EmailEvent =
   | ({ kind: "guideWelcome"; name?: string } & Marketing)
   | ({ kind: "postPurchase" | "reviewAsk" | "reorder" } & Referenced & Marketing)
   | ({ kind: "paymentRecovery"; checkoutUrl: string } & Referenced & Marketing);
-export type RenderedEmail = { subject: string; html: string; text: string };
+export type RenderedEmail = {
+  subject: string;
+  html: string;
+  text: string;
+  listUnsubscribe?: string;
+};
 
 export const SUPPORT_EMAIL = site.email;
 export const LEGAL_FOOTER = site.name;
@@ -209,7 +214,7 @@ function wrap(c: Content): RenderedEmail {
       : "";
 
   const addressHtml = address
-    ? `<div class="tx" style="border-left:2px solid #AC4821;padding:1px 0 1px 14px;margin:0 0 26px;color:#040825;font-size:15px"><span class="mute" style="display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8C8779;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#5B5F73;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
+    ? `<div class="tx" style="border-left:2px solid #AC4821;padding:1px 0 1px 14px;margin:0 0 26px;color:#040825;font-size:15px"><span class="mute" style="display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8C8779;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#5B5F73;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
     : "";
   const unsubscribe = c.unsubscribeUrl
     ? c.unsubscribeUrl === `mailto:${SUPPORT_EMAIL}`
@@ -239,7 +244,12 @@ function wrap(c: Content): RenderedEmail {
     LEGAL_FOOTER,
     ...(unsubscribe ? [`Unsubscribe: ${unsubscribe}`] : []),
   ].join("\n");
-  return { subject: oneLine(c.subject), html, text };
+  return {
+    subject: oneLine(c.subject),
+    html,
+    text,
+    ...(unsubscribe ? { listUnsubscribe: unsubscribe } : {}),
+  };
 }
 
 export function renderEmail(event: EmailEvent): RenderedEmail {
@@ -348,7 +358,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
           "Your code is below. It takes 10% off orders over £50, and the discount grows with the basket: 15% over £250, 20% over £400.",
           "A free 10ml bacteriostatic water is added over £75, and any three vials make the cheapest one free.",
         ],
-        detail: { html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:2px 0 24px"><tr><td align="center" style="border:1px dashed #CFC5B4;border-radius:12px;padding:18px 12px;background:#FBF8F1"><span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8C8779">Your code</span><div style="margin-top:8px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:25px;font-weight:700;letter-spacing:.12em;color:#040825">${e(WELCOME_CODE)}</div></td></tr></table>`, text: [`Your code: ${WELCOME_CODE}`] },
+        detail: { html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:2px 0 24px"><tr><td align="center" style="border:1px dashed #CFC5B4;border-radius:12px;padding:18px 12px;background:#FBF8F1"><span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8C8779">Your code</span><div style="margin-top:8px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:25px;font-weight:700;letter-spacing:.12em;color:#040825">${e(WELCOME_CODE)}</div></td></tr></table>`, text: [`Your code: ${WELCOME_CODE}`] },
         action: { label: "Start shopping", url: SHOP_URL },
         lines: ["Enter the code in the basket before checkout. It applies to the goods value, not delivery."],
         unsubscribeUrl: event.unsubscribeUrl,
