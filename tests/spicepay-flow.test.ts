@@ -72,6 +72,10 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         amount: payload["amount"],
         currency: "GBP",
         test_mode: true,
+        payment_link: {
+          link: "https://checkout.spicepay.net/pay/51eb087f-eb16-42d5-8ee1-5aeec8433b22",
+          payment_link_id: "51eb087f-eb16-42d5-8ee1-5aeec8433b22",
+        },
       });
     }
     if (url.includes("/rest/v1/orders")) {
@@ -135,7 +139,22 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
       guest_token: string;
       checkout_url: string;
     };
-    expect(details.checkout_url).toBe("https://checkout.spicepay.net/pay/merchant_vyrax/pay_vyrax");
+    expect(details.checkout_url).toBe(
+      "https://checkout.spicepay.net/pay/51eb087f-eb16-42d5-8ee1-5aeec8433b22",
+    );
+    expect(payment["payment_link"]).toBe(true);
+    expect(payment["merchant_order_reference_id"]).toMatch(/^VX-[A-F0-9]{8}$/);
+    expect(payment["description"]).toContain(String(payment["merchant_order_reference_id"]));
+    expect(payment["customer_id"]).toMatch(/^vx_[a-f0-9]{24}$/);
+    expect(payment["billing"]).toMatchObject({
+      address: { line1: "1 Lab Road", city: "London", zip: "SW1A 1AA", country: "GB" },
+    });
+    expect(payment["shipping"]).toMatchObject({
+      address: { line1: "1 Lab Road", zip: "SW1A 1AA" },
+    });
+    const lines = payment["order_details"] as { amount: number; quantity: number }[];
+    expect(lines.length).toBeGreaterThan(0);
+    expect(lines.reduce((n, l) => n + l.amount * l.quantity, 0)).toBe(payment["amount"]);
     expect(inserted["total_pence"]).toBe(3897);
     expect(payment["amount"]).toBe(3897);
     expect(payment["test_mode"]).toBe(true);
