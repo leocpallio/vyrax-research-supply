@@ -24,7 +24,7 @@ export function ProductGallery({
       <figure
         data-testid="pdp-gallery"
         data-pdp-gallery
-        className={`relative overflow-hidden rounded-[20px] bg-[#EAE6DC] ${showReport ? "" : "aspect-[4/5]"}`}
+        className={`relative overflow-hidden rounded-[20px] bg-white ${showReport ? "" : "aspect-[4/5]"}`}
       >
         {showReport && report ? (
           <a

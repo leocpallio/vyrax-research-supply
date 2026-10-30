@@ -8,7 +8,7 @@ type Step = { id: string; label: string; at: number; kind: "delivery" | "gift" |
 function ladder(): Step[] {
   const gift = site.firstOrderGift;
   const out: Step[] = [{ id: "delivery", label: "Free delivery", at: site.freeDeliveryThreshold, kind: "delivery" }];
-  if (gift) out.push({ id: "gift", label: "Free Bac Water", at: gift.over, kind: "gift" });
+  if (gift) out.push({ id: "gift", label: `Free ${gift.short}`, at: gift.over, kind: "gift" });
   for (const t of [...site.spendTiers].sort((a, b) => a.over - b.over)) {
     out.push({ id: `pct-${t.over}`, label: `${Math.round(t.rate * 100)}% off`, at: t.over, kind: "pct", pct: Math.round(t.rate * 100) });
   }

@@ -140,8 +140,8 @@ function Basket() {
                 )}
                 {!p.gift && p.giftGap !== undefined && p.giftGap > 0 && site.firstOrderGift && (
                   <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
-                    <Tag size={13} /> Add {gbp(p.giftGap)} more for a free{" "}
-                    {site.firstOrderGift.label}
+                    <Tag size={13} /> Add {gbp(p.giftGap)} more for{" "}
+                    {site.firstOrderGift.short} free
                   </p>
                 )}
                 {p.nextTier && (

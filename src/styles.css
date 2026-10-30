@@ -144,7 +144,8 @@
 }
 
 /* Vyrax Labs research storefront.
- * Palette: paper #F5F0E5 background, ink #040825 text, tint #EAE6DC panels, warm #AC4821 accent
+ * Palette: white #FFFFFF page and product surfaces so white-background renders merge with no
+ * seam, ink #040825 text, sand #F4F1EA chips/bands, warm #AC4821 accent
  * (sparingly), line #DDD7C8 hairlines. Existing --ink tokens keep working for dark panels. */
 @font-face {
   font-family: "Satoshi";
@@ -162,10 +163,10 @@
 }
 :root {
   --radius: 0.75rem;
-  --paper: oklch(0.956 0.016 86.4);
-  --paper-deep: oklch(0.938 0.016 86.4);
-  --tint: oklch(0.925 0.014 88.7);
-  --line: oklch(0.88 0.021 88.7);
+  --paper: #ffffff;
+  --paper-deep: #fbfaf7;
+  --tint: #f4f1ea;
+  --line: #e8e4da;
   --warm: oklch(0.528 0.141 40.2);
   --warm-foreground: oklch(0.99 0.005 86);
   --background: var(--paper);
@@ -503,9 +504,6 @@ textarea:focus-visible,
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
-
-/* Seamless product pages: pure white page behind the white-edged renders */
-.bg-paper:has([data-pdp-gallery]) { background-color: #fff; }
 
 /* Offer popup entrance: fade + lift, disabled for reduced motion. */
 @keyframes offer-panel-in {

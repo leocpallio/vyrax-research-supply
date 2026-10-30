@@ -27,6 +27,7 @@ export type OfferGift = {
   strength: string;
   label: string;
   short: string;
+  quantity: number;
   value: number;
   over: number;
 };

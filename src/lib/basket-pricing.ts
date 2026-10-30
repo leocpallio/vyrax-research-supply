@@ -34,15 +34,13 @@ export function priceBasket(items: CartItem[], code?: string | null) {
   const next = [...tiers].reverse().find((t) => afterP < t.over * 100);
   const gbpOf = (p: number) => p / 100;
   const giftRule = site.firstOrderGift;
-  const hasGiftAlready = giftRule
-    ? items.some((i) => i.slug === giftRule.slug && i.strength === giftRule.strength)
-    : false;
+  // The gift is an offer, so it is granted on goods value alone. Buying the same vial does not
+  // cancel it (that would silently cost the customer the whole gift).
   const gift =
-    giftRule && !hasGiftAlready && goodsP >= giftRule.over * 100
-      ? { label: giftRule.label, value: giftRule.value }
+    giftRule && goodsP >= giftRule.over * 100
+      ? { label: giftRule.label, quantity: giftRule.quantity, value: giftRule.value }
       : undefined;
-  const giftGap =
-    giftRule && !hasGiftAlready ? gbpOf(Math.max(0, giftRule.over * 100 - goodsP)) : undefined;
+  const giftGap = giftRule ? gbpOf(Math.max(0, giftRule.over * 100 - goodsP)) : undefined;
   return {
     subtotal: gbpOf(subtotalP),
     freeVials: gbpOf(freeP),

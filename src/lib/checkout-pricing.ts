@@ -56,19 +56,16 @@ export function quoteCheckout(input: unknown, code?: string | null) {
       ?.rate ?? 0;
   const tierDiscountPence = Math.round(afterOffer * rate);
   const goodsPence = afterOffer - tierDiscountPence;
-  // Free gift: a real £0 line on the order record (not in the payment amount) so the packer
-  // dispatches it. Never added when the customer already bought the same vial.
+  // Free gift: real £0 lines on the order record (not in the payment amount) so the packer
+  // dispatches them. Granted on goods value alone; buying the same vial does not cancel it.
   const giftRule = site.firstOrderGift;
-  const alreadyHasGift = giftRule
-    ? items.some((i) => i.slug === giftRule.slug && i.strength === giftRule.strength)
-    : false;
-  const giftApplies = Boolean(giftRule && !alreadyHasGift && goodsPence >= giftRule.over * 100);
+  const giftApplies = Boolean(giftRule && goodsPence >= giftRule.over * 100);
   const giftLine = giftApplies
     ? {
         slug: giftRule!.slug,
         name: giftRule!.label,
         strength: giftRule!.strength,
-        quantity: 1,
+        quantity: giftRule!.quantity,
         unitPence: 0,
         linePence: 0,
         gift: true as const,
@@ -85,7 +82,9 @@ export function quoteCheckout(input: unknown, code?: string | null) {
     throw new Error("Invalid total");
   return {
     items: orderLines,
-    gift: giftLine ? { name: giftLine.name, strength: giftLine.strength } : undefined,
+    gift: giftLine
+      ? { name: giftLine.name, strength: giftLine.strength, quantity: giftLine.quantity }
+      : undefined,
     promo:
       promoApplied && promoPenceApplied > 0
         ? {

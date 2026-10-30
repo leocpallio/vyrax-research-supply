@@ -13,12 +13,12 @@ export function buildWelcomeEmail(o: {
     ? `<a href="${o.unsubscribe}" style="color:#14213D">Unsubscribe</a>`
     : "";
   const imgs =
-    IMG(1, "Up to 20% off your first order, plus free goods", o.shopUrl) +
-    IMG(2, "Free delivery 50, free water 75, 10% off 150, 15% off 250, 20% off 400", o.shopUrl) +
+    IMG(1, "Up to 20% off your first order, plus five free bac water vials", o.shopUrl) +
+    IMG(2, "Five free bac water vials over 75, free delivery over 50, 10% off 150, 15% off 250, 20% off 400", o.shopUrl) +
     IMG(3, "Most requested: BPC-157, retatrutide, GHK-Cu", o.shopUrl) +
     IMG(4, "Every report we publish is the lab's own", o.shopUrl);
   const head = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your code</title><style>@media (prefers-color-scheme:dark){body{background:#0E1730!important}table{background:#0E1730!important}}</style></head><body style="margin:0;padding:0;background:#FFFFFF"><div style="display:none;font-size:1px;color:#FFFFFF;max-height:0;overflow:hidden">Your code is inside, plus the free goods you unlock as the basket grows.</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF"><tr><td align="center"><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#FFFFFF">`;
-  const bits = `<tr><td style="padding:18px 28px 26px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;text-align:center"><p style="margin:0 0 8px;font-size:14px;color:#14213D">Code <strong>${o.code}</strong>. Free delivery over 50, free water over 75, 10% over 150, 15% over 250, 20% over 400.</p>`;
+  const bits = `<tr><td style="padding:18px 28px 26px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;text-align:center"><p style="margin:0 0 8px;font-size:14px;color:#14213D">Code <strong>${o.code}</strong>. Free delivery over 50, five free bac water vials over 75, 10% over 150, 15% over 250, 20% over 400.</p>`;
   const legal = `Sold for research use only. Not a licensed medicine. No dose is on the label.`;
   const policy = `Research use policy: ${SITE_URL}/research-use-policy`;
   const links = `<a href="${o.shopUrl}" style="color:#14213D">Shop</a> · <a href="mailto:${o.contactEmail}" style="color:#14213D">${o.contactEmail}</a>${foot ? ` · ${foot}` : ""}`;
@@ -28,6 +28,6 @@ export function buildWelcomeEmail(o: {
     ? `<tr><td align="center" style="padding:0 28px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif"><p style="margin:0;font-size:13px;line-height:1.6;color:#4A5568">Your reconstitution guide is ready: <a href="${o.guideUrl}" style="color:#14213D;font-weight:700">download the PDF</a></p></td></tr>`
     : "";
   const html = head + brand + guide + imgs + bits + tail;
-  const text = [`Vyrax Labs`, ``, `Your code: ${o.code}`, "", "Up to 20% off your first order.", "Free delivery over 50, free water over 75, 10% over 150, 15% over 250, 20% over 400.", o.guideUrl ? `Guide: ${o.guideUrl}` : "", "", legal, policy, o.unsubscribe ? `Unsubscribe: ${o.unsubscribe}` : "Unsubscribe: mailto:"+o.contactEmail, o.shopUrl, o.contactEmail];
+  const text = [`Vyrax Labs`, ``, `Your code: ${o.code}`, "", "Up to 20% off your first order.", "Free delivery over 50, five free bac water vials over 75, 10% over 150, 15% over 250, 20% over 400.", o.guideUrl ? `Guide: ${o.guideUrl}` : "", "", legal, policy, o.unsubscribe ? `Unsubscribe: ${o.unsubscribe}` : "Unsubscribe: mailto:"+o.contactEmail, o.shopUrl, o.contactEmail];
   return { html, text };
 }

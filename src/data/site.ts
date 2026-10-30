@@ -51,16 +51,25 @@ export const site = {
     { slug: "retatrutide", strength: "10mg" },
     { slug: "tirzepatide", strength: "20mg" },
   ],
-  // Free gift added automatically once goods reach `over`. Fulfilled as a real £0 order line so the
-  // packer sees it; mirrored in priceBasket and quoteCheckout. Null disables it.
+  // Free gift added automatically once goods reach `over`. Fulfilled as `quantity` real £0 order
+  // lines so the packer sees them; mirrored in priceBasket and quoteCheckout. Null disables it.
   firstOrderGift: {
     slug: "bacteriostatic-water",
     strength: "10ml",
-    label: "Bacteriostatic Water 10ml",
-    short: "10ml Bac Water",
-    value: 5.99,
+    label: "5 × Bacteriostatic Water 10ml",
+    short: "5× Bac Water",
+    quantity: 5,
+    value: 29.95,
     over: 75,
-  } as { slug: string; strength: string; label: string; short: string; value: number; over: number } | null,
+  } as {
+    slug: string;
+    strength: string;
+    label: string;
+    short: string;
+    quantity: number;
+    value: number;
+    over: number;
+  } | null,
 };
 
 export const abs = (path: string) => SITE_URL + (path.startsWith("/") ? path : "/" + path);

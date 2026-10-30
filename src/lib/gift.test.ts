@@ -13,19 +13,23 @@ test("free gift line appears once the basket passes the threshold", () => {
   const line = big.items.find((i) => i.slug === gift.slug);
   expect(line).toBeTruthy();
   expect(line!.unitPence).toBe(0);
-  expect(line!.quantity).toBe(1);
+  expect(line!.quantity).toBe(gift.quantity);
   // The gift must never change what the customer pays.
   const paidGoods = big.subtotalPence - big.freeVialsPence - big.tierDiscountPence;
   expect(big.totalPence).toBe(paidGoods + big.deliveryPence);
 });
 
-test("no duplicate gift when the customer already buys the same vial", () => {
+test("buying the same vial does not cancel the gift", () => {
   const q = quoteCheckout([
     { slug: "bpc-157", strength: "10mg", quantity: 6 },
     { slug: gift.slug, strength: gift.strength, quantity: 1 },
   ]);
-  expect(q.gift).toBeUndefined();
-  expect(q.items.filter((i) => i.slug === gift.slug).length).toBe(1);
+  expect(q.gift?.quantity).toBe(gift.quantity);
+  // Two lines: the one they paid for, and the free one.
+  const bacLines = q.items.filter((i) => i.slug === gift.slug);
+  expect(bacLines.length).toBe(2);
+  expect(bacLines.find((l) => l.gift)!.quantity).toBe(gift.quantity);
+  expect(bacLines.find((l) => !l.gift)!.unitPence).toBeGreaterThan(0);
 });
 
 test("gift threshold is honoured to the penny", () => {
