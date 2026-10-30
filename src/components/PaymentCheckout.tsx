@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
-import { readPromo } from "@/lib/promo-client";
+import { readPromo, savePromo } from "@/lib/promo-client";
+import { findPromo } from "@/data/promos";
 import { capture, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
@@ -70,6 +71,9 @@ export function PaymentCheckout() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [promoCode, setPromoCode] = useState<string>(() => readPromo());
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState("");
   const lock = useRef(false);
   const addressStarted = useRef(false);
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -88,8 +92,24 @@ export function PaymentCheckout() {
     return () => window.removeEventListener("pageshow", reset);
   }, []);
 
-  const code = readPromo();
-  const quote = priceBasket(items, code);
+  const quote = priceBasket(items, promoCode);
+
+  function applyCode(e: React.FormEvent) {
+    e.preventDefault();
+    const promo = findPromo(codeInput);
+    if (!promo) {
+      setCodeError("That code isn't recognised.");
+      return;
+    }
+    if (quote.goods < promo.minSpend) {
+      setCodeError(`Spend ${gbp(promo.minSpend)} to use ${promo.code}.`);
+      return;
+    }
+    setCodeError("");
+    savePromo(promo.code);
+    setPromoCode(promo.code);
+    setCodeInput("");
+  }
 
   function set(key: FieldKey, value: string) {
     if (!addressStarted.current) {
@@ -126,7 +146,7 @@ export function PaymentCheckout() {
           ...form,
           postcode: formatPostcode(form.postcode),
           researchAgreement: agree,
-          code,
+          code: promoCode,
           items: items.map(({ slug, strength, quantity }) => ({ slug, strength, quantity })),
         }),
       });
@@ -224,6 +244,46 @@ export function PaymentCheckout() {
           </li>
         ))}
       </ul>
+      {quote.promo ? (
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
+          <span className="font-medium text-verify">
+            {quote.promo.code} applied · {quote.promo.pct}% off
+          </span>
+          <button
+            type="button"
+            className="text-xs underline underline-offset-2"
+            onClick={() => {
+              savePromo("");
+              setPromoCode("");
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={applyCode} className="mt-3">
+          <label htmlFor="co-promo" className="text-sm font-medium">
+            Discount code
+          </label>
+          <div className="mt-2 flex gap-2">
+            <input
+              id="co-promo"
+              value={codeInput}
+              onChange={(e) => {
+                setCodeInput(e.target.value);
+                setCodeError("");
+              }}
+              placeholder="Enter code"
+              autoComplete="off"
+              className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
+            />
+            <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
+              Apply
+            </Button>
+          </div>
+          {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+        </form>
+      )}
       <dl className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
         <div className="flex justify-between">
           <dt>Subtotal</dt>
