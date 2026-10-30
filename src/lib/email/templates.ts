@@ -3,6 +3,7 @@ import { promos } from "../../data/promos";
 const WELCOME_CODE = promos[0]?.code ?? "FIRST10";
 import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
+import { buildWelcomeEmail } from "./welcome-image";
 
 // Pure rendering only. Sending and consent/idempotency decisions belong to the caller.
 export type Line = {
@@ -348,21 +349,20 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
           : {}),
       });
     }
-    case "guideWelcome":
-      return wrap({
-        heading: "Up to 20% off your first order",
-        preheader: "Your code is inside, plus the free goods you unlock as the basket grows.",
-        subject: subject("Your code for 10% off"),
-        paragraphs: [
-          hello,
-          "Your code is below. It takes 10% off orders over £50, and the discount grows with the basket: 15% over £250, 20% over £400.",
-          "A free 10ml bacteriostatic water is added over £75, and any three vials make the cheapest one free.",
-        ],
-        detail: { html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:2px 0 24px"><tr><td align="center" style="border:1px dashed #CFC5B4;border-radius:12px;padding:18px 12px;background:#FBF8F1"><span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8C8779">Your code</span><div style="margin-top:8px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:25px;font-weight:700;letter-spacing:.12em;color:#040825">${e(WELCOME_CODE)}</div></td></tr></table>`, text: [`Your code: ${WELCOME_CODE}`] },
-        action: { label: "Start shopping", url: SHOP_URL },
-        lines: ["Enter the code in the basket before checkout. It applies to the goods value, not delivery."],
-        unsubscribeUrl: event.unsubscribeUrl,
+    case "guideWelcome": {
+      const w = buildWelcomeEmail({
+        code: WELCOME_CODE,
+        shopUrl: SHOP_URL,
+        contactEmail: SUPPORT_EMAIL,
+        unsubscribe: event.unsubscribeUrl,
       });
+      return {
+        subject: subject("Your code for 10% off"),
+        html: w.html,
+        text: w.text.join("\n"),
+        listUnsubscribe: event.unsubscribeUrl,
+      };
+    }
     case "postPurchase":
       return wrap({
         ...base,
