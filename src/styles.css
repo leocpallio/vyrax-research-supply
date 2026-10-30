@@ -521,3 +521,5 @@ textarea:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .offer-veil, .offer-panel { animation: none; }
 }
+.pill-dark{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;background:#040825;color:#faf6ef;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.pill-light{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;border:1px solid rgba(4,8,37,.25);color:#040825;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}

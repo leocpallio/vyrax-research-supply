@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { offerGift, offerTiers, researchIntents, topOfferPct } from "@/data/offers";
+import { offerGift, offerTiers, topOfferPct } from "@/data/offers";
 
 const SEEN_KEY = "vyrax_offer_seen";
 const INTENT_KEY = "vyrax_intent";
@@ -58,18 +58,6 @@ export function OfferPopup() {
     }
   }
 
-  function pick(id: string, to: string) {
-    try {
-      localStorage.setItem(INTENT_KEY, id);
-      localStorage.setItem(SEEN_KEY, "1");
-    } catch {
-      /* ignore */
-    }
-    setSeen(true);
-    setOpen(false);
-    void navigate({ to });
-  }
-
   const onProduct = path.startsWith("/product");
 
   if (suppressed) return null;
@@ -101,11 +89,10 @@ export function OfferPopup() {
             className="flex max-h-[86vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl bg-[#faf6ef] shadow-2xl offer-panel"
           >
             <div className="px-5 pb-3 pt-5 text-center sm:px-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#15191e]/55">
-                First order
-              </p>
-              <p className="mt-1 font-heading text-[2rem] font-black leading-none text-[#b45309]">
-                Up to {topOfferPct}% off
+              <p className="font-heading text-[23px] font-black leading-none tracking-[-0.03em] text-[#040825]">vyrax</p>
+              <p className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#040825]/55">Research use only</p>
+              <p className="mt-5 font-heading text-[1.6rem] font-black leading-tight tracking-[-0.02em] text-[#040825]">
+                Save up to {topOfferPct}% today
               </p>
 
               <dl className="mt-4 divide-y divide-[#15191e]/10 rounded-xl bg-white/70 text-left">
@@ -143,30 +130,12 @@ export function OfferPopup() {
               </dl>
             </div>
 
-            <div className="px-5 pb-2">
-              <p className="text-center text-[13px] font-semibold text-[#15191e]">
-                What are you researching?
-              </p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {researchIntents.map((intent) => (
-                  <button
-                    key={intent.id}
-                    type="button"
-                    onClick={() => pick(intent.id, intent.to)}
-                    className="min-h-10 w-full rounded-full bg-[#15191e] px-2 py-2 text-[12px] font-semibold text-[#faf6ef] transition hover:bg-[#2a3138]"
-                  >
-                    {intent.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="border-t border-[#15191e]/10 px-5 py-1">
-              <button
-                type="button"
-                onClick={() => dismiss(true)}
-                className="min-h-10 w-full text-[13px] text-[#15191e]/55 underline underline-offset-2"
-              >
-                No thanks, I&rsquo;ll pay full price
+            <div className="px-5 pb-5">
+              <button type="button" onClick={() => dismiss(true)} className="pill-dark">
+                Shop with the discount
+              </button>
+              <button type="button" onClick={() => dismiss(true)} className="pill-light mt-2">
+                No thanks
               </button>
             </div>
           </div>
