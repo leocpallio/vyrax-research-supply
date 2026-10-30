@@ -89,24 +89,24 @@ function safeUrl(url: string, external = false): string {
 }
 function link(label: string, url: string, external = false) {
   const href = url === `mailto:${SUPPORT_EMAIL}` ? url : safeUrl(url, external);
-  return `<a href="${e(href)}" style="color:#040825;text-decoration:underline">${e(label)}</a>`;
+  return `<a href="${e(href)}" style="color:#14213D;text-decoration:underline">${e(label)}</a>`;
 }
 function button(label: string, url: string, external = false) {
   const href = safeUrl(url, external);
-  return `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:4px 0 24px"><tr><td class="btn" bgcolor="#040825" style="background:#040825;border-radius:999px"><a href="${e(href)}" style="display:inline-block;padding:16px 28px;font-size:15px;font-weight:700;letter-spacing:.01em;color:#F5F0E5;text-decoration:none">${e(label)}</a></td></tr></table>`;
+  return `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:4px 0 24px"><tr><td class="btn" bgcolor="#14213D" style="background:#14213D;border-radius:999px"><a href="${e(href)}" style="display:inline-block;padding:16px 28px;font-size:15px;font-weight:700;letter-spacing:.01em;color:#F6F8FC;text-decoration:none">${e(label)}</a></td></tr></table>`;
 }
-// Palette mirrors the storefront: paper #F5F0E5, ink #040825, tint #EAE6DC, warm #AC4821, line #DDD7C8.
+// Palette mirrors the storefront: paper #F6F8FC, ink #14213D, tint #EEF2F9, warm #5B8DEF, line #E1E6EF.
 const FONT = "Satoshi,'Helvetica Neue',Helvetica,Arial,sans-serif";
 const css = {
-  body: `margin:0;padding:0;background:#F5F0E5;color:#040825;font-family:${FONT}`,
-  card: "max-width:600px;width:100%;background:#ffffff;border:1px solid #DDD7C8;border-radius:16px",
-  head: "padding:26px 32px 22px;border-bottom:1px solid #DDD7C8",
-  main: "padding:32px;line-height:1.6;font-size:16px;color:#040825",
+  body: `margin:0;padding:0;background:#F6F8FC;color:#14213D;font-family:${FONT}`,
+  card: "max-width:600px;width:100%;background:#ffffff;border:1px solid #E1E6EF;border-radius:16px",
+  head: "padding:26px 32px 22px;border-bottom:1px solid #E1E6EF",
+  main: "padding:32px;line-height:1.6;font-size:16px;color:#14213D",
   p: "margin:0 0 16px",
-  foot: "padding:22px 32px;border-top:1px solid #DDD7C8;font-size:12px;line-height:1.7;color:#5B5F73",
-  cell: "padding:12px 0;border-bottom:1px solid #DDD7C8;vertical-align:top",
+  foot: "padding:22px 32px;border-top:1px solid #E1E6EF;font-size:12px;line-height:1.7;color:#4A5568",
+  cell: "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:top",
 };
-const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#040825!important}.card{background:#0B1232!important;border-color:#1F2A55!important}.tx{color:#F5F0E5!important}.mute{color:#A9B0C9!important}.rule{border-color:#1F2A55!important}.tint{background:#111A3F!important}.btn{background:#F5F0E5!important}.btn a{color:#040825!important}.step-on{background:#F5F0E5!important;color:#040825!important}.step-off{background:#1F2A55!important;color:#A9B0C9!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
+const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#14213D!important}.card{background:#0B1232!important;border-color:#1B2C56!important}.tx{color:#F6F8FC!important}.mute{color:#A9B0C9!important}.rule{border-color:#1B2C56!important}.tint{background:#111A3F!important}.btn{background:#F6F8FC!important}.btn a{color:#14213D!important}.step-on{background:#F6F8FC!important;color:#14213D!important}.step-off{background:#1B2C56!important;color:#A9B0C9!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
 
 /** Three-step fulfilment strip. `current` is 1-based and passed by the caller, never inferred. */
 function steps(current: 1 | 2 | 3): { html: string; text: string } {
@@ -117,15 +117,15 @@ function steps(current: 1 | 2 | 3): { html: string; text: string } {
       const on = n <= current;
       const done = n < current;
       const dot = done
-        ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#040825;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
+        ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#14213D;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
         : on
-          ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#040825;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
-          : `<span class="step-off" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#ffffff;border:1px solid #D8D2C6;color:#8C8779;font-size:12px;font-weight:700;text-align:center">${n}</span>`;
-      return `<td align="center" style="padding:0 4px;width:33%">${dot}<div class="${on ? "tx" : "mute"}" style="margin-top:8px;font-size:12px;font-weight:${n === current ? 700 : 500};color:${on ? "#040825" : "#8C8779"}">${e(label)}</div></td>`;
+          ? `<span class="step-on" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#14213D;color:#ffffff;font-size:13px;font-weight:700;text-align:center">&#10003;</span>`
+          : `<span class="step-off" style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:999px;background:#ffffff;border:1px solid #DCE2EC;color:#6B7688;font-size:12px;font-weight:700;text-align:center">${n}</span>`;
+      return `<td align="center" style="padding:0 4px;width:33%">${dot}<div class="${on ? "tx" : "mute"}" style="margin-top:8px;font-size:12px;font-weight:${n === current ? 700 : 500};color:${on ? "#14213D" : "#6B7688"}">${e(label)}</div></td>`;
     })
     .join("");
   return {
-    html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="tint" style="background:transparent;border-top:1px solid #E3DDD0;border-bottom:1px solid #E3DDD0;margin:0 0 26px"><tr><td style="padding:16px 4px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>${cells}</tr></table></td></tr></table>`,
+    html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="tint" style="background:transparent;border-top:1px solid #E1E6EF;border-bottom:1px solid #E1E6EF;margin:0 0 26px"><tr><td style="padding:16px 4px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>${cells}</tr></table></td></tr></table>`,
     text: labels.map((l, i) => `${i + 1 <= current ? "[x]" : "[ ]"} ${l}`).join("  "),
   };
 }
@@ -141,7 +141,7 @@ function thumb(l: Line): string {
   } catch {
     return `<td class="rule" style="${css.cell};width:0;padding-left:0;padding-right:0"></td>`;
   }
-  const pic = `<img class="thumb" src="${e(img)}" width="64" height="64" alt="${e(oneLine(l.name))}" style="display:block;width:64px;height:64px;border:1px solid #DDD7C8;border-radius:10px;background:#EAE6DC">`;
+  const pic = `<img class="thumb" src="${e(img)}" width="64" height="64" alt="${e(oneLine(l.name))}" style="display:block;width:64px;height:64px;border:1px solid #E1E6EF;border-radius:10px;background:#EEF2F9">`;
   const href = l.url
     ? (() => {
         try {
@@ -159,11 +159,11 @@ function table(s: Summary): { html: string; text: string[] } {
   const rows = s.lines
     .map(
       (l) =>
-        `<tr>${thumb(l)}<td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#5B5F73;font-size:13px">${e(oneLine(l.strength).replace(/(\d)(mg|ml)\b/gi, "$1 $2"))} · ${l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${e(l.quantity)}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
+        `<tr>${thumb(l)}<td class="rule tx" style="${css.cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(oneLine(l.strength).replace(/(\d)(mg|ml)\b/gi, "$1 $2"))} · ${l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${e(l.quantity)}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${css.cell};white-space:nowrap">${e(gbp(l.lineTotal))}</td></tr>`,
     )
     .join("");
   const extra = (label: string, v: string, bold = false) =>
-    `<tr><td colspan="2" class="${bold ? "tx" : "mute"}" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 400};color:${bold ? "#040825" : "#5B5F73"}">${e(label)}</td><td class="tx" align="right" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 500}">${e(v)}</td></tr>`;
+    `<tr><td colspan="2" class="${bold ? "tx" : "mute"}" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 400};color:${bold ? "#14213D" : "#4A5568"}">${e(label)}</td><td class="tx" align="right" style="padding:${bold ? "14px 0 0" : "6px 0 0"};font-size:${bold ? "16px" : "14px"};font-weight:${bold ? 700 : 500}">${e(v)}</td></tr>`;
   const breakdown = s.delivery !== undefined || s.discount;
   return {
     html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 24px;font-size:15px"><tbody>${rows}${breakdown ? extra("Subtotal", gbp(subtotal)) : ""}${s.discount ? extra("Discount", `-${gbp(s.discount)}`) : ""}${s.delivery !== undefined ? extra(`Delivery (${CARRIER})`, s.delivery === 0 ? "Free" : gbp(s.delivery)) : ""}${extra("Total paid", gbp(s.total), true)}</tbody></table>`,
@@ -215,7 +215,7 @@ function wrap(c: Content): RenderedEmail {
       : "";
 
   const addressHtml = address
-    ? `<div class="tx" style="border-left:2px solid #AC4821;padding:1px 0 1px 14px;margin:0 0 26px;color:#040825;font-size:15px"><span class="mute" style="display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8C8779;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#5B5F73;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
+    ? `<div class="tx" style="border-left:2px solid #5B8DEF;padding:1px 0 1px 14px;margin:0 0 26px;color:#14213D;font-size:15px"><span class="mute" style="display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B7688;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#4A5568;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
     : "";
   const unsubscribe = c.unsubscribeUrl
     ? c.unsubscribeUrl === `mailto:${SUPPORT_EMAIL}`
@@ -224,9 +224,9 @@ function wrap(c: Content): RenderedEmail {
     : null;
   const progress = c.step ? steps(c.step) : null;
   const metaHtml = c.reference
-    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B5F73">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#040825">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#040825">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
+    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#14213D">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#14213D">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F5F0E5"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#040825">VYRAX</span> <span style="color:#AC4821">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#5B5F73">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#040825">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#8C8779">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#5B5F73">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#040825;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F6F8FC"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#4A5568">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#14213D">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#6B7688">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#4A5568">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#14213D;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -355,6 +355,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
         shopUrl: SHOP_URL,
         contactEmail: SUPPORT_EMAIL,
         unsubscribe: event.unsubscribeUrl,
+        guideUrl: GUIDE_URL,
       });
       return {
         subject: subject("Your code for 10% off"),
