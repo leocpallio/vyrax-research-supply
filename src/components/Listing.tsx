@@ -1,13 +1,7 @@
 import { useMemo, useState } from "react";
-import { StoreShell, Breadcrumbs } from "@/components/Store";
+import { StoreShell, Breadcrumbs, FAQ } from "@/components/Store";
 import { ProductCardGrid } from "@/components/ProductCard";
 import { CategoryPills, type Pill, type SortKey } from "@/components/CategoryPills";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Link } from "@tanstack/react-router";
 import { featuredSlugs, fromPrice, productPath, type Compound } from "@/lib/catalog";
 import type { CategoryContent } from "@/data/category-content";
@@ -53,21 +47,9 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
         <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight mb-4">
           Frequently asked questions
         </h2>
-        <Accordion type="single" collapsible className="border-t border-[#040825]/10">
-          {content.faqs.map(([q, a], i) => (
-            <AccordionItem key={q} value={`faq-${i}`} className="border-b border-[#040825]/10">
-              <AccordionTrigger
-                data-testid="faq-question"
-                className="py-4 text-left font-heading font-semibold text-[15px] md:text-base hover:no-underline hover:text-[#040825] transition-colors duration-150"
-              >
-                {q}
-              </AccordionTrigger>
-              <AccordionContent className="text-[15px] leading-relaxed text-[#040825]/75">
-                {a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        {/* Native <details> so both the question and the answer are in the server-rendered HTML and
+            the FAQPage JSON-LD above describes text that is actually on the page. */}
+        <FAQ items={content.faqs} />
       </div>
     </section>
   );

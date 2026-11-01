@@ -1,6 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, FileCheck2, Truck, ShieldCheck, PackageCheck, Check } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  FileCheck2,
+  Truck,
+  ShieldCheck,
+  PackageCheck,
+  Check,
+} from "lucide-react";
 import {
   compounds,
   featured,
@@ -258,6 +266,44 @@ export function FAQ({ items = coreFaqs }: { items?: QA[] | string[][] }) {
         </details>
       ))}
     </div>
+  );
+}
+
+/**
+ * Native <details> disclosure. Used instead of the Radix accordion wherever the panel holds copy
+ * that must exist in the server-rendered HTML (product description, specifications, testing
+ * report, common questions, listing FAQs). Radix unmounts closed panels, so the prerendered page
+ * shipped an empty shell and the FAQPage/Product schema described text no crawler without JS saw.
+ */
+export function Disclosure({
+  title,
+  children,
+  id,
+  defaultOpen = false,
+  className = "",
+}: {
+  title: string;
+  children: React.ReactNode;
+  id?: string | undefined;
+  defaultOpen?: boolean | undefined;
+  className?: string | undefined;
+}) {
+  return (
+    <details
+      {...(id ? { id } : {})}
+      open={defaultOpen}
+      className={`group border-b border-border ${className}`}
+    >
+      <summary className="font-heading text-lg py-5 cursor-pointer list-none flex items-center justify-between gap-4 hover:text-primary">
+        {title}
+        <ChevronDown
+          size={18}
+          aria-hidden
+          className="shrink-0 transition-transform group-open:rotate-180"
+        />
+      </summary>
+      <div className="pb-5">{children}</div>
+    </details>
   );
 }
 

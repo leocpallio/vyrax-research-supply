@@ -1,13 +1,7 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
-import { StoreShell } from "@/components/Store";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { StoreShell, Disclosure } from "@/components/Store";
 import {
   resolveProductSlug,
   productImage,
@@ -330,7 +324,9 @@ function ProductPage() {
             >
               Check lab report
             </Link>
-            <ReconstitutionAddon show={c.kind !== "supply" && !/water|solution/i.test(form ?? "")} />
+            <ReconstitutionAddon
+              show={c.kind !== "supply" && !/water|solution/i.test(form ?? "")}
+            />
 
             <DispatchCountdown className="mt-3" />
 
@@ -352,16 +348,9 @@ function ProductPage() {
         </div>
 
         <div className="mt-14 lg:mt-20 max-w-[920px]">
-          <Accordion
-            type="multiple"
-            defaultValue={["description"]}
-            className="border-t border-border"
-          >
-            <AccordionItem value="description">
-              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
-                Description
-              </AccordionTrigger>
-              <AccordionContent className="prose-area mt-0 text-base">
+          <div className="border-t border-border">
+            <Disclosure title="Description" defaultOpen>
+              <div className="prose-area text-base">
                 <p>{c.summary}</p>
                 <h2>What is {c.name}?</h2>
                 {c.overview.map((p) => (
@@ -415,60 +404,45 @@ function ProductPage() {
                     </ol>
                   </>
                 )}
-              </AccordionContent>
-            </AccordionItem>
+              </div>
+            </Disclosure>
 
-            <AccordionItem value="specifications">
-              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
-                Specifications
-              </AccordionTrigger>
-              <AccordionContent>
-                <table className="spec-table" data-testid="pdp-specifications">
-                  <tbody>
-                    {specs.map(([k, v]) => (
-                      <tr key={k}>
-                        <th scope="row">{k}</th>
-                        <td
-                          className={
-                            k === "Sequence" || k === "CAS number"
-                              ? "font-mono text-sm break-all"
-                              : undefined
-                          }
-                        >
-                          {v}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="testing-reports" id="testing-reports">
-              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
-                Testing reports
-              </AccordionTrigger>
-              <AccordionContent>
-                <TestingReportCard coa={coa} productName={heading} identity={c.name} />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="questions">
-              <AccordionTrigger className="font-heading text-lg py-5 hover:no-underline">
-                Common questions
-              </AccordionTrigger>
-              <AccordionContent>
-                <dl className="divide-y divide-border">
-                  {faqs.map(([q, a]) => (
-                    <div key={q} className="py-4">
-                      <dt className="font-semibold">{q}</dt>
-                      <dd className="mt-1.5 text-muted-foreground leading-relaxed">{a}</dd>
-                    </div>
+            <Disclosure title="Specifications">
+              <table className="spec-table" data-testid="pdp-specifications">
+                <tbody>
+                  {specs.map(([k, v]) => (
+                    <tr key={k}>
+                      <th scope="row">{k}</th>
+                      <td
+                        className={
+                          k === "Sequence" || k === "CAS number"
+                            ? "font-mono text-sm break-all"
+                            : undefined
+                        }
+                      >
+                        {v}
+                      </td>
+                    </tr>
                   ))}
-                </dl>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                </tbody>
+              </table>
+            </Disclosure>
+
+            <Disclosure title="Testing reports" id="testing-reports">
+              <TestingReportCard coa={coa} productName={heading} identity={c.name} />
+            </Disclosure>
+
+            <Disclosure title="Common questions">
+              <dl className="divide-y divide-border">
+                {faqs.map(([q, a]) => (
+                  <div key={q} className="py-4">
+                    <dt className="font-semibold">{q}</dt>
+                    <dd className="mt-1.5 text-muted-foreground leading-relaxed">{a}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Disclosure>
+          </div>
         </div>
 
         <GuideCards guides={relatedGuides} />
