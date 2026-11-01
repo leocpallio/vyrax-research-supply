@@ -134,7 +134,7 @@ function Home() {
       {/* Hero */}
       <section className="container-main pt-14 pb-10 md:pt-24 md:pb-16 grid lg:grid-cols-[1fr_minmax(0,460px)] gap-10 items-center">
         <div className="max-w-[760px]">
-          <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#040825]/60">
             Peptides · UK dispatch
           </p>
           <h1
@@ -205,7 +205,7 @@ function Home() {
       <section className="container-main pb-16 md:pb-24">
         <div className="flex items-end justify-between gap-4 mb-6">
           <div>
-            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#040825]/60">
               Start here
             </p>
             <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
@@ -224,7 +224,7 @@ function Home() {
 
       {/* Research ranges */}
       <section className="container-main pb-16 md:pb-24">
-        <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#040825]/60">
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#040825]/60">
           Browse by range
         </p>
         <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
@@ -268,7 +268,7 @@ function Home() {
         >
           <div className="container-main flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-              <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#F5F0E5]/60">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#F5F0E5]/60">
                 Lab reports
               </p>
               <h2 className="mt-2 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">

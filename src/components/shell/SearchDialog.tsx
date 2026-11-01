@@ -110,7 +110,7 @@ export function SearchDialog({
             </DialogPrimitive.Close>
           </div>
           <div className="max-h-[60vh] overflow-y-auto">
-            <p className="px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            <p className="px-4 pt-3 pb-1 t-label text-muted-foreground">
               {typed ? `${matches.length} result${matches.length === 1 ? "" : "s"}` : "Popular"}
             </p>
             <div id={listId} role="listbox" aria-label="Matching compounds" className="pb-2">
