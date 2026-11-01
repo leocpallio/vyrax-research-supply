@@ -143,7 +143,18 @@ function ProductPage() {
   const relatedGuides = guides
     .filter((g) => g.compounds.includes(c.slug))
     .sort((a, b) => b.updated.localeCompare(a.updated))
-    .slice(0, 2);
+    .slice(0, 2)
+    .concat(
+      // Every product here is a lyophilised vial with a certificate, so these two guides are
+      // relevant on any PDP even when the guide does not name the compound. They were the only
+      // pages on the site with fewer than three internal inbound links, and a PDP buyer is the
+      // reader they were written for.
+      ["how-to-reconstitute-peptides", "how-to-read-a-certificate-of-analysis"]
+        .map((slug) => guides.find((g) => g.slug === slug))
+        .filter((g): g is (typeof guides)[number] => Boolean(g)),
+    )
+    .filter((g, i, all) => all.findIndex((x) => x.slug === g.slug) === i)
+    .slice(0, 4);
   const dispatchLine = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
 
