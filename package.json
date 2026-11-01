@@ -7,6 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "prebuild": "node scripts/gen-sitemap-lastmod.mjs",
+    "sitemap:check": "node scripts/gen-sitemap-lastmod.mjs --check",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
