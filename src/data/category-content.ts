@@ -58,7 +58,7 @@ const shopContent: CategoryContent = {
     {
       heading: "What is on each product page",
       paragraphs: [
-        "Product pages carry the CAS number, molecular formula and molecular weight, an overview written from the published literature, PubMed references and the full list of vial strengths with cost per mg. Where a certificate is held for a batch it is linked from the product page and from the [lab reports hub](/lab-reports). Once you have picked a vial, the [reconstitution calculator](/calculator) works out the solvent volume needed for a target concentration.",
+        "Product pages list available compound identifiers and specifications, such as CAS number, molecular formula and molecular weight where recorded. They also show the vial strengths and pricing, with literature references where available. Where a certificate is held for a batch it is linked from the product page and from the [lab reports hub](/lab-reports). The [reconstitution calculator](/calculator) calculates solvent volume for a target laboratory concentration.",
       ],
     },
     {
@@ -243,7 +243,7 @@ const SECTION: Record<string, CategoryContent> = {
       {
         heading: "Peptides used in tissue repair work",
         paragraphs: [
-          "[BPC-157](/product/bpc-157) is a 15-amino-acid fragment of body protection compound, and [TB-500](/product/tb-500) is the active fragment of thymosin beta-4. Both are widely used in tendon, muscle and gut tissue work. [KPV](/product/kpv) is the C-terminal tripeptide of alpha-MSH, [LL-37](/product/ll-37) is the human cathelicidin antimicrobial peptide and [ARA-290](/product/ara-290) is an erythropoietin-derived peptide that acts at the innate repair receptor. [SNAP-8](/product/snap-8) is an octapeptide used in dermal work.",
+          "[BPC-157](/product/bpc-157) is a 15-amino-acid fragment of body protection compound, and [TB-500](/product/tb-500) is a fragment of thymosin beta-4. [KPV](/product/kpv) is the C-terminal tripeptide of alpha-MSH, [LL-37](/product/ll-37) is the human cathelicidin antimicrobial peptide and [ARA-290](/product/ara-290) is an erythropoietin-derived peptide. [SNAP-8](/product/snap-8) is an octapeptide. The linked product pages describe the research literature for each compound.",
           "The [Wolverine Stack](/product/wolverine-stack) combines BPC-157 and TB-500 in one vial for anyone using the pair together.",
         ],
       },
@@ -539,7 +539,7 @@ const CATEGORY: Record<string, CategoryContent> = {
         heading: "Why blends",
         paragraphs: [
           "A blend puts a fixed ratio of peptides into one vial so every component comes from the same preparation and batch. [GLOW](/product/glow) combines GHK-Cu, BPC-157 and TB-500; [KLOW](/product/klow) adds KPV; the [Wolverine Stack](/product/wolverine-stack) pairs BPC-157 and TB-500; the [Hulk Stack](/product/hulk-stack) pairs CJC-1295 DAC with ipamorelin. Composition and total content are printed on each product page.",
-          "The trade-off is the same every time: one vial instead of two or three, and no ability to vary the ratio between components. If you need to change how much of one peptide goes in, the single vials are the way to do it, and each blend page links to the components it uses.",
+          "A blend has a fixed component ratio, while separate single-compound vials are listed as distinct research materials. Each blend page links to its constituent compounds for comparison.",
         ],
       },
       {

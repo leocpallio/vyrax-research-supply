@@ -4,12 +4,11 @@
 set -euo pipefail
 PORT="${1:-4395}"
 export PATH="$HOME/.bun/bin:$PATH"
-WT=/srv/hermes/work/vyrax-sd-trust
+WT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$WT"
 
 echo "== head: $(git rev-parse --short HEAD) $(git log -1 --format=%s)"
-VITE_SPICEPAY_CHECKOUT_ENABLED=true bun run build >/tmp/vyrax-sd-build.log 2>&1 || {
-  tail -40 /tmp/vyrax-sd-build.log; exit 1; }
+VITE_SPICEPAY_CHECKOUT_ENABLED=false bun run build
 if [[ -n "$(git status --porcelain src/data/sitemap-lastmod.json)" ]]; then
   echo "FAIL: prebuild rewrote the tracked sitemap-lastmod.json"; exit 1
 fi
