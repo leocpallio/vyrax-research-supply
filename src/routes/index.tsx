@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, FileCheck2, FlaskConical, Truck, type LucideIcon } from "lucide-react";
-import { StoreShell } from "@/components/Store";
+import { StoreShell, FAQ } from "@/components/Store";
 import { ProductCardGrid } from "@/components/ProductCard";
 import { compounds, featured, getCompound, gbp, fromPrice } from "@/lib/catalog";
 import { coas } from "@/data/coa";
@@ -322,6 +322,16 @@ function Home() {
           )}
         </section>
       )}
+
+      <section className="container-main pb-16 md:pb-24">
+        {/* The page already emitted FAQPage schema for these six answers, but none of them were
+            rendered, so the markup described text no visitor or crawler could see. Render the same
+            items the schema lists, open by default. */}
+        <h2 className="font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em] mb-6">
+          Common questions
+        </h2>
+        <FAQ items={coreFaqs} defaultOpen />
+      </section>
 
       <section className="container-main">
         {/* Indicative "from" prices for the hero compounds, for crawlers and quick scanning. */}
