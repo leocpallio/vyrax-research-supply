@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { gbp, productImage, productPath, type Compound, type Strength } from "@/lib/catalog";
 import { claimFilled, claimText } from "@/lib/claims";
-import { dispatchCutoffLabel } from "@/lib/delivery";
+import { dispatchCutoffLabel, transitAimValues } from "@/lib/delivery";
 import { ladderSaving, perActiveLabel } from "@/lib/price-ladder";
 
 /** Three-price block: current price, struck single-equivalent "Was", "Save £X (Y% off)". */
@@ -49,9 +49,11 @@ export function PriceBlock({ c, s }: { c: Compound; s: Strength }) {
 /** Trust strip under the buy box. Every line is a registry claim or a plain link. */
 export function BuyBoxTrustStrip() {
   const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
+  const transit = claimFilled("delivery.transit-aim", transitAimValues());
   const coldChain = claimText("delivery.cold-chain-packing");
   const rows: { k: string; v: React.ReactNode }[] = [];
   if (dispatch) rows.push({ k: "Dispatch", v: `${dispatch} Not a delivery guarantee.` });
+  if (transit) rows.push({ k: "Transit", v: transit });
   if (coldChain)
     rows.push({ k: "Packing", v: `${coldChain}. Tracked, not temperature-controlled in transit.` });
   rows.push({

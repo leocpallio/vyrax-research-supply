@@ -3,7 +3,7 @@ import { InfoPage, pageHead } from "@/components/InfoPage";
 import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 import { claimFilled, claimText } from "@/lib/claims";
-import { dispatchCutoffLabel } from "@/lib/delivery";
+import { dispatchCutoffLabel, transitAimSource, transitAimValues } from "@/lib/delivery";
 
 export const Route = createFileRoute("/shipping")({
   head: () =>
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/shipping")({
 });
 
 function Shipping() {
+  const transit = claimFilled("delivery.transit-aim", transitAimValues());
   return (
     <InfoPage eyebrow="CUSTOMER CARE" title="UK delivery" crumb="Delivery" updated="2026-10-06">
       <p>
@@ -40,9 +41,7 @@ function Shipping() {
             <tr>
               <td className="p-4">{site.carrier}</td>
               <td className="p-4 tabular-nums">£{site.standardDeliveryFee.toFixed(2)}</td>
-              <td className="p-4">
-                Carrier estimate from dispatch. Tracked. Dispatch is not a delivery guarantee.
-              </td>
+              <td className="p-4">{transit ?? "Carrier estimate from dispatch. Tracked."}</td>
               <td className="p-4 tabular-nums">£{site.freeDeliveryThreshold} after discounts</td>
             </tr>
           </tbody>
@@ -50,7 +49,17 @@ function Shipping() {
       </div>
       <p className="text-sm text-muted-foreground">
         One UK service, {claimText("delivery.cold-chain-packing")?.toLowerCase()}. No express or
-        international option is offered.
+        international option is offered. The delivery window above is the carrier's published aim
+        for this service plus one working day of allowance:{" "}
+        <a
+          href={transitAimSource()}
+          rel="noreferrer noopener"
+          target="_blank"
+          className="text-primary underline"
+        >
+          {site.carrier} service page
+        </a>
+        . It is an aim, so a parcel can arrive later than that.
       </p>
       <h2>Dispatch and delivery</h2>
       <p>

@@ -5,6 +5,7 @@ import {
   buildHead,
   clampText,
   collectionPageJsonLd,
+  contactPageJsonLd,
   faqPageJsonLd,
   howToJsonLd,
   imageAltAudit,
@@ -102,6 +103,44 @@ describe("json-ld builders", () => {
     const json = serializeJsonLd(org);
     for (const k of BANNED_SCHEMA_KEYS) expect(json).not.toContain(`"${k}"`);
     expect(json).not.toMatch(/company number|companies house|VAT/i);
+  });
+  test("organization carries the return policy and only live payment methods", () => {
+    const org = organizationJsonLd();
+    const policy = org["hasMerchantReturnPolicy"] as Record<string, unknown>;
+    expect(policy["@type"]).toBe("MerchantReturnPolicy");
+    expect(policy["merchantReturnDays"]).toBe(site.returnWindowDays);
+    expect(policy["merchantReturnLink"]).toBe("https://vyraxlabs.co.uk/returns");
+    if (site.paymentMethods.length) {
+      expect(org["paymentAccepted"]).toBe(site.paymentMethods.join(", "));
+    } else {
+      expect(org["paymentAccepted"]).toBeUndefined();
+    }
+  });
+  test("sameAs is emitted only for profiles that actually exist", () => {
+    const org = organizationJsonLd();
+    if (site.sameAs.length === 0) expect(org["sameAs"]).toBeUndefined();
+    else expect(org["sameAs"]).toEqual([...site.sameAs]);
+  });
+  test("contact page repeats the support details the page prints", () => {
+    const c = contactPageJsonLd();
+    expect(c["@type"]).toBe("ContactPage");
+    expect(c["url"]).toBe("https://vyraxlabs.co.uk/contact");
+    const entity = c["mainEntity"] as Record<string, unknown>;
+    expect(entity["email"]).toBe(site.email);
+    expect(entity["telephone"]).toBe(site.phone);
+    const orgPoint = organizationJsonLd()["contactPoint"] as Record<string, unknown>;
+    expect(orgPoint["hoursAvailable"]).toEqual({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "https://schema.org/Monday",
+        "https://schema.org/Tuesday",
+        "https://schema.org/Wednesday",
+        "https://schema.org/Thursday",
+        "https://schema.org/Friday",
+      ],
+      opens: "09:00",
+      closes: "17:00",
+    });
   });
   test("website has SearchAction", () => {
     const w = webSiteJsonLd();

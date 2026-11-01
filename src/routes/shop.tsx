@@ -3,11 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { ListingPage } from "@/components/Listing";
 import { sectionPills } from "@/components/CategoryPills";
-import { compounds, searchCompounds } from "@/lib/catalog";
+import { compounds, productPath, searchCompounds } from "@/lib/catalog";
 import { shopSections, sectionFor } from "@/data/shop-sections";
 import { shopSeo } from "@/data/category-content";
 import { abs, site } from "@/data/site";
-import { clampDescription, ogImageFor } from "@/lib/seo";
+import { breadcrumbListJsonLd, clampDescription, ogImageFor } from "@/lib/seo";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { capture } from "@/lib/analytics";
 
@@ -45,6 +45,40 @@ export const Route = createFileRoute("/shop")({
         { rel: "canonical", href: abs("/shop") },
         { rel: "alternate", hrefLang: "en-GB", href: abs("/shop") },
         { rel: "alternate", hrefLang: "x-default", href: abs("/shop") },
+      ],
+      // The catalogue page had no structured data at all. A BreadcrumbList gives the SERP a
+      // trail back to the homepage and a CollectionPage+ItemList describes the list that renders
+      // by default (every compound; search and ?cat= narrow it client-side).
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            breadcrumbListJsonLd([{ name: "Home", path: "/" }, { name: "Shop", path: "/shop" }]),
+          ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": abs("/shop") + "#collection",
+            url: abs("/shop"),
+            name: title,
+            description: desc,
+            inLanguage: "en-GB",
+            isPartOf: { "@id": abs("/") + "#website" },
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: compounds.length,
+              itemListElement: compounds.map((c, i) => ({
+                "@type": "ListItem",
+                position: i + 1,
+                name: c.name,
+                url: abs(productPath(c.slug)),
+              })),
+            },
+          }),
+        },
       ],
     };
   },

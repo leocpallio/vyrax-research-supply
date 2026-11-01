@@ -12,7 +12,8 @@ import { faqJsonLd, type QA } from "../data/faq";
 import { sectionFor } from "../data/shop-sections";
 import { purityStat } from "./pdp-coa";
 import { claimGate } from "./claims";
-import { DESC_TAIL } from "./seo";
+import { deliveryTimeJsonLd } from "./delivery";
+import { DESC_TAIL, ORG_ID, merchantReturnPolicyJsonLd } from "./seo";
 
 /** Listing a product belongs to for breadcrumbs: its shop section when it has one, else its category. */
 export function listingFor(c: Compound) {
@@ -180,7 +181,8 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
               stockOf(s) === "out" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
             itemCondition: "https://schema.org/NewCondition",
             priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
-            seller: { "@type": "Organization", name: site.name },
+            // Same node as the sitewide organization (__root), not a second anonymous Organization.
+            seller: { "@id": ORG_ID },
             shippingDetails: {
               "@type": "OfferShippingDetails",
               shippingRate: {
@@ -192,16 +194,10 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
                 currency: "GBP",
               },
               shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
+              // Same window the buy box and /shipping state, from one constant in lib/delivery.
+              deliveryTime: deliveryTimeJsonLd(),
             },
-            hasMerchantReturnPolicy: {
-              "@type": "MerchantReturnPolicy",
-              applicableCountry: "GB",
-              returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-              merchantReturnDays: site.returnWindowDays,
-              returnMethod: "https://schema.org/ReturnByMail",
-              returnFees: "https://schema.org/FreeReturn",
-              merchantReturnLink: abs("/returns"),
-            },
+            hasMerchantReturnPolicy: merchantReturnPolicyJsonLd(),
           },
         }
       : {}),
