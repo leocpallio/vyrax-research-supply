@@ -109,7 +109,7 @@ export function BoughtTogether({ lines, onAddAll }: { lines: BundleLine[]; onAdd
             <li key={`${l.c.slug}-${l.s.label}`} className="flex items-center gap-3 py-2">
               <img
                 src={img.small ?? img.src}
-                alt=""
+                alt={`${l.c.name} ${l.s.label}`}
                 width={48}
                 height={48}
                 loading="lazy"

@@ -73,7 +73,7 @@ export function ProductGallery({
           >
             <img
               src={image.src}
-              alt=""
+              alt={`${name} vial, thumbnail`}
               width={64}
               height={64}
               className="h-full w-full object-contain"

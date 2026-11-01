@@ -54,7 +54,7 @@ export function PairsWith({ product, onAdd }: { product: Compound; onAdd: () => 
         <Link to={productPath(product.slug)} className="shrink-0">
           <img
             src={img.small ?? img.src}
-            alt=""
+            alt={`${product.name} ${s.label}`}
             width={56}
             height={56}
             loading="lazy"
