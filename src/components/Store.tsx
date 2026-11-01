@@ -253,11 +253,17 @@ export function Disclaimer() {
 }
 
 export const faqItems: QA[] = coreFaqs;
-export function FAQ({ items = coreFaqs }: { items?: QA[] | string[][] }) {
+export function FAQ({
+  items = coreFaqs,
+  defaultOpen = false,
+}: {
+  items?: QA[] | string[][];
+  defaultOpen?: boolean;
+}) {
   return (
     <div className="divide-y divide-border border-t border-b border-border">
       {items.map(([q, a]) => (
-        <details key={q} className="group py-5">
+        <details key={q} className="group py-5" open={defaultOpen}>
           <summary className="font-heading font-semibold cursor-pointer list-none flex justify-between gap-4">
             {q}
             <span className="text-primary group-open:rotate-45 transition-transform">+</span>

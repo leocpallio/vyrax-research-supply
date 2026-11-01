@@ -48,8 +48,9 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
           Frequently asked questions
         </h2>
         {/* Native <details> so both the question and the answer are in the server-rendered HTML and
-            the FAQPage JSON-LD above describes text that is actually on the page. */}
-        <FAQ items={content.faqs} />
+            the FAQPage JSON-LD above describes text that is actually on the page. Open by default:
+            hub copy should not be hidden from a buyer or from a crawler that does not run JS. */}
+        <FAQ items={content.faqs} defaultOpen />
       </div>
     </section>
   );

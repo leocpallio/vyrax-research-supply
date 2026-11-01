@@ -432,7 +432,7 @@ function ProductPage() {
               <TestingReportCard coa={coa} productName={heading} identity={c.name} />
             </Disclosure>
 
-            <Disclosure title="Common questions">
+            <Disclosure title="Common questions" defaultOpen>
               <dl className="divide-y divide-border">
                 {faqs.map(([q, a]) => (
                   <div key={q} className="py-4">
