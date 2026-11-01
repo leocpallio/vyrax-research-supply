@@ -8,7 +8,7 @@ import { dispatchCutoffLabel } from "@/lib/delivery";
 function Col({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-4">
+      <h2 className="t-label text-ink-muted mb-4">
         {title}
       </h2>
       <ul className="space-y-2.5">{children}</ul>

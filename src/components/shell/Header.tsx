@@ -130,7 +130,7 @@ function Dropdown({
           </div>
           {group.sections && (
             <div className="border-l border-line pl-2">
-              <p className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              <p className="px-3 pt-2 pb-1 t-label text-muted-foreground">
                 Research stacks
               </p>
               {shopSections.map((s) => (
@@ -178,7 +178,7 @@ function MobileMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
           <nav className="flex-1 overflow-y-auto px-4 py-4">
             {NAV.map((g) => (
               <div key={g.testid} className="mb-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1">
+                <p className="t-label text-muted-foreground mb-1">
                   {g.label}
                 </p>
                 {g.links.map((l) => (
@@ -210,7 +210,7 @@ function MobileMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (v: b
               </div>
             ))}
             <div className="mb-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground mb-1">
+              <p className="t-label text-muted-foreground mb-1">
                 Company
               </p>
               {(
@@ -296,7 +296,7 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
           >
             <Search size={20} className="lg:size-4" />
             <span className="hidden lg:inline flex-1 text-left">Search peptides</span>
-            <kbd className="hidden lg:inline font-mono text-[10px] border border-line rounded px-1 py-0.5">
+            <kbd className="hidden lg:inline font-mono t-micro border border-line rounded px-1 py-0.5">
               Ctrl K
             </kbd>
           </button>
@@ -319,7 +319,7 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
             {count > 0 && (
               <span
                 data-testid="cart-badge"
-                className="absolute right-0.5 top-0.5 bg-warm text-warm-foreground rounded-full text-[10px] font-bold min-w-[18px] h-[18px] px-1 grid place-items-center tabular"
+                className="absolute right-0.5 top-0.5 bg-warm text-warm-foreground rounded-full text-badge font-bold min-w-[18px] h-[18px] px-1 grid place-items-center tabular"
               >
                 {count}
               </span>

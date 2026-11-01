@@ -215,7 +215,7 @@ function wrap(c: Content): RenderedEmail {
       : "";
 
   const addressHtml = address
-    ? `<div class="tx" style="border-left:2px solid #5B8DEF;padding:1px 0 1px 14px;margin:0 0 26px;color:#14213D;font-size:15px"><span class="mute" style="display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6B7688;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#4A5568;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
+    ? `<div class="tx" style="border-left:2px solid #5B8DEF;padding:1px 0 1px 14px;margin:0 0 26px;color:#14213D;font-size:15px"><span class="mute" style="display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6B7688;margin-bottom:5px">Delivery address</span>${e(oneLine(c.address ?? ""))}<br><span class="mute" style="color:#4A5568;font-size:13px">Cannot be changed after dispatch. If it is wrong, ${link("contact us before dispatch", CONTACT_URL)}.</span></div>`
     : "";
   const unsubscribe = c.unsubscribeUrl
     ? c.unsubscribeUrl === `mailto:${SUPPORT_EMAIL}`

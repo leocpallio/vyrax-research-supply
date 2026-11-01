@@ -219,7 +219,42 @@
   --radius-pill: 999px;
   --radius-large: 20px;
   --radius-base: 16px;
+
+  /* ---- Microtype scale ---------------------------------------------------
+   * Measured standard (learned-microtype.md): nothing below 11px, integer
+   * sizes only, integer-only small sizes are 12 (micro) and 11 (label/badge).
+   * Use the t-micro / t-label / t-badge utilities below rather than
+   * hand-rolled text-[10px] + font-* + tracking-[...] combinations. */
+  --text-micro: 0.75rem; /* 12px */
+  --text-micro--line-height: 1rem; /* 16px */
+  --text-label: 0.6875rem; /* 11px */
+  --text-label--line-height: 0.875rem; /* 14px */
+  --text-badge: 0.6875rem; /* 11px */
+  --text-badge--line-height: 0.875rem; /* 14px */
 }
+
+/* Microtype utilities. One tracking band per role: 0 sentence case,
+ * 0.08em uppercase labels, 0.04em badges. Ceiling 0.08em. */
+@utility t-micro {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+@utility t-label {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@utility t-badge {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -237,13 +272,18 @@ body {
   background: var(--paper);
   color: var(--foreground);
 }
-h1,
-h2,
-h3,
-h4 {
-  font-family: "Satoshi", system-ui, sans-serif;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
+/* Inside @layer base so heading tracking is a default that tracking-[...]
+ * utilities can override. Unlayered, this beat every utility and forced
+ * -0.015em onto 11px uppercase labels (e.g. footer column headings). */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Satoshi", system-ui, sans-serif;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
 }
 .tabular,
 .price {
@@ -274,10 +314,12 @@ h4 {
 }
 .eyebrow {
   color: var(--warm);
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
+  font-weight: 600;
   margin-bottom: 1rem;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .page-title {
   font-family: "Satoshi", system-ui, sans-serif;
@@ -519,8 +561,8 @@ textarea:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .offer-veil, .offer-panel { animation: none; }
 }
-.pill-dark{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;background:#040825;color:#faf6ef;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
-.pill-light{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;border:1px solid rgba(4,8,37,.25);color:#040825;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.pill-dark{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;background:#040825;color:#faf6ef;font-size:11px;line-height:14px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.pill-light{display:flex;height:3rem;width:100%;align-items:center;justify-content:center;border-radius:9999px;border:1px solid rgba(4,8,37,.25);color:#040825;font-size:11px;line-height:14px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .offer-panel{background-image:linear-gradient(rgba(4,8,37,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(4,8,37,.05) 1px,transparent 1px);background-size:44px 44px;background-position:center top}
 @keyframes tier-pop{0%{opacity:0;transform:translateY(10px) scale(.96)}100%{opacity:1;transform:none}}
 .reward-in{animation:tier-pop .34s cubic-bezier(.2,.8,.2,1) both}

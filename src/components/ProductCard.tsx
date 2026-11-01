@@ -103,7 +103,7 @@ export function ProductCard({
           data-testid="card-stock-pill"
           data-stock={stock}
           title={stockLabel[stock]}
-          className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${
+          className={`absolute top-3 left-3 rounded-full px-2.5 py-1 t-badge ${
             pill.warm ? "bg-[#AC4821] text-[#F5F0E5]" : "bg-white/95 text-[#040825]"
           }`}
         >
@@ -129,7 +129,7 @@ export function ProductCard({
                 sideOffset={8}
                 className="w-56 rounded-2xl border-[#040825]/10 bg-white p-1.5 shadow-xl"
               >
-                <p className="px-3 pt-1.5 pb-1 text-[11px] uppercase tracking-wider text-[#040825]/60">
+                <p className="px-3 pt-1.5 pb-1 t-label text-[#040825]/60">
                   Choose amount
                 </p>
                 <ul>
@@ -194,7 +194,7 @@ export function ProductCard({
             <a
               href={`${href}#lab-report`}
               data-testid="card-coa-link"
-              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
+              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 t-badge uppercase text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
             >
               COA
             </a>
@@ -208,7 +208,7 @@ export function ProductCard({
           {bestPct && (
             <span
               data-testid="card-ladder-save"
-              className="shrink-0 whitespace-nowrap rounded-full bg-[#AC4821]/10 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[#AC4821] md:text-[11px]"
+              className="shrink-0 whitespace-nowrap rounded-full bg-[#AC4821]/10 px-2 py-0.5 t-badge tabular-nums text-[#AC4821]"
             >
               Save up to {bestPct}%
             </span>
