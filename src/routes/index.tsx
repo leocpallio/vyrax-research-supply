@@ -25,26 +25,9 @@ export const Route = createFileRoute("/")({
     const desc = clampDescription(
       `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
     );
-    const org = {
-      "@context": "https://schema.org",
-      "@type": "OnlineStore",
-      name: site.name,
-      url: site.url,
-      logo: abs("/logo-512.png"),
-      ...(site.email ? { email: site.email } : {}),
-      ...(site.phone ? { telephone: site.phone } : {}),
-    };
-    const webSite = {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: site.name,
-      url: site.url,
-      potentialAction: {
-        "@type": "SearchAction",
-        target: { "@type": "EntryPoint", urlTemplate: `${site.url}/shop?q={search_term_string}` },
-        "query-input": "required name=search_term_string",
-      },
-    };
+    // Organization and WebSite are emitted once, in __root. Emitting them here as well put two
+    // Organization and two WebSite nodes on the home page, which is what a validator flags first.
+    const faq = faqJsonLd(coreFaqs);
     return {
       meta: [
         { title },
@@ -64,11 +47,7 @@ export const Route = createFileRoute("/")({
         { rel: "alternate", hrefLang: "en-GB", href: abs("/") },
         { rel: "alternate", hrefLang: "x-default", href: abs("/") },
       ],
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(org) },
-        { type: "application/ld+json", children: JSON.stringify(webSite) },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(coreFaqs)) },
-      ],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(faq) }],
     };
   },
   component: Home,

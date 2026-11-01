@@ -226,7 +226,13 @@ export function organizationJsonLd(): Record<string, unknown> {
     email: site.email,
     areaServed: "GB",
     availableLanguage: "en-GB",
-    hoursAvailable: site.supportHours,
+    // schema.org wants an OpeningHoursSpecification here, not the sentence the page prints.
+    hoursAvailable: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: site.supportHoursSpec.days.map((d) => `https://schema.org/${d}`),
+      opens: site.supportHoursSpec.opens,
+      closes: site.supportHoursSpec.closes,
+    },
   };
   if (site.phone) contactPoint["telephone"] = site.phone;
   return {
@@ -285,15 +291,6 @@ export function webSiteJsonLd(): Record<string, unknown> {
 /** /contact as a ContactPage whose mainEntity is the organization node, with the same email, phone
  *  and hours the page prints. Nothing here is stated that the page does not show. */
 export function contactPageJsonLd(): Record<string, unknown> {
-  const contactPoint: Record<string, unknown> = {
-    "@type": "ContactPoint",
-    contactType: "customer support",
-    email: site.email,
-    areaServed: "GB",
-    availableLanguage: "en-GB",
-    hoursAvailable: site.supportHours,
-  };
-  if (site.phone) contactPoint["telephone"] = site.phone;
   return {
     "@context": CONTEXT,
     "@type": "ContactPage",
@@ -310,7 +307,6 @@ export function contactPageJsonLd(): Record<string, unknown> {
       url: SITE_URL + "/",
       email: site.email,
       ...(site.phone ? { telephone: site.phone } : {}),
-      contactPoint,
     },
   };
 }

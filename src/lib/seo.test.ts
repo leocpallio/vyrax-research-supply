@@ -128,9 +128,19 @@ describe("json-ld builders", () => {
     const entity = c["mainEntity"] as Record<string, unknown>;
     expect(entity["email"]).toBe(site.email);
     expect(entity["telephone"]).toBe(site.phone);
-    expect((entity["contactPoint"] as Record<string, unknown>)["hoursAvailable"]).toBe(
-      site.supportHours,
-    );
+    const orgPoint = organizationJsonLd()["contactPoint"] as Record<string, unknown>;
+    expect(orgPoint["hoursAvailable"]).toEqual({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "https://schema.org/Monday",
+        "https://schema.org/Tuesday",
+        "https://schema.org/Wednesday",
+        "https://schema.org/Thursday",
+        "https://schema.org/Friday",
+      ],
+      opens: "09:00",
+      closes: "17:00",
+    });
   });
   test("website has SearchAction", () => {
     const w = webSiteJsonLd();

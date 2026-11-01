@@ -27,6 +27,13 @@ export const site = {
   phone: "+44 7575 894339" as string | null,
   whatsapp: "447575894339" as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
+  // The same hours, structured, for ContactPoint.hoursAvailable (schema wants a spec, not a
+  // sentence). Derived from the sentence above, nothing added: Mon-Fri, 09:00-17:00 UK time.
+  supportHoursSpec: {
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "09:00",
+    closes: "17:00",
+  },
   // Fulfilment
   dispatchCutoffHour: 14, // paid orders confirmed before 2pm UK time on working days, subject to stock
   coldChainPacked: true, // operator-confirmed packing practice; transit temperature is not monitored
