@@ -6,6 +6,7 @@ import { guides } from "../data/guides";
 import { shopSections } from "../data/shop-sections";
 import { SITE_URL, site, spendTierLine } from "../data/site";
 import { coas } from "../data/coa";
+import { chem } from "../data/research";
 import { dispatchCutoffLabel } from "./delivery";
 import { CONTENT_UPDATED, TRUST_PAGES } from "./seo";
 
@@ -19,7 +20,7 @@ export function buildLlmsTxt(): string {
   lines.push(`# ${site.name}`, "");
   lines.push(`> ${site.tagline}. ${RUO}`, "");
   lines.push(
-    `${site.name} is a UK online store for peptides, peptide blends and lab supplies. Prices are in GBP and include UK delivery over £${site.freeDeliveryThreshold}. ${dispatchPromise()} Published certificates of analysis, where available, are listed at ${url("/lab-reports")} and each batch can be checked at ${url("/verify/<batch>")}. Content last updated ${CONTENT_UPDATED}.`,
+    `${site.name} is a UK online store for peptides, peptide blends and lab supplies. Prices are in GBP and include UK delivery over £${site.freeDeliveryThreshold}. ${dispatchPromise()} Published certificates of analysis, where available, are listed at ${url("/lab-reports")} and each batch can be checked at ${url("/verify/<batch>")}. The catalogue and the full price list are also available in one file at ${url("/llms-full.txt")}. Content last updated ${CONTENT_UPDATED}.`,
     "",
   );
   lines.push("## Catalogue", "");
@@ -33,10 +34,15 @@ export function buildLlmsTxt(): string {
     lines.push(`- [${s.name}](${url(`/collections/${s.slug}`)}): ${s.products.length} products.`);
   lines.push("");
   lines.push("## Products", "");
-  for (const c of compounds.filter(sellable))
+  for (const c of compounds.filter(sellable)) {
+    const ch = chem[c.slug];
+    const ids = [ch?.cas ? `CAS ${ch.cas}` : null, ch?.formula ? `formula ${ch.formula}` : null]
+      .filter(Boolean)
+      .join(", ");
     lines.push(
-      `- [${c.name}](${url(productPath(c.slug))}): ${c.summary} Strengths: ${c.strengths.map((s) => s.label).join(", ")}. From ${gbp(fromPrice(c))}.`,
+      `- [${c.name}](${url(productPath(c.slug))}): ${c.summary} Strengths: ${c.strengths.map((s) => s.label).join(", ")}. From ${gbp(fromPrice(c))}.${ids ? ` ${ids}.` : ""}`,
     );
+  }
   lines.push("");
   lines.push("## Guides", "");
   for (const g of guides)
@@ -60,6 +66,29 @@ export function buildLlmsTxt(): string {
     "/cookies": "Cookie policy",
   };
   for (const [p] of TRUST_PAGES) lines.push(`- [${names[p] ?? p}](${url(p)})`);
+  lines.push("");
+  lines.push("## Batch documentation", "");
+  lines.push(
+    `Certificates of analysis are published for specific batches, and ${coas.length} are listed at present. A certificate names one batch, so it describes that vial and not another batch of the same compound. Unlisted batches have no published certificate.`,
+  );
+  lines.push("");
+  for (const c of coas) {
+    const p = compounds.find((x) => x.slug === c.compound);
+    lines.push(
+      `- [${p ? p.name : c.compound} ${c.strength}, batch ${c.batch}](${url(c.file)}): purity ${c.purity}% by ${c.method} from ${c.lab}, tested ${c.tested}${c.measuredMg ? `, ${c.measuredMg}mg measured` : ""}.${c.verifyUrl ? ` Laboratory verification: ${c.verifyUrl}` : ""}`,
+    );
+  }
+  lines.push(`- Batch lookup for a vial label: ${url("/verify/<batch>")}`);
+  lines.push(`- Full register with dates and methods: ${url("/lab-reports")}`);
+  lines.push("");
+  lines.push("## Research use", "");
+  lines.push(`- ${RUO}`);
+  lines.push(
+    `- Products are not licensed medicines, carry no dose on the label, and no dosing or administration advice is given.`,
+  );
+  lines.push(
+    `- Conditions of sale, including buyer age and handling: ${url("/research-use-policy")}`,
+  );
   lines.push("");
   lines.push("## Facts", "");
   lines.push(

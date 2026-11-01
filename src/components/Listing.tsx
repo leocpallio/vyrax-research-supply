@@ -5,6 +5,58 @@ import { CategoryPills, type Pill, type SortKey } from "@/components/CategoryPil
 import { Link } from "@tanstack/react-router";
 import { featuredSlugs, fromPrice, productPath, type Compound } from "@/lib/catalog";
 import type { CategoryContent } from "@/data/category-content";
+import { guideBySlug } from "@/data/guides";
+
+// Copy in src/data/category-content.ts may carry internal links written as [label](/path).
+// Only root-relative paths render as links, so a typo in the data cannot emit an external href.
+const INLINE_LINK = /\[([^\]]+)\]\((\/[^)\s]+)\)/g;
+
+function RichText({ text }: { text: string }) {
+  const parts: React.ReactNode[] = [];
+  let cursor = 0;
+  for (const match of text.matchAll(INLINE_LINK)) {
+    const at = match.index ?? 0;
+    if (at > cursor) parts.push(text.slice(cursor, at));
+    parts.push(
+      <a
+        key={`${at}-${match[2]}`}
+        href={match[2]}
+        className="text-primary underline underline-offset-2 decoration-1 hover:decoration-2"
+      >
+        {match[1]}
+      </a>,
+    );
+    cursor = at + match[0].length;
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return <>{parts}</>;
+}
+
+/** Related reading under the hub copy: real guide links, each with its reading time. */
+function RelatedGuides({ slugs }: { slugs: string[] }) {
+  const list = slugs.map((slug) => guideBySlug(slug)).filter((g) => g !== undefined);
+  if (!list.length) return null;
+  return (
+    <nav aria-label="Related guides" className="mt-10 border-t border-border pt-8">
+      <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight">
+        Related guides
+      </h2>
+      <ul className="mt-4 space-y-2 text-[15px] leading-relaxed">
+        {list.map((g) => (
+          <li key={g.slug}>
+            <a
+              href={`/guides/${g.slug}`}
+              className="text-primary underline underline-offset-2 decoration-1 hover:decoration-2"
+            >
+              {g.title}
+            </a>
+            <span className="text-[#040825]/60 text-sm"> {g.readMins} min read</span>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
 export function sortCompounds(list: Compound[], sort: SortKey): Compound[] {
   const out = [...list];
@@ -37,11 +89,14 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
             </h2>
             <div className="mt-3 space-y-3 text-[15px] leading-relaxed text-[#040825]/75">
               {b.paragraphs.map((p) => (
-                <p key={p.slice(0, 48)}>{p}</p>
+                <p key={p.slice(0, 48)}>
+                  <RichText text={p} />
+                </p>
               ))}
             </div>
           </div>
         ))}
+        {content.relatedGuides?.length ? <RelatedGuides slugs={content.relatedGuides} /> : null}
       </div>
       <div>
         <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight mb-4">

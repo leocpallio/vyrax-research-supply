@@ -30,7 +30,7 @@ export const guides: Guide[] = [
       "How to reconstitute a lyophilised peptide vial with bacteriostatic water: step by step, with the concentration maths worked through.",
     updated: "2026-09-28",
     readMins: 6,
-    compounds: ["bacteriostatic-water", "bpc-157", "retatrutide"],
+    compounds: ["bacteriostatic-water", "bpc-157", "retatrutide", "ghk-cu"],
     body: [
       {
         type: "p",
