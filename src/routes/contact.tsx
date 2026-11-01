@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Mail, Clock, FileCheck2, MessageCircle, Phone } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { pageHead } from "@/components/InfoPage";
-import { titles } from "@/lib/seo";
+import { contactPageJsonLd, titles } from "@/lib/seo";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/contact")({
       "/contact",
       titles.info("Contact Us"),
       "Contact Vyrax Labs by email or phone about peptide orders, UK delivery, returns and batch documentation.",
-      { crumb: "Contact" },
+      { crumb: "Contact", jsonLd: contactPageJsonLd() },
     ),
   component: Contact,
 });

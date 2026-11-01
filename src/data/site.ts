@@ -20,6 +20,10 @@ export const site = {
   // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
   returnsAddress: null as string | null,
   email: "support@vyraxlabs.co.uk",
+  // Verified, owned profile URLs only (Organization.sameAs). Leave empty rather than guess: a
+  // sameAs pointing at an account we do not control is a false entity statement. Add an entry the
+  // day the profile exists and its bio names Vyrax Labs.
+  sameAs: [] as string[],
   phone: "+44 7575 894339" as string | null,
   whatsapp: "447575894339" as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
@@ -29,6 +33,15 @@ export const site = {
   minOrderValue: 20,
   freeDeliveryThreshold: 50,
   standardDeliveryFee: 4.99,
+  // Carrier-published transit aim for the one UK service sold. An aim, not a guarantee: the copy
+  // that renders it says so, and the schema emits the same window the page shows. Source read
+  // 1 Nov 2026: https://www.royalmail.com/sending/uk/tracked-24 ("Next working day delivery aim").
+  carrierTransitAim: {
+    publishedAim: "next working day",
+    minDays: 1,
+    maxDays: 2,
+    source: "https://www.royalmail.com/sending/uk/tracked-24",
+  },
   carrier: "Royal Mail Tracked 24",
   // Payments: list only methods that are actually live at checkout.
   // Card payment uses a hosted provider page, and only while checkout is switched on.

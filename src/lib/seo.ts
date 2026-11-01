@@ -205,6 +205,19 @@ const CONTEXT = "https://schema.org";
 export const ORG_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
 
+/** The returns terms in one place: the organization node and every Product offer use this. */
+export function merchantReturnPolicyJsonLd(): Record<string, unknown> {
+  return {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "GB",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: site.returnWindowDays,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/FreeReturn",
+    merchantReturnLink: abs("/returns"),
+  };
+}
+
 export function organizationJsonLd(): Record<string, unknown> {
   // Intentionally NO legalName, company number, VAT number, address or person.
   const contactPoint: Record<string, unknown> = {
@@ -231,6 +244,13 @@ export function organizationJsonLd(): Record<string, unknown> {
     areaServed: { "@type": "Country", name: "United Kingdom" },
     currenciesAccepted: "GBP",
     priceRange: "££",
+    // Only methods that are live at checkout are listed (site.paymentMethods is empty while it is off).
+    ...(site.paymentMethods.length
+      ? { paymentAccepted: site.paymentMethods.join(", ") }
+      : {}),
+    // Only verified, owned profiles. Empty array emits nothing rather than a guessed account.
+    ...(site.sameAs.length ? { sameAs: [...site.sameAs] } : {}),
+    hasMerchantReturnPolicy: merchantReturnPolicyJsonLd(),
     knowsAbout: [
       "peptides",
       "buying peptides in the UK",
@@ -258,6 +278,39 @@ export function webSiteJsonLd(): Record<string, unknown> {
         urlTemplate: `${SITE_URL}/shop?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+/** /contact as a ContactPage whose mainEntity is the organization node, with the same email, phone
+ *  and hours the page prints. Nothing here is stated that the page does not show. */
+export function contactPageJsonLd(): Record<string, unknown> {
+  const contactPoint: Record<string, unknown> = {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: site.email,
+    areaServed: "GB",
+    availableLanguage: "en-GB",
+    hoursAvailable: site.supportHours,
+  };
+  if (site.phone) contactPoint["telephone"] = site.phone;
+  return {
+    "@context": CONTEXT,
+    "@type": "ContactPage",
+    "@id": `${abs("/contact")}#contactpage`,
+    url: abs("/contact"),
+    name: `Contact ${SITE_NAME}`,
+    inLanguage: "en-GB",
+    isPartOf: { "@id": WEBSITE_ID },
+    about: { "@id": ORG_ID },
+    mainEntity: {
+      "@type": ["Organization", "OnlineStore"],
+      "@id": ORG_ID,
+      name: SITE_NAME,
+      url: SITE_URL + "/",
+      email: site.email,
+      ...(site.phone ? { telephone: site.phone } : {}),
+      contactPoint,
     },
   };
 }

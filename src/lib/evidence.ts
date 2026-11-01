@@ -38,6 +38,7 @@ export type EvidenceKey =
   | "supportHours"
   | "paymentMethodsLive"
   | "couriers"
+  | "carrierTransitAim"
   | "dispatchCutoffHour"
   | "coldChainPacked"
   | "freeShippingThreshold"
@@ -61,6 +62,8 @@ export type EvidenceValue = {
   supportHours: string;
   paymentMethodsLive: readonly string[];
   couriers: readonly string[];
+  /** Carrier-published transit aim, phrased for copy, e.g. "1-2 working days". */
+  carrierTransitAim: string;
   dispatchCutoffHour: number;
   coldChainPacked: boolean;
   freeShippingThreshold: number;
@@ -139,6 +142,11 @@ export const evidence: EvidenceManifest = {
   couriers: site.carrier
     ? known([site.carrier])
     : unknown("No courier is configured, so no carrier may be named"),
+  carrierTransitAim: site.carrierTransitAim
+    ? known(
+        `${site.carrierTransitAim.minDays}-${site.carrierTransitAim.maxDays} working days`,
+      )
+    : unknown("No carrier transit aim is recorded, so no delivery window may be stated"),
   dispatchCutoffHour: known(site.dispatchCutoffHour),
   coldChainPacked: known(site.coldChainPacked),
   freeShippingThreshold: known(site.freeDeliveryThreshold),

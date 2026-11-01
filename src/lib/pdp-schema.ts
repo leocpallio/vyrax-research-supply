@@ -12,7 +12,8 @@ import { faqJsonLd, type QA } from "../data/faq";
 import { sectionFor } from "../data/shop-sections";
 import { purityStat } from "./pdp-coa";
 import { claimGate } from "./claims";
-import { DESC_TAIL } from "./seo";
+import { deliveryTimeJsonLd } from "./delivery";
+import { DESC_TAIL, merchantReturnPolicyJsonLd } from "./seo";
 
 /** Listing a product belongs to for breadcrumbs: its shop section when it has one, else its category. */
 export function listingFor(c: Compound) {
@@ -192,16 +193,10 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
                 currency: "GBP",
               },
               shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
+              // Same window the buy box and /shipping state, from one constant in lib/delivery.
+              deliveryTime: deliveryTimeJsonLd(),
             },
-            hasMerchantReturnPolicy: {
-              "@type": "MerchantReturnPolicy",
-              applicableCountry: "GB",
-              returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-              merchantReturnDays: site.returnWindowDays,
-              returnMethod: "https://schema.org/ReturnByMail",
-              returnFees: "https://schema.org/FreeReturn",
-              merchantReturnLink: abs("/returns"),
-            },
+            hasMerchantReturnPolicy: merchantReturnPolicyJsonLd(),
           },
         }
       : {}),

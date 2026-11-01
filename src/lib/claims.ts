@@ -484,6 +484,17 @@ const DEFS = {
     assertion: false,
     surfaces: ["src/routes/shipping.tsx"],
   },
+  // The one time window the site states, and the same window Product offer schema emits. It is the
+  // carrier's own published aim plus one working day of allowance, so it is an aim, never a promise.
+  "delivery.transit-aim": {
+    text: "{{courier}} aims to deliver by {{aim}}; allow {{window}} from dispatch. This is a carrier aim, not a guarantee.",
+    requires: [
+      { key: "couriers", kind: "nonEmpty" },
+      { key: "carrierTransitAim", kind: "present" },
+    ],
+    assertion: false,
+    surfaces: ["src/routes/shipping.tsx", "src/components/pdp/PortMoves.tsx"],
+  },
   "offer.b2g1": {
     text: "Buy 2 get 1 free",
     requires: [],
