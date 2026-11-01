@@ -41,7 +41,7 @@ function About() {
     [
       ShieldCheck,
       "Batch documentation",
-      "A certificate for every batch, published and searchable by batch number.",
+      "Certificates are published for tested batches and searchable by batch number.",
     ],
   ];
   return (
