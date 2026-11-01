@@ -266,7 +266,7 @@ export function FAQ({
         <details key={q} className="group py-5" open={defaultOpen}>
           <summary className="font-heading font-semibold cursor-pointer list-none flex justify-between gap-4">
             {q}
-            <span className="text-primary group-open:rotate-45 transition-transform">+</span>
+            <span className="text-primary mr-1.5 group-open:rotate-45 transition-transform">+</span>
           </summary>
           <p className="text-muted-foreground leading-relaxed mt-3 max-w-3xl">{a}</p>
         </details>

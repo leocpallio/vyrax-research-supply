@@ -75,7 +75,7 @@ function FaqPage() {
                   <details key={question} id={anchor(question)} className="group py-5 scroll-mt-28">
                     <summary className="font-heading font-semibold cursor-pointer list-none flex justify-between gap-4">
                       {question}
-                      <span className="text-primary group-open:rotate-45 transition-transform">
+                      <span className="text-primary mr-1.5 group-open:rotate-45 transition-transform">
                         +
                       </span>
                     </summary>
