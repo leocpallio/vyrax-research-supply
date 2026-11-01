@@ -29,3 +29,11 @@ print(f"pinned worker: {name}")
 PY
 
 bunx wrangler deploy -c .output/server/wrangler.json
+
+# Tell IndexNow (Bing and the endpoints that share its feed) which URLs changed. Runs after the
+# deploy because it reads the live sitemap, so the list is what is actually published. It never
+# fails the deploy: the site is already live by this point, and a rejected submission is a crawl
+# delay, not an outage. SKIP_INDEXNOW=1 skips it (e.g. a rollback deploy that should not be pushed).
+if [ "${SKIP_INDEXNOW:-0}" != "1" ]; then
+  bun scripts/indexnow.mjs || echo "warning: IndexNow submission failed; deploy is live, resubmit with: bun scripts/indexnow.mjs"
+fi
