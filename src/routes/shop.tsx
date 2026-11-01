@@ -20,7 +20,9 @@ export const Route = createFileRoute("/shop")({
     const titleTag = isClaimAllowed("testing.page-title")
       ? `, ${claimGate("testing.page-title")}`
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss & Recovery | Full Catalogue | Vyrax Labs`;
+    // Held under the 60-character SERP limit at either prefix: the old tail ("Weight Loss &
+    // Recovery | Full Catalogue") pushed this to 70-73 characters and truncated in results.
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Full Peptide Catalogue | Vyrax Labs`;
     const batchCerts = claimText("testing.batch-certificates");
     const desc = clampDescription(
       `Buy peptides in the UK from ${compounds.length} compounds, grouped by what people search for: weight loss, recovery and repair, growth hormone, longevity, tanning and sleep.${batchCerts ? ` ${batchCerts}.` : ""} UK supplied.`,

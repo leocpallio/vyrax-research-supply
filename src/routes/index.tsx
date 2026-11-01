@@ -19,7 +19,8 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery & Growth | Vyrax Labs`;
+    // Held under the 60-character SERP limit at either prefix, so "Browse" and "Buy" both fit.
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery & Growth | Vyrax`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
     const desc = clampDescription(
       `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
