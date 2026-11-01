@@ -1,0 +1,31 @@
+{
+  "generated": "2026-11-01",
+  "files": {
+    "src/routes/index.tsx": "2026-10-30",
+    "src/routes/shop.tsx": "2026-10-30",
+    "src/routes/about.tsx": "2026-10-28",
+    "src/routes/calculator.tsx": "2026-10-28",
+    "src/routes/contact.tsx": "2026-10-28",
+    "src/routes/cookies.tsx": "2026-10-28",
+    "src/routes/faq.tsx": "2026-11-01",
+    "src/routes/lab-reports.tsx": "2026-10-28",
+    "src/routes/privacy.tsx": "2026-10-12",
+    "src/routes/research-use-policy.tsx": "2026-10-28",
+    "src/routes/returns.tsx": "2026-10-28",
+    "src/routes/shipping.tsx": "2026-10-13",
+    "src/routes/terms.tsx": "2026-10-28",
+    "src/routes/guides.index.tsx": "2026-10-28",
+    "src/routes/guides.$slug.tsx": "2026-10-28",
+    "src/routes/category.$slug.tsx": "2026-10-28",
+    "src/routes/collections.$slug.tsx": "2026-11-01",
+    "src/routes/product.$slug.tsx": "2026-11-01",
+    "src/data/categories.ts": "2026-10-29",
+    "src/data/category-content.ts": "2026-10-29",
+    "src/data/shop-sections.ts": "2026-10-29",
+    "src/data/compounds-a.ts": "2026-10-30",
+    "src/data/compounds-b.ts": "2026-10-30",
+    "src/data/coa.ts": "2026-10-28",
+    "src/lib/catalog.ts": "2026-10-06",
+    "src/lib/pdp-schema.ts": "2026-10-29"
+  }
+}
