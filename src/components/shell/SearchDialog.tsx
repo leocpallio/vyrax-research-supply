@@ -34,17 +34,6 @@ export function SearchDialog({
       setActive(0);
     }
   }, [open]);
-  // Cmd/Ctrl+K opens search from anywhere.
-  useEffect(() => {
-    const on = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        onOpenChange(true);
-      }
-    };
-    window.addEventListener("keydown", on);
-    return () => window.removeEventListener("keydown", on);
-  }, [onOpenChange]);
   const report = () => {
     if (typed) capture("search", { source: "header", result_count: matches.length });
   };
