@@ -11,16 +11,16 @@ function b2g1Price(): number {
   return c?.strengths.find((s) => s.label === "10mg")?.price ?? 29.99;
 }
 
-export function OfferPopup() {
+export function OfferPopup({ delay = 12000 }: { delay?: number }) {
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.localStorage.getItem(SEEN)) return;
-    const t = window.setTimeout(() => setOpen(true), 12000);
+    const t = window.setTimeout(() => setOpen(true), delay);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [delay]);
 
   useEffect(() => {
     if (!open) return;

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -27,14 +27,21 @@ import { claimFilled, claimText } from "@/lib/claims";
 import { AnnouncementBar } from "@/components/shell/AnnouncementBar";
 import { Header } from "@/components/shell/Header";
 import { WhatsAppButton } from "@/components/shell/WhatsAppButton";
-import { OfferPopup } from "@/components/shell/OfferPopup";
 import { Footer } from "@/components/shell/Footer";
 import { FooterSignup } from "@/components/shell/FooterSignup";
-import { SearchDialog } from "@/components/shell/SearchDialog";
-import { CartDrawer } from "@/components/shell/CartDrawer";
 import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/shell/cart-store";
 
 export { openCartDrawer };
+
+const SearchDialog = lazy(() =>
+  import("@/components/shell/SearchDialog").then((m) => ({ default: m.SearchDialog })),
+);
+const CartDrawer = lazy(() =>
+  import("@/components/shell/CartDrawer").then((m) => ({ default: m.CartDrawer })),
+);
+const OfferPopup = lazy(() =>
+  import("@/components/shell/OfferPopup").then((m) => ({ default: m.OfferPopup })),
+);
 
 // ---------------------------------------------------------------- Added-to-basket toast
 function AddedToast() {
@@ -84,10 +91,27 @@ function AddedToast() {
 export function StoreShell({ children }: { children: React.ReactNode }) {
   const [search, setSearch] = useState(false);
   const [cart, setCart] = useState(false);
+  const [offerReady, setOfferReady] = useState(false);
   useEffect(() => {
     const open = () => setCart(true);
     window.addEventListener(CART_OPEN_EVENT, open);
     return () => window.removeEventListener(CART_OPEN_EVENT, open);
+  }, []);
+  useEffect(() => {
+    const onShortcut = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearch(true);
+      }
+    };
+    window.addEventListener("keydown", onShortcut);
+    return () => window.removeEventListener("keydown", onShortcut);
+  }, []);
+  useEffect(() => {
+    // The offer cannot appear until its own timer expires. Keep its UI off the
+    // first-load network path without delaying visible shell or commerce actions.
+    const timer = window.setTimeout(() => setOfferReady(true), 10000);
+    return () => window.clearTimeout(timer);
   }, []);
   return (
     <div className="min-h-screen bg-paper text-foreground flex flex-col">
@@ -104,10 +128,10 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       </main>
       <FooterSignup />
       <Footer />
-      <OfferPopup />
+      {offerReady && <OfferPopup delay={2000} />}
       <WhatsAppButton />
-      <SearchDialog open={search} onOpenChange={setSearch} />
-      <CartDrawer open={cart} onOpenChange={setCart} />
+      {search && <SearchDialog open={search} onOpenChange={setSearch} />}
+      {cart && <CartDrawer open={cart} onOpenChange={setCart} />}
       <AddedToast />
     </div>
   );
