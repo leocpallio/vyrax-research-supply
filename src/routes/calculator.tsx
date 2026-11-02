@@ -4,7 +4,8 @@ import { Calculator as CalcIcon, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs, FAQ, SectionTitle } from "@/components/Store";
 import { Input } from "@/components/ui/input";
 import { compounds, getCompound, productPath } from "@/lib/catalog";
-import { dilutionFor, solvents } from "@/data/reconstitution";
+import { dilutionFor, dilutionRecords, solvents } from "@/data/reconstitution";
+import { SyringeTool } from "@/components/SyringeTool";
 import { chem } from "@/data/research";
 import { abs } from "@/data/site";
 import { type QA } from "@/data/faq";
@@ -102,6 +103,15 @@ const molar = (mgPerMl: number, mw: number) => {
   return molPerL >= 1e-3 ? `${fmt(molPerL * 1e3, 3)} mM` : `${fmt(molPerL * 1e6, 2)} µM`;
 };
 
+const syringeOptions = compounds.map((c) => ({
+  slug: c.slug,
+  name: c.name,
+  strengths: c.strengths
+    .filter((s) => s.unit === "mg")
+    .map((s) => ({ label: s.label, amount: s.amount })),
+}));
+const syringeRecords = Object.fromEntries(dilutionRecords.map((r) => [r.slug, r]));
+
 function CalculatorPage() {
   const [mg, setMg] = useState("10");
   const [ml, setMl] = useState("2");
@@ -161,7 +171,17 @@ function CalculatorPage() {
           vial and the volume of diluent you add.
         </p>
 
-        <div className="grid lg:grid-cols-2 gap-8 mt-10">
+        <div className="mt-10">
+          <SyringeTool options={syringeOptions} records={syringeRecords} />
+        </div>
+
+        <div className="mt-16">
+          <SectionTitle
+            title="Stock, molarity and working dilution"
+            body="The stock calculator below adds molar concentration and C1V1 = C2V2 working dilutions."
+          />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-8">
           <div className="border border-border rounded-2xl p-6 md:p-8 space-y-6">
             <label className="block">
               <span className="text-sm font-semibold">Start from a product (optional)</span>

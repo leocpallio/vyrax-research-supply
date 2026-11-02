@@ -165,6 +165,11 @@ export type DilutionRecord = {
   readyToUse?: boolean;
   /** The item is the diluent itself, not something to be diluted. */
   isDiluent?: boolean;
+  /**
+   * Highest stock concentration (mg/ml) the cited guidance supports. Only set where a source gives
+   * one; `verified` is false when that source is unverified supplier guidance.
+   */
+  concentrationCeiling?: { mgPerMl: number; verified: boolean; source: string };
   storageDry: string;
   storageSolution: string;
   stability: StabilityRecord;
@@ -222,6 +227,7 @@ type Override = Partial<
     | "preparationCaveat"
     | "readyToUse"
     | "isDiluent"
+    | "concentrationCeiling"
   >
 > & {
   cautions?: string[];
@@ -421,6 +427,11 @@ const isWaterSolubleNote = (c: Compound) => {
  */
 const EXTRA: Record<string, Partial<Override>> = {
   "cjc-1295-dac": {
+    concentrationCeiling: {
+      mgPerMl: 2,
+      verified: false,
+      source: "Unverified supplier guidance puts the soluble range near 2 mg/ml.",
+    },
     dilutionNote:
       "No primary solubility dataset is published for the DAC form. Supplier guidance puts the soluble range near 2 mg/ml, which is unverified, so start at the lower concentrations in the table and record what actually dissolved before making a more concentrated stock.",
   },
@@ -512,6 +523,7 @@ function buildRecord(c: Compound): DilutionRecord {
     ...(o.preparationCaveat ? { preparationCaveat: o.preparationCaveat } : {}),
     ...(o.readyToUse ? { readyToUse: true } : {}),
     ...(o.isDiluent ? { isDiluent: true } : {}),
+    ...(o.concentrationCeiling ? { concentrationCeiling: o.concentrationCeiling } : {}),
     storageDry: o.isDiluent ? "Store the unopened vial at 2 to 8°C; do not freeze." : STORAGE_DRY,
     storageSolution: o.storageSolution ?? STORAGE_SOLUTION,
     stability,

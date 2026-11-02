@@ -525,3 +525,23 @@ textarea:focus-visible,
 @keyframes tier-pop{0%{opacity:0;transform:translateY(10px) scale(.96)}100%{opacity:1;transform:none}}
 .reward-in{animation:tier-pop .34s cubic-bezier(.2,.8,.2,1) both}
 @media (prefers-reduced-motion:reduce){.reward-in{animation:none}}
+
+/* Syringe tool: vial surface ripple when the stock concentration changes. */
+@keyframes vx-swirl {
+  0% {
+    transform: translateX(0);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateX(-29px);
+    opacity: 0.2;
+  }
+}
+.vx-swirl {
+  animation: vx-swirl 0.9s ease-out 2 alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vx-swirl {
+    animation: none;
+  }
+}
