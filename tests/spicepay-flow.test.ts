@@ -1,7 +1,9 @@
 import { test, expect } from "bun:test";
 import { createCheckout, orderStatus, spicepayWebhook } from "../src/lib/checkout.server";
+import { resetRateLimits } from "../src/lib/rate-limit";
 
 test("checkout stays closed when webhook signing is not configured", async () => {
+  resetRateLimits();
   const previous = {
     enabled: process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"],
     secret: process.env["VYRAX_SPICEPAY_WEBHOOK_SECRET"],
@@ -34,6 +36,7 @@ test("checkout stays closed when webhook signing is not configured", async () =>
 });
 
 test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", async () => {
+  resetRateLimits();
   const originalFetch = globalThis.fetch;
   const vars: Record<string, string> = {
     VYRAX_SPICEPAY_CHECKOUT_ENABLED: "true",
@@ -209,6 +212,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
     );
     expect((await status.json()).status).toBe("paid");
     for (const invalid of ["null", "[]", "{"]) {
+      resetRateLimits();
       const bad = await createCheckout(
         new Request("https://vyraxlabs.co.uk/api/checkout", {
           method: "POST",

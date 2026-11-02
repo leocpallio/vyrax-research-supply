@@ -72,10 +72,17 @@ function FaqPage() {
               <h2 className="font-heading text-2xl font-semibold mb-4">{g.title}</h2>
               <div className="divide-y divide-border border-t border-b border-border">
                 {g.items.map(([question, answer]) => (
-                  <details key={question} id={anchor(question)} className="group py-5 scroll-mt-28">
+                  // Open by default: the answer text is the page's content, and a collapsed panel is
+                  // copy a buyer (and a crawler) has to click for. Readers can still close a panel.
+                  <details
+                    key={question}
+                    id={anchor(question)}
+                    open
+                    className="group py-5 scroll-mt-28"
+                  >
                     <summary className="font-heading font-semibold cursor-pointer list-none flex justify-between gap-4">
                       {question}
-                      <span className="text-primary group-open:rotate-45 transition-transform">
+                      <span className="text-primary mr-1.5 group-open:rotate-45 transition-transform">
                         +
                       </span>
                     </summary>

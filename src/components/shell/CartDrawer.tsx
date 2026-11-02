@@ -229,7 +229,7 @@ export function CartDrawer({
             >
               <ChevronLeft size={22} />
             </DialogPrimitive.Close>
-            <DialogPrimitive.Title className="text-[11px] font-bold uppercase tracking-[0.22em]">
+            <DialogPrimitive.Title className="t-label">
               Your cart
               <span className="sr-only" data-testid="cart-drawer-count">({count})</span>
             </DialogPrimitive.Title>
@@ -242,7 +242,7 @@ export function CartDrawer({
           <div className="flex-1 overflow-y-auto">
             {items.length === 0 ? (
               <div className="px-5 py-12 text-center" data-testid="cart-empty">
-                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#AC4821]">Your basket is ready</p>
+                <p className="t-label text-[#AC4821]">Your basket is ready</p>
                 <p className="mt-2 font-heading text-[1.3rem] font-black leading-tight text-ink">Start with our most-ordered peptides</p>
                 <DialogPrimitive.Close asChild>
                   <Link

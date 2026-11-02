@@ -141,11 +141,13 @@ export function withDescTail(description: string): string {
 
 export const titles = {
   // The testing modifier comes from the claims registry: "Lab-Tested" until certificates exist.
-  home: () => `Buy Peptides UK | Weight Loss, Recovery & Growth | ${SITE_NAME}`,
+  // Both of these are held under the 60-character SERP limit: the brand tail drops to "Vyrax" on the
+  // home title rather than cutting the use-case phrase, which is the part buyers scan.
+  home: () => `Buy Peptides UK | Weight Loss, Recovery & Growth | Vyrax`,
   /** "Lab-Tested" only when claim-gated evidence exists, otherwise empty string. */
   testingModifier: () =>
     isClaimAllowed("testing.page-title") ? claimGate("testing.page-title") : "",
-  shop: () => `Buy Peptides UK | Weight Loss & Recovery | Full Catalogue | ${SITE_NAME}`,
+  shop: () => `Buy Peptides UK | Full Peptide Catalogue | ${SITE_NAME}`,
   product: (name: string, strength?: string) =>
     `Buy ${name}${strength ? ` ${strength}` : ""} UK | ${SITE_NAME}`,
   category: (seoName: string) => `Buy ${seoName} UK | ${SITE_NAME}`,

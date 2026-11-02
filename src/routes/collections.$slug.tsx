@@ -4,9 +4,14 @@ import { sectionPills } from "@/components/CategoryPills";
 import { compounds, productPath, fromPrice, gbp } from "@/lib/catalog";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 import { sectionSeo } from "@/data/category-content";
+import { categories } from "@/data/categories";
 import { faqJsonLd } from "@/data/faq";
 import { abs } from "@/data/site";
 import { clampDescription, ogImageFor } from "@/lib/seo";
+
+// Section names that also exist as a legacy category seoName (see the title comment below).
+const categorySeoNames = new Set(categories.map((c) => c.seoName));
+const sharedSeoName = (name: string) => categorySeoNames.has(name);
 
 export const Route = createFileRoute("/collections/$slug")({
   loader: ({ params }) => {
@@ -20,7 +25,14 @@ export const Route = createFileRoute("/collections/$slug")({
     const list = productsInSection(compounds, section.slug);
     const low = list.length ? Math.min(...list.map(fromPrice)) : 0;
     const content = sectionSeo(section.slug);
-    const title = `${section.seoName} UK | Vyrax Labs`;
+    // A shop section and a legacy research category can share a seoName (e.g. Weight Loss
+    // Peptides), which produced identical <title> tags on four pairs of hub pages. The
+    // product sets genuinely differ, so the pair is not a canonical duplicate: differentiate
+    // the section title instead of folding one URL into the other.
+    const sectionTitle = sharedSeoName(section.seoName)
+      ? `${section.seoName} Range`
+      : section.seoName;
+    const title = `${sectionTitle} UK | Vyrax Labs`;
     // The lede is long enough to eat the whole 155-char budget, so trim it before the price and the
     // tail are appended. Otherwise clampDescription cuts at the lede's full stop and drops both.
     const lede = content.lede.replace(/\.$/, "");

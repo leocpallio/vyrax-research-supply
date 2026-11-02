@@ -90,7 +90,7 @@ export function ProductCard({
             src={img.small ?? img.src}
             srcSet={img.srcSet}
             sizes={SIZES}
-            alt=""
+            alt={`${product.name} ${s.label} ${img.isRender ? "illustrative vial render" : "vial illustration"}`}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : undefined}
             width={640}
@@ -103,7 +103,7 @@ export function ProductCard({
           data-testid="card-stock-pill"
           data-stock={stock}
           title={stockLabel[stock]}
-          className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${
+          className={`absolute top-3 left-3 rounded-full px-2.5 py-1 t-badge ${
             pill.warm ? "bg-[#AC4821] text-[#F5F0E5]" : "bg-white/95 text-[#040825]"
           }`}
         >
@@ -129,7 +129,7 @@ export function ProductCard({
                 sideOffset={8}
                 className="w-56 rounded-2xl border-[#040825]/10 bg-white p-1.5 shadow-xl"
               >
-                <p className="px-3 pt-1.5 pb-1 text-[11px] uppercase tracking-wider text-[#040825]/60">
+                <p className="px-3 pt-1.5 pb-1 t-label text-[#040825]/60">
                   Choose amount
                 </p>
                 <ul>
@@ -173,7 +173,9 @@ export function ProductCard({
         </div>
       </div>
       <div className="pt-3 px-0.5 flex flex-col gap-0.5">
-        <h3 className="font-heading font-bold text-[17px] md:text-[18px] leading-snug tracking-[-0.02em]">
+        {/* h2, not h3: the card name is the top-level item under the page h1, and an h1 -> h3 jump
+            is a heading-level skip on every listing page. */}
+        <h2 className="font-heading font-bold text-[17px] md:text-[18px] leading-snug tracking-[-0.02em]">
           <a
             href={href}
             data-testid="product-title"
@@ -181,7 +183,7 @@ export function ProductCard({
           >
             {product.name}
           </a>
-        </h3>
+        </h2>
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-[#040825]/60">
             {product.kind === "blend" && product.composition?.length
@@ -192,7 +194,7 @@ export function ProductCard({
             <a
               href={`${href}#lab-report`}
               data-testid="card-coa-link"
-              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
+              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 t-badge uppercase text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
             >
               COA
             </a>
@@ -206,7 +208,7 @@ export function ProductCard({
           {bestPct && (
             <span
               data-testid="card-ladder-save"
-              className="shrink-0 whitespace-nowrap rounded-full bg-[#AC4821]/10 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[#AC4821] md:text-[11px]"
+              className="shrink-0 whitespace-nowrap rounded-full bg-[#AC4821]/10 px-2 py-0.5 t-badge tabular-nums text-[#AC4821]"
             >
               Save up to {bestPct}%
             </span>

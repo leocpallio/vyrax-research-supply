@@ -72,8 +72,8 @@ export function RuoGate() {
             </h2>
             <div id="ruo-gate-body" className="text-sm text-muted-foreground mt-3 space-y-3">
               <p>
-                {site.name} sells peptides in sealed vials, with a certificate for every batch. They
-                are not licensed medicines, so the label carries no dose.
+                {site.name} sells peptides in sealed vials. Certificates are published for tested
+                batches. They are not licensed medicines, so the label carries no dose.
               </p>
               <p>You must be 18 or over to order. Everything is sold for research use only.</p>
               <p>
