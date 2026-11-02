@@ -169,42 +169,40 @@ export function productJsonLd(c: Compound, s: Strength, pageSlug: string) {
         ? [{ "@type": "PropertyValue", name: "Purity (HPLC)", value: stat.purityLabel }]
         : []),
     ],
-    ...(site.paymentMethods.length
-      ? {
-          offers: {
-            "@type": "Offer",
-            url,
-            priceCurrency: "GBP",
-            price: s.price.toFixed(2),
-            availability:
-              stockOf(s) === "out" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-            itemCondition: "https://schema.org/NewCondition",
-            priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
-            seller: { "@type": "Organization", name: site.name },
-            shippingDetails: {
-              "@type": "OfferShippingDetails",
-              shippingRate: {
-                "@type": "MonetaryAmount",
-                value:
-                  s.price >= site.freeDeliveryThreshold
-                    ? "0.00"
-                    : site.standardDeliveryFee.toFixed(2),
-                currency: "GBP",
-              },
-              shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
-            },
-            hasMerchantReturnPolicy: {
-              "@type": "MerchantReturnPolicy",
-              applicableCountry: "GB",
-              returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-              merchantReturnDays: site.returnWindowDays,
-              returnMethod: "https://schema.org/ReturnByMail",
-              returnFees: "https://schema.org/FreeReturn",
-              merchantReturnLink: abs("/returns"),
-            },
-          },
-        }
-      : {}),
+    // The price, availability, shipping charge and return policy on this page are true whether or not
+    // the card rail is switched on, so the Offer is emitted on both settings. Gating it on
+    // site.paymentMethods hid the price from every product rich result and from merchant listings
+    // while the PDP itself still showed a price, a stock state and an add-to-basket control.
+    offers: {
+      "@type": "Offer",
+      url,
+      priceCurrency: "GBP",
+      price: s.price.toFixed(2),
+      availability:
+        stockOf(s) === "out" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
+      priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
+      seller: { "@type": "Organization", name: site.name },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value:
+            s.price >= site.freeDeliveryThreshold ? "0.00" : site.standardDeliveryFee.toFixed(2),
+          currency: "GBP",
+        },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "GB" },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "GB",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: site.returnWindowDays,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+        merchantReturnLink: abs("/returns"),
+      },
+    },
   };
   const breadcrumbs = {
     "@context": "https://schema.org",
