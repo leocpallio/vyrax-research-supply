@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Calculator, ArrowRight } from "lucide-react";
+import { BookOpen, Calculator, ArrowRight, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs } from "@/components/Store";
 import { guides } from "@/data/guides";
 import { breadcrumbListJsonLd, buildHead, collectionPageJsonLd } from "@/lib/seo";
@@ -64,6 +64,19 @@ function Guides() {
             </p>
             <p className="text-sm text-primary font-semibold mt-4">
               Open calculator <ArrowRight className="inline" size={14} />
+            </p>
+          </Link>
+          <Link to="/reconstitution" className="category-tile flex flex-col">
+            <FlaskConical className="text-primary mb-4" size={22} />
+            <h2 className="font-heading text-xl font-semibold leading-snug">
+              Reconstitution and dilution reference
+            </h2>
+            <p className="text-sm text-muted-foreground mt-2 flex-1">
+              Solvent, concentration options for every vial size, storage and stability evidence for
+              every compound in the catalogue.
+            </p>
+            <p className="text-sm text-primary font-semibold mt-4">
+              Open the reference <ArrowRight className="inline" size={14} />
             </p>
           </Link>
         </div>

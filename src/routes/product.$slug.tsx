@@ -331,6 +331,14 @@ function ProductPage() {
               Check lab report
             </Link>
             <ReconstitutionAddon show={c.kind !== "supply" && !/water|solution/i.test(form ?? "")} />
+            <Link
+              to="/reconstitution"
+              hash={c.slug}
+              data-testid="pdp-dilution-reference"
+              className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 decoration-[#040825]/30 hover:decoration-[#040825]"
+            >
+              Dilution reference: {c.name}
+            </Link>
 
             <DispatchCountdown className="mt-3" />
 

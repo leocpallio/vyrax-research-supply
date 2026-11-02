@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { Calculator as CalcIcon, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs, FAQ, SectionTitle } from "@/components/Store";
 import { Input } from "@/components/ui/input";
-import { compounds, productPath } from "@/lib/catalog";
+import { compounds, getCompound, productPath } from "@/lib/catalog";
+import { dilutionFor, solvents } from "@/data/reconstitution";
 import { chem } from "@/data/research";
 import { abs } from "@/data/site";
 import { type QA } from "@/data/faq";
@@ -107,9 +108,12 @@ function CalculatorPage() {
   const [compound, setCompound] = useState("");
   const [targetConc, setTargetConc] = useState("");
   const [finalVol, setFinalVol] = useState("");
+  const [targetMass, setTargetMass] = useState("");
   const peptides = compounds.filter(
     (c) => c.strengths.some((s) => s.unit === "mg") && c.kind !== "supply",
   );
+  const selected = compound ? getCompound(compound) : undefined;
+  const record = compound ? dilutionFor(compound) : undefined;
   const r = useMemo(() => {
     const a = parseFloat(mg);
     const v = parseFloat(ml);
@@ -124,15 +128,20 @@ function CalculatorPage() {
       c2 > 0 && v2 > 0 && c2 < ugPerMl
         ? { stockUl: ((c2 * v2) / ugPerMl) * 1000, diluentUl: (v2 - (c2 * v2) / ugPerMl) * 1000 }
         : null;
+    // Volume of this stock that contains a given mass: volume = mass / concentration.
+    const m = parseFloat(targetMass);
+    const mass =
+      m > 0 ? { ml: m / mgPerMl, ul: (m / mgPerMl) * 1000, tooMuch: m > a } : null;
     return {
       mgPerMl,
       ugPerMl,
       mw,
       molar: mw ? molar(mgPerMl, mw) : null,
       dil,
+      mass,
       tooHigh: c2 > 0 && c2 >= ugPerMl,
     };
-  }, [mg, ml, compound, targetConc, finalVol]);
+  }, [mg, ml, compound, targetConc, finalVol, targetMass]);
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">
@@ -237,6 +246,24 @@ function CalculatorPage() {
                 </label>
               </div>
             </fieldset>
+            <fieldset className="border-t border-border pt-5">
+              <legend className="text-sm font-semibold pr-2">
+                Target mass (optional, volume = mass ÷ concentration)
+              </legend>
+              <label className="block mt-3">
+                <span className="text-xs text-muted-foreground">Mass wanted from this stock (mg)</span>
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="any"
+                  value={targetMass}
+                  onChange={(e) => setTargetMass(e.target.value)}
+                  className="mt-1"
+                  placeholder="e.g. 2"
+                />
+              </label>
+            </fieldset>
           </div>
 
           <div className="bg-ink text-ink-foreground rounded-2xl p-6 md:p-8">
@@ -269,7 +296,24 @@ function CalculatorPage() {
                   {r?.dil ? `${fmt(r.dil.diluentUl, 1)} µl` : "-"}
                 </dd>
               </div>
+              <div className="bg-ink-panel rounded-xl p-4 col-span-2">
+                <dt className="text-ink-muted">
+                  Volume holding {targetMass ? `${fmt(parseFloat(targetMass), 3)} mg` : "the target mass"}
+                </dt>
+                <dd className="font-mono text-xl mt-1">
+                  {r?.mass
+                    ? r.mass.ml >= 1
+                      ? `${fmt(r.mass.ml, 3)} ml`
+                      : `${fmt(r.mass.ul, 1)} µl`
+                    : "-"}
+                </dd>
+              </div>
             </dl>
+            {r?.mass?.tooMuch && (
+              <p className="text-xs text-promo mt-4">
+                That mass is larger than the vial contains. Use a bigger vial or check the label.
+              </p>
+            )}
             {r?.tooHigh && (
               <p className="text-xs text-promo mt-4">
                 The target concentration must be lower than the stock concentration.
@@ -278,6 +322,20 @@ function CalculatorPage() {
             <p className="text-xs text-ink-muted mt-6">
               Arithmetic only. Verify all preparations against your own validated procedures.
             </p>
+            {selected && record && (
+              <div className="mt-6 rounded-xl border border-white/10 p-4 text-xs">
+                <p className="text-ink-muted">Solvent for {selected.name}</p>
+                <p className="font-semibold mt-1">{solvents[record.solvent].name}</p>
+                <p className="text-ink-muted mt-2">{record.solventReason}</p>
+                <Link
+                  to="/reconstitution"
+                  hash={selected.slug}
+                  className="inline-block mt-3 font-semibold underline underline-offset-4"
+                >
+                  Full dilution record for {selected.name}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 

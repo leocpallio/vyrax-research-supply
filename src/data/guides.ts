@@ -27,10 +27,12 @@ export const guides: Guide[] = [
     title: "How to reconstitute lyophilised peptides",
     seoTitle: "How to Reconstitute Peptides: Lab Guide UK",
     description:
-      "How to reconstitute a lyophilised peptide vial with bacteriostatic water: step by step, with the concentration maths worked through.",
-    updated: "2026-09-28",
-    readMins: 6,
-    compounds: ["bacteriostatic-water", "bpc-157", "retatrutide"],
+      "How to reconstitute a lyophilised peptide vial with bacteriostatic water: step by step, solvent choice, concentration maths and storage, plus a dilution reference for every compound.",
+    updated: "2026-11-02",
+    changed:
+      "Added solvent selection, aliquoting, stability evidence and a per-compound dilution reference covering the whole catalogue.",
+    readMins: 12,
+    compounds: ["bacteriostatic-water", "bpc-157", "retatrutide", "ghk-cu", "igf-1-lr3", "nad-plus"],
     body: [
       {
         type: "p",
@@ -65,27 +67,116 @@ export const guides: Guide[] = [
       { type: "h", text: "Working out the concentration" },
       {
         type: "p",
-        text: "Concentration is simply the amount of peptide divided by the volume of diluent. A 10mg vial reconstituted with 2ml of bacteriostatic water gives 5mg/ml. The same vial with 1ml gives 10mg/ml. Use our reconstitution calculator to work this out in either direction, including the volume needed to reach a target concentration.",
+        text: "Concentration is the amount of peptide divided by the volume of diluent. A 10mg vial reconstituted with 2ml of bacteriostatic water gives 5mg/ml. The same vial with 1ml gives 10mg/ml. The amount of peptide never changes, only the volume it sits in, so the choice of volume is a choice of concentration and nothing else.",
+      },
+      {
+        type: "p",
+        text: "Turn it round the other way when you are working from a target mass: the volume of stock that contains a given mass is that mass divided by the concentration. In a 5mg/ml stock, 2mg of peptide sits in 0.4ml. Our reconstitution calculator does both directions, and the per-compound reference lists the concentrations each diluent volume produces for every vial size we supply.",
       },
       {
         type: "table",
-        head: ["Vial", "Diluent volume", "Concentration"],
+        head: ["Vial", "Diluent volume", "Concentration", "Volume holding 1mg"],
         rows: [
-          ["5mg", "1ml", "5mg/ml"],
-          ["5mg", "2ml", "2.5mg/ml"],
-          ["10mg", "2ml", "5mg/ml"],
-          ["10mg", "3ml", "3.33mg/ml"],
-          ["50mg", "5ml", "10mg/ml"],
+          ["5mg", "1ml", "5mg/ml", "0.2ml"],
+          ["5mg", "2ml", "2.5mg/ml", "0.4ml"],
+          ["10mg", "1ml", "10mg/ml", "0.1ml"],
+          ["10mg", "2ml", "5mg/ml", "0.2ml"],
+          ["10mg", "3ml", "3.33mg/ml", "0.3ml"],
+          ["20mg", "5ml", "4mg/ml", "0.25ml"],
+          ["50mg", "5ml", "10mg/ml", "0.1ml"],
+          ["70mg", "5ml", "14mg/ml", "0.07ml"],
+        ],
+      },
+      { type: "h", text: "Choosing the solvent" },
+      {
+        type: "p",
+        text: "The solvent does two jobs: it dissolves the powder, and it decides how long the solution stays usable. Three solvents cover almost everything in a research catalogue, and the reason for each is chemistry rather than habit.",
+      },
+      {
+        type: "table",
+        head: ["Solvent", "What it is", "Why it is used"],
+        rows: [
+          [
+            "Bacteriostatic water",
+            "Sterile water with 0.9% benzyl alcohol",
+            "The default for a vial that will be accessed more than once: benzyl alcohol is bacteriostatic, so microbial growth in the vial is limited (Meyer 2007). Not for spectrophotometry near 260 nm, where benzyl alcohol absorbs.",
+          ],
+          [
+            "Sterile water, no preservative",
+            "Sterile water without an antimicrobial",
+            "Used where a preservative would interfere with the assay or the chemistry, and where the stock is single-use. No protection against microbial growth, so make it fresh and aliquot it.",
+          ],
+          [
+            "Dilute acetic acid, 0.1 M",
+            "0.1 mol/l acetic acid in sterile water",
+            "For peptides that are poorly soluble, or hydrolyse and aggregate faster, at neutral pH. The stock stays acidic and is diluted into buffer on the day (Wang 1999).",
+          ],
         ],
       },
       {
         type: "note",
-        text: "Some peptides are poorly soluble in water at neutral pH. If a peptide does not dissolve, check the supplier data and the literature for a recommended solvent before adding more diluent.",
+        text: "Benzyl alcohol is a preservative, not a stabiliser: it slows microbial growth, it does not stop hydrolysis, oxidation or aggregation. A preserved solution still degrades, so the storage rules below apply either way.",
+      },
+      { type: "h", text: "Aliquoting and repeated access" },
+      {
+        type: "list",
+        items: [
+          "Every access to a vial is an opportunity for contamination and for oxygen to enter. Decide the aliquot size before the first access, not after.",
+          "Divide a solution that has to be kept into single-use aliquots, freeze them at -20°C and thaw each one once. A refrozen aliquot is not the same material.",
+          "Use a fresh sterile tip or needle for each transfer and never return unused solution to the stock vial.",
+          "Keep the dry vial sealed until it has reached room temperature, so moisture does not condense onto the powder, and reseal it promptly after use.",
+          "Record the number of accesses and the date of the first one. A multi-access vial has a finite working life even when it is preserved.",
+        ],
+      },
+      { type: "h", text: "How long a solution keeps" },
+      {
+        type: "p",
+        text: "Reconstituted material is far less stable than the dry powder. The dry vial is the stable form: sealed at -20°C it is the reference state, and the solution is the transient one. Water enables hydrolysis and deamidation, dissolved oxygen enables oxidation, and light drives photo-oxidation of tryptophan and tyrosine residues (Manning 2010).",
+      },
+      {
+        type: "p",
+        text: "Published stability data exists for some peptides and not for most. Where a study exists, our per-compound reference quotes it. Where none exists, it says so, because a shelf life printed without a source is worse than no number at all. The working assumption for an unsourced peptide is the conservative one: keep the solution at 2 to 8°C, protected from light, and treat any time in solution as short.",
+      },
+      { type: "h", text: "Labelling and records" },
+      {
+        type: "list",
+        items: [
+          "Compound name, batch number and the mass that was in the vial.",
+          "Solvent used, and the volume added, so the concentration can be recomputed from the label alone.",
+          "Date and time of reconstitution, and who prepared it.",
+          "Storage location and the date each aliquot was frozen.",
+          "Anything unusual: a slow-to-dissolve cake, a colour that differs from the previous preparation, visible particles, foam that did not clear.",
+        ],
+      },
+      { type: "h", text: "When the powder does not fully dissolve" },
+      {
+        type: "list",
+        items: [
+          "Give it time and gentle swirling before adding anything else. Some cakes wet out slowly and clear after a few minutes.",
+          "Do not add more diluent to force it into solution: you change the concentration, not the solubility, and you lose track of what is in the vial.",
+          "Do not heat it, sonicate it or vortex it. All three increase aggregation (Manning 2010).",
+          "Check the appearance recorded for that compound. GHK-Cu and the blends that contain it give a blue solution, which is the copper complex and not a fault.",
+          "If material remains undissolved after gentle handling, stop. A peptide that will not dissolve at neutral pH may need dilute acetic acid, and that decision belongs in your records before more material is used.",
+        ],
+      },
+      { type: "h", text: "Every compound, one page" },
+      {
+        type: "p",
+        text: "The general method above is the same for the whole catalogue, but the solvent, the concentration options and the published stability evidence differ by compound. The reconstitution and dilution reference lists all of them: solvent and the reason for it, the concentration each diluent volume gives for every vial size we supply, storage for the dry and diluted forms, handling cautions and the sources behind each statement.",
       },
       { type: "h", text: "After reconstitution" },
       {
         type: "p",
         text: "Reconstituted peptides are much less stable than the dry powder. Keep them at 2 to 8°C, protect them from light and avoid freeze-thaw cycles. If you need to store a solution for longer, divide it into single-use aliquots and freeze those, so each aliquot is thawed only once.",
+      },
+      { type: "h", text: "Sources" },
+      {
+        type: "list",
+        items: [
+          "Manning MC, Chou DK, Murphy BM, Payne RW, Katayama DS. Stability of protein pharmaceuticals: an update. Pharmaceutical Research, 2010. PMID 20143256.",
+          "Wang W. Instability, stabilization, and formulation of liquid protein pharmaceuticals. International Journal of Pharmaceutics, 1999. PMID 10460913.",
+          "Meyer BK, Ni A, Hu B, Shi L. Antimicrobial preservative use in parenteral products: past and present. Journal of Pharmaceutical Sciences, 2007. PMID 17722087.",
+        ],
       },
     ],
   },

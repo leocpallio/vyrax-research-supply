@@ -24,6 +24,7 @@ import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PricingDotmdRouteImport } from './routes/pricing[.]md'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ReconstitutionRouteImport } from './routes/reconstitution'
 import { Route as ResearchUsePolicyRouteImport } from './routes/research-use-policy'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
@@ -35,6 +36,7 @@ import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-autom
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
+import { Route as ApiWelcomeCodeRouteImport } from './routes/api.welcome-code'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout_.return'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
@@ -121,6 +123,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReconstitutionRoute = ReconstitutionRouteImport.update({
+  id: '/reconstitution',
+  path: '/reconstitution',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResearchUsePolicyRoute = ResearchUsePolicyRouteImport.update({
   id: '/research-use-policy',
   path: '/research-use-policy',
@@ -174,6 +181,11 @@ const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
 const ApiSpicepayWebhookRoute = ApiSpicepayWebhookRouteImport.update({
   id: '/api/spicepay-webhook',
   path: '/api/spicepay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWelcomeCodeRoute = ApiWelcomeCodeRouteImport.update({
+  id: '/api/welcome-code',
+  path: '/api/welcome-code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -243,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
+  '/reconstitution': typeof ReconstitutionRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
@@ -254,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -281,6 +295,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
+  '/reconstitution': typeof ReconstitutionRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
@@ -292,6 +307,7 @@ export interface FileRoutesByTo {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -320,6 +336,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/pricing.md': typeof PricingDotmdRoute
   '/privacy': typeof PrivacyRoute
+  '/reconstitution': typeof ReconstitutionRoute
   '/research-use-policy': typeof ResearchUsePolicyRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
@@ -331,6 +348,7 @@ export interface FileRoutesById {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout_/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -360,6 +378,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
+    | '/reconstitution'
     | '/research-use-policy'
     | '/returns'
     | '/shipping'
@@ -371,6 +390,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -398,6 +418,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
+    | '/reconstitution'
     | '/research-use-policy'
     | '/returns'
     | '/shipping'
@@ -409,6 +430,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -436,6 +458,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/pricing.md'
     | '/privacy'
+    | '/reconstitution'
     | '/research-use-policy'
     | '/returns'
     | '/shipping'
@@ -447,6 +470,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout_/return'
     | '/collections/$slug'
@@ -475,6 +499,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   PricingDotmdRoute: typeof PricingDotmdRoute
   PrivacyRoute: typeof PrivacyRoute
+  ReconstitutionRoute: typeof ReconstitutionRoute
   ResearchUsePolicyRoute: typeof ResearchUsePolicyRoute
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
@@ -486,6 +511,7 @@ export interface RootRouteChildren {
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
+  ApiWelcomeCodeRoute: typeof ApiWelcomeCodeRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
@@ -605,6 +631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reconstitution': {
+      id: '/reconstitution'
+      path: '/reconstitution'
+      fullPath: '/reconstitution'
+      preLoaderRoute: typeof ReconstitutionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/research-use-policy': {
       id: '/research-use-policy'
       path: '/research-use-policy'
@@ -680,6 +713,13 @@ declare module '@tanstack/react-router' {
       path: '/api/spicepay-webhook'
       fullPath: '/api/spicepay-webhook'
       preLoaderRoute: typeof ApiSpicepayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/welcome-code': {
+      id: '/api/welcome-code'
+      path: '/api/welcome-code'
+      fullPath: '/api/welcome-code'
+      preLoaderRoute: typeof ApiWelcomeCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -771,6 +811,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   PricingDotmdRoute: PricingDotmdRoute,
   PrivacyRoute: PrivacyRoute,
+  ReconstitutionRoute: ReconstitutionRoute,
   ResearchUsePolicyRoute: ResearchUsePolicyRoute,
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
@@ -782,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGuideSignupRoute: ApiGuideSignupRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
+  ApiWelcomeCodeRoute: ApiWelcomeCodeRoute,
   CategorySlugRoute: CategorySlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { StoreShell, Disclaimer, Breadcrumbs, ProductGrid, SectionTitle } from "@/components/Store";
 import { guideBySlug, guides, type Block } from "@/data/guides";
-import { getCompound, productPath, type Compound } from "@/lib/catalog";
+import { compounds, getCompound, productPath, type Compound } from "@/lib/catalog";
 import { ORG_ID, breadcrumbListJsonLd, buildHead, titles, withDescTail } from "@/lib/seo";
 import { abs, site } from "@/data/site";
 
@@ -105,6 +105,7 @@ function GuidePage() {
   const g = guideBySlug(slug);
   if (!g) return null;
   const related = g.compounds.map(getCompound).filter((c): c is Compound => Boolean(c));
+  const references = compounds.length;
   const more = guides
     .filter((x) => x.slug !== g.slug)
     .sort((a, b) => b.updated.localeCompare(a.updated))
@@ -145,6 +146,33 @@ function GuidePage() {
               <Render key={i} b={b} />
             ))}
           </div>
+          {slug === "how-to-reconstitute-peptides" && (
+            <div
+              className="mt-8 rounded-2xl border border-border bg-card p-5"
+              data-testid="guide-reference-cta"
+            >
+              <p className="font-heading font-semibold">Every compound, one page</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Solvent, the concentration each diluent volume gives for every vial size we supply,
+                storage for both forms, and the published stability evidence for all{" "}
+                {references} compounds.
+              </p>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <Link
+                  to="/reconstitution"
+                  className="inline-flex items-center gap-2 rounded-full bg-ink text-ink-foreground px-4 py-2 text-sm font-semibold"
+                >
+                  Reconstitution and dilution reference
+                </Link>
+                <Link
+                  to="/calculator"
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold"
+                >
+                  Open the calculator
+                </Link>
+              </div>
+            </div>
+          )}
           <div className="note-box mt-10">
             This guide covers general peptide chemistry. Vyrax Labs products are sold as research
             compounds, and nothing here is medical advice.

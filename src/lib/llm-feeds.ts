@@ -48,6 +48,7 @@ export function buildLlmsTxt(): string {
   const names: Record<string, string> = {
     "/lab-reports": "Lab reports and certificates of analysis",
     "/calculator": "Peptide reconstitution calculator",
+    "/reconstitution": "Reconstitution and dilution reference, every compound",
     "/guides": "Guides",
     "/faq": "Frequently asked questions",
     "/about": "About Vyrax Labs",

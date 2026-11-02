@@ -77,11 +77,12 @@ export function ogImageFor(path: string, productStrength?: string): string {
 export const DESC_TAIL = "UK supplied.";
 /** Last catalogue/trust-content change (ISO date). Bump when compounds, prices, categories or policy
  *  pages change; sitemap lastmod reads it. A request date is not a content change date. */
-export const CONTENT_UPDATED = "2026-10-28";
+export const CONTENT_UPDATED = "2026-11-02";
 /** Trust and legal pages every crawler should find (path, priority, changefreq). */
 export const TRUST_PAGES = [
   ["/lab-reports", "0.8", "weekly"],
   ["/calculator", "0.7", "monthly"],
+  ["/reconstitution", "0.7", "monthly"],
   ["/guides", "0.7", "weekly"],
   ["/faq", "0.6", "monthly"],
   ["/about", "0.5", "monthly"],
