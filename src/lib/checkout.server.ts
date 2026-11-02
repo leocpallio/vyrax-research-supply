@@ -7,6 +7,7 @@ import { validatePaymentEvent, verifySignature } from "./spicepay";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
+import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -70,6 +71,8 @@ const validText = (v: unknown, max: number) =>
 
 export async function createCheckout(request: Request): Promise<Response> {
   if (request.method !== "POST") return fail("Method not allowed", 405);
+  const limit = takeRateLimit(`checkout:${clientKey(request)}`, LIMITS.checkout);
+  if (!limit.allowed) return tooManyRequests(limit);
   if (process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"] !== "true")
     return fail("Checkout is not open", 503);
   try {
@@ -222,6 +225,8 @@ export async function createCheckout(request: Request): Promise<Response> {
 }
 
 export async function orderStatus(request: Request): Promise<Response> {
+  const limit = takeRateLimit(`order-status:${clientKey(request)}`, LIMITS.orderStatus);
+  if (!limit.allowed) return tooManyRequests(limit);
   try {
     const c = config();
     const url = new URL(request.url);
