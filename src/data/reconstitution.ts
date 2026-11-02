@@ -20,8 +20,9 @@ import type { Compound, Strength } from "./types";
  *      as a finding, and
  *   4. the lab's own general handling guidance in the reconstitution guide.
  * Where no aqueous stability study for a compound has been published, `stability` is
- * `{ status: "none" }` and the page prints "No published stability data" rather than a guess. Where
- * a relevant study exists but studied a different molecule or a non-aqueous matrix, it is carried as
+ * `{ status: "none" }` and the page prints no shelf-life figure rather than a guess. Where
+ * a relevant study exists but studied a different molecule, a non-aqueous matrix, or the same
+ * molecule without yielding a shelf-life figure, it is carried as
  * a labelled note so it cannot be read as a shelf life for this item.
  */
 
@@ -429,7 +430,7 @@ const EXTRA: Record<string, Partial<Override>> = {
   },
   "kisspeptin-10": {
     cautions: [
-      "Half-life in solution is measured in minutes at bench temperature. Prepare the working dilution immediately before use and do not hold it across a session.",
+      "Half-life figures published for kisspeptin-10 come from rat plasma, not from an aqueous buffer stock, so they bound handling in that matrix and are not a time in solution; do not carry them over to a stock. Prepare the working dilution immediately before use and do not hold it across a session.",
     ],
   },
   "ghrp-6": {

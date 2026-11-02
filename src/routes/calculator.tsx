@@ -114,7 +114,10 @@ function CalculatorPage() {
   );
   const selected = compound ? getCompound(compound) : undefined;
   const record = compound ? dilutionFor(compound) : undefined;
+  // Compounds with no validated stock in the reference print no arithmetic at all.
+  const withheld = record?.withholdConcentrations === true;
   const r = useMemo(() => {
+    if (withheld) return null;
     const a = parseFloat(mg);
     const v = parseFloat(ml);
     if (!(a > 0) || !(v > 0)) return null;
@@ -130,8 +133,7 @@ function CalculatorPage() {
         : null;
     // Volume of this stock that contains a given mass: volume = mass / concentration.
     const m = parseFloat(targetMass);
-    const mass =
-      m > 0 ? { ml: m / mgPerMl, ul: (m / mgPerMl) * 1000, tooMuch: m > a } : null;
+    const mass = m > 0 ? { ml: m / mgPerMl, ul: (m / mgPerMl) * 1000, tooMuch: m > a } : null;
     return {
       mgPerMl,
       ugPerMl,
@@ -141,7 +143,7 @@ function CalculatorPage() {
       mass,
       tooHigh: c2 > 0 && c2 >= ugPerMl,
     };
-  }, [mg, ml, compound, targetConc, finalVol, targetMass]);
+  }, [mg, ml, compound, targetConc, finalVol, targetMass, withheld]);
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">
@@ -251,7 +253,9 @@ function CalculatorPage() {
                 Target mass (optional, volume = mass ÷ concentration)
               </legend>
               <label className="block mt-3">
-                <span className="text-xs text-muted-foreground">Mass wanted from this stock (mg)</span>
+                <span className="text-xs text-muted-foreground">
+                  Mass wanted from this stock (mg)
+                </span>
                 <Input
                   type="number"
                   inputMode="decimal"
@@ -268,60 +272,81 @@ function CalculatorPage() {
 
           <div className="bg-ink text-ink-foreground rounded-2xl p-6 md:p-8">
             <CalcIcon className="text-primary-soft mb-4" />
-            <p className="text-ink-muted text-sm">Stock concentration</p>
-            <p className="font-mono text-4xl font-semibold mt-1">
-              {r ? `${fmt(r.mgPerMl, 3)} mg/ml` : "-"}
-            </p>
-            <dl className="grid grid-cols-2 gap-4 mt-8 text-sm">
-              <div className="bg-ink-panel rounded-xl p-4">
-                <dt className="text-ink-muted">µg per ml</dt>
-                <dd className="font-mono text-xl mt-1">{r ? fmt(r.ugPerMl, 1) : "-"}</dd>
+            {withheld ? (
+              <div data-testid="calculator-withheld">
+                <p className="text-ink-muted text-sm">Stock concentration</p>
+                <p className="text-xl font-semibold mt-1">Withheld</p>
+                <p className="text-sm text-ink-muted mt-4">
+                  {selected?.name} has no validated stock in this reference, so the calculator
+                  prints no concentration, no working dilution and no volume for a target mass.
+                  Running the arithmetic against an unvalidated stock would put a usable-looking
+                  number on a preparation that does not exist.
+                </p>
+                <p className="text-sm text-ink-muted mt-4">
+                  Do the arithmetic against the concentration your own validated preparation
+                  measured, starting from the solvent and caveat below.
+                </p>
               </div>
-              <div className="bg-ink-panel rounded-xl p-4">
-                <dt className="text-ink-muted">Molar concentration</dt>
-                <dd className="font-mono text-xl mt-1">{r?.molar ?? "-"}</dd>
-                <dd className="text-[11px] text-ink-muted mt-1">
-                  {r?.mw ? `MW ${fmt(r.mw, 1)} g/mol` : "Select a compound"}
-                </dd>
-              </div>
-              <div className="bg-ink-panel rounded-xl p-4">
-                <dt className="text-ink-muted">Stock to add</dt>
-                <dd className="font-mono text-xl mt-1">
-                  {r?.dil ? `${fmt(r.dil.stockUl, 1)} µl` : "-"}
-                </dd>
-              </div>
-              <div className="bg-ink-panel rounded-xl p-4">
-                <dt className="text-ink-muted">Diluent to add</dt>
-                <dd className="font-mono text-xl mt-1">
-                  {r?.dil ? `${fmt(r.dil.diluentUl, 1)} µl` : "-"}
-                </dd>
-              </div>
-              <div className="bg-ink-panel rounded-xl p-4 col-span-2">
-                <dt className="text-ink-muted">
-                  Volume holding {targetMass ? `${fmt(parseFloat(targetMass), 3)} mg` : "the target mass"}
-                </dt>
-                <dd className="font-mono text-xl mt-1">
-                  {r?.mass
-                    ? r.mass.ml >= 1
-                      ? `${fmt(r.mass.ml, 3)} ml`
-                      : `${fmt(r.mass.ul, 1)} µl`
-                    : "-"}
-                </dd>
-              </div>
-            </dl>
-            {r?.mass?.tooMuch && (
-              <p className="text-xs text-promo mt-4">
-                That mass is larger than the vial contains. Use a bigger vial or check the label.
-              </p>
+            ) : (
+              <>
+                <p className="text-ink-muted text-sm">Stock concentration</p>
+                <p className="font-mono text-4xl font-semibold mt-1">
+                  {r ? `${fmt(r.mgPerMl, 3)} mg/ml` : "-"}
+                </p>
+                <dl className="grid grid-cols-2 gap-4 mt-8 text-sm">
+                  <div className="bg-ink-panel rounded-xl p-4">
+                    <dt className="text-ink-muted">µg per ml</dt>
+                    <dd className="font-mono text-xl mt-1">{r ? fmt(r.ugPerMl, 1) : "-"}</dd>
+                  </div>
+                  <div className="bg-ink-panel rounded-xl p-4">
+                    <dt className="text-ink-muted">Molar concentration</dt>
+                    <dd className="font-mono text-xl mt-1">{r?.molar ?? "-"}</dd>
+                    <dd className="text-[11px] text-ink-muted mt-1">
+                      {r?.mw ? `MW ${fmt(r.mw, 1)} g/mol` : "Select a compound"}
+                    </dd>
+                  </div>
+                  <div className="bg-ink-panel rounded-xl p-4">
+                    <dt className="text-ink-muted">Stock to add</dt>
+                    <dd className="font-mono text-xl mt-1">
+                      {r?.dil ? `${fmt(r.dil.stockUl, 1)} µl` : "-"}
+                    </dd>
+                  </div>
+                  <div className="bg-ink-panel rounded-xl p-4">
+                    <dt className="text-ink-muted">Diluent to add</dt>
+                    <dd className="font-mono text-xl mt-1">
+                      {r?.dil ? `${fmt(r.dil.diluentUl, 1)} µl` : "-"}
+                    </dd>
+                  </div>
+                  <div className="bg-ink-panel rounded-xl p-4 col-span-2">
+                    <dt className="text-ink-muted">
+                      Volume holding{" "}
+                      {targetMass ? `${fmt(parseFloat(targetMass), 3)} mg` : "the target mass"}
+                    </dt>
+                    <dd className="font-mono text-xl mt-1">
+                      {r?.mass
+                        ? r.mass.ml >= 1
+                          ? `${fmt(r.mass.ml, 3)} ml`
+                          : `${fmt(r.mass.ul, 1)} µl`
+                        : "-"}
+                    </dd>
+                  </div>
+                </dl>
+                {r?.mass?.tooMuch && (
+                  <p className="text-xs text-promo mt-4">
+                    That mass is larger than the vial contains. Use a bigger vial or check the
+                    label.
+                  </p>
+                )}
+                {r?.tooHigh && (
+                  <p className="text-xs text-promo mt-4">
+                    The target concentration must be lower than the stock concentration.
+                  </p>
+                )}
+                <p className="text-xs text-ink-muted mt-6">
+                  Arithmetic only. Verify all preparations against your own validated procedures.
+                </p>
+              </>
             )}
-            {r?.tooHigh && (
-              <p className="text-xs text-promo mt-4">
-                The target concentration must be lower than the stock concentration.
-              </p>
-            )}
-            <p className="text-xs text-ink-muted mt-6">
-              Arithmetic only. Verify all preparations against your own validated procedures.
-            </p>
             {selected && record && (
               <div className="mt-6 rounded-xl border border-white/10 p-4 text-xs">
                 <p className="text-ink-muted">Solvent for {selected.name}</p>

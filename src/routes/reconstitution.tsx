@@ -4,12 +4,7 @@ import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs, SectionTitle, FAQ } from "@/components/Store";
 import { compounds, productPath } from "@/lib/catalog";
 import type { Compound } from "@/lib/catalog";
-import {
-  dilutionFor,
-  dilutionGroups,
-  dilutionRows,
-  solvents,
-} from "@/data/reconstitution";
+import { dilutionFor, dilutionGroups, dilutionRows, solvents } from "@/data/reconstitution";
 import { abs } from "@/data/site";
 import { STABILITY } from "@/data/stability";
 import { type QA } from "@/data/faq";
@@ -37,7 +32,7 @@ const faqs: QA[] = [
   ],
   [
     "Why do some compounds say there is no published stability data?",
-    "Because there is none for that specific peptide in either form. Rather than print a shelf life that no paper supports, the reference says so and falls back to the general handling guidance: dry storage at -20°C, solutions at 2 to 8°C, protected from light, aliquoted and thawed once. Where a study does exist but covers a different molecule or a non-aqueous matrix, it is shown as a labelled note, not as a shelf life.",
+    "Because no published shelf-life figure applies to that peptide in either form. Rather than print a shelf life that no paper supports, the reference says so and falls back to the general handling guidance: dry storage at -20°C, solutions at 2 to 8°C, protected from light, aliquoted and thawed once. Where a study does exist but gives no shelf-life figure, covers a different molecule or covers a non-aqueous matrix, it is shown as a labelled note, not as a shelf life.",
   ],
   [
     "Does a blend have a different concentration from a single peptide?",
@@ -144,16 +139,16 @@ function Detail({ c }: { c: Compound }) {
           <p className="font-semibold">Concentration options</p>
           {record.readyToUse ? (
             <p className="text-muted-foreground">
-              Supplied as a solution, so there is no reconstitution step. Concentration is printed on
-              the label; to find the volume that contains a mass, divide the mass by the stated
+              Supplied as a solution, so there is no reconstitution step. Concentration is printed
+              on the label; to find the volume that contains a mass, divide the mass by the stated
               concentration.
             </p>
           ) : record.withholdConcentrations ? (
             <div className="space-y-2">
               <p className="text-muted-foreground">{record.dilutionNote}</p>
               <p className="text-xs text-muted-foreground">
-                The volume table is withheld for this compound: no validated aqueous stock exists, so
-                any mg/ml figure here would be arithmetic without a basis.
+                The volume table is withheld for this compound: no validated aqueous stock exists,
+                so any mg/ml figure here would be arithmetic without a basis.
               </p>
             </div>
           ) : (
@@ -189,8 +184,8 @@ function Detail({ c }: { c: Compound }) {
                 <p className="text-muted-foreground">{record.dilutionNote}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                Volumes are concentration options, not a protocol. Do not exceed the nominal capacity
-                of the vial.
+                Volumes are concentration options, not a protocol. Do not exceed the nominal
+                capacity of the vial.
               </p>
             </>
           )}
@@ -211,13 +206,15 @@ function Detail({ c }: { c: Compound }) {
           <p className="font-semibold mb-1">Stability data</p>
           {record.stability.status === "published" ? (
             <p className="text-muted-foreground">
-              {record.stability.text} <span className="whitespace-nowrap">({record.stability.cite})</span>
+              {record.stability.text}{" "}
+              <span className="sm:whitespace-nowrap">({record.stability.cite})</span>
             </p>
           ) : (
             <div className="space-y-2 text-muted-foreground">
               <p>
-                No published stability data for this compound in either form. Store it as set out
-                above and treat any time in solution as short.
+                {record.stability.note
+                  ? "No published shelf-life figure for this compound in aqueous solution. The research that does exist is printed below, labelled with how far it actually applies, and none of it is used here as a working time in solution: store it as set out above and treat any time in solution as short."
+                  : "No published stability data for this compound in either form. Store it as set out above and treat any time in solution as short."}
               </p>
               {record.stability.note && (
                 <p>
@@ -225,7 +222,7 @@ function Detail({ c }: { c: Compound }) {
                     {record.stability.note.label}:
                   </span>{" "}
                   {record.stability.note.text}{" "}
-                  <span className="whitespace-nowrap">({record.stability.note.cite})</span>
+                  <span className="sm:whitespace-nowrap">({record.stability.note.cite})</span>
                 </p>
               )}
             </div>
@@ -304,7 +301,8 @@ function ReconstitutionReference() {
           contains no dose, no per-use amount and no route of administration.
         </p>
         <p className="text-sm text-muted-foreground mt-3 tabular-nums">
-          {compounds.length} compounds · {Object.keys(solvents).length} solvents · updated 2 November 2026 ·{" "}
+          {compounds.length} compounds · {Object.keys(solvents).length} solvents · updated 2
+          November 2026 ·{" "}
           <Link to="/calculator" className="text-primary underline underline-offset-4">
             open the calculator
           </Link>
