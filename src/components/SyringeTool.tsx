@@ -24,6 +24,8 @@ type Option = { slug: string; name: string; strengths: { label: string; amount: 
 
 const fmt = (n: number, dp = 3) =>
   Number.isFinite(n) ? n.toLocaleString("en-GB", { maximumFractionDigits: dp }) : "-";
+const fmtDraw = (n: number, dp: number) =>
+  n > 0 && n < 10 ** -dp ? `<${(10 ** -dp).toFixed(dp)}` : fmt(n, dp);
 
 const fmtMass = (mg: number) => (mg < 1 ? `${fmt(mg * 1000, 1)} mcg` : `${fmt(mg, 3)} mg`);
 
@@ -107,7 +109,8 @@ export function SyringeTool({
     if (diluentMl !== null) setPour((n) => n + 1);
   }, [diluentMl]);
 
-  const drawFrac = r?.draw ? Math.min(r.draw.shownMl / syringe.capacityMl, 1) : 0;
+  const barrelMl = r?.draw ? Math.min(r.draw.shownMl, syringe.capacityMl) : 0;
+  const drawFrac = barrelMl / syringe.capacityMl;
   const plungerX = BX0 + drawFrac * BW;
   const over = r?.warnings.find((w) => w.kind === "over-capacity");
 
@@ -172,8 +175,8 @@ export function SyringeTool({
 
   const valueText = r?.draw
     ? syringe.unitScale
-      ? `${fmt(r.draw.nearestUnits, 1)} units, ${fmt(r.draw.nearestMl, 3)} ml`
-      : `${fmt(r.draw.nearestMl, 2)} ml`
+      ? `${fmt(mlToUnits(barrelMl), 1)} units, ${fmt(barrelMl, 3)} ml`
+      : `${fmt(barrelMl, 2)} ml`
     : "Empty";
 
   return (
@@ -425,9 +428,7 @@ export function SyringeTool({
                 aria-valuemax={
                   syringe.unitScale ? mlToUnits(syringe.capacityMl) : syringe.capacityMl
                 }
-                aria-valuenow={
-                  r?.draw ? (syringe.unitScale ? r.draw.nearestUnits : r.draw.nearestMl) : 0
-                }
+                aria-valuenow={syringe.unitScale ? mlToUnits(barrelMl) : barrelMl}
                 aria-valuetext={valueText}
                 aria-disabled={!r}
                 onKeyDown={onKey}
@@ -714,13 +715,13 @@ export function SyringeTool({
                 <Stat label="Concentration" value={r ? `${fmt(r.mgPerMl, 3)}` : "-"} unit="mg/ml" />
                 <Stat
                   label="Draw volume"
-                  value={r?.draw ? fmt(r.draw.ml, 3) : "-"}
+                  value={r?.draw ? fmtDraw(r.draw.ml, 6) : "-"}
                   unit={over ? "ml, over capacity" : "ml"}
                   alert={Boolean(over)}
                 />
                 <Stat
                   label={syringe.unitScale ? "Units (U-100)" : "Units equiv."}
-                  value={r?.draw ? fmt(r.draw.units, 1) : "-"}
+                  value={r?.draw ? fmtDraw(r.draw.units, 4) : "-"}
                   unit="units"
                 />
               </dl>

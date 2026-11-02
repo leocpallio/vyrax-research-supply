@@ -218,6 +218,12 @@ describe("edge cases", () => {
     expect(r.draw!.ml).toBeCloseTo(0.001, 12);
     expect(r.warnings.map((w) => w.kind)).toContain("below-graduation");
   });
+  test("tiny positive draw retains its exact volume and units", () => {
+    const r = compute({ vialMg: 40, diluentMl: 1, targetMg: 0.01, syringe: s03 })!;
+    expect(r.draw!.ml).toBeCloseTo(0.00025, 12);
+    expect(r.draw!.units).toBeCloseTo(0.025, 12);
+    expect(r.warnings.map((w) => w.kind)).toContain("below-graduation");
+  });
   test("target larger than vial", () => {
     const r = compute({ vialMg: 2, diluentMl: 1, targetMg: 3, syringe: s3 })!;
     expect(r.warnings.map((w) => w.kind)).toContain("exceeds-vial");
@@ -281,6 +287,17 @@ describe("compliance copy", () => {
   });
   test("target mass starts empty", () => {
     expect(src).toMatch(/useState\(""\); \/\/ deliberately empty/);
+  });
+  test("tiny draw readout and slider barrel position are wired", () => {
+    expect(src).toMatch(/value=\{r\?\.draw \? fmtDraw\(r\.draw\.ml, 6\)/);
+    expect(src).toMatch(/value=\{r\?\.draw \? fmtDraw\(r\.draw\.units, 4\)/);
+    expect(src).toMatch(
+      /const barrelMl = r\?\.draw \? Math\.min\(r\.draw\.shownMl, syringe\.capacityMl\) : 0/,
+    );
+    expect(src).toMatch(
+      /aria-valuenow=\{\s*syringe\.unitScale \? mlToUnits\(barrelMl\) : barrelMl/,
+    );
+    expect(src).toMatch(/fmt\(mlToUnits\(barrelMl\), 1\)/);
   });
   test("no em-dashes", () => {
     expect(src).not.toContain("\u2014");
