@@ -67,7 +67,7 @@ export const guides: Guide[] = [
       { type: "h", text: "Working out the concentration" },
       {
         type: "p",
-        text: "Concentration is the amount of peptide divided by the volume of diluent. A 10mg vial reconstituted with 2ml of bacteriostatic water gives 5mg/ml. The same vial with 1ml gives 10mg/ml. The amount of peptide never changes, only the volume it sits in, so the choice of volume is a choice of concentration and nothing else.",
+        text: "Concentration is the amount of peptide divided by the volume of diluent. A 10mg vial reconstituted with 2ml of bacteriostatic water gives 5mg/ml. The same vial with 1ml gives 10mg/ml. The amount of peptide never changes, only the volume it sits in, so the choice of volume is a choice of concentration, subject to what the solvent can actually dissolve.",
       },
       {
         type: "p",
@@ -84,13 +84,13 @@ export const guides: Guide[] = [
           ["10mg", "3ml", "3.33mg/ml", "0.3ml"],
           ["20mg", "5ml", "4mg/ml", "0.25ml"],
           ["50mg", "5ml", "10mg/ml", "0.1ml"],
-          ["70mg", "5ml", "14mg/ml", "0.07ml"],
+          ["70mg", "5ml", "14mg/ml", "0.071ml"],
         ],
       },
       { type: "h", text: "Choosing the solvent" },
       {
         type: "p",
-        text: "The solvent does two jobs: it dissolves the powder, and it decides how long the solution stays usable. Three solvents cover almost everything in a research catalogue, and the reason for each is chemistry rather than habit.",
+        text: "The solvent does two jobs: it dissolves the powder, and it decides how long the solution stays usable. Four solvents cover almost everything in a research catalogue, and the reason for each is chemistry rather than habit.",
       },
       {
         type: "table",
@@ -110,6 +110,11 @@ export const guides: Guide[] = [
             "Dilute acetic acid, 0.1 M",
             "0.1 mol/l acetic acid in sterile water",
             "For peptides that are poorly soluble, or hydrolyse and aggregate faster, at neutral pH. The stock stays acidic and is diluted into buffer on the day (Wang 1999).",
+          ],
+          [
+            "DMSO, anhydrous",
+            "Dimethyl sulfoxide",
+            "For the few materials that will not reach a workable concentration in water. The powder is pre-dissolved in the minimum volume of DMSO and an aliquot is diluted into buffer. No aqueous stock is claimed, DMSO freezes at about 18.5°C, and the final DMSO percentage has to be recorded because it changes most assays.",
           ],
         ],
       },
@@ -153,7 +158,7 @@ export const guides: Guide[] = [
         type: "list",
         items: [
           "Give it time and gentle swirling before adding anything else. Some cakes wet out slowly and clear after a few minutes.",
-          "Do not add more diluent to force it into solution: you change the concentration, not the solubility, and you lose track of what is in the vial.",
+          "Do not keep adding diluent to force it into solution. More volume does dissolve more material once the solution is saturated, but it also dilutes everything already dissolved and you lose track of the final concentration. Work out the volume you need first; if the powder still will not clear, the problem is the solvent, not the volume.",
           "Do not heat it, sonicate it or vortex it. All three increase aggregation (Manning 2010).",
           "Check the appearance recorded for that compound. GHK-Cu and the blends that contain it give a blue solution, which is the copper complex and not a fault.",
           "If material remains undissolved after gentle handling, stop. A peptide that will not dissolve at neutral pH may need dilute acetic acid, and that decision belongs in your records before more material is used.",

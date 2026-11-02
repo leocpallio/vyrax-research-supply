@@ -31,8 +31,12 @@ const faqs: QA[] = [
     "A few peptides are poorly soluble or poorly stable at neutral pH, and a 0.1 M acetic acid stock keeps them in solution. The stock stays acidic; it is diluted into buffer on the day of the experiment rather than neutralised.",
   ],
   [
+    "Why is DMSO listed for some compounds?",
+    "Because no aqueous stock can be justified for them, so the water-only tables would be arithmetic without a basis. The powder is dissolved in the minimum volume of DMSO and an aliquot is diluted into buffer. DMSO freezes at about 18.5°C, carries solutes through many plastics and changes most assays, so the final DMSO percentage is recorded.",
+  ],
+  [
     "Why do some compounds say there is no published stability data?",
-    "Because there is none for that specific peptide in either form. Rather than print a shelf life that no paper supports, the reference says so and falls back to the general handling guidance: dry storage at -20°C, solutions at 2 to 8°C, protected from light, aliquoted and thawed once.",
+    "Because there is none for that specific peptide in either form. Rather than print a shelf life that no paper supports, the reference says so and falls back to the general handling guidance: dry storage at -20°C, solutions at 2 to 8°C, protected from light, aliquoted and thawed once. Where a study does exist but covers a different molecule or a non-aqueous matrix, it is shown as a labelled note, not as a shelf life.",
   ],
   [
     "Does a blend have a different concentration from a single peptide?",
@@ -65,7 +69,9 @@ export const Route = createFileRoute("/reconstitution")({
         "Meyer BK et al. Antimicrobial preservative use in parenteral products: past and present. Journal of Pharmaceutical Sciences, 2007. PMID 17722087",
         ...Array.from(
           new Set(
-            Object.values(STABILITY).flatMap((s) => (s.status === "published" ? [s.cite] : [])),
+            Object.values(STABILITY).flatMap((s) =>
+              s.status === "published" ? [s.cite] : s.note ? [s.note.cite] : [],
+            ),
           ),
         ),
       ],
@@ -97,7 +103,10 @@ const strengthList = (c: Compound) => c.strengths.map((s) => s.label).join(", ")
 function headlineRow(c: Compound) {
   const record = dilutionFor(c.slug);
   const first = c.strengths.find((s) => s.unit === "mg");
-  if (!record || !first) return record?.readyToUse ? "Supplied as a solution" : "";
+  if (!record) return "";
+  if (record.readyToUse) return "Supplied as a solution";
+  if (record.withholdConcentrations) return "pre-dissolve, no aqueous stock";
+  if (!first) return "";
   const rows = dilutionRows(first);
   const row = rows[0];
   return row ? `${fmt(row.mgPerMl)} mg/ml at ${row.ml} ml` : "";
@@ -116,7 +125,11 @@ function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
       <summary className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-4 cursor-pointer list-none">
         <span className="font-heading font-semibold">{c.name}</span>
         <span className="font-mono text-xs text-muted-foreground">{strengthList(c)}</span>
-        <span className="text-xs rounded-full bg-tint text-primary px-2 py-0.5">{solvent.short}</span>
+        <span className="text-xs rounded-full bg-tint text-primary px-2 py-0.5">
+          {record.alternateSolvent
+            ? `${solvent.short} or ${solvents[record.alternateSolvent].short}`
+            : solvent.short}
+        </span>
         <span className="text-xs text-muted-foreground ml-auto tabular-nums">
           {record.readyToUse ? "solution, no dilution step" : headlineRow(c)}
         </span>
@@ -135,42 +148,52 @@ function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
               the label; to find the volume that contains a mass, divide the mass by the stated
               concentration.
             </p>
+          ) : record.withholdConcentrations ? (
+            <div className="space-y-2">
+              <p className="text-muted-foreground">{record.dilutionNote}</p>
+              <p className="text-xs text-muted-foreground">
+                The volume table is withheld for this compound: no validated aqueous stock exists, so
+                any mg/ml figure here would be arithmetic without a basis.
+              </p>
+            </div>
           ) : (
-            c.strengths.map((s) => {
-              const rows = dilutionRows(s);
-              if (rows.length === 0) return null;
-              return (
-                <div key={s.label} className="overflow-x-auto">
-                  <p className="text-xs text-muted-foreground mb-1">{s.label} vial</p>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-muted-foreground">
-                        <th className="py-1 pr-4 font-medium">Diluent</th>
-                        <th className="py-1 pr-4 font-medium">Concentration</th>
-                        <th className="py-1 font-medium">µg per ml</th>
-                      </tr>
-                    </thead>
-                    <tbody className="font-mono tabular-nums">
-                      {rows.map((row) => (
-                        <tr key={row.ml}>
-                          <td className="py-1 pr-4">{fmt(row.ml)} ml</td>
-                          <td className="py-1 pr-4">{fmt(row.mgPerMl)} mg/ml</td>
-                          <td className="py-1">{fmt(row.ugPerMl)}</td>
+            <>
+              {c.strengths.map((s) => {
+                const rows = dilutionRows(s);
+                if (rows.length === 0) return null;
+                return (
+                  <div key={s.label} className="overflow-x-auto">
+                    <p className="text-xs text-muted-foreground mb-1">{s.label} vial</p>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-left text-muted-foreground">
+                          <th className="py-1 pr-4 font-medium">Diluent</th>
+                          <th className="py-1 pr-4 font-medium">Concentration</th>
+                          <th className="py-1 font-medium">µg per ml</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              );
-            })
+                      </thead>
+                      <tbody className="font-mono tabular-nums">
+                        {rows.map((row) => (
+                          <tr key={row.ml}>
+                            <td className="py-1 pr-4">{fmt(row.ml)} ml</td>
+                            <td className="py-1 pr-4">{fmt(row.mgPerMl)} mg/ml</td>
+                            <td className="py-1">{fmt(row.ugPerMl)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
+              {record.dilutionNote && (
+                <p className="text-muted-foreground">{record.dilutionNote}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Volumes are concentration options, not a protocol. Do not exceed the nominal capacity
+                of the vial.
+              </p>
+            </>
           )}
-          {record.dilutionNote && (
-            <p className="text-muted-foreground">{record.dilutionNote}</p>
-          )}
-          <p className="text-xs text-muted-foreground">
-            Volumes are concentration options, not a protocol. Do not exceed the nominal capacity of
-            the vial.
-          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -191,10 +214,21 @@ function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
               {record.stability.text} <span className="whitespace-nowrap">({record.stability.cite})</span>
             </p>
           ) : (
-            <p className="text-muted-foreground">
-              No published stability data for this compound in either form. Store it as set out
-              above and treat any time in solution as short.
-            </p>
+            <div className="space-y-2 text-muted-foreground">
+              <p>
+                No published stability data for this compound in either form. Store it as set out
+                above and treat any time in solution as short.
+              </p>
+              {record.stability.note && (
+                <p>
+                  <span className="font-medium text-foreground">
+                    {record.stability.note.label}:
+                  </span>{" "}
+                  {record.stability.note.text}{" "}
+                  <span className="whitespace-nowrap">({record.stability.note.cite})</span>
+                </p>
+              )}
+            </div>
           )}
         </div>
 
@@ -252,15 +286,15 @@ function ReconstitutionReference() {
           contains no dose, no per-use amount and no route of administration.
         </p>
         <p className="text-sm text-muted-foreground mt-3 tabular-nums">
-          {compounds.length} compounds · 3 solvents · updated 2 November 2026 ·{" "}
+          {compounds.length} compounds · {Object.keys(solvents).length} solvents · updated 2 November 2026 ·{" "}
           <Link to="/calculator" className="text-primary underline underline-offset-4">
             open the calculator
           </Link>
         </p>
 
         <section className="mt-10">
-          <SectionTitle title="The three solvents" />
-          <div className="grid md:grid-cols-3 gap-4">
+          <SectionTitle title="The solvents" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {Object.values(solvents).map((s) => (
               <div key={s.id} className="border border-border rounded-2xl p-5 bg-card">
                 <FlaskConical className="text-primary mb-3" size={20} />
@@ -277,8 +311,9 @@ function ReconstitutionReference() {
           Read the arithmetic first. A vial of <span className="font-mono">m</span> mg made up to{" "}
           <span className="font-mono">v</span> ml gives <span className="font-mono">m / v</span>{" "}
           mg/ml, and a target mass <span className="font-mono">x</span> mg sits in{" "}
-          <span className="font-mono">x / (m / v)</span> ml of that stock. Nothing else changes when
-          you pick a different volume.
+          <span className="font-mono">x / (m / v)</span> ml of that stock. The mass does not change
+          with the volume; the concentration does. Solubility is a separate limit, so if the powder
+          will not clear at the volume you chose, the answer is a different solvent, not more water.
         </div>
 
         {dilutionGroups.map((group) => {

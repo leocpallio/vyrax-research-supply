@@ -325,8 +325,16 @@ function CalculatorPage() {
             {selected && record && (
               <div className="mt-6 rounded-xl border border-white/10 p-4 text-xs">
                 <p className="text-ink-muted">Solvent for {selected.name}</p>
-                <p className="font-semibold mt-1">{solvents[record.solvent].name}</p>
+                <p className="font-semibold mt-1">
+                  {solvents[record.solvent].name}
+                  {record.alternateSolvent
+                    ? `, or ${solvents[record.alternateSolvent].name.toLowerCase()}`
+                    : ""}
+                </p>
                 <p className="text-ink-muted mt-2">{record.solventReason}</p>
+                {record.preparationCaveat && (
+                  <p className="text-promo mt-2">{record.preparationCaveat}</p>
+                )}
                 <Link
                   to="/reconstitution"
                   hash={selected.slug}

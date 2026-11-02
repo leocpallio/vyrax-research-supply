@@ -13,12 +13,16 @@ import type { Compound, Strength } from "./types";
  * dose, no per-use amount and no administration route. "Suggested volumes" are arithmetic options
  * chosen so the stock lands in a useful concentration band, not a protocol.
  *
- * SOURCING RULE. Every claim in the rendered page comes from one of three places:
+ * SOURCING RULE. Every claim in the rendered page comes from one of four places:
  *   1. the catalogue specification for the item (form and appearance, held in data/compounds-*.ts),
- *   2. a peer-reviewed paper (PMID listed in `sources`),
- *   3. the lab's own general handling guidance in the reconstitution guide.
+ *   2. a peer-reviewed paper, cited in the record's own `sources` list,
+ *   3. unverified supplier guidance, which is always labelled as unverified rather than presented
+ *      as a finding, and
+ *   4. the lab's own general handling guidance in the reconstitution guide.
  * Where no aqueous stability study for a compound has been published, `stability` is
- * `{ status: "none" }` and the page prints "No published stability data" rather than a guess.
+ * `{ status: "none" }` and the page prints "No published stability data" rather than a guess. Where
+ * a relevant study exists but studied a different molecule or a non-aqueous matrix, it is carried as
+ * a labelled note so it cannot be read as a shelf life for this item.
  */
 
 // ------------------------------------------------------------------ general sources
@@ -32,7 +36,11 @@ export const SOURCES = {
 } as const;
 
 // ------------------------------------------------------------------ solvents
-export type SolventId = "bacteriostatic-water" | "sterile-water" | "acetic-acid-0.1m";
+export type SolventId =
+  | "bacteriostatic-water"
+  | "sterile-water"
+  | "acetic-acid-0.1m"
+  | "dmso";
 
 export type Solvent = {
   id: SolventId;
@@ -76,6 +84,16 @@ export const solvents: Record<SolventId, Solvent> = {
     caveat:
       "Acidic stocks are not neutralised before storage. Prepare 0.1 M acetic acid by dilution of glacial acetic acid in sterile water, filter it, and record the preparation date on the label.",
   },
+  dmso: {
+    id: "dmso",
+    name: "Dimethyl sulfoxide, anhydrous",
+    short: "DMSO",
+    composition: "Anhydrous dimethyl sulfoxide, 99.9% or better",
+    reason:
+      "Used only where the material will not reach a workable concentration in water. The powder is pre-dissolved in the minimum volume of DMSO and an aliquot of that concentrate is diluted into aqueous buffer. No aqueous stock is claimed, and none of the water-only arithmetic applies.",
+    caveat:
+      "DMSO is not interchangeable with water. It freezes at about 18.5°C, so it crystallises if it is stored cold; it is hygroscopic, so keep the bottle sealed; and it carries solutes through many plastics, so use glass or polypropylene. Record the final DMSO percentage, because a co-solvent changes the behaviour of most assays.",
+  },
 };
 
 // ------------------------------------------------------------------ dilution maths
@@ -114,18 +132,34 @@ export function volumeForMass(massMg: number, stockMgPerMl: number) {
 }
 
 // ------------------------------------------------------------------ per-compound records
+export type StabilityNote = {
+  /** What the evidence actually is, so it cannot be read as a shelf life. */
+  label: string;
+  text: string;
+  cite: string;
+};
+
 export type StabilityRecord =
   | { status: "published"; text: string; cite: string }
-  | { status: "none" };
+  | { status: "none"; note?: StabilityNote };
 
 export type DilutionRecord = {
   slug: string;
   name: string;
   solvent: SolventId;
+  /** A second solvent the batch form may require, shown alongside the first. */
+  alternateSolvent?: SolventId;
   /** Compound-specific reason for the solvent, shown in the reference table. */
   solventReason: string;
-  /** Shown under the concentration table. */
+  /** Shown under the concentration table, or in its place when the table is withheld. */
   dilutionNote?: string;
+  /**
+   * True where no validated aqueous stock exists. The volume table is then withheld rather than
+   * printing a concentration the compound may not reach.
+   */
+  withholdConcentrations?: boolean;
+  /** Short warning shown in the calculator next to the solvent. */
+  preparationCaveat?: string;
   /** True when the item is supplied as a liquid, so there is nothing to dissolve. */
   readyToUse?: boolean;
   /** The item is the diluent itself, not something to be diluted. */
@@ -177,11 +211,23 @@ export function sequenceCautions(slug: string): string[] {
 }
 
 type Override = Partial<
-  Pick<DilutionRecord, "solvent" | "solventReason" | "dilutionNote" | "readyToUse" | "isDiluent">
+  Pick<
+    DilutionRecord,
+    | "solvent"
+    | "alternateSolvent"
+    | "solventReason"
+    | "dilutionNote"
+    | "withholdConcentrations"
+    | "preparationCaveat"
+    | "readyToUse"
+    | "isDiluent"
+  >
 > & {
   cautions?: string[];
   stability?: StabilityRecord;
   storageSolution?: string;
+  /** Compound-specific citations, added to the record's sources so each claim is traceable. */
+  evidence?: string[];
 };
 
 /** Compound-specific entries. Anything not listed uses the water-soluble peptide defaults. */
@@ -189,12 +235,15 @@ const OVERRIDES: Record<string, Override> = {
   "igf-1-lr3": {
     solvent: "acetic-acid-0.1m",
     solventReason:
-      "IGF-1 LR3 is poorly stable at neutral pH, and the established laboratory practice is to dissolve the lyophilised powder in 0.1 M acetic acid and dilute into buffer on the day of the experiment (Wang 1999).",
+      "The acidic stock is the standard laboratory handling for this protein family. For IGF-I in acetate buffer the documented loss routes were methionine oxidation and reducible dimer and trimer, and a histidine buffer held the protein together better (Germershaus 2013). No solvent study of the LR3 variant itself is published, so this is best practice applied from the parent molecule, not an LR3-specific finding.",
     dilutionNote:
       "Keep the stock acidic. Neutralising it drives aggregation, which is why the stock is diluted into buffer rather than titrated to pH 7.",
     cautions: [
-      "Do not neutralise the stock: solubility and stability are both pH dependent for this peptide.",
+      "Do not neutralise the stock: solubility and stability are both pH dependent for this protein.",
       "Adsorbs to some plastics; use low-binding tubes for aliquots.",
+    ],
+    evidence: [
+      "Germershaus 2013, European Journal of Pharmaceutics and Biopharmaceutics, PMID 23958318 (IGF-I, not the LR3 variant)",
     ],
   },
   mgf: {
@@ -264,10 +313,40 @@ const OVERRIDES: Record<string, Override> = {
     },
   },
   "melanotan-2": {
+    solvent: "dmso",
+    withholdConcentrations: true,
+    solventReason:
+      "No primary aqueous solubility dataset could be found for this peptide, so the reference does not print an aqueous stock. Published work on MT-II measures its degradation in aqueous solution (Ugwu 1994), which shows it dissolves at low concentration but gives no workable stock figure. It is therefore handled as a DMSO pre-dissolve: dissolve the powder in the minimum volume of DMSO that clears it, then dilute an aliquot of that concentrate into the buffer the experiment needs.",
+    dilutionNote:
+      "There is no aqueous concentration table for this compound. A figure of about 0.2 mg/ml is quoted in supplier material but could not be traced to a primary study, so it is unverified: test a small quantity before committing the vial, record what actually dissolved, and record the final DMSO percentage, which changes the assay. The aqueous degradation kinetics themselves are published (Ugwu 1994).",
+    preparationCaveat:
+      "No aqueous stock is validated for this compound. The arithmetic below does not establish that the powder will dissolve.",
     cautions: [
       "Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench.",
-      "Phosphate buffer accelerates degradation of this peptide, so it is the wrong choice for a working stock.",
+      "Phosphate buffer accelerates degradation of this peptide (Ugwu 1994), so it is the wrong choice for a working stock.",
+      "DMSO freezes at about 18.5°C: keep the concentrate at room temperature, not in the fridge.",
     ],
+    evidence: [
+      "Ugwu 1994, International Journal of Pharmaceutics, doi:10.1016/0378-5173(94)90055-8 (aqueous degradation kinetics of MT-II)",
+    ],
+  },
+  adamax: {
+    solvent: "dmso",
+    withholdConcentrations: true,
+    solventReason:
+      "No aqueous solubility, stability or solvent dataset is published for adamax, and the only handling note available is an unverified supplier statement that it dissolves in DMSO. The reference therefore offers no aqueous stock and no concentration table for it.",
+    dilutionNote:
+      "Pre-dissolve in the minimum volume of DMSO only if you have your own solubility data for the batch, dilute an aliquot into buffer, and record the final DMSO percentage, because a co-solvent changes the assay.",
+    preparationCaveat:
+      "No validated preparation exists for this compound: no aqueous stock, no concentration table.",
+    cautions: [
+      "Unverified handling: no primary source covers adamax, so treat every step as provisional and record what was done.",
+    ],
+  },
+  "cjc-1295-no-dac": {
+    alternateSolvent: "acetic-acid-0.1m",
+    solventReason:
+      "Salt form decides the solvent here. The acetate salt is the water-soluble one; the free base has limited water solubility and is handled in dilute acetic acid. The catalogue does not state which form a batch is, so the record shows both options and the batch record has to settle it.",
   },
   "melanotan-1": {
     cautions: ["Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench."],
@@ -339,19 +418,11 @@ const isWaterSolubleNote = (c: Compound) => {
 const EXTRA: Record<string, Partial<Override>> = {
   "cjc-1295-dac": {
     dilutionNote:
-      "The reference product dissolves in plain water at about 2 mg/mL. The DAC unit adds mass and albumin binding, not ionisable charge, so no acid co-solvent is needed.",
+      "No primary solubility dataset is published for the DAC form. Supplier guidance puts the soluble range near 2 mg/ml, which is unverified, so start at the lower concentrations in the table and record what actually dissolved before making a more concentrated stock.",
   },
   "cjc-1295-no-dac": {
     dilutionNote:
-      "Salt form decides the solvent here. The acetate dissolves in water to about 5 mg/mL; the free base has limited water solubility and is handled in 1% acetic acid. Read the datasheet before choosing, and record what was used.",
-  },
-  "melanotan-2": {
-    dilutionNote:
-      "Sparingly soluble in aqueous buffer, in the region of 0.2 mg/mL. Pre-dissolve in the minimum volume of DMF or DMSO, then dilute into buffer; a straight 5 mg/mL aqueous stock is not achievable with this peptide.",
-    cautions: [
-      "Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench.",
-      "Phosphate buffer accelerates degradation of this peptide, so it is the wrong choice for a working stock.",
-    ],
+      "If the batch is the acetate salt, water is the solvent. If it is the free base, the stock is made in 0.1 M acetic acid. The catalogue does not state which form is in the vial, so confirm it from the batch record and record what was used.",
   },
   "kisspeptin-10": {
     cautions: [
@@ -365,56 +436,76 @@ const EXTRA: Record<string, Partial<Override>> = {
   },
   "ara-290": {
     dilutionNote:
-      "Solubility is pH dependent. The supplier datasheet reaches about 66 mg/mL only after the solution is adjusted to pH 8, so do not assume a neutral-pH stock will clear.",
-  },
-  adamax: {
-    dilutionNote:
-      "The supplier datasheet publishes a DMSO solubility only. Pre-dissolve in DMSO, then dilute into aqueous buffer, and record the final DMSO percentage because it changes the assay.",
+      "Solubility is pH dependent and the alkaline end is the soluble one. No primary solubility dataset is on file, so do not assume a neutral-pH stock will clear at the concentrations in the table: test a small quantity first, adjust the pH, and record the pH used.",
   },
   epithalon: {
     dilutionNote:
-      "The supplier datasheet limits aqueous storage of a stock to one day. Weigh, dissolve and use within the session rather than storing a stock.",
+      "Unverified supplier guidance limits aqueous storage of a stock to one day. Prepare it for the session rather than the week, and record the preparation time.",
+    storageSolution:
+      "Prepared for the session: the quoted working life of a stock is one day, and no primary dataset was found to extend it. Keep it at 2 to 8°C and protected from light in the meantime.",
   },
   semax: {
     dilutionNote:
-      "The supplier datasheet limits aqueous storage of a stock to one day, so a stock is prepared for the session rather than the week.",
+      "Unverified supplier guidance limits aqueous storage of a stock to one day, so a stock is prepared for the session rather than the week.",
+    storageSolution:
+      "Prepared for the session: the quoted working life of a stock is one day, and no primary dataset was found to extend it. Keep it at 2 to 8°C and protected from light in the meantime.",
   },
   selank: {
     dilutionNote:
-      "The supplier datasheet limits aqueous storage of a stock to one day, so a stock is prepared for the session rather than the week.",
+      "Unverified supplier guidance limits aqueous storage of a stock to one day, so a stock is prepared for the session rather than the week.",
+    storageSolution:
+      "Prepared for the session: the quoted working life of a stock is one day, and no primary dataset was found to extend it. Keep it at 2 to 8°C and protected from light in the meantime.",
   },
 };
 
 function buildRecord(c: Compound): DilutionRecord {
   const o = { ...EXTRA[c.slug], ...OVERRIDES[c.slug] } as Override;
   const solvent = o.solvent ?? "bacteriostatic-water";
+  const stability: StabilityRecord = o.stability ?? STABILITY[c.slug] ?? { status: "none" };
   const labels: string[] = [];
   if (c.composition?.length) labels.push(`composition ${c.composition.join(", ")}`);
   if (c.form) labels.push(c.form.toLowerCase());
   if (c.appearance) labels.push(c.appearance.toLowerCase());
 
-  const sources = [
-    `Catalogue specification for ${c.name}${labels.length ? ` (${labels.join("; ")})` : ""}, held in the product data for this site.`,
-    SOURCES.manning,
-    SOURCES.wang,
+  // Every compound-specific claim on the page is traceable: the citation for the stability entry
+  // or the labelled note goes into that record's own source list, not just into a page footer.
+  const evidence = [
+    ...(o.evidence ?? []),
+    ...(stability.status === "published"
+      ? [stability.cite]
+      : stability.note
+        ? [`${stability.note.cite} (${stability.note.label.toLowerCase()})`]
+        : []),
   ];
-  if (solvent === "bacteriostatic-water") sources.push(SOURCES.meyer);
+
+  const sources = Array.from(
+    new Set([
+      `Catalogue specification for ${c.name}${labels.length ? ` (${labels.join("; ")})` : ""}, held in the product data for this site.`,
+      ...evidence,
+      SOURCES.manning,
+      SOURCES.wang,
+      ...(solvent === "bacteriostatic-water" ? [SOURCES.meyer] : []),
+    ]),
+  );
 
   return {
     slug: c.slug,
     name: c.name,
     solvent,
+    ...(o.alternateSolvent ? { alternateSolvent: o.alternateSolvent } : {}),
     solventReason:
       o.solventReason ??
       (solvent === "bacteriostatic-water"
         ? isWaterSolubleNote(c)
         : "See the solvent note in the guide."),
     ...(o.dilutionNote ? { dilutionNote: o.dilutionNote } : {}),
+    ...(o.withholdConcentrations ? { withholdConcentrations: true } : {}),
+    ...(o.preparationCaveat ? { preparationCaveat: o.preparationCaveat } : {}),
     ...(o.readyToUse ? { readyToUse: true } : {}),
     ...(o.isDiluent ? { isDiluent: true } : {}),
     storageDry: o.isDiluent ? "Store the unopened vial at 2 to 8°C; do not freeze." : STORAGE_DRY,
     storageSolution: o.storageSolution ?? STORAGE_SOLUTION,
-    stability: o.stability ?? STABILITY[c.slug] ?? { status: "none" },
+    stability,
     cautions: [
       ...(o.cautions ?? []),
       ...(o.readyToUse || o.isDiluent ? [] : BASE_CAUTIONS),
