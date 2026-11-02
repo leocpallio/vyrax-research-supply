@@ -1,0 +1,96 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Satoshi;src:url("{{FONT}}") format("woff2");font-weight:300 900}
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:600px;background:#FFFFFF;font-family:Satoshi,"Segoe UI",Helvetica,Arial,sans-serif;color:#14213D}
+.pad{padding:0 34px}
+.grid{background-image:linear-gradient(#EFF2F8 1px,transparent 1px),linear-gradient(90deg,#EFF2F8 1px,transparent 1px);background-size:72px 72px}
+.brand{font-size:26px;font-weight:800;letter-spacing:-.02em;text-align:center;padding:30px 0 6px}
+.brand{display:none}
+.wm{display:block;font-size:25px;font-weight:800;letter-spacing:.30em;color:#14213D;margin-left:.30em}
+.wmr{display:block;width:86px;height:2px;background:#5B8DEF;margin:7px auto 6px}
+.wml{display:block;font-size:13px;font-weight:700;letter-spacing:.42em;color:#5B8DEF;margin-left:.42em}
+.sub{text-align:center;font-size:16px;color:#1E2A44;padding-bottom:18px}
+h1{text-align:center;font-size:44px;line-height:1.06;font-weight:800;letter-spacing:-.03em}
+h1 .t{color:#24479C}
+.p{text-align:center;font-size:16.5px;line-height:1.55;color:#26314A;margin:18px auto 0;max-width:440px}
+.kick{text-align:center;font-size:12px;font-weight:800;letter-spacing:.28em;color:#6B7688;margin-top:22px}
+.goods{text-align:center;font-size:22px;font-weight:800;margin-top:8px}
+.cards{display:flex;gap:14px;margin:16px 0 0}
+.card{flex:1;background:#FFFFFF;border:1px solid #E1E6EF;border-radius:14px;padding:16px 12px 14px;text-align:center;color:#14213D}
+.card img{height:118px;display:block;margin:0 auto 10px;}
+.card .n{font-size:13px;font-weight:600}
+.card .r{font-size:12px;color:#6B7688;text-decoration:line-through;margin-top:6px}
+.card .f{font-size:13px;font-weight:800;letter-spacing:.16em;color:#24479C;margin-top:2px}
+.how{margin:24px 0 0;border-top:1px solid #E1E6EF;border-bottom:1px solid #E1E6EF;padding:18px 0 4px}
+.howh{text-align:center;font-size:12px;font-weight:800;letter-spacing:.26em;color:#5B8DEF;margin-bottom:14px}
+.hrow{display:flex;gap:14px;align-items:baseline;padding:9px 0;border-bottom:1px solid #EEF1F7}
+.hrow:last-of-type{border-bottom:0}
+.hrow b{flex:0 0 196px;font-size:14px;font-weight:800;color:#14213D;line-height:1.3}
+.hrow span{flex:1;font-size:13.5px;line-height:1.45;color:#26314A}
+.eg{margin:14px 0 12px;background:#F4F7FD;border-radius:10px;padding:13px 14px;font-size:13.5px;line-height:1.5;color:#14213D}
+.eg b{font-weight:800}
+.code{text-align:center;font-size:15px;color:#26314A;margin:20px 0}
+.code span{border:1px solid #C9D3E6;border-radius:6px;padding:5px 10px;font-weight:800;letter-spacing:.14em;font-size:16px}
+.cta{margin:0 auto 28px;width:250px;background:#14213D;color:#fff;text-align:center;font-size:15px;font-weight:700;letter-spacing:.07em;padding:18px 0;border-radius:999px}
+
+.fine{font-size:12.5px;color:#42506B;line-height:1.6;padding:16px 34px 0;text-align:center}
+.showcase{display:flex;gap:14px;align-items:flex-end;background:#FFFFFF;border-top:1px solid #E1E6EF;border-bottom:1px solid #E1E6EF;padding:24px 22px 26px;justify-content:space-between;align-items:flex-end}
+
+.shopall{text-align:center;font-size:12.5px;font-weight:800;letter-spacing:.2em;padding:20px 0 6px}
+h2{text-align:center;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.lead{text-align:center;font-size:14.5px;color:#26314A;margin:10px auto 20px;max-width:400px;line-height:1.55}
+.product{display:flex;gap:16px;background:#FFFFFF;border-radius:14px;padding:14px;margin:12px 0;align-items:center}
+.product img{width:88px;height:144px;object-fit:contain;margin:2px 0 6px}
+.product h3{font-size:17px;font-weight:800;margin-bottom:4px}
+.product .s{font-size:12px;color:#4E5B75;margin-bottom:6px;letter-spacing:.08em;font-weight:700}
+.product .d{font-size:13.5px;line-height:1.5;color:#26314A}
+.product .pr{font-size:18px;font-weight:800;margin:9px 0 8px}
+.product .b{display:inline-block;background:#24479C;color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:999px;letter-spacing:.04em}
+.test{background:#14213D;color:#FFFFFF;padding:34px;text-align:center;margin-top:20px}
+.test .k{font-size:11px;letter-spacing:.26em;color:#8FB0F5;font-weight:800}
+.test h2{font-size:28px;margin:10px 0 12px}
+.test p{font-size:13px;line-height:1.6;color:#C9D3E6;max-width:420px;margin:0 auto}
+.cell{flex:1;display:flex;justify-content:center;align-items:flex-end}
+.showcase img{height:118px;width:auto;max-width:none;object-fit:contain;display:block}
+.kband{background:#040825;padding:26px 0 24px;text-align:center}
+.kband img{width:100%;height:auto;display:block;margin:0}
+.kn{color:#fff;font-size:25px;font-weight:500;letter-spacing:-.01em;margin-top:6px}
+.krow{display:flex;align-items:baseline;justify-content:center;gap:16px;margin-top:8px}
+.kw{color:#6E7BA3;font-size:24px;font-weight:600;text-decoration:line-through}
+.kf{color:#5B8DEF;font-size:25px;font-weight:800;letter-spacing:.02em}
+</style></head><body class="grid">
+<div class="brand"><span class="wm">VYRAX</span><span class="wmr"></span><span class="wml">LABS</span></div>
+<div class="sub">Welcome to the Vyrax family</div>
+<div class="pad"><h1>{{PCT}}% off<br><span class="t">your first order</span></h1>
+<p class="p">With code {{CODE}} on goods over {{MIN}}. Plus five 10ml bacteriostatic waters free over {{GIFT_OVER}}, and every third vial free on {{B2G1}}.</p>
+<div class="kick">PLUS</div>
+<div class="goods">{{GIFT_VALUE}} of free bac water</div></div>
+<div class="kband" data-cut><img src="{{ASSETS}}/gift-group.png?v=4"><div class="kn">5 &times; Bac Water 10ml</div><div class="krow"><span class="kw">{{GIFT_VALUE}}</span><span class="kf">FREE</span></div></div><i data-cut></i>
+<div class="pad">
+<div class="how">
+<div class="howh">HOW YOUR DISCOUNT WORKS</div>
+<div class="hrow"><b>{{PCT}}% off with your code</b><span>Code {{CODE}} takes {{PCT}}% off when goods reach {{MIN}}, after tier savings.</span></div>
+<div class="hrow"><b>Bigger basket, bigger saving</b><span>{{TIERS}}. Added automatically, no code needed.</span></div>
+<div class="hrow"><b>Third vial free</b><span>On {{B2G1}}: every third vial of the same strength is free.</span></div>
+<div class="hrow"><b>Free delivery over {{DELIVERY}}</b><span>On UK orders, {{DELIVERY_FEE}} below that. {{GIFT_LABEL}} free over {{GIFT_OVER}}, worth {{GIFT_VALUE}}.</span></div>
+<div class="eg">{{EXAMPLE}}</div>
+</div>
+<div class="code">using code <span>{{CODE}}</span></div>
+<div class="cta">USE MY CODE NOW</div>
+</div>
+<div class="showcase"><div class="cell"><img src="{{ASSETS}}/row/nad-plus__500mg.png"></div><div class="cell"><img src="{{ASSETS}}/row/selank__10mg.png"></div><div class="cell"><img src="{{ASSETS}}/row/ghk-cu__50mg.png"></div><div class="cell"><img src="{{ASSETS}}/row/retatrutide__10mg.png"></div><div class="cell"><img src="{{ASSETS}}/row/mots-c__10mg.png"></div></div>
+<div class="fine">Free delivery and free water are judged on goods after tier savings. Your code stacks with tier pricing, one code per order.</div>
+<div class="pad" data-cut>
+<div class="kick">MOST REQUESTED</div>
+<h2>What people actually order</h2>
+<p class="lead">Three of our most requested, and the research each one actually sits on.</p>
+<div class="product"><img src="{{ASSETS}}/row/bpc-157__10mg.png"><div><h3>BPC-157</h3><div class="s">10MG VIAL</div><div class="d">A synthetic pentadecapeptide fragment studied for its role in tissue repair signalling and angiogenesis.</div><div class="pr">{{PRICE_bpc-157_10mg}}</div><div class="b">VIEW BPC-157</div></div></div>
+<div class="product"><img src="{{ASSETS}}/row/retatrutide__10mg.png"><div><h3>RETATRUTIDE</h3><div class="s">10MG VIAL</div><div class="d">A triple-receptor agonist studied across GLP-1, GIP and glucagon signalling in metabolic research.</div><div class="pr">{{PRICE_retatrutide_10mg}}</div><div class="b">VIEW RETATRUTIDE</div></div></div>
+<div class="product"><img src="{{ASSETS}}/row/ghk-cu__50mg.png"><div><h3>GHK-Cu</h3><div class="s">50MG VIAL</div><div class="d">A copper-binding tripeptide studied for collagen synthesis, wound repair and skin remodelling.</div><div class="pr">{{PRICE_ghk-cu_50mg}}</div><div class="b">VIEW GHK-CU</div></div></div>
+<div class="shopall">SHOP ALL {{COUNT}} COMPOUNDS</div>
+</div>
+<div class="test"><div class="k">HOW WE TEST</div><h2>Every report we publish is the lab's own</h2><p>Batch number on the vial matches the certificate on the product page. If a batch has no report yet, the card says so rather than showing a number we do not have.</p></div>
+<!--SENTINEL-->
+
+</body></html>
