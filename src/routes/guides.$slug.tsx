@@ -154,8 +154,8 @@ function GuidePage() {
               <p className="font-heading font-semibold">Every compound, one page</p>
               <p className="text-sm text-muted-foreground mt-2">
                 Solvent, the concentration each diluent volume gives for every vial size we supply,
-                storage for both forms, and the published stability evidence for all{" "}
-                {references} compounds.
+                storage for both forms, and the published stability evidence for all {references}{" "}
+                compounds.
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 <Link

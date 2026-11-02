@@ -32,7 +32,14 @@ export const guides: Guide[] = [
     changed:
       "Added solvent selection, aliquoting, stability evidence and a per-compound dilution reference covering the whole catalogue.",
     readMins: 12,
-    compounds: ["bacteriostatic-water", "bpc-157", "retatrutide", "ghk-cu", "igf-1-lr3", "nad-plus"],
+    compounds: [
+      "bacteriostatic-water",
+      "bpc-157",
+      "retatrutide",
+      "ghk-cu",
+      "igf-1-lr3",
+      "nad-plus",
+    ],
     body: [
       {
         type: "p",

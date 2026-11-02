@@ -30,18 +30,13 @@ import type { Compound, Strength } from "./types";
 export const SOURCES = {
   manning:
     "Manning MC, Chou DK, Murphy BM, Payne RW, Katayama DS. Stability of protein pharmaceuticals: an update. Pharmaceutical Research, 2010. PMID 20143256",
-  wang:
-    "Wang W. Instability, stabilization, and formulation of liquid protein pharmaceuticals. International Journal of Pharmaceutics, 1999. PMID 10460913",
+  wang: "Wang W. Instability, stabilization, and formulation of liquid protein pharmaceuticals. International Journal of Pharmaceutics, 1999. PMID 10460913",
   meyer:
     "Meyer BK, Ni A, Hu B, Shi L. Antimicrobial preservative use in parenteral products: past and present. Journal of Pharmaceutical Sciences, 2007. PMID 17722087",
 } as const;
 
 // ------------------------------------------------------------------ solvents
-export type SolventId =
-  | "bacteriostatic-water"
-  | "sterile-water"
-  | "acetic-acid-0.1m"
-  | "dmso";
+export type SolventId = "bacteriostatic-water" | "sterile-water" | "acetic-acid-0.1m" | "dmso";
 
 export type Solvent = {
   id: SolventId;
@@ -141,8 +136,7 @@ export type StabilityNote = {
 };
 
 export type StabilityRecord =
-  | { status: "published"; text: string; cite: string }
-  | { status: "none"; note?: StabilityNote };
+  { status: "published"; text: string; cite: string } | { status: "none"; note?: StabilityNote };
 
 export type DilutionRecord = {
   slug: string;
@@ -359,7 +353,9 @@ const OVERRIDES: Record<string, Override> = {
       "Salt form decides the solvent here. The acetate salt is the water-soluble one; the free base has limited water solubility and is handled in dilute acetic acid. The catalogue does not state which form a batch is, so the record shows both options and the batch record has to settle it.",
   },
   "melanotan-1": {
-    cautions: ["Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench."],
+    cautions: [
+      "Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench.",
+    ],
   },
   oxytocin: {
     cautions: [
@@ -372,7 +368,7 @@ const OVERRIDES: Record<string, Override> = {
     solventReason:
       "Supplied as a solution at 600 mg/ml in a 10 ml vial, so there is nothing to reconstitute. Concentration arithmetic for a solution works the other way: volume = mass / concentration.",
   },
-  "glow": {
+  glow: {
     dilutionNote:
       "The table gives total blend mass per ml. Per-component concentration is the component mass on the label divided by the same volume, so 70 mg in 5 ml is 14 mg/ml of total peptide and 10 mg/ml of GHK-Cu.",
     cautions: [
@@ -380,7 +376,7 @@ const OVERRIDES: Record<string, Override> = {
       "The blue colour comes from GHK-Cu and is expected.",
     ],
   },
-  "klow": {
+  klow: {
     dilutionNote:
       "The table gives total blend mass per ml. Per-component concentration is the component mass on the label divided by the same volume.",
     cautions: [
@@ -391,22 +387,30 @@ const OVERRIDES: Record<string, Override> = {
   "wolverine-stack": {
     dilutionNote:
       "The table gives total blend mass per ml. Each component is half the stated total, so 10 mg total in 2 ml is 5 mg/ml of BPC-157 and 5 mg/ml of TB-500.",
-    cautions: ["Co-lyophilised blend: do not separate or filter; record the total mass not the component masses."],
+    cautions: [
+      "Co-lyophilised blend: do not separate or filter; record the total mass not the component masses.",
+    ],
   },
   "hulk-stack": {
     dilutionNote:
       "The table gives total blend mass per ml. Per-component concentration is the component mass on the label divided by the same volume.",
-    cautions: ["Co-lyophilised blend: do not separate or filter; record the total mass not the component masses."],
+    cautions: [
+      "Co-lyophilised blend: do not separate or filter; record the total mass not the component masses.",
+    ],
   },
   "cjc-1295-ipamorelin": {
     dilutionNote:
       "The table gives total blend mass per ml. With a 5 + 5 mg vial, 2 ml gives 5 mg/ml in total, which is 2.5 mg/ml of each component.",
-    cautions: ["Co-lyophilised blend: do not separate or filter; record the total mass not the component masses."],
+    cautions: [
+      "Co-lyophilised blend: do not separate or filter; record the total mass not the component masses.",
+    ],
   },
   "selank-semax": {
     dilutionNote:
       "The table gives total blend mass per ml. With a 10 + 10 mg vial, 4 ml gives 5 mg/ml in total, which is 2.5 mg/ml of each component.",
-    cautions: ["Co-lyophilised blend: do not separate or filter; record the total mass not the component masses."],
+    cautions: [
+      "Co-lyophilised blend: do not separate or filter; record the total mass not the component masses.",
+    ],
   },
 };
 
