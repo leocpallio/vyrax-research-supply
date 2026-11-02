@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs, SectionTitle, FAQ } from "@/components/Store";
 import { compounds, productPath } from "@/lib/catalog";
@@ -113,14 +113,13 @@ function headlineRow(c: Compound) {
   return row ? `${fmt(row.mgPerMl)} mg/ml at ${row.ml} ml` : "";
 }
 
-function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
+function Detail({ c }: { c: Compound }) {
   const record = dilutionFor(c.slug);
   if (!record) return null;
   const solvent = solvents[record.solvent];
   return (
     <details
       id={c.slug}
-      open={expanded || undefined}
       className="border border-border rounded-2xl bg-card open:shadow-sm scroll-mt-28"
     >
       <summary className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-4 cursor-pointer list-none">
@@ -265,16 +264,10 @@ function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
 }
 
 function ReconstitutionReference() {
-  const routerAnchor = useRouterState({
-    select: (s) => s.location.hash.replace(/^#/, ""),
-  });
-  // A deep link such as /reconstitution#bpc-157 arrives before the router has a
-  // hash in state, so the window hash is tracked directly as well and the
-  // matching panel is opened and scrolled to once it has rendered.
-  const [windowAnchor, setWindowAnchor] = useState("");
+  // A deep link such as /reconstitution#bpc-157 arrives with no hash in router
+  // state, and the panels are uncontrolled, so the target is opened and scrolled
+  // to directly once it has rendered.
   useEffect(() => {
-    // Deep links arrive before the router has a hash in state, and hydration can
-    // overwrite the attribute, so open the target panel directly as well.
     const openFromHash = () => {
       const id = window.location.hash.replace(/^#/, "");
       if (!id) return;
@@ -282,7 +275,6 @@ function ReconstitutionReference() {
       if (!el) return;
       el.open = true;
       el.scrollIntoView({ block: "start" });
-      setWindowAnchor(id);
     };
     openFromHash();
     const settle = window.setTimeout(openFromHash, 400);
@@ -292,12 +284,7 @@ function ReconstitutionReference() {
       window.removeEventListener("hashchange", openFromHash);
     };
   }, []);
-  const anchor = routerAnchor || windowAnchor;
-  useEffect(() => {
-    if (!anchor) return;
-    const el = document.getElementById(anchor);
-    if (el) el.scrollIntoView({ block: "start" });
-  }, [anchor]);
+
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">
@@ -355,7 +342,7 @@ function ReconstitutionReference() {
               <h2 className="font-heading text-xl font-semibold mb-4">{group.label}</h2>
               <div className="space-y-2">
                 {list.map((c) => (
-                  <Detail key={c.slug} c={c} expanded={anchor === c.slug} />
+                  <Detail key={c.slug} c={c} />
                 ))}
               </div>
             </section>
