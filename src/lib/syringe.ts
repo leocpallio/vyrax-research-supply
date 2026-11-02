@@ -95,6 +95,10 @@ export type Warning =
       kind: "over-capacity";
       nextSyringe: SyringeSpec | null;
       diluentForFullBarrelMl: number | null;
+      /** Volume above the barrel's capacity, in ml. */
+      excessMl: number;
+      /** Full barrels of this syringe needed to hold the draw. */
+      drawsNeeded: number;
     }
   | { kind: "below-graduation"; minorMl: number }
   | { kind: "exceeds-vial" }
@@ -159,14 +163,17 @@ export function compute(i: Inputs): Result | null {
     };
     if (i.targetMg > i.vialMg + 1e-12) warnings.push({ kind: "exceeds-vial" });
     if (ml > i.syringe.capacityMl + 1e-9) {
+      // Largest diluent volume that puts the target mass in one full barrel: V = vial x cap / target.
+      // Less diluent means a higher concentration and a smaller draw. Withheld when the target
+      // exceeds the vial, or when that concentration would break the compound's solubility ceiling.
+      const fix = (i.vialMg * i.syringe.capacityMl) / i.targetMg;
+      const breaksCeiling = i.ceiling ? i.vialMg / fix > i.ceiling.mgPerMl + 1e-9 : false;
       warnings.push({
         kind: "over-capacity",
         nextSyringe: smallestSyringeFor(ml),
-        // Largest diluent volume that puts the target mass in one full barrel: V = vial x cap / target.
-        // Less diluent means a higher concentration and a smaller draw. Meaningless when the target
-        // exceeds the vial, so it is null there.
-        diluentForFullBarrelMl:
-          i.targetMg > i.vialMg ? null : (i.vialMg * i.syringe.capacityMl) / i.targetMg,
+        diluentForFullBarrelMl: i.targetMg > i.vialMg || breaksCeiling ? null : fix,
+        excessMl: ml - i.syringe.capacityMl,
+        drawsNeeded: Math.ceil(Number((ml / i.syringe.capacityMl).toPrecision(12))),
       });
     } else if (ml < i.syringe.minorMl - 1e-12) {
       warnings.push({ kind: "below-graduation", minorMl: i.syringe.minorMl });

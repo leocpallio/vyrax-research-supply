@@ -169,6 +169,37 @@ describe("edge cases", () => {
     expect(fixed.draw?.ml).toBeCloseTo(0.5, 9);
     expect(fixed.warnings.some((x) => x.kind === "over-capacity")).toBe(false);
   });
+  test("over-capacity reports excess volume and full barrels needed", () => {
+    const r = compute({ vialMg: 10, diluentMl: 2, targetMg: 4, syringe: s05 })!;
+    const w = r.warnings.find((x) => x.kind === "over-capacity");
+    expect(w && w.kind === "over-capacity" && w.excessMl).toBeCloseTo(0.3, 12);
+    expect(w && w.kind === "over-capacity" && w.drawsNeeded).toBe(2);
+    // exactly two barrels: 1.0 ml in a 0.5 ml syringe is 2, not 3 from float noise
+    const two = compute({ vialMg: 10, diluentMl: 2, targetMg: 5, syringe: s05 })!;
+    const w2 = two.warnings.find((x) => x.kind === "over-capacity");
+    expect(w2 && w2.kind === "over-capacity" && w2.drawsNeeded).toBe(2);
+    const big = compute({ vialMg: 10, diluentMl: 5, targetMg: 8, syringe: s3 })!;
+    const w3 = big.warnings.find((x) => x.kind === "over-capacity");
+    expect(w3 && w3.kind === "over-capacity" && w3.drawsNeeded).toBe(2);
+  });
+  test("no diluent fix offered when it would break the solubility ceiling", () => {
+    // 5 mg vial, ceiling 2 mg/ml => at least 2.5 ml. Target 4 mg in a 0.3 ml barrel needs 0.375 ml.
+    const ceiling = { mgPerMl: 2, verified: false, source: "x" };
+    const r = compute({ vialMg: 5, diluentMl: 2.5, targetMg: 4, syringe: SYRINGES[0]!, ceiling })!;
+    const w = r.warnings.find((x) => x.kind === "over-capacity");
+    expect(w && w.kind === "over-capacity" && w.diluentForFullBarrelMl).toBeNull();
+    expect(w && w.kind === "over-capacity" && w.nextSyringe?.id).toBe("3");
+    // within the ceiling the fix is still offered: 5 mg, target 0.5 mg, 0.3 ml barrel => 3 ml
+    const ok = compute({
+      vialMg: 5,
+      diluentMl: 10,
+      targetMg: 0.5,
+      syringe: SYRINGES[0]!,
+      ceiling,
+    })!;
+    const w2 = ok.warnings.find((x) => x.kind === "over-capacity");
+    expect(w2 && w2.kind === "over-capacity" && w2.diluentForFullBarrelMl).toBeCloseTo(3, 9);
+  });
   test("no diluent fix offered when the target exceeds the vial", () => {
     const r = compute({ vialMg: 10, diluentMl: 2, targetMg: 50, syringe: s1 })!;
     const w = r.warnings.find((x) => x.kind === "over-capacity");

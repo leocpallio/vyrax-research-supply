@@ -27,14 +27,21 @@ const fmt = (n: number, dp = 3) =>
 
 const fmtMass = (mg: number) => (mg < 1 ? `${fmt(mg * 1000, 1)} mcg` : `${fmt(mg, 3)} mg`);
 
-// Barrel geometry in SVG user units.
-const VB_W = 680;
-const VB_H = 210;
-const BX0 = 132; // needle end of the barrel (0 ml line)
-const BX1 = 572; // capacity line
+// Syringe geometry in SVG user units. The vial is its own SVG so both can be sized for the hero.
+const VB_W = 720;
+const VB_H = 196;
+const BX0 = 96; // needle end of the barrel (0 ml line)
+const BX1 = 640; // capacity line
 const BW = BX1 - BX0;
-const BY = 92; // barrel top
-const BH = 54; // barrel height
+const BY = 78; // barrel top
+const BH = 70; // barrel height
+
+// Vial geometry.
+const VW = 140;
+const VH = 220;
+const VIAL_TOP = 64;
+const VIAL_BOT = 206;
+const VIAL_H = VIAL_BOT - VIAL_TOP;
 
 export function SyringeTool({
   options,
@@ -52,6 +59,7 @@ export function SyringeTool({
   const [syringeId, setSyringeId] = useState<SyringeSpec["id"]>("1");
   const [dragging, setDragging] = useState(false);
   const [swirl, setSwirl] = useState(0);
+  const [pour, setPour] = useState(0);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const syringe = syringeById(syringeId) ?? SYRINGES[2]!;
@@ -89,6 +97,15 @@ export function SyringeTool({
   useEffect(() => {
     if (concKey) setSwirl((n) => n + 1);
   }, [concKey]);
+  // Pour a stream of diluent into the vial whenever the diluent volume changes.
+  const firstPour = useRef(true);
+  useEffect(() => {
+    if (firstPour.current) {
+      firstPour.current = false;
+      return;
+    }
+    if (diluentMl !== null) setPour((n) => n + 1);
+  }, [diluentMl]);
 
   const drawFrac = r?.draw ? Math.min(r.draw.shownMl / syringe.capacityMl, 1) : 0;
   const plungerX = BX0 + drawFrac * BW;
@@ -147,8 +164,11 @@ export function SyringeTool({
   const ticks = useMemo(() => graduations(syringe), [syringe]);
   const vialCapMl = diluentMl !== null && diluentMl > 3 ? 10 : 3;
   const liquidMl = diluentMl === null ? 0 : Math.min(diluentMl, vialCapMl);
-  const remainingMl = Math.max(0, liquidMl - (r?.draw ? Math.min(r.draw.shownMl, liquidMl) : 0));
+  const drawnMl = r?.draw ? Math.min(r.draw.shownMl, liquidMl) : 0;
+  const remainingMl = Math.max(0, liquidMl - drawnMl);
   const level = liquidMl ? remainingMl / vialCapMl : 0;
+  const overTone = Boolean(over);
+  const drawKey = r?.draw ? round(r.draw.shownMl, 4) : 0;
 
   const valueText = r?.draw
     ? syringe.unitScale
@@ -172,6 +192,347 @@ export function SyringeTool({
           barrel shows the draw volume on a real U-100 or ml scale. Drag the plunger, or use the
           arrow keys, to read the mass held at any graduation. For research use only.
         </p>
+      </div>
+
+      {/* ---------------- hero diagram: vial + syringe, full width */}
+      <div className="px-5 md:px-8 pt-6">
+        <div className="rounded-2xl bg-tint/60 border border-border px-3 py-4 md:px-8 md:py-8 flex flex-col md:flex-row md:items-center gap-2 md:gap-8">
+          <svg
+            viewBox={`0 0 ${VW} ${VH}`}
+            className="block h-[132px] md:h-auto md:w-[150px] lg:w-[170px] mx-auto md:mx-0 shrink-0"
+            style={{ aspectRatio: `${VW} / ${VH}` }}
+            role="img"
+            aria-label={
+              diluentMl !== null
+                ? `Vial: ${fmt(liquidMl, 2)} ml of diluent added, ${fmt(remainingMl, 2)} ml left after the draw`
+                : "Vial with lyophilised powder, no diluent added"
+            }
+          >
+            <defs>
+              <linearGradient id={`${uid}-vglass`} x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#dfe5ef" stopOpacity="0.95" />
+                <stop offset="0.35" stopColor="#ffffff" stopOpacity="0.95" />
+                <stop offset="1" stopColor="#dfe5ef" stopOpacity="0.95" />
+              </linearGradient>
+              <linearGradient id={`${uid}-vliquid`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#a7c3f7" />
+                <stop offset="1" stopColor="#5B8DEF" />
+              </linearGradient>
+              <clipPath id={`${uid}-vialclip`}>
+                <rect x="24" y={VIAL_TOP} width="92" height={VIAL_H} rx="12" />
+              </clipPath>
+            </defs>
+            {/* diluent stream, replayed on every diluent change */}
+            {pour > 0 && (
+              <rect
+                key={`pour-${pour}`}
+                className="vx-pour"
+                x="66"
+                y="0"
+                width="8"
+                height={VIAL_BOT - 8}
+                rx="4"
+                fill="#5B8DEF"
+                opacity="0"
+              />
+            )}
+            {/* crimp cap and stopper */}
+            <rect x="40" y="22" width="60" height="22" rx="4" fill="#14213D" />
+            <rect x="46" y="44" width="48" height="14" fill="#6B7688" />
+            <rect
+              x="24"
+              y={VIAL_TOP - 6}
+              width="92"
+              height={VIAL_H + 6}
+              rx="13"
+              fill={`url(#${uid}-vglass)`}
+              stroke="#14213D"
+              strokeOpacity="0.35"
+              strokeWidth="2"
+            />
+            <g clipPath={`url(#${uid}-vialclip)`}>
+              {/* lyophilised cake, fades as diluent goes in */}
+              <rect
+                x="24"
+                y={VIAL_BOT - 22}
+                width="92"
+                height="22"
+                fill="#f4f1ea"
+                className="motion-safe:transition-opacity motion-safe:duration-700"
+                opacity={diluentMl === null ? 1 : 0}
+              />
+              <g
+                className="motion-safe:transition-transform motion-safe:duration-700 ease-out"
+                style={{ transform: `translateY(${VIAL_H * (1 - level)}px)` }}
+              >
+                <rect
+                  x="24"
+                  y={VIAL_TOP}
+                  width="92"
+                  height={VIAL_H}
+                  fill={`url(#${uid}-vliquid)`}
+                  opacity="0.88"
+                />
+                <path
+                  key={swirl}
+                  className="vx-swirl"
+                  d={`M24 ${VIAL_TOP + 2} q11.5 -6 23 0 t23 0 t23 0 t23 0 t23 0 v9 h-115z`}
+                  fill="#ffffff"
+                  opacity="0.4"
+                />
+              </g>
+            </g>
+            {/* reflection */}
+            <rect
+              x="32"
+              y={VIAL_TOP + 8}
+              width="6"
+              height={VIAL_H - 24}
+              rx="3"
+              fill="#ffffff"
+              opacity="0.55"
+            />
+          </svg>
+
+          <div className="min-w-0 flex-1">
+            <svg
+              ref={svgRef}
+              viewBox={`0 0 ${VB_W} ${VB_H}`}
+              className="w-full h-auto block select-none touch-none"
+              style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
+              role="group"
+              aria-label="Laboratory measuring syringe"
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+            >
+              <defs>
+                <linearGradient id={`${uid}-glass`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
+                  <stop offset="0.5" stopColor="#eef2f8" stopOpacity="0.9" />
+                  <stop offset="1" stopColor="#dfe5ef" stopOpacity="0.95" />
+                </linearGradient>
+                <linearGradient id={`${uid}-liquid`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#8fb2f4" />
+                  <stop offset="1" stopColor="#5B8DEF" />
+                </linearGradient>
+                <linearGradient id={`${uid}-liquid-over`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#e9b48f" />
+                  <stop offset="1" stopColor="#c8693a" />
+                </linearGradient>
+                <clipPath id={`${uid}-barrel`}>
+                  <rect x={BX0} y={BY + 3} width={BW} height={BH - 6} rx="3" />
+                </clipPath>
+              </defs>
+
+              {/* needle and hub; liquid runs along it on each new draw */}
+              <g aria-hidden="true">
+                <rect x="8" y={BY + BH / 2 - 1.5} width="72" height="3" fill="#6B7688" />
+                {drawKey > 0 && (
+                  <line
+                    key={`flow-${drawKey}`}
+                    className="vx-flow"
+                    x1="8"
+                    x2="80"
+                    y1={BY + BH / 2}
+                    y2={BY + BH / 2}
+                    stroke="#5B8DEF"
+                    strokeWidth="3"
+                    strokeDasharray="10 8"
+                  />
+                )}
+                <rect
+                  x="78"
+                  y={BY + BH / 2 - 10}
+                  width="18"
+                  height="20"
+                  rx="3"
+                  fill="#c9d1de"
+                  stroke="#6B7688"
+                  strokeOpacity="0.6"
+                />
+              </g>
+
+              {/* barrel */}
+              <rect
+                x={BX0}
+                y={BY}
+                width={BW}
+                height={BH}
+                rx="6"
+                fill={`url(#${uid}-glass)`}
+                stroke={overTone ? "#c8693a" : "#14213D"}
+                strokeOpacity={overTone ? 0.9 : 0.45}
+                strokeWidth={overTone ? 2.5 : 1.5}
+              />
+              <g clipPath={`url(#${uid}-barrel)`} aria-hidden="true">
+                <rect
+                  x={BX0}
+                  y={BY + 3}
+                  width={BW}
+                  height={BH - 6}
+                  fill={`url(#${uid}-${overTone ? "liquid-over" : "liquid"})`}
+                  opacity="0.85"
+                  className={
+                    dragging
+                      ? ""
+                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
+                  }
+                  style={{
+                    transform: `scaleX(${drawFrac})`,
+                    transformBox: "fill-box",
+                    transformOrigin: "left center",
+                  }}
+                />
+              </g>
+              {/* graduations, printed on the barrel like a real syringe */}
+              <g aria-hidden="true">
+                {ticks.map((t) => {
+                  const x = BX0 + t.frac * BW;
+                  const len = t.major ? 24 : t.mid ? 16 : 9;
+                  return (
+                    <g key={t.k}>
+                      <line
+                        x1={x}
+                        x2={x}
+                        y1={BY}
+                        y2={BY + len}
+                        stroke="#14213D"
+                        strokeWidth={t.major ? 1.6 : 0.9}
+                      />
+                      {t.label && (
+                        <text
+                          x={x}
+                          y={BY - 10}
+                          textAnchor="middle"
+                          fontSize="17"
+                          className="vx-scale-num fill-[#14213D] font-mono"
+                        >
+                          {t.label}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+              </g>
+
+              {/* plunger: stopper + rod + thumb press. The slider for keyboard and AT. */}
+              <g
+                role="slider"
+                tabIndex={r ? 0 : -1}
+                aria-label="Plunger position"
+                aria-valuemin={0}
+                aria-valuemax={
+                  syringe.unitScale ? mlToUnits(syringe.capacityMl) : syringe.capacityMl
+                }
+                aria-valuenow={
+                  r?.draw ? (syringe.unitScale ? r.draw.nearestUnits : r.draw.nearestMl) : 0
+                }
+                aria-valuetext={valueText}
+                aria-disabled={!r}
+                onKeyDown={onKey}
+                onPointerDown={onPointerDown}
+                className={`${r ? "cursor-ew-resize" : "cursor-not-allowed"} outline-none focus-visible:[&_.vx-stopper]:stroke-[#5B8DEF] focus-visible:[&_.vx-stopper]:stroke-[3]`}
+              >
+                <g
+                  className={
+                    dragging
+                      ? ""
+                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
+                  }
+                  style={{ transform: `translateX(${plungerX - BX0}px)` }}
+                >
+                  {/* generous invisible hit area for touch */}
+                  <rect
+                    x={BX0 - 18}
+                    y={BY - 34}
+                    width={VB_W - BX0 + 18}
+                    height={BH + 68}
+                    fill="transparent"
+                  />
+                  <rect
+                    className="vx-stopper"
+                    x={BX0}
+                    y={BY + 2}
+                    width="16"
+                    height={BH - 4}
+                    rx="3"
+                    fill="#14213D"
+                    stroke="#14213D"
+                  />
+                  <rect
+                    x={BX0 + 16}
+                    y={BY + BH / 2 - 6}
+                    width={BW + 30}
+                    height="12"
+                    fill="#6B7688"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x={BX0 + BW + 44}
+                    y={BY - 14}
+                    width="13"
+                    height={BH + 28}
+                    rx="4"
+                    fill="#14213D"
+                  />
+                </g>
+              </g>
+              <rect
+                x={BX1 + 2}
+                y={BY - 6}
+                width="10"
+                height={BH + 12}
+                rx="3"
+                fill={overTone ? "#c8693a" : "#14213D"}
+                opacity="0.9"
+                aria-hidden="true"
+                className={overTone ? "vx-pulse" : ""}
+              />
+
+              {/* callout at the draw line */}
+              {r?.draw && !over && (
+                <g
+                  aria-hidden="true"
+                  className={
+                    dragging
+                      ? ""
+                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
+                  }
+                  style={{ transform: `translateX(${plungerX - BX0}px)` }}
+                >
+                  <line
+                    x1={BX0}
+                    x2={BX0}
+                    y1={BY + BH}
+                    y2={BY + BH + 8}
+                    stroke="#5B8DEF"
+                    strokeWidth="2.5"
+                  />
+                  <polygon
+                    points={`${BX0 - 7},${BY + BH + 38} ${BX0 + 7},${BY + BH + 38} ${BX0},${BY + BH + 30}`}
+                    fill="#5B8DEF"
+                  />
+                </g>
+              )}
+            </svg>
+            <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs md:text-sm text-muted-foreground md:pl-[13%]">
+              <span>Laboratory measuring syringe, {syringe.label}</span>
+              <span>{syringe.unitScale ? "U-100 units (100 per ml)" : "ml scale"}</span>
+            </div>
+            <p
+              className={`mt-2 min-h-8 md:pl-[13%] ${over && r?.draw ? "" : "invisible"}`}
+              aria-hidden="true"
+              data-testid="syringe-over-badge"
+            >
+              <span className="inline-block rounded-full bg-[#a4512a] text-white text-xs md:text-sm font-semibold px-3 py-1.5">
+                {over && r?.draw
+                  ? `Needs ${fmt(r.draw.ml, 3)} ml, barrel holds ${fmt(syringe.capacityMl, 2)} ml`
+                  : "Within capacity"}
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 md:gap-8 p-5 md:p-8">
@@ -321,275 +682,12 @@ export function SyringeTool({
           </fieldset>
         </div>
 
-        {/* ---------------- visual + readout */}
+        {/* ---------------- readout */}
         <div className="min-w-0">
-          <div className="rounded-xl bg-tint/60 border border-border p-3 md:p-4">
-            <svg
-              ref={svgRef}
-              viewBox={`0 0 ${VB_W} ${VB_H}`}
-              className="w-full h-auto block select-none touch-none"
-              style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
-              role="group"
-              aria-label="Laboratory measuring syringe and vial"
-              onPointerMove={onPointerMove}
-              onPointerUp={endDrag}
-              onPointerCancel={endDrag}
-            >
-              <defs>
-                <linearGradient id={`${uid}-glass`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
-                  <stop offset="0.5" stopColor="#eef2f8" stopOpacity="0.9" />
-                  <stop offset="1" stopColor="#dfe5ef" stopOpacity="0.95" />
-                </linearGradient>
-                <linearGradient id={`${uid}-liquid`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#8fb2f4" />
-                  <stop offset="1" stopColor="#5B8DEF" />
-                </linearGradient>
-                <clipPath id={`${uid}-barrel`}>
-                  <rect x={BX0} y={BY + 3} width={BW} height={BH - 6} rx="3" />
-                </clipPath>
-                <clipPath id={`${uid}-vialclip`}>
-                  <rect x="20" y="58" width="58" height="110" rx="8" />
-                </clipPath>
-              </defs>
-
-              {/* vial */}
-              <g aria-hidden="true">
-                <rect x="30" y="34" width="38" height="14" rx="3" fill="#14213D" />
-                <rect x="34" y="46" width="30" height="10" fill="#6B7688" />
-                <rect
-                  x="20"
-                  y="56"
-                  width="58"
-                  height="114"
-                  rx="9"
-                  fill={`url(#${uid}-glass)`}
-                  stroke="#14213D"
-                  strokeOpacity="0.35"
-                  strokeWidth="1.5"
-                />
-                <g clipPath={`url(#${uid}-vialclip)`}>
-                  <g
-                    className="motion-safe:transition-transform motion-safe:duration-700 ease-out"
-                    style={{ transform: `translateY(${110 * (1 - level)}px)` }}
-                  >
-                    <rect
-                      x="20"
-                      y="58"
-                      width="58"
-                      height="112"
-                      fill={`url(#${uid}-liquid)`}
-                      opacity="0.85"
-                    />
-                    <path
-                      key={swirl}
-                      className="vx-swirl"
-                      d="M20 60 q7 -4 14.5 0 t14.5 0 t14.5 0 t14.5 0 v6 h-58z"
-                      fill="#ffffff"
-                      opacity="0.35"
-                    />
-                  </g>
-                </g>
-                <text x="49" y="190" textAnchor="middle" className="fill-[#6B7688]" fontSize="12">
-                  {diluentMl !== null ? `${fmt(remainingMl, 2)} ml left` : "vial"}
-                </text>
-              </g>
-
-              {/* needle */}
-              <g aria-hidden="true">
-                <rect x="88" y={BY + BH / 2 - 1} width="34" height="2" fill="#6B7688" />
-                <rect
-                  x="120"
-                  y={BY + BH / 2 - 7}
-                  width="12"
-                  height="14"
-                  rx="2"
-                  fill="#c9d1de"
-                  stroke="#6B7688"
-                  strokeOpacity="0.6"
-                />
-              </g>
-
-              {/* barrel */}
-              <rect
-                x={BX0}
-                y={BY}
-                width={BW}
-                height={BH}
-                rx="5"
-                fill={`url(#${uid}-glass)`}
-                stroke="#14213D"
-                strokeOpacity="0.45"
-                strokeWidth="1.5"
-              />
-              <g clipPath={`url(#${uid}-barrel)`} aria-hidden="true">
-                <rect
-                  x={BX0}
-                  y={BY + 3}
-                  width={BW}
-                  height={BH - 6}
-                  fill={`url(#${uid}-liquid)`}
-                  opacity="0.85"
-                  className={
-                    dragging
-                      ? ""
-                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
-                  }
-                  style={{
-                    transform: `scaleX(${drawFrac})`,
-                    transformBox: "fill-box",
-                    transformOrigin: "left center",
-                  }}
-                />
-              </g>
-              {/* graduations, printed on the barrel like a real syringe */}
-              <g aria-hidden="true">
-                {ticks.map((t) => {
-                  const x = BX0 + t.frac * BW;
-                  const len = t.major ? 18 : t.mid ? 12 : 7;
-                  return (
-                    <g key={t.k}>
-                      <line
-                        x1={x}
-                        x2={x}
-                        y1={BY}
-                        y2={BY + len}
-                        stroke="#14213D"
-                        strokeWidth={t.major ? 1.4 : 0.8}
-                      />
-                      {t.label && (
-                        <text
-                          x={x}
-                          y={BY - 7}
-                          textAnchor="middle"
-                          fontSize="12"
-                          className="fill-[#14213D] font-mono"
-                        >
-                          {t.label}
-                        </text>
-                      )}
-                    </g>
-                  );
-                })}
-                <text
-                  x={BX1}
-                  y={BY + BH + 18}
-                  textAnchor="end"
-                  fontSize="11"
-                  className="fill-[#6B7688]"
-                >
-                  {syringe.unitScale ? "U-100 units (100 per ml)" : "ml"}
-                </text>
-                <text x={BX0} y={BY + BH + 18} fontSize="11" className="fill-[#6B7688]">
-                  Laboratory measuring syringe, {syringe.label}
-                </text>
-              </g>
-
-              {/* plunger: stopper + rod + thumb press. The slider for keyboard and AT. */}
-              <g
-                role="slider"
-                tabIndex={r ? 0 : -1}
-                aria-label="Plunger position"
-                aria-valuemin={0}
-                aria-valuemax={
-                  syringe.unitScale ? mlToUnits(syringe.capacityMl) : syringe.capacityMl
-                }
-                aria-valuenow={
-                  r?.draw ? (syringe.unitScale ? r.draw.nearestUnits : r.draw.nearestMl) : 0
-                }
-                aria-valuetext={valueText}
-                aria-disabled={!r}
-                onKeyDown={onKey}
-                onPointerDown={onPointerDown}
-                className={`${r ? "cursor-ew-resize" : "cursor-not-allowed"} outline-none focus-visible:[&_.vx-stopper]:stroke-[#5B8DEF] focus-visible:[&_.vx-stopper]:stroke-[3]`}
-              >
-                <g
-                  className={
-                    dragging
-                      ? ""
-                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
-                  }
-                  style={{ transform: `translateX(${plungerX - BX0}px)` }}
-                >
-                  {/* generous invisible hit area for touch */}
-                  <rect
-                    x={BX0 - 14}
-                    y={BY - 26}
-                    width={VB_W - BX0 + 14}
-                    height={BH + 52}
-                    fill="transparent"
-                  />
-                  <rect
-                    className="vx-stopper"
-                    x={BX0}
-                    y={BY + 2}
-                    width="12"
-                    height={BH - 4}
-                    rx="2"
-                    fill="#14213D"
-                    stroke="#14213D"
-                  />
-                  <rect
-                    x={BX0 + 12}
-                    y={BY + BH / 2 - 5}
-                    width={BW + 30}
-                    height="10"
-                    fill="#6B7688"
-                    opacity="0.8"
-                  />
-                  <rect
-                    x={BX0 + BW + 40}
-                    y={BY - 10}
-                    width="10"
-                    height={BH + 20}
-                    rx="3"
-                    fill="#14213D"
-                  />
-                </g>
-              </g>
-              <rect
-                x={BX1 + 2}
-                y={BY - 4}
-                width="8"
-                height={BH + 8}
-                rx="2"
-                fill="#14213D"
-                opacity="0.85"
-                aria-hidden="true"
-              />
-
-              {/* callout at the draw line */}
-              {r?.draw && !over && (
-                <g
-                  aria-hidden="true"
-                  className={
-                    dragging
-                      ? ""
-                      : "motion-safe:transition-transform motion-safe:duration-500 ease-out"
-                  }
-                  style={{ transform: `translateX(${plungerX - BX0}px)` }}
-                >
-                  <line
-                    x1={BX0}
-                    x2={BX0}
-                    y1={BY + BH}
-                    y2={BY + BH + 6}
-                    stroke="#5B8DEF"
-                    strokeWidth="2"
-                  />
-                  <polygon
-                    points={`${BX0 - 5},${BY + BH + 30} ${BX0 + 5},${BY + BH + 30} ${BX0},${BY + BH + 24}`}
-                    fill="#5B8DEF"
-                  />
-                </g>
-              )}
-            </svg>
-          </div>
-
           {/* readout: fixed heights so warnings never shift the layout */}
           {blocked ? (
             <div
-              className="mt-4 rounded-xl bg-ink text-ink-foreground p-5 min-h-[248px]"
+              className="rounded-xl bg-ink text-ink-foreground p-5 min-h-[248px]"
               data-testid="syringe-blocked"
             >
               <p className="font-semibold">
@@ -609,12 +707,17 @@ export function SyringeTool({
             </div>
           ) : (
             <div
-              className="mt-4 rounded-xl bg-ink text-ink-foreground p-5 min-h-[248px]"
+              className="rounded-xl bg-ink text-ink-foreground p-5 min-h-[248px]"
               aria-live="polite"
             >
               <dl className="grid grid-cols-3 gap-3">
                 <Stat label="Concentration" value={r ? `${fmt(r.mgPerMl, 3)}` : "-"} unit="mg/ml" />
-                <Stat label="Draw volume" value={r?.draw ? fmt(r.draw.ml, 3) : "-"} unit="ml" />
+                <Stat
+                  label="Draw volume"
+                  value={r?.draw ? fmt(r.draw.ml, 3) : "-"}
+                  unit={over ? "ml, over capacity" : "ml"}
+                  alert={Boolean(over)}
+                />
                 <Stat
                   label={syringe.unitScale ? "Units (U-100)" : "Units equiv."}
                   value={r?.draw ? fmt(r.draw.units, 1) : "-"}
@@ -654,31 +757,66 @@ export function SyringeTool({
                 )}
               </div>
               <div className="mt-3 min-h-[56px] space-y-2 text-xs">
-                {r?.warnings.map((w) => (
-                  <p
-                    key={w.kind}
-                    className="rounded-md bg-[oklch(0.528_0.141_40.2/0.18)] text-[oklch(0.92_0.05_60)] px-3 py-2"
-                    role="status"
-                  >
-                    {w.kind === "over-capacity"
-                      ? `${fmt(r.draw?.ml ?? 0, 3)} ml is more than this ${syringe.capacityMl} ml barrel holds. ${
-                          w.nextSyringe
-                            ? `Use the ${w.nextSyringe.id} ml syringe`
-                            : "Split it across draws"
-                        }${
-                          w.diluentForFullBarrelMl !== null
-                            ? `, or reconstitute with ${fmt(w.diluentForFullBarrelMl, 2)} ml of diluent or less so it fits one barrel.`
-                            : "."
-                        }`
-                      : w.kind === "below-graduation"
+                {r?.warnings.map((w) =>
+                  w.kind === "over-capacity" ? (
+                    <div
+                      key={w.kind}
+                      className="rounded-md bg-[oklch(0.528_0.141_40.2/0.18)] text-[oklch(0.92_0.05_60)] px-3 py-2"
+                      role="status"
+                      data-testid="syringe-over-capacity"
+                    >
+                      <p className="font-semibold">
+                        Over capacity: {fmt(r.draw?.ml ?? 0, 3)} ml does not fit this{" "}
+                        {fmt(syringe.capacityMl, 2)} ml barrel ({fmt(w.excessMl, 3)} ml over).
+                      </p>
+                      <p className="mt-1">
+                        {w.nextSyringe
+                          ? `Switch to the ${w.nextSyringe.id} ml syringe`
+                          : `Split it across ${w.drawsNeeded} full draws of this barrel`}
+                        {w.diluentForFullBarrelMl !== null
+                          ? `, or reconstitute with ${fmt(w.diluentForFullBarrelMl, 2)} ml of diluent or less so it fits one barrel.`
+                          : "."}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {w.nextSyringe && (
+                          <button
+                            type="button"
+                            onClick={() => setSyringeId(w.nextSyringe!.id)}
+                            className="h-9 px-3 rounded-full bg-white/15 hover:bg-white/25 font-semibold text-white"
+                          >
+                            Use {w.nextSyringe.id} ml syringe
+                          </button>
+                        )}
+                        {w.diluentForFullBarrelMl !== null && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDiluent(String(Math.floor(w.diluentForFullBarrelMl! * 100) / 100))
+                            }
+                            className="h-9 px-3 rounded-full bg-white/15 hover:bg-white/25 font-semibold text-white"
+                          >
+                            Set diluent to{" "}
+                            {fmt(Math.floor(w.diluentForFullBarrelMl * 100) / 100, 2)} ml
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <p
+                      key={w.kind}
+                      className="rounded-md bg-[oklch(0.528_0.141_40.2/0.18)] text-[oklch(0.92_0.05_60)] px-3 py-2"
+                      role="status"
+                    >
+                      {w.kind === "below-graduation"
                         ? `The draw is smaller than one graduation (${fmt(w.minorMl, 3)} ml), so it cannot be measured on this barrel. Use a smaller syringe or more diluent.`
                         : w.kind === "exceeds-vial"
                           ? "The target mass is more than the vial contains."
                           : `${fmt(r.mgPerMl, 2)} mg/ml is above the ${fmt(w.ceilingMgPerMl, 2)} mg/ml soluble range in the reference (${
                               w.verified ? "published" : "unverified supplier guidance"
                             }). Use ${fmt(w.minDiluentMl, 2)} ml of diluent or more.`}
-                  </p>
-                ))}
+                    </p>
+                  ),
+                )}
               </div>
               <p className="text-[11px] text-ink-muted mt-2">
                 Arithmetic only, for laboratory measurement. Units are U-100 volume graduations, not
@@ -692,9 +830,19 @@ export function SyringeTool({
   );
 }
 
-function Stat({ label, value, unit }: { label: string; value: string; unit: string }) {
+function Stat({
+  label,
+  value,
+  unit,
+  alert = false,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  alert?: boolean;
+}) {
   return (
-    <div className="bg-ink-panel rounded-lg p-3 min-w-0">
+    <div className={`bg-ink-panel rounded-lg p-3 min-w-0 ${alert ? "ring-2 ring-[#c8693a]" : ""}`}>
       <dt className="text-[11px] text-ink-muted">{label}</dt>
       <dd className="font-mono text-lg md:text-2xl font-semibold mt-1 truncate tabular-nums">
         {value}

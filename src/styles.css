@@ -540,8 +540,62 @@ textarea:focus-visible,
 .vx-swirl {
   animation: vx-swirl 0.9s ease-out 2 alternate;
 }
+@keyframes vx-pour {
+  0% {
+    opacity: 0.9;
+    transform: scaleY(0);
+  }
+  45% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1) translateY(12px);
+  }
+}
+.vx-pour {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: vx-pour 1.1s ease-in forwards;
+}
+@keyframes vx-flow {
+  0% {
+    stroke-dashoffset: 36;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -36;
+    opacity: 0;
+  }
+}
+.vx-flow {
+  animation: vx-flow 0.7s linear forwards;
+}
+@keyframes vx-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.vx-pulse {
+  animation: vx-pulse 1.2s ease-in-out 3;
+}
 @media (prefers-reduced-motion: reduce) {
-  .vx-swirl {
+  .vx-swirl,
+  .vx-pour,
+  .vx-flow,
+  .vx-pulse {
     animation: none;
+  }
+  .vx-pour,
+  .vx-flow {
+    display: none;
+  }
+}
+
+/* Syringe scale text: SVG scales down on phones, so print it larger there. */
+@media (max-width: 767px) {
+  .vx-scale-num {
+    font-size: 25px;
   }
 }
