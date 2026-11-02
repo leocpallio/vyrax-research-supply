@@ -269,11 +269,14 @@ const OVERRIDES: Record<string, Override> = {
       "A blue solution is expected. Do not read colour as a fault, and do not add a chelator such as EDTA to the stock, which strips the copper.",
       "Record the appearance at reconstitution so a later colour change can be judged against it.",
     ],
+    evidence: [
+      "Badenhorst 2016, Pharmaceutical Development and Technology, PMID 25384620 (preformulation study of the GHK-Cu complex itself: stable in water and pH 4.5 to 7.4 buffers for at least two weeks at 60 degrees, first-order hydrolysis only under basic and oxidative stress)",
+    ],
   },
   "nad-plus": {
     solvent: "sterile-water",
     solventReason:
-      "NAD+ is measured spectrophotometrically at 260 nm and 340 nm, where the benzyl alcohol in bacteriostatic water absorbs, so a preservative-free sterile water stock is used instead. NAD+ is also hydrolytically labile, so the stock is prepared fresh (Wang 1999).",
+      "NAD+ is measured at 260 nm and 340 nm, where the benzyl alcohol in a preserved diluent absorbs (Meyer 2007), so a preservative-free sterile water stock is used instead. The free dinucleotide is hydrolytically labile, with a half-life measured in tens of hours at 37 degrees (McDonough 2025), so the stock is prepared fresh and kept cold.",
     dilutionNote:
       "Prepare the stock on the day of use and keep it on ice. A preserved multi-access vial is the wrong container here.",
     cautions: [
@@ -284,7 +287,7 @@ const OVERRIDES: Record<string, Override> = {
   glutathione: {
     solvent: "sterile-water",
     solventReason:
-      "Reduced glutathione oxidises to the disulfide dimer in aqueous solution. A preservative-free sterile water stock, made fresh in single-use aliquots, keeps the oxidation chemistry visible and the preparation simple (Wang 1999).",
+      "Reduced glutathione oxidises to the disulfide dimer, and forced-degradation work on glutathione formulations shows oxidation is the dominant loss route in aerated solution (Tsiasioti 2020). A preservative-free sterile water stock, made fresh in single-use aliquots, keeps the preparation simple and the loss visible.",
     cautions: [
       "Oxidation to the disulfide is the main loss route; keep the solution cold, minimise headspace and prepare close to use.",
       "Some colorimetric thiol assays are sensitive to the age of the solution; run a fresh blank with each preparation.",
@@ -323,7 +326,7 @@ const OVERRIDES: Record<string, Override> = {
       "No aqueous stock is validated for this compound. The arithmetic below does not establish that the powder will dissolve.",
     cautions: [
       "Light-sensitive in solution; store in the dark and wrap the vial if it is kept on the bench.",
-      "Phosphate buffer accelerates degradation of this peptide (Ugwu 1994), so it is the wrong choice for a working stock.",
+      "Keep the solution near the reported pH of maximum stability rather than assuming neutral is safest (Ugwu 1994).",
       "DMSO freezes at about 18.5°C: keep the concentrate at room temperature, not in the fridge.",
     ],
     evidence: [
@@ -469,13 +472,18 @@ function buildRecord(c: Compound): DilutionRecord {
 
   // Every compound-specific claim on the page is traceable: the citation for the stability entry
   // or the labelled note goes into that record's own source list, not just into a page footer.
+  // When the record already carries its own annotated citation, that one is enough, so the plain
+  // duplicate is dropped rather than printed twice.
+  const cited = o.evidence ?? [];
   const evidence = [
-    ...(o.evidence ?? []),
-    ...(stability.status === "published"
-      ? [stability.cite]
-      : stability.note
-        ? [`${stability.note.cite} (${stability.note.label.toLowerCase()})`]
-        : []),
+    ...cited,
+    ...(cited.length
+      ? []
+      : stability.status === "published"
+        ? [stability.cite]
+        : stability.note
+          ? [`${stability.note.cite} (${stability.note.label.toLowerCase()})`]
+          : []),
   ];
 
   const sources = Array.from(

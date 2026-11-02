@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, Calculator, FlaskConical } from "lucide-react";
 import { StoreShell, Disclaimer, Breadcrumbs, SectionTitle, FAQ } from "@/components/Store";
 import { compounds, productPath } from "@/lib/catalog";
@@ -264,9 +265,39 @@ function Detail({ c, expanded }: { c: Compound; expanded?: boolean }) {
 }
 
 function ReconstitutionReference() {
-  const anchor = useRouterState({
+  const routerAnchor = useRouterState({
     select: (s) => s.location.hash.replace(/^#/, ""),
   });
+  // A deep link such as /reconstitution#bpc-157 arrives before the router has a
+  // hash in state, so the window hash is tracked directly as well and the
+  // matching panel is opened and scrolled to once it has rendered.
+  const [windowAnchor, setWindowAnchor] = useState("");
+  useEffect(() => {
+    // Deep links arrive before the router has a hash in state, and hydration can
+    // overwrite the attribute, so open the target panel directly as well.
+    const openFromHash = () => {
+      const id = window.location.hash.replace(/^#/, "");
+      if (!id) return;
+      const el = document.getElementById(id) as HTMLDetailsElement | null;
+      if (!el) return;
+      el.open = true;
+      el.scrollIntoView({ block: "start" });
+      setWindowAnchor(id);
+    };
+    openFromHash();
+    const settle = window.setTimeout(openFromHash, 400);
+    window.addEventListener("hashchange", openFromHash);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener("hashchange", openFromHash);
+    };
+  }, []);
+  const anchor = routerAnchor || windowAnchor;
+  useEffect(() => {
+    if (!anchor) return;
+    const el = document.getElementById(anchor);
+    if (el) el.scrollIntoView({ block: "start" });
+  }, [anchor]);
   return (
     <StoreShell>
       <div className="container-main py-8 md:py-12">

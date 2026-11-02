@@ -63,7 +63,7 @@ export const STABILITY: Record<string, StabilityRecord> = {
   },
   "ghrp-6": {
     status: "published",
-    text: "Heating GHRP-6 in the dark at 60 degrees across pH 3 to 8 produced a family of modified species; pH 6 to 7 and phosphate buffer are the conditions that drive them.",
+    text: "Heating GHRP-6 in the dark at 60 degrees across pH 3 to 8 produced a family of modified species: C-terminal deamidation peaked at pH 3 and 8, while hydrolysis and head-to-tail cyclisation were favoured between pH 6 and 7 in phosphate buffers.",
     cite: "Santana 2021, Journal of Pharmaceutical and Biomedical Analysis, PMID 33272786",
   },
   sermorelin: {
@@ -102,13 +102,16 @@ export const STABILITY: Record<string, StabilityRecord> = {
   },
   "melanotan-2": {
     status: "published",
-    text: "The pH-rate profile puts maximum stability at about pH 5, phosphate buffer accelerates degradation, and the reported shelf life at 25 degrees was around 27 hours.",
+    text: "Degradation of MT-II in aqueous solution follows apparent first-order kinetics, and the pH-rate profile puts maximum stability at about pH 5. Away from that pH the loss is faster, so the working pH is a deliberate choice rather than a default.",
     cite: "Ugwu 1994, International Journal of Pharmaceutics, doi:10.1016/0378-5173(94)90055-8",
   },
   "melanotan-1": {
-    status: "published",
-    text: "MT-I is relatively stable under acidic conditions and degrades faster as the pH rises; the reported room-temperature shelf life at pH 7.4 was about 40 days.",
-    cite: "Surendran 1996, International Journal of Pharmaceutics, doi:10.1016/0378-5173(95)04394-2",
+    status: "none",
+    note: {
+      label: "Same molecule, no shelf-life figure",
+      text: "A dedicated preformulation study measured the solution stability and partitioning of MT-I, so its degradation in aqueous solution was characterised, but the published record does not give a shelf life that can be quoted here. No numeric stability claim is made.",
+      cite: "Surendran 1996, International Journal of Pharmaceutics, doi:10.1016/0378-5173(95)04394-2",
+    },
   },
   "pt-141": {
     status: "published",
@@ -117,7 +120,7 @@ export const STABILITY: Record<string, StabilityRecord> = {
   },
   oxytocin: {
     status: "published",
-    text: "Aqueous oxytocin is stabilised by 5 to 10 mM citrate buffer at pH 4.5 together with a divalent metal ion; loss near neutral pH runs through disulfide chemistry.",
+    text: "Aqueous oxytocin was stabilised by 5 to 10 mM citrate buffer at pH 4.5 combined with at least 2 mM of a divalent metal ion; acetate buffer with the same ions did not give the same improvement.",
     cite: "Avanti 2011, The AAPS Journal, PMID 21448747",
   },
 };
