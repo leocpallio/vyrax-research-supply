@@ -164,6 +164,15 @@ describe("edge cases", () => {
     expect(w && w.kind === "over-capacity" && w.nextSyringe?.id).toBe("1");
     // 4 mg in one 0.5 ml barrel needs 8 mg/ml, i.e. 10 mg in 1.25 ml
     expect(w && w.kind === "over-capacity" && w.diluentForFullBarrelMl).toBe(1.25);
+    // Less diluent shrinks the draw: 10 mg in 1.25 ml at 4 mg target is exactly 0.5 ml.
+    const fixed = compute({ vialMg: 10, diluentMl: 1.25, targetMg: 4, syringe: SYRINGES[1]! })!;
+    expect(fixed.draw?.ml).toBeCloseTo(0.5, 9);
+    expect(fixed.warnings.some((x) => x.kind === "over-capacity")).toBe(false);
+  });
+  test("no diluent fix offered when the target exceeds the vial", () => {
+    const r = compute({ vialMg: 10, diluentMl: 2, targetMg: 50, syringe: s1 })!;
+    const w = r.warnings.find((x) => x.kind === "over-capacity");
+    expect(w && w.kind === "over-capacity" && w.diluentForFullBarrelMl).toBeNull();
   });
   test("over every syringe", () => {
     const r = compute({ vialMg: 10, diluentMl: 5, targetMg: 8, syringe: s3 })!;

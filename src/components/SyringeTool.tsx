@@ -174,7 +174,7 @@ export function SyringeTool({
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 md:gap-8 p-5 md:p-8">
+      <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-6 md:gap-8 p-5 md:p-8">
         {/* ---------------- inputs */}
         <div className="space-y-5">
           <label className="block">
@@ -663,9 +663,13 @@ export function SyringeTool({
                     {w.kind === "over-capacity"
                       ? `${fmt(r.draw?.ml ?? 0, 3)} ml is more than this ${syringe.capacityMl} ml barrel holds. ${
                           w.nextSyringe
-                            ? `Use the ${w.nextSyringe.id} ml syringe, or `
-                            : "Split it across draws, or "
-                        }add ${fmt(w.diluentForFullBarrelMl, 2)} ml of diluent or more so it fits one barrel.`
+                            ? `Use the ${w.nextSyringe.id} ml syringe`
+                            : "Split it across draws"
+                        }${
+                          w.diluentForFullBarrelMl !== null
+                            ? `, or reconstitute with ${fmt(w.diluentForFullBarrelMl, 2)} ml of diluent or less so it fits one barrel.`
+                            : "."
+                        }`
                       : w.kind === "below-graduation"
                         ? `The draw is smaller than one graduation (${fmt(w.minorMl, 3)} ml), so it cannot be measured on this barrel. Use a smaller syringe or more diluent.`
                         : w.kind === "exceeds-vial"

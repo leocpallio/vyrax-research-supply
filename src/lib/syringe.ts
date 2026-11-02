@@ -91,7 +91,11 @@ export const smallestSyringeFor = (ml: number) =>
   SYRINGES.find((s) => ml <= s.capacityMl + 1e-9) ?? null;
 
 export type Warning =
-  | { kind: "over-capacity"; nextSyringe: SyringeSpec | null; diluentForFullBarrelMl: number }
+  | {
+      kind: "over-capacity";
+      nextSyringe: SyringeSpec | null;
+      diluentForFullBarrelMl: number | null;
+    }
   | { kind: "below-graduation"; minorMl: number }
   | { kind: "exceeds-vial" }
   | {
@@ -158,8 +162,11 @@ export function compute(i: Inputs): Result | null {
       warnings.push({
         kind: "over-capacity",
         nextSyringe: smallestSyringeFor(ml),
-        // Diluent that would put the target mass in exactly one full barrel: V = vial x cap / target.
-        diluentForFullBarrelMl: (i.vialMg * i.syringe.capacityMl) / i.targetMg,
+        // Largest diluent volume that puts the target mass in one full barrel: V = vial x cap / target.
+        // Less diluent means a higher concentration and a smaller draw. Meaningless when the target
+        // exceeds the vial, so it is null there.
+        diluentForFullBarrelMl:
+          i.targetMg > i.vialMg ? null : (i.vialMg * i.syringe.capacityMl) / i.targetMg,
       });
     } else if (ml < i.syringe.minorMl - 1e-12) {
       warnings.push({ kind: "below-graduation", minorMl: i.syringe.minorMl });
