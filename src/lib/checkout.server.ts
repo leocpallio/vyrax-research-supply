@@ -7,6 +7,7 @@ import { validatePaymentEvent, verifySignature } from "./spicepay";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
+import { checkFirstOrderCode } from "./first-order-gate";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
 const json = (value: unknown, status = 200) =>
@@ -117,10 +118,17 @@ export async function createCheckout(request: Request): Promise<Response> {
       body["researchAgreement"] !== true
     )
       return fail("Check your contact and UK delivery details", 400);
-    const quote = quoteCheckout(
-      body["items"],
-      typeof body["code"] === "string" ? body["code"] : null,
-    );
+    const submittedCode = typeof body["code"] === "string" ? body["code"] : null;
+    const gate = await checkFirstOrderCode(submittedCode, email, async (pattern) => {
+      const r = await db(c.url, c.key)
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .ilike("email", pattern)
+        .eq("status", "paid");
+      return { count: r.count, error: r.error };
+    });
+    if (!gate.ok) return fail(gate.message, gate.status);
+    const quote = quoteCheckout(body["items"], submittedCode);
     if (quote.belowMinimum)
       return fail(`Minimum order is £${Math.round(quote.minimumPence / 100)}`, 400);
     const store = db(c.url, c.key);
