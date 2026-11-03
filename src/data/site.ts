@@ -61,7 +61,7 @@ export const site = {
     short: "5× Bac Water",
     quantity: 5,
     value: 29.95,
-    over: 75,
+    over: 100,
   } as {
     slug: string;
     strength: string;
