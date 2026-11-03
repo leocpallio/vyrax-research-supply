@@ -231,7 +231,9 @@ export function CartDrawer({
             </DialogPrimitive.Close>
             <DialogPrimitive.Title className="t-label">
               Your cart
-              <span className="sr-only" data-testid="cart-drawer-count">({count})</span>
+              <span className="sr-only" data-testid="cart-drawer-count">
+                ({count})
+              </span>
             </DialogPrimitive.Title>
             <span aria-hidden className="w-6" />
           </div>
@@ -243,7 +245,9 @@ export function CartDrawer({
             {items.length === 0 ? (
               <div className="px-5 py-12 text-center" data-testid="cart-empty">
                 <p className="t-label text-[#AC4821]">Your basket is ready</p>
-                <p className="mt-2 font-heading text-[1.3rem] font-black leading-tight text-ink">Start with our most-ordered peptides</p>
+                <p className="mt-2 font-heading text-[1.3rem] font-black leading-tight text-ink">
+                  Start with our most-ordered peptides
+                </p>
                 <DialogPrimitive.Close asChild>
                   <Link
                     to="/shop"
@@ -269,7 +273,7 @@ export function CartDrawer({
               </>
             )}
           </div>
-          {(
+          {
             <div
               className="border-t border-line px-5 pt-4 pb-5 bg-paper"
               data-testid="cart-summary"
@@ -310,11 +314,7 @@ export function CartDrawer({
                 data-testid="cart-checkout"
                 disabled={blocked || !site.checkoutOpen || quote.belowMinimum}
                 onClick={() => {
-                  if (site.checkoutOpen)
-                    capture("checkout_started", {
-                      checkout_type: "hosted_payment",
-                      source: "drawer",
-                    });
+                  // checkout_started fires once, from trackPage("/checkout") with full basket props.
                   onOpenChange(false);
                   navigate({ to: "/checkout" });
                 }}
@@ -350,7 +350,7 @@ export function CartDrawer({
                 </p>
               )}
             </div>
-          )}
+          }
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

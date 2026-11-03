@@ -7,6 +7,8 @@ import { validatePaymentEvent, verifySignature } from "./spicepay";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
+import { cleanAttribution } from "./analytics-events";
+import { capturePaymentConfirmed } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
 const json = (value: unknown, status = 200) =>
@@ -123,6 +125,7 @@ export async function createCheckout(request: Request): Promise<Response> {
     );
     if (quote.belowMinimum)
       return fail(`Minimum order is £${Math.round(quote.minimumPence / 100)}`, 400);
+    const attr = cleanAttribution(body["attribution"]);
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
     const { data: order, error: insertError } = await store
@@ -145,6 +148,15 @@ export async function createCheckout(request: Request): Promise<Response> {
         checkout_state: "creating",
         status: "pending_payment",
         guest_token: token,
+        utm_source: attr.utm_source ?? null,
+        utm_medium: attr.utm_medium ?? null,
+        utm_campaign: attr.utm_campaign ?? null,
+        utm_term: attr.utm_term ?? null,
+        utm_content: attr.utm_content ?? null,
+        gclid: attr.gclid ?? null,
+        fbclid: attr.fbclid ?? null,
+        ttclid: attr.ttclid ?? null,
+        landing_path: attr.landing_path ?? null,
       })
       .select("id")
       .single();
@@ -282,7 +294,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     const store = db(c.url, c.key);
     const { data: order, error } = await store
       .from("orders")
-      .select("id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode")
+      .select(
+        "id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,ttclid,landing_path",
+      )
       .eq("payment_id", paymentId)
       .maybeSingle();
     if (error) throw error;
@@ -326,6 +340,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
       if (legacyKind) await sendOrderEmail(legacyKind, order, String(event["event_id"]));
     }
     if (applied === "paid") {
+      // Aggregate order event. Fires only on the DB paid transition (exactly once per order, retries
+      // return 'duplicate'). Never blocks or fails the webhook.
+      await capturePaymentConfirmed(order as never);
       // Owner alert first: the sale must never depend on the outbox drain.
       await sendSaleAlert(order as never, String(event["event_id"]));
       // Drain inline. There is no reliable cron on this worker, and a paid receipt that sits queued
