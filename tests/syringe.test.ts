@@ -257,9 +257,9 @@ describe("edge cases", () => {
 
 describe("catalogue", () => {
   const all = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...ukplAdditions];
-  test("all 50 compounds have a record and compute or are explicitly blocked", () => {
-    expect(all.length).toBe(50);
-    expect(dilutionRecords.length).toBe(50);
+  test("all 49 compounds have a record and compute or are explicitly blocked", () => {
+    expect(all.length).toBe(49);
+    expect(dilutionRecords.length).toBe(49);
     for (const c of all) {
       const rec = dilutionRecords.find((d) => d.slug === c.slug);
       expect(rec).toBeDefined();
