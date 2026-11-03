@@ -63,6 +63,12 @@ export default {
         reqUrl.hostname = reqUrl.hostname.slice(4);
         return Response.redirect(reqUrl.toString(), 301);
       }
+      // Removed product (not stocked): permanent redirect to its category.
+      if (reqUrl.pathname.replace(/\/+$/, "") === "/product/cagrilintide") {
+        reqUrl.pathname = "/category/metabolic-research";
+        reqUrl.search = "";
+        return Response.redirect(reqUrl.toString(), 301);
+      }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
