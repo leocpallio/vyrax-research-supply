@@ -136,6 +136,15 @@ function GuidePage() {
               View as Markdown
             </a>
           </p>
+          {g.tldr && (
+            <div
+              className="mt-6 rounded-2xl border border-border bg-card p-5"
+              data-testid="guide-answer"
+            >
+              <p className="eyebrow mb-2">AT A GLANCE</p>
+              <p className="text-base leading-relaxed">{g.tldr}</p>
+            </div>
+          )}
           {g.changed && (
             <p className="mt-3 text-sm border-l-2 border-border pl-3" data-testid="guide-changed">
               <span className="font-semibold">What changed:</span> {g.changed}

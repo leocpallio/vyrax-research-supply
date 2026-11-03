@@ -41,7 +41,7 @@ export function buildLlmsTxt(): string {
   lines.push("## Guides", "");
   for (const g of guides)
     lines.push(
-      `- [${g.title}](${url(`/guides/${g.slug}`)}): ${g.description} Markdown: ${url(`/guides-md/${g.slug}`)}`,
+      `- [${g.title}](${url(`/guides/${g.slug}`)}): ${g.tldr} Markdown: ${url(`/guides-md/${g.slug}`)}`,
     );
   lines.push("");
   lines.push("## Trust and policies", "");

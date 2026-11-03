@@ -18,6 +18,8 @@ export type Guide = {
   changed?: string;
   readMins: number;
   compounds: string[]; // related compound slugs
+  /** Answer-first summary, 40-60 words, extractable by AI answer engines verbatim. */
+  tldr: string;
   body: Block[];
 };
 
@@ -40,6 +42,8 @@ export const guides: Guide[] = [
       "igf-1-lr3",
       "nad-plus",
     ],
+    tldr:
+      "To reconstitute a peptide, let the sealed vial reach room temperature, add bacteriostatic water slowly down the vial wall, and swirl gently: never shake. A 10mg vial with 2ml of diluent gives 5mg/ml. Store the solution at 2 to 8°C and treat it as short-lived; the dry powder is the stable form.",
     body: [
       {
         type: "p",
@@ -201,6 +205,8 @@ export const guides: Guide[] = [
     updated: "2026-09-28",
     readMins: 5,
     compounds: ["bpc-157", "ghk-cu", "nad-plus"],
+    tldr:
+      "Store lyophilised peptides at -20°C long term, sealed, dark and dry, or at 2 to 8°C for weeks. Reconstituted peptides keep at 2 to 8°C, protected from light, with no repeated freeze-thaw cycles; aliquot before freezing. Cloudiness, particles or a colour change mean the material has degraded and should be discarded.",
     body: [
       {
         type: "p",
@@ -254,6 +260,8 @@ export const guides: Guide[] = [
     updated: "2026-09-28",
     readMins: 7,
     compounds: ["bpc-157", "tb-500", "retatrutide"],
+    tldr:
+      "A valid peptide CoA names the testing laboratory, carries a batch number matching your vial, and shows HPLC purity with the chromatogram plus mass spectrometry confirming the molecular weight. Red flags: no lab name, no batch match, a purity figure with no chromatogram, or the same certificate reused across compounds and years.",
     body: [
       {
         type: "p",
@@ -308,6 +316,8 @@ export const guides: Guide[] = [
     updated: "2026-09-28",
     readMins: 6,
     compounds: ["bpc-157", "tb-500", "wolverine-stack"],
+    tldr:
+      "BPC-157 is a stable 15 amino acid peptide studied in tendon, ligament and gut models, linked to angiogenesis and the nitric oxide system. TB-500 is the 43 amino acid thymosin beta-4, studied for actin regulation and cell migration in wound and cardiac models. Different mechanisms, which is why researchers pair them.",
     body: [
       {
         type: "p",
@@ -362,6 +372,8 @@ export const guides: Guide[] = [
     updated: "2026-09-28",
     readMins: 7,
     compounds: ["retatrutide", "tirzepatide", "semaglutide"],
+    tldr:
+      "Semaglutide activates one receptor (GLP-1), tirzepatide two (GIP and GLP-1), retatrutide three (GIP, GLP-1 and glucagon). All are incretin peptides with fatty diacid half-life extension; all are sold in the UK as research compounds. Receptor count, not potency claims, is the defensible difference between them.",
     body: [
       {
         type: "p",
@@ -410,6 +422,8 @@ export const guides: Guide[] = [
     updated: "2026-10-28",
     readMins: 5,
     compounds: ["bacteriostatic-water", "bpc-157", "tb-500"],
+    tldr:
+      "There is no single shelf life for a reconstituted peptide: stability depends on sequence, diluent, temperature, light and access frequency. Powder is far more stable than solution. Hold solutions at 2 to 8°C in the dark, aliquot before freezing, and discard any that turns cloudy or discoloured. Where a hold time matters, labs test it by HPLC.",
     body: [
       {
         type: "p",
@@ -456,6 +470,8 @@ export const guides: Guide[] = [
     updated: "2026-10-28",
     readMins: 5,
     compounds: ["melanotan-1", "melanotan-2"],
+    tldr:
+      "Melanotan 1 (afamelanotide) is a linear 13 amino acid peptide selective mainly for the MC1R receptor, studied in melanogenesis and photoprotection models. Melanotan 2 is a smaller cyclic heptapeptide binding MC1R, MC3R, MC4R and MC5R. Afamelanotide is a licensed medicine for one rare condition; melanotan 2 has no UK authorisation.",
     body: [
       {
         type: "p",
@@ -501,6 +517,8 @@ export const guides: Guide[] = [
     updated: "2026-10-27",
     readMins: 7,
     compounds: ["retatrutide", "tirzepatide", "bacteriostatic-water"],
+    tldr:
+      "When buying retatrutide in the UK, check the batch number on the vial against a published certificate showing HPLC purity with chromatogram and mass spectrometry near 4,731 Da. Compare cost per milligram across 10mg, 20mg and 30mg vials rather than headline price. Prefer lyophilised powder over pre-mixed liquid: powder is the stable form.",
     body: [
       {
         type: "p",
@@ -591,6 +609,8 @@ export const guides: Guide[] = [
     updated: "2026-10-27",
     readMins: 6,
     compounds: ["retatrutide", "tirzepatide", "semaglutide"],
+    tldr:
+      "Tirzepatide is a dual agonist at the GIP and GLP-1 receptors; retatrutide is a triple agonist that adds the glucagon receptor, studied for energy expenditure and hepatic lipid effects. Both are 39 amino acid GIP-backbone peptides with a C20 fatty diacid, differing by about 82 Da, which mass spectrometry resolves and the eye cannot.",
     body: [
       {
         type: "p",
@@ -657,6 +677,8 @@ export const guides: Guide[] = [
     updated: "2026-10-27",
     readMins: 8,
     compounds: ["bpc-157", "retatrutide", "tb-500"],
+    tldr:
+      "HPLC purity measures what share of detected material is the target peptide; it says nothing about identity, water, salt or fill. Mass spectrometry confirms identity against the theoretical molecular weight. Purity is not content: a 99% pure vial can be under-filled. Check the chromatogram, and match the batch number to your vial.",
     body: [
       {
         type: "p",
