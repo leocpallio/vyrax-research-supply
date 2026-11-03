@@ -361,7 +361,7 @@ export const guides: Guide[] = [
       "Semaglutide, tirzepatide and retatrutide compared: receptor targets, structure, half-life chemistry and what separates them.",
     updated: "2026-09-28",
     readMins: 7,
-    compounds: ["retatrutide", "tirzepatide", "semaglutide", "cagrilintide"],
+    compounds: ["retatrutide", "tirzepatide", "semaglutide"],
     body: [
       {
         type: "p",
@@ -397,7 +397,7 @@ export const guides: Guide[] = [
       { type: "h", text: "Choosing a compound for your study" },
       {
         type: "p",
-        text: "Studies that isolate GLP-1 receptor effects typically use semaglutide. Studies of combined incretin signalling use tirzepatide, often with semaglutide as a comparator. Studies of glucagon receptor contribution use retatrutide alongside one or both of the others. The amylin analogue cagrilintide is used for a separate pathway and is often studied in combination with GLP-1 agonists.",
+        text: "Studies that isolate GLP-1 receptor effects typically use semaglutide. Studies of combined incretin signalling use tirzepatide, often with semaglutide as a comparator. Studies of glucagon receptor contribution use retatrutide alongside one or both of the others.",
       },
     ],
   },

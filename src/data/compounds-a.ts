@@ -99,31 +99,6 @@ export const metabolicAndRegenerative: Compound[] = [
     },
   },
   {
-    slug: "cagrilintide",
-    name: "Cagrilintide",
-    aliases: ["amylin analogue", "cagri", "NN9838"],
-    category: "metabolic-research",
-    tags: ["Amylin", "Satiety signalling"],
-    useCases: ["Weight Loss", "Appetite Control", "Satiety"],
-    kind: "peptide",
-    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 39.99 }],
-    summary:
-      "Cagrilintide is a long-acting acylated amylin analogue acting at the amylin and calcitonin receptors. Supplied as a lyophilised powder.",
-    overview: [
-      "Cagrilintide is a lipidated analogue of amylin designed for an extended duration of action. It acts as a non-selective agonist at amylin receptors and at the calcitonin receptor.",
-      "It acts on satiety signalling and is usually bought alongside semaglutide, where the complementary amylin and GLP-1 pathways are worked together.",
-    ],
-    applications: [
-      "Amylin and calcitonin receptor pharmacology",
-      "Satiety and gastric emptying in animal models",
-      "Combination with GLP-1 receptor agonists",
-    ],
-    compare: {
-      slug: "semaglutide",
-      text: "Semaglutide targets the GLP-1 receptor, cagrilintide targets amylin receptors, and the two are frequently studied in combination.",
-    },
-  },
-  {
     slug: "aod-9604",
     name: "AOD-9604",
     aliases: ["AOD9604", "hGH fragment 176-191", "Tyr-hGH 177-191"],

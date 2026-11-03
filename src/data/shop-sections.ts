@@ -11,7 +11,6 @@ export const shopSections = [
       "retatrutide",
       "tirzepatide",
       "semaglutide",
-      "cagrilintide",
       "aod-9604",
       "5-amino-1mq",
       "mots-c",
