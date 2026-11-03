@@ -150,7 +150,8 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 9.99 },
-      { label: "10mg", amount: 10, unit: "mg", price: 14.99 },
+      // 10mg size never bought from LKB and not held as UKPL stock.
+      { label: "10mg", amount: 10, unit: "mg", price: 14.99, stock: "out" },
     ],
     summary:
       "GHRP-6 is a synthetic hexapeptide (His-D-Trp-Ala-Trp-D-Phe-Lys-NH2) and one of the first growth hormone releasing peptides.",
@@ -176,7 +177,8 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["Ghrelin receptor", "Cardiovascular"],
     useCases: ["Growth Hormone", "Muscle Growth", "Heart"],
     kind: "peptide",
-    strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 12.99 }],
+    // 2mg is the only size listed and was never bought from LKB.
+    strengths: [{ label: "2mg", amount: 2, unit: "mg", price: 12.99, stock: "out" }],
     summary:
       "Hexarelin (examorelin) is a synthetic hexapeptide ghrelin receptor agonist with additional affinity for the CD36 receptor. Lyophilised powder.",
     overview: [
@@ -202,7 +204,8 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Growth Hormone", "Anti-Ageing", "Sleep"],
     kind: "peptide",
     strengths: [
-      { label: "2mg", amount: 2, unit: "mg", price: 12.99 },
+      // 2mg never bought from LKB; 5mg and 10mg are priced off a paid line.
+      { label: "2mg", amount: 2, unit: "mg", price: 12.99, stock: "out" },
       { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 39.99 },
     ],
@@ -625,7 +628,8 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Muscle Growth", "Growth Hormone", "Strength"],
     kind: "blend",
     composition: ["CJC-1295 DAC", "Ipamorelin"],
-    strengths: [{ label: "20mg", amount: 20, unit: "mg", price: 69.99 }],
+    // Component vials are priced, but no LKB line quote exists for the assembled 20mg blend.
+    strengths: [{ label: "20mg", amount: 20, unit: "mg", price: 69.99, stock: "out" }],
     summary:
       "The Hulk Stack combines CJC-1295 DAC and Ipamorelin in a single 20mg lyophilised vial.",
     overview: [
