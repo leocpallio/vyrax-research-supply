@@ -38,8 +38,9 @@ import {
 export * from "./analytics-events";
 
 // The public project token and capture host must BOTH belong to Vyrax. Never use a different brand's token.
-const key = import.meta.env["VITE_POSTHOG_KEY"]?.trim();
-const host = import.meta.env["VITE_POSTHOG_HOST"]?.trim();
+// Public Vyrax project token (project 291775, EU). Fallback because .env.production is untracked and Lovable builds omit it.
+const key = import.meta.env["VITE_POSTHOG_KEY"]?.trim() || "phc_mgjmEQUYX3pQE3rs7t9WjMRfAtG234oZxMoHa4HKsuVU";
+const host = import.meta.env["VITE_POSTHOG_HOST"]?.trim() || "https://eu.i.posthog.com";
 const captureHost = (() => {
   try {
     const url = new URL(host || "");
