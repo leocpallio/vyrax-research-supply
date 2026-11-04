@@ -2,7 +2,7 @@
   "files": {
     "src/data/categories.ts": "2026-11-03",
     "src/data/category-content.ts": "2026-11-03",
-    "src/data/coa.ts": "2026-10-28",
+    "src/data/coa.ts": "2026-11-04",
     "src/data/compounds-a.ts": "2026-11-03",
     "src/data/compounds-b.ts": "2026-10-30",
     "src/data/shop-sections.ts": "2026-11-03",
@@ -18,7 +18,7 @@
     "src/routes/faq.tsx": "2026-11-01",
     "src/routes/guides.$slug.tsx": "2026-11-02",
     "src/routes/guides.index.tsx": "2026-11-02",
-    "src/routes/index.tsx": "2026-11-01",
+    "src/routes/index.tsx": "2026-11-04",
     "src/routes/lab-reports.tsx": "2026-10-28",
     "src/routes/privacy.tsx": "2026-10-12",
     "src/routes/product.$slug.tsx": "2026-11-02",

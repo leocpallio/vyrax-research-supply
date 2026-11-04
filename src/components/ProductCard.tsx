@@ -18,7 +18,7 @@ import {
 import { openCartDrawer } from "@/components/shell/cart-store";
 import { sectionFor } from "@/data/shop-sections";
 import { coaFor, cardPurity } from "@/data/coa";
-import { isClaimAllowed } from "@/lib/claims";
+import { claimFilled, isClaimAllowed } from "@/lib/claims";
 import { bestLadderPct, ladderSaving } from "@/lib/price-ladder";
 
 // Minimal card, kova pattern: stock pill, 1:1 render, round quick-add, name, category, "From £".
@@ -60,7 +60,7 @@ export function ProductCard({
   const img = productImage(product.slug);
   const href = productPath(product.slug);
   const hasReport = coaFor(product.slug).length > 0;
-  const purity = isClaimAllowed("testing.purity-badge") ? cardPurity(product.slug) : undefined;
+  const purity = isClaimAllowed("testing.card-purity") ? cardPurity(product.slug) : undefined;
   const [added, setAdded] = useState(false);
   const [open, setOpen] = useState(false);
   if (!s) return null;
@@ -202,7 +202,9 @@ export function ProductCard({
               }
               className="shrink-0 whitespace-nowrap rounded-full bg-[#040825]/5 px-2 py-0.5 t-badge tabular-nums text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
             >
-              {purity !== undefined ? `${purity}% · COA` : "COA"}
+              {purity !== undefined
+                ? claimFilled("testing.card-purity", { purity: String(purity) })
+                : "COA"}
             </a>
           )}
         </div>

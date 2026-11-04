@@ -300,11 +300,15 @@ const DEFS = {
     requires: [{ key: "labReportsPublished", kind: "true" }],
     coverage: "hplc-ms",
     assertion: true,
-    surfaces: [
-      "src/components/Store.tsx",
-      "src/routes/product.$slug.tsx",
-      "src/components/ProductCard.tsx",
-    ],
+    surfaces: ["src/components/Store.tsx", "src/routes/product.$slug.tsx"],
+  },
+  // Per-card chip: the product's OWN published certificate(s), never a catalogue-wide claim. The
+  // per-product floor and >=98% gate live in cardPurity (src/data/coa.ts).
+  "testing.card-purity": {
+    text: "{{purity}}% · COA",
+    requires: [{ key: "labReportsPublished", kind: "true" }],
+    assertion: true,
+    surfaces: ["src/components/ProductCard.tsx"],
   },
   "testing.batch-verified": {
     text: "Batch verified",
