@@ -43,7 +43,7 @@ export const guides: Guide[] = [
       "nad-plus",
     ],
     tldr:
-      "To reconstitute a peptide, let the sealed vial reach room temperature, add bacteriostatic water slowly down the vial wall, and swirl gently: never shake. A 10mg vial with 2ml of diluent gives 5mg/ml. Store the solution at 2 to 8°C and treat it as short-lived; the dry powder is the stable form.",
+      "Peptide reconstitution is a laboratory preparation step, not a universal recipe. Solvent compatibility, concentration and stability depend on the particular sequence and formulation. Researchers should use compound-specific documentation and validated methods, record the batch and preparation conditions, and assess solution quality with appropriate analytical controls. This guide discusses those considerations for research materials only.",
     body: [
       {
         type: "p",
@@ -206,7 +206,7 @@ export const guides: Guide[] = [
     readMins: 5,
     compounds: ["bpc-157", "ghk-cu", "nad-plus"],
     tldr:
-      "Store lyophilised peptides at -20°C long term, sealed, dark and dry, or at 2 to 8°C for weeks. Reconstituted peptides keep at 2 to 8°C, protected from light, with no repeated freeze-thaw cycles; aliquot before freezing. Cloudiness, particles or a colour change mean the material has degraded and should be discarded.",
+      "Peptide stability varies with sequence, formulation, moisture, light and temperature; no single storage duration applies across a catalogue. Freeze-thaw cycles can affect some materials, while visible changes alone cannot establish chemical identity or potency. Researchers should consult compound-specific stability evidence and use analytical testing where a defined holding period matters. This guide compares the factors affecting dry and solution forms.",
     body: [
       {
         type: "p",
@@ -317,7 +317,7 @@ export const guides: Guide[] = [
     readMins: 6,
     compounds: ["bpc-157", "tb-500", "wolverine-stack"],
     tldr:
-      "BPC-157 is a stable 15 amino acid peptide studied in tendon, ligament and gut models, linked to angiogenesis and the nitric oxide system. TB-500 is the 43 amino acid thymosin beta-4, studied for actin regulation and cell migration in wound and cardiac models. Different mechanisms, which is why researchers pair them.",
+      "BPC-157 is a 15 amino acid peptide investigated mainly in preclinical tissue-repair models. Thymosin beta-4 is a distinct 43 amino acid peptide studied for actin regulation and cell migration. The label TB-500 can refer to a shorter fragment rather than full-length thymosin beta-4, so identity requires sequence or molecular-weight evidence. Neither name establishes a clinical benefit.",
     body: [
       {
         type: "p",
@@ -373,7 +373,7 @@ export const guides: Guide[] = [
     readMins: 7,
     compounds: ["retatrutide", "tirzepatide", "semaglutide"],
     tldr:
-      "Semaglutide activates one receptor (GLP-1), tirzepatide two (GIP and GLP-1), retatrutide three (GIP, GLP-1 and glucagon). All are incretin peptides with fatty diacid half-life extension; all are sold in the UK as research compounds. Receptor count, not potency claims, is the defensible difference between them.",
+      "Semaglutide targets GLP-1 receptors, tirzepatide targets GIP and GLP-1 receptors, and investigational retatrutide also targets the glucagon receptor. Receptor count describes their pharmacology, not comparative clinical potency or regulatory status. Licensed medicines and unapproved research materials must not be conflated; verify the identity and applicable status of each specific product independently.",
     body: [
       {
         type: "p",
@@ -423,7 +423,7 @@ export const guides: Guide[] = [
     readMins: 5,
     compounds: ["bacteriostatic-water", "bpc-157", "tb-500"],
     tldr:
-      "There is no single shelf life for a reconstituted peptide: stability depends on sequence, diluent, temperature, light and access frequency. Powder is far more stable than solution. Hold solutions at 2 to 8°C in the dark, aliquot before freezing, and discard any that turns cloudy or discoloured. Where a hold time matters, labs test it by HPLC.",
+      "There is no universal shelf life for a peptide solution: sequence, formulation, temperature, light and handling influence stability. Lyophilised and dissolved forms require separate evidence; appearance by itself cannot quantify degradation. Laboratories can evaluate a proposed holding period using validated analytical methods such as HPLC. Consult compound-specific documentation rather than applying one duration or storage rule to every research material.",
     body: [
       {
         type: "p",
@@ -518,7 +518,7 @@ export const guides: Guide[] = [
     readMins: 7,
     compounds: ["retatrutide", "tirzepatide", "bacteriostatic-water"],
     tldr:
-      "When buying retatrutide in the UK, check the batch number on the vial against a published certificate showing HPLC purity with chromatogram and mass spectrometry near 4,731 Da. Compare cost per milligram across 10mg, 20mg and 30mg vials rather than headline price. Prefer lyophilised powder over pre-mixed liquid: powder is the stable form.",
+      "Retatrutide is an investigational peptide, not an authorised UK medicine. For research-material identity, a certificate should identify the batch and show the methods and results behind any purity or mass claim; a headline percentage alone does not establish content or authenticity. Check whether molecular mass matches the declared sequence, and distinguish independent analytical evidence from a seller's unverified assertion.",
     body: [
       {
         type: "p",
