@@ -17,11 +17,13 @@ import {
 } from "@/lib/catalog";
 import { openCartDrawer } from "@/components/shell/cart-store";
 import { sectionFor } from "@/data/shop-sections";
-import { coaFor } from "@/data/coa";
+import { coaFor, cardPurity } from "@/data/coa";
+import { isClaimAllowed } from "@/lib/claims";
 import { bestLadderPct, ladderSaving } from "@/lib/price-ladder";
 
 // Minimal card, kova pattern: stock pill, 1:1 render, round quick-add, name, category, "From £".
-// No purity, no rating, no pack chips: trust lives on the product page.
+// No rating, no pack chips. A purity figure shows only from a published report at or above the
+// card gate (cardPurity in src/data/coa.ts); every other card shows the plain COA link.
 
 const PILL: Record<StockState, { text: string; warm: boolean }> = {
   in: { text: stockLabel.in, warm: false },
@@ -58,6 +60,7 @@ export function ProductCard({
   const img = productImage(product.slug);
   const href = productPath(product.slug);
   const hasReport = coaFor(product.slug).length > 0;
+  const purity = isClaimAllowed("testing.purity-badge") ? cardPurity(product.slug) : undefined;
   const [added, setAdded] = useState(false);
   const [open, setOpen] = useState(false);
   if (!s) return null;
@@ -80,10 +83,7 @@ export function ProductCard({
     "size-11 rounded-full bg-white text-[#040825] ring-1 ring-[#040825]/15 shadow-[0_2px_10px_rgba(4,8,37,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#040825] hover:text-white hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
 
   return (
-    <article
-      data-testid="product-wrapper"
-      className="group flex flex-col"
-    >
+    <article data-testid="product-wrapper" className="group flex flex-col">
       <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
@@ -98,7 +98,10 @@ export function ProductCard({
             className="size-full object-contain object-center scale-[1.02] mix-blend-multiply transition-transform duration-500 group-hover:scale-[0.99]"
           />
         </a>
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-white to-transparent" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-white to-transparent"
+        />
         <span
           data-testid="card-stock-pill"
           data-stock={stock}
@@ -129,9 +132,7 @@ export function ProductCard({
                 sideOffset={8}
                 className="w-56 rounded-2xl border-[#040825]/10 bg-white p-1.5 shadow-xl"
               >
-                <p className="px-3 pt-1.5 pb-1 t-label text-[#040825]/60">
-                  Choose amount
-                </p>
+                <p className="px-3 pt-1.5 pb-1 t-label text-[#040825]/60">Choose amount</p>
                 <ul>
                   {product.strengths.map((x) => (
                     <li key={x.label}>
@@ -193,10 +194,15 @@ export function ProductCard({
           {hasReport && (
             <a
               href={`${href}#lab-report`}
-              data-testid="card-coa-link"
-              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 t-badge uppercase text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
+              data-testid={purity !== undefined ? "card-purity-chip" : "card-coa-link"}
+              aria-label={
+                purity !== undefined
+                  ? `${purity}% purity on the published lab report, view certificate`
+                  : undefined
+              }
+              className="shrink-0 whitespace-nowrap rounded-full bg-[#040825]/5 px-2 py-0.5 t-badge tabular-nums text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
             >
-              COA
+              {purity !== undefined ? `${purity}% · COA` : "COA"}
             </a>
           )}
         </div>

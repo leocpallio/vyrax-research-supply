@@ -300,7 +300,11 @@ const DEFS = {
     requires: [{ key: "labReportsPublished", kind: "true" }],
     coverage: "hplc-ms",
     assertion: true,
-    surfaces: ["src/components/Store.tsx", "src/routes/product.$slug.tsx"],
+    surfaces: [
+      "src/components/Store.tsx",
+      "src/routes/product.$slug.tsx",
+      "src/components/ProductCard.tsx",
+    ],
   },
   "testing.batch-verified": {
     text: "Batch verified",

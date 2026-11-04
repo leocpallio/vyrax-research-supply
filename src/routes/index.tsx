@@ -12,6 +12,30 @@ import { clampDescription, ogImageFor } from "@/lib/seo";
 import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
 
+// Range tile renders: scripts/render-range-tiles.py (three real Vyrax vial renders per range).
+const rangeFiles = import.meta.glob("../assets/ranges/*.webp", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+const rangeImages: Record<string, { sm: string; lg: string }> = {};
+for (const [path, url] of Object.entries(rangeFiles)) {
+  const m = /ranges\/(.+?)(-800)?\.webp$/.exec(path);
+  if (!m) continue;
+  const key = m[1] ?? "";
+  const entry = (rangeImages[key] ??= { sm: "", lg: "" });
+  if (m[2]) entry.sm = url;
+  else entry.lg = url;
+}
+
+// Mosaic: the flagship range is a 2x2 feature, a few are wide; the rest fill single cells.
+const RANGE_SPAN: Record<string, string> = {
+  "weight-metabolic": "col-span-2 row-span-2",
+  "growth-hormone": "col-span-2",
+  "tanning-libido": "lg:col-span-2",
+  sleep: "lg:col-span-2",
+  "bacteriostatic-water": "col-span-2",
+};
+
 const strengthCount = compounds.reduce((n, c) => n + c.strengths.length, 0);
 
 export const Route = createFileRoute("/")({
@@ -230,33 +254,55 @@ function Home() {
         <h2 className="mt-2 mb-6 font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]">
           Ranges
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4" data-testid="range-tiles">
-          {ranges.map((r) => (
-            <Link
-              key={r.slug}
-              to="/collections/$slug"
-              params={{ slug: r.slug }}
-              data-testid="range-tile"
-              className="group flex flex-col rounded-[18px] border border-[#040825]/10 p-5 md:p-6 min-h-[164px] transition-colors duration-200 hover:bg-[#F6F5F1] hover:border-[#040825]/30"
-            >
-              <h3 className="font-heading text-base md:text-lg font-semibold leading-snug">
-                {r.name}
-              </h3>
-              <p className="mt-2 text-xs md:text-sm text-[#040825]/60 leading-relaxed flex-1">
-                {r.list
-                  .slice(0, 3)
-                  .map((c) => c.name)
-                  .join(" · ")}
-              </p>
-              <span className="mt-4 flex items-center justify-between text-xs text-[#040825]/60">
-                {r.list.length} product{r.list.length === 1 ? "" : "s"}
-                <ArrowRight
-                  size={16}
-                  className="text-[#040825] transition-transform duration-200 group-hover:translate-x-1"
+        <div
+          className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[200px] md:auto-rows-[240px] lg:auto-rows-[260px] gap-3 md:gap-4"
+          data-testid="range-tiles"
+        >
+          {ranges.map((r) => {
+            const img = rangeImages[r.slug];
+            return (
+              <Link
+                key={r.slug}
+                to="/collections/$slug"
+                params={{ slug: r.slug }}
+                data-testid="range-tile"
+                className={`range-tile group relative isolate overflow-hidden rounded-[18px] bg-[#040825] text-white ${RANGE_SPAN[r.slug] ?? ""}`}
+              >
+                {img && (
+                  <img
+                    src={img.sm}
+                    srcSet={`${img.sm} 800w, ${img.lg} 1600w`}
+                    sizes="(max-width:1023px) 100vw, 50vw"
+                    width={1600}
+                    height={1200}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="range-tile-img absolute inset-0 -z-10 h-full w-full object-cover"
+                  />
+                )}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 -z-10 bg-gradient-to-t from-[#040825]/90 via-[#040825]/35 to-transparent"
                 />
-              </span>
-            </Link>
-          ))}
+                <span className="absolute inset-x-0 bottom-0 p-4 md:p-6">
+                  <h3 className="font-heading text-lg md:text-2xl font-black leading-tight tracking-[-0.02em]">
+                    {r.name}
+                  </h3>
+                  <span className="mt-1 block text-xs md:text-sm text-white/80 leading-relaxed line-clamp-2">
+                    {r.list
+                      .slice(0, 4)
+                      .map((c) => c.name)
+                      .join(" · ")}
+                  </span>
+                  <span className="mt-2 flex items-center gap-1.5 text-xs text-white/80">
+                    {r.list.length} product{r.list.length === 1 ? "" : "s"}
+                    <ArrowRight size={14} />
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

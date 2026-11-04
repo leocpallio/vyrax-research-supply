@@ -102,6 +102,18 @@ export const coaFor = (compound: string, strength?: string) =>
     .filter((c) => c.compound === compound && (!strength || c.strength === strength))
     .sort((a, b) => b.tested.localeCompare(a.tested));
 
+/** Card purity chip gate: published reports must all clear this before a card shows a figure. */
+export const CARD_PURITY_MIN = 98;
+
+/** Lowest purity across a compound's published reports, floored to one decimal so the chip can never
+ * overstate a certificate. Undefined when there is no report or ANY report is below the gate
+ * (tesamorelin 97.70% never gets a chip). */
+export const cardPurity = (compound: string): number | undefined => {
+  const list = coaFor(compound);
+  if (!list.length || list.some((c) => !(c.purity >= CARD_PURITY_MIN))) return undefined;
+  return Math.floor(Math.min(...list.map((c) => c.purity)) * 10) / 10;
+};
+
 export const latestCoa = (compound: string, strength?: string) => coaFor(compound, strength)[0];
 
 export const findBatch = (batch: string) =>

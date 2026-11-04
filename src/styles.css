@@ -641,3 +641,38 @@ textarea:focus-visible,
     font-size: 25px;
   }
 }
+
+/* Home range mosaic: lift on hover/focus, motion off under reduced-motion. */
+.range-tile {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+.range-tile-img {
+  transition: transform 400ms ease;
+}
+.range-tile:hover,
+.range-tile:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px -16px rgb(4 8 37 / 0.55);
+}
+.range-tile:hover .range-tile-img,
+.range-tile:focus-visible .range-tile-img {
+  transform: scale(1.03);
+}
+.range-tile:focus-visible {
+  outline: 3px solid #040825;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .range-tile,
+  .range-tile-img {
+    transition: none;
+  }
+  .range-tile:hover,
+  .range-tile:focus-visible,
+  .range-tile:hover .range-tile-img,
+  .range-tile:focus-visible .range-tile-img {
+    transform: none;
+  }
+}
