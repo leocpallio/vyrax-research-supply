@@ -16,7 +16,7 @@
     "src/routes/contact.tsx": "2026-10-28",
     "src/routes/cookies.tsx": "2026-10-28",
     "src/routes/faq.tsx": "2026-11-01",
-    "src/routes/guides.$slug.tsx": "2026-11-02",
+    "src/routes/guides.$slug.tsx": "2026-11-04",
     "src/routes/guides.index.tsx": "2026-11-02",
     "src/routes/index.tsx": "2026-11-01",
     "src/routes/lab-reports.tsx": "2026-10-28",
