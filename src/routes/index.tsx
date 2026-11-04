@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, FileCheck2, FlaskConical, Truck, type LucideIcon } from "lucide-react";
 import { StoreShell, FAQ } from "@/components/Store";
@@ -11,6 +12,35 @@ import { site, abs } from "@/data/site";
 import { clampDescription, ogImageFor } from "@/lib/seo";
 import heroImage from "@/assets/products/bpc-157__5mg.webp";
 import { shopSections, productsInSection } from "@/data/shop-sections";
+
+/**
+ * Decorative tile photos load only once the grid is near the viewport. Chrome's native
+ * lazy-load margin (up to 2500px on slow links) otherwise pulls ~93KB during first paint.
+ */
+function useNearViewport<T extends Element>(margin = "300px") {
+  const ref = useRef<T>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: margin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [margin, near]);
+  return [ref, near] as const;
+}
 
 // Range tile renders: scripts/render-range-tiles.py (three real Vyrax vial renders per range).
 const rangeFiles = import.meta.glob("../assets/ranges/*.webp", {
@@ -153,6 +183,7 @@ const ranges = shopSections
   .filter((s) => s.list.length > 0);
 
 function Home() {
+  const [tilesRef, showTileImages] = useNearViewport<HTMLDivElement>();
   return (
     <StoreShell>
       {/* Hero */}
@@ -255,6 +286,7 @@ function Home() {
           Ranges
         </h2>
         <div
+          ref={tilesRef}
           className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[200px] md:auto-rows-[240px] lg:auto-rows-[260px] gap-3 md:gap-4"
           data-testid="range-tiles"
         >
@@ -268,7 +300,7 @@ function Home() {
                 data-testid="range-tile"
                 className={`range-tile group relative isolate overflow-hidden rounded-[18px] bg-[#040825] text-white ${RANGE_SPAN[r.slug] ?? ""}`}
               >
-                {img && (
+                {img && showTileImages && (
                   <img
                     src={img.sm}
                     srcSet={`${img.sm} 800w, ${img.lg} 1600w`}
