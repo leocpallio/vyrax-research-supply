@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, FileCheck2, FlaskConical, Truck, type LucideIcon } from "lucide-react";
 import { StoreShell, FAQ } from "@/components/Store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   addCart,
   blends,
@@ -23,7 +23,11 @@ import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
 import { clampDescription, ogImageFor } from "@/lib/seo";
-import heroImage from "@/assets/vyrax-hero.webp";
+import slideOrange from "@/assets/vyrax-slide-orange.webp";
+import slideCobalt from "@/assets/vyrax-slide-cobalt.webp";
+import slideOlive from "@/assets/vyrax-slide-olive.webp";
+import slideRose from "@/assets/vyrax-slide-rose.webp";
+import slidePlum from "@/assets/vyrax-slide-plum.webp";
 import tWeight from "@/assets/vyrax-t-weight.webp";
 import tRecovery from "@/assets/vyrax-t-recovery.webp";
 import tGh from "@/assets/vyrax-t-gh.webp";
@@ -162,12 +166,21 @@ const TINTS: Record<string, string> = {
 };
 const tintFor = (slug: string) => TINTS[slug] ?? "#E9E4D6";
 
+const FIELD_VIALS: Record<string, string[]> = {
+  "weight-metabolic": ["retatrutide", "tirzepatide", "semaglutide"],
+  "recovery-repair": ["kpv", "bpc-157", "tb-500"],
+  "growth-hormone": ["tesamorelin", "ipamorelin", "cjc-1295-no-dac"],
+  "brain-focus": ["selank", "semax", "dsip"],
+  "longevity-cellular": ["nad-plus", "epithalon", "ss-31"],
+};
+
 // Research fields: deep photo tiles mapped to shop sections.
 const fieldTiles = [
   {
     slug: "weight-metabolic",
     title: "Metabolic",
     img: tWeight,
+    bg: "#450e01",
     alt: "Three Vyrax Labs vials on a burnt orange backdrop",
     ratio: "aspect-[4/5] md:aspect-[4/5]",
     col: 0,
@@ -176,6 +189,7 @@ const fieldTiles = [
     slug: "recovery-repair",
     title: "Tissue repair",
     img: tRecovery,
+    bg: "#1a1f10",
     alt: "Three Vyrax Labs vials on an olive green backdrop",
     ratio: "aspect-[4/5] md:aspect-[4/3]",
     col: 1,
@@ -184,6 +198,7 @@ const fieldTiles = [
     slug: "growth-hormone",
     title: "Growth hormone",
     img: tGh,
+    bg: "#010e3c",
     alt: "Three Vyrax Labs vials on a cobalt blue backdrop",
     ratio: "aspect-[4/5] md:aspect-[4/3]",
     col: 1,
@@ -192,23 +207,26 @@ const fieldTiles = [
     slug: "brain-focus",
     title: "Neuro",
     img: tBrain,
+    bg: "#28101c",
     alt: "Three Vyrax Labs vials on a plum backdrop",
-    ratio: "aspect-[4/5] md:aspect-[5/3]",
+    ratio: "aspect-[5/3] md:aspect-[5/3]",
     col: 1,
   },
   {
     slug: "longevity-cellular",
     title: "Cellular",
     img: tLongevity,
+    bg: "#3b0009",
     alt: "Three Vyrax Labs vials on a crimson backdrop",
     ratio: "aspect-[4/5] md:aspect-[20/17]",
     col: 0,
   },
 ].map((t) => ({
   ...t,
-  names: productsInSection(compounds, t.slug)
-    .slice(0, 3)
-    .map((c) => c.name),
+  // Names of the three vials shown in each photo, in on-shelf order.
+  names: (FIELD_VIALS[t.slug] ?? [])
+    .map((slug) => getCompound(slug)?.name)
+    .filter((n): n is string => Boolean(n)),
 }));
 
 const pillBtn =
@@ -298,60 +316,109 @@ function CardRow({ list, priorityCount = 0 }: { list: Compound[]; priorityCount?
 const eyebrow = "text-xs font-semibold uppercase tracking-[0.08em]";
 const h2c = "font-heading text-[28px] md:text-4xl font-black leading-tight tracking-[-0.03em]";
 
+const heroSlides = [
+  {
+    src: slideOrange,
+    alt: "Three Vyrax Labs vials labelled Retatrutide, Tirzepatide and AOD-9604 on a terracotta backdrop",
+  },
+  {
+    src: slideCobalt,
+    alt: "Three Vyrax Labs vials labelled Ipamorelin, CJC-1295 and GHRP-2 on a cobalt backdrop",
+  },
+  {
+    src: slideOlive,
+    alt: "Three Vyrax Labs vials labelled BPC-157, TB-500 and KPV on an olive backdrop",
+  },
+  {
+    src: slideRose,
+    alt: "Three Vyrax Labs vials labelled NAD+, Epithalon and Glutathione on a crimson backdrop",
+  },
+  {
+    src: slidePlum,
+    alt: "Three Vyrax Labs vials labelled Selank, Semax and DSIP on a plum backdrop",
+  },
+];
+
 function Home() {
+  const [slide, setSlide] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setSlide((i) => (i + 1) % heroSlides.length), 5000);
+    return () => clearInterval(t);
+  }, [slide]);
   return (
     <StoreShell>
       <div style={{ background: CREAM, color: NAVY }}>
         {/* Hero */}
-        <section className="container-main pt-10 pb-10 md:pt-16 md:pb-14 grid lg:grid-cols-[1fr_1.15fr] gap-8 lg:gap-10 items-center">
-          <div className="max-w-[640px]">
-            <p className={eyebrow} style={{ color: `${NAVY}b3` }}>
-              Research peptides · UK dispatch
-            </p>
-            <h1
-              data-testid="hero-title"
-              className="mt-4 font-heading text-[40px] md:text-[64px] font-black leading-[1.02] tracking-[-0.04em]"
-            >
-              Peptides for weight loss, recovery and growth.
-            </h1>
-            <p
-              className="mt-6 text-lg md:text-xl leading-relaxed max-w-[560px]"
-              style={{ color: `${NAVY}c0` }}
-            >
-              {compounds.length} research compounds across {strengthCount} strengths, each with CAS
-              numbers, literature references and per-mg pricing. Supplied for laboratory research
-              use only.{" "}
-              {site.checkoutOpen
-                ? "Card checkout on a secure hosted payment page."
-                : "The site is not live yet; no orders or payments are taken."}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link
-                to="/shop"
-                data-testid="hero-cta"
-                className={`${pillBtn} h-13 px-7 text-base hover:scale-[1.02]`}
-                style={{ background: NAVY, color: CREAM }}
-              >
-                Shop all peptides <ArrowRight size={18} />
-              </Link>
-              <Link
-                to="/lab-reports"
-                data-testid="hero-lab-reports"
-                className="inline-flex items-center h-13 font-semibold underline underline-offset-4 decoration-[#040825]/30 hover:decoration-[#040825]"
-              >
-                Browse lab reports
-              </Link>
+        <section className="relative overflow-hidden bg-[#040825]" data-testid="hero-visual">
+          <div className="relative aspect-[3/4] sm:aspect-[16/9] lg:aspect-[21/9] max-h-[760px] w-full">
+            {heroSlides.map((h, i) => (
+              <img
+                key={h.src}
+                src={h.src}
+                alt={h.alt}
+                width={1200}
+                height={900}
+                fetchPriority={i === 0 ? "high" : "low"}
+                loading={i === 0 ? "eager" : "lazy"}
+                aria-hidden={i !== slide}
+                className={`absolute inset-0 h-full w-full object-cover object-[50%_20%] sm:object-[50%_40%] transition-opacity duration-700 ${i === slide ? "opacity-100" : "opacity-0"}`}
+              />
+            ))}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent sm:from-black/80 sm:via-black/25" />
+            <div className="absolute inset-x-0 bottom-0">
+              <div className="container-main pb-12 md:pb-16">
+                <div className="max-w-[640px] text-white">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
+                    Research peptides · UK dispatch
+                  </p>
+                  <h1
+                    data-testid="hero-title"
+                    className="mt-3 font-heading text-[32px] md:text-[56px] font-black leading-[1.03] tracking-[-0.035em]"
+                  >
+                    Peptides for weight loss, recovery and growth.
+                  </h1>
+                  <p className="mt-4 hidden sm:block text-base md:text-lg leading-relaxed text-white/85 max-w-[560px]">
+                    {compounds.length} research compounds across {strengthCount} strengths, each
+                    with CAS numbers, literature references and per-mg pricing. Supplied for
+                    laboratory research use only.{" "}
+                    {site.checkoutOpen
+                      ? "Card checkout on a secure hosted payment page."
+                      : "The site is not live yet; no orders or payments are taken."}
+                  </p>
+                  <div className="mt-6 flex flex-wrap items-center gap-5">
+                    <Link
+                      to="/shop"
+                      data-testid="hero-cta"
+                      className={`${pillBtn} h-13 px-7 text-base hover:scale-[1.02]`}
+                      style={{ background: NAVY, color: CREAM }}
+                    >
+                      Shop all peptides <ArrowRight size={18} />
+                    </Link>
+                    <Link
+                      to="/lab-reports"
+                      data-testid="hero-lab-reports"
+                      className="inline-flex items-center h-13 font-semibold text-white underline underline-offset-4 decoration-white/50 hover:decoration-white"
+                    >
+                      Browse lab reports
+                    </Link>
+                  </div>
+                  <div className="mt-7 flex gap-2" role="tablist" aria-label="Hero slides">
+                    {heroSlides.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        role="tab"
+                        aria-selected={i === slide}
+                        aria-label={`Show slide ${i + 1}`}
+                        onClick={() => setSlide(i)}
+                        className={`h-1.5 rounded-full transition-all ${i === slide ? "w-10 bg-white" : "w-4 bg-white/45"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div data-testid="hero-visual" className="overflow-hidden rounded-[24px]">
-            <img
-              src={heroImage}
-              alt="Five Vyrax Labs research vials with coloured labels on a cream surface"
-              width={1376}
-              height={768}
-              fetchPriority="high"
-              className="w-full h-auto"
-            />
           </div>
         </section>
 
@@ -417,7 +484,7 @@ function Home() {
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-4 items-start" data-testid="field-tiles">
               {[0, 1].map((c) => (
-                <div key={c} className="flex flex-col gap-3 md:gap-4">
+                <div key={c} className="contents md:flex md:flex-col md:gap-4">
                   {fieldTiles
                     .filter((t) => t.col === c)
                     .map((t) => (
@@ -426,7 +493,8 @@ function Home() {
                         to="/collections/$slug"
                         params={{ slug: t.slug }}
                         data-testid="field-tile"
-                        className={`group relative block overflow-hidden rounded-[20px] bg-[#1b1b1b] ${t.ratio}`}
+                        style={{ background: t.bg }}
+                        className={`group relative block overflow-hidden rounded-[20px] ${t.ratio} ${t.slug === "brain-focus" ? "col-span-2 md:col-span-1" : ""}`}
                       >
                         <img
                           src={t.img}
@@ -434,7 +502,12 @@ function Home() {
                           width={1200}
                           height={896}
                           loading="lazy"
-                          className="absolute inset-0 size-full object-cover object-bottom transition-transform duration-500 group-hover:scale-[1.03]"
+                          className="absolute inset-x-0 bottom-0 h-[84%] w-full object-cover object-bottom transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-x-0 top-[16%] h-[22%]"
+                          style={{ background: `linear-gradient(${t.bg}, transparent)` }}
                         />
                         <div className="absolute inset-x-0 top-0 p-3 md:p-5 text-center text-white bg-gradient-to-b from-black/75 via-black/45 to-transparent pb-14">
                           <h3 className="font-heading text-lg md:text-2xl font-black tracking-[-0.02em]">
