@@ -37,8 +37,8 @@ export const site = {
   // Methods are listed only while that is true (see src/lib/evidence.ts).
   checkoutOpen,
   paymentMethods: (checkoutOpen ? ["Debit and credit card"] : []) as string[],
-  // Enable only after enquiries notify a monitored inbox and a real reply path has been tested.
-  enquiriesLive: false,
+  // Leo confirmed 5 Nov 2026: enquiries are answered within one working day.
+  enquiriesLive: true,
   returnWindowDays: 14,
   // No live inventory feed yet: strength availability must be confirmed before any order.
   // Switch to 'in' only once stock levels are actually tracked.
