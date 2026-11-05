@@ -3,7 +3,7 @@ import { promos } from "../../data/promos";
 const WELCOME_CODE = promos[0]?.code ?? "FIRST10";
 import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
-import { buildWelcomeEmail } from "./welcome-image";
+import { guideWelcome } from "./v4/welcome";
 
 // Pure rendering only. Sending and consent/idempotency decisions belong to the caller.
 export type Line = {
@@ -41,7 +41,7 @@ export type RenderedEmail = {
 };
 
 export const SUPPORT_EMAIL = site.email;
-export const LEGAL_FOOTER = site.name;
+export const LEGAL_FOOTER = site.postalAddress ? `${site.name}, ${site.postalAddress}` : site.name;
 export const RESEARCH_NOTICE =
   "Sold for research use only. Not a licensed medicine. No dose is on the label.";
 const CARRIER = site.carrier;
@@ -63,16 +63,16 @@ export const escapeHtml = (value: unknown) =>
     /[&<>"']/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
   );
-const gbp = (value: number) =>
+export const gbp = (value: number) =>
   new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
-const oneLine = (value: unknown) =>
+export const oneLine = (value: unknown) =>
   String(value ?? "")
     .replace(/[\r\n\t]+/g, " ")
     .trim();
 const e = escapeHtml;
 
 // Accept only store-owned links, except a caller-provided HTTPS carrier tracking or hosted checkout link.
-function safeUrl(url: string, external = false): string {
+export function safeUrl(url: string, external = false): string {
   const parsed = new URL(url);
   if (
     parsed.protocol !== "https:" ||
@@ -87,11 +87,11 @@ function safeUrl(url: string, external = false): string {
     throw new Error("Unsafe email link");
   return parsed.toString();
 }
-function link(label: string, url: string, external = false) {
+export function link(label: string, url: string, external = false, colour = "#14213D") {
   const href = url === `mailto:${SUPPORT_EMAIL}` ? url : safeUrl(url, external);
-  return `<a href="${e(href)}" style="color:#14213D;text-decoration:underline">${e(label)}</a>`;
+  return `<a class="${colour === "#14213D" ? "lk" : "lkf"}" href="${e(href)}" style="color:${colour};text-decoration:underline">${e(label)}</a>`;
 }
-function button(label: string, url: string, external = false) {
+export function button(label: string, url: string, external = false) {
   const href = safeUrl(url, external);
   return `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:4px 0 24px"><tr><td class="btn" bgcolor="#14213D" style="background:#14213D;border-radius:999px"><a href="${e(href)}" style="display:inline-block;padding:16px 28px;font-size:15px;font-weight:700;letter-spacing:.01em;color:#F6F8FC;text-decoration:none">${e(label)}</a></td></tr></table>`;
 }
@@ -106,10 +106,10 @@ const css = {
   foot: "padding:22px 32px;border-top:1px solid #E1E6EF;font-size:12px;line-height:1.7;color:#4A5568",
   cell: "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:top",
 };
-const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#14213D!important}.card{background:#0B1232!important;border-color:#1B2C56!important}.tx{color:#F6F8FC!important}.mute{color:#A9B0C9!important}.rule{border-color:#1B2C56!important}.tint{background:#111A3F!important}.btn{background:#F6F8FC!important}.btn a{color:#14213D!important}.step-on{background:#F6F8FC!important;color:#14213D!important}.step-off{background:#1B2C56!important;color:#A9B0C9!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
+const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#14213D!important}.card{background:#0B1232!important;border-color:#1B2C56!important}.tx{color:#F6F8FC!important}.mute{color:#A9B0C9!important}.rule{border-color:#1B2C56!important}.tint{background:#111A3F!important}.btn{background:#F6F8FC!important}.btn a{color:#14213D!important}.step-on{background:#F6F8FC!important;color:#14213D!important}.step-off{background:#1B2C56!important;color:#A9B0C9!important}.hero{background:#1B2C56!important}.fcard{background:#1B2C56!important}.lk{color:#F6F8FC!important}.vx{color:#F6F8FC!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
 
 /** Three-step fulfilment strip. `current` is 1-based and passed by the caller, never inferred. */
-function steps(current: 1 | 2 | 3): { html: string; text: string } {
+export function steps(current: 1 | 2 | 3): { html: string; text: string } {
   const labels = ["Payment confirmed", "Packed", "Dispatched"] as const;
   const cells = labels
     .map((label, i) => {
@@ -132,7 +132,7 @@ function steps(current: 1 | 2 | 3): { html: string; text: string } {
 
 // Product thumbnail cell, UKPL pattern: 64px JPEG (Outlook-safe) with a hairline and radius, linking to the product page.
 // Only store-origin images are embedded; anything else renders as the text-only row.
-function thumb(l: Line): string {
+export function thumb(l: Line): string {
   if (!l.image)
     return `<td class="rule" style="${css.cell};width:0;padding-left:0;padding-right:0"></td>`;
   let img: string;
@@ -154,7 +154,7 @@ function thumb(l: Line): string {
   return `<td class="rule thumbtd" width="78" style="${css.cell};width:78px;padding-right:14px;vertical-align:middle">${href ? `<a href="${e(href)}">${pic}</a>` : pic}</td>`;
 }
 
-function table(s: Summary): { html: string; text: string[] } {
+export function table(s: Summary): { html: string; text: string[] } {
   const subtotal = s.lines.reduce((sum, l) => sum + l.lineTotal, 0);
   const rows = s.lines
     .map(
@@ -181,7 +181,7 @@ function table(s: Summary): { html: string; text: string[] } {
   };
 }
 
-type Content = {
+export type Content = {
   heading: string;
   preheader: string;
   paragraphs: string[];
@@ -195,7 +195,7 @@ type Content = {
   unsubscribeUrl?: string;
   step?: 1 | 2 | 3;
 };
-const longDate = (d?: string) => {
+export const longDate = (d?: string) => {
   if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d;
   return new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-GB", {
     day: "numeric",
@@ -204,13 +204,13 @@ const longDate = (d?: string) => {
     timeZone: "UTC",
   });
 };
-function wrap(c: Content): RenderedEmail {
+export function wrap(c: Content): RenderedEmail {
   c = { ...c, orderDate: longDate(c.orderDate) };
   const meta = c.reference
     ? `Order reference: ${oneLine(c.reference)}${c.orderDate ? ` · ${oneLine(c.orderDate)}` : ""}`
     : "";
   const address =
-    c.address && c.step !== 3
+    c.address && (c.step === 1 || c.step === 2)
       ? `Check your delivery address: ${oneLine(c.address)}. Your address cannot be changed after dispatch. If it is incorrect, contact us before dispatch.`
       : "";
 
@@ -226,7 +226,7 @@ function wrap(c: Content): RenderedEmail {
   const metaHtml = c.reference
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#14213D">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#14213D">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F6F8FC"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#4A5568">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#14213D">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#6B7688">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#4A5568">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#14213D;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#F6F8FC" style="background:#F6F8FC"><tr><td align="center" style="padding:18px 0 28px"><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%"><tr><td class="pad" style="padding:6px 26px 16px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span class="vx" style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#4A5568">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td style="padding:0 14px 12px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="hero pad" bgcolor="#14213D" style="background:#14213D;border-radius:18px;padding:34px 30px"><div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8FB0F5;margin:0 0 12px">${c.reference ? e(oneLine(c.reference)) : "Vyrax Labs"}</div><h1 style="margin:0;font-size:28px;line-height:1.22;letter-spacing:-.015em;font-weight:700;color:#FFFFFF">${e(c.heading)}</h1></td></tr></table></td></tr><tr><td style="padding:0 14px 12px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="card pad tx" bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E1E6EF;border-radius:18px;padding:30px;line-height:1.6;font-size:16px;color:#14213D">${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#6B7688">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#4A5568">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a class="lk" href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#14213D;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr></table></td></tr><tr><td style="padding:0 14px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="fcard pad" bgcolor="#14213D" style="background:#14213D;border-radius:18px;padding:24px 30px;font-size:12px;line-height:1.75;color:#A9B3C4">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL, false, "#FFFFFF")} · ${link("Contact", CONTACT_URL, false, "#FFFFFF")}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true, "#FFFFFF")}` : ""}</td></tr></table></td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -350,19 +350,12 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
       });
     }
     case "guideWelcome": {
-      const w = buildWelcomeEmail({
-        code: WELCOME_CODE,
-        shopUrl: SHOP_URL,
-        contactEmail: SUPPORT_EMAIL,
-        unsubscribe: event.unsubscribeUrl,
+      const w = guideWelcome({
+        ...(event.name ? { firstName: event.name } : {}),
+        ...(event.unsubscribeUrl ? { unsubscribeUrl: event.unsubscribeUrl } : {}),
         guideUrl: GUIDE_URL,
       });
-      return {
-        subject: subject("Your code for 10% off"),
-        html: w.html,
-        text: w.text.join("\n"),
-        listUnsubscribe: event.unsubscribeUrl,
-      };
+      return w;
     }
     case "postPurchase":
       return wrap({
@@ -394,7 +387,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     case "reorder":
       return wrap({
         ...base,
-        heading: "Restock when you need to",
+        heading: "Restocking when you are ready",
         preheader: "Browse the current catalogue if you need to restock.",
         subject: subject("Restock your shelf"),
         paragraphs: [

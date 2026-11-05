@@ -42,6 +42,7 @@ import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
 import { BoughtTogether, BuyBoxTrustStrip, PriceBlock } from "@/components/pdp/PortMoves";
 import { DispatchCountdown } from "@/components/pdp/DispatchCountdown";
 import { ReconstitutionAddon } from "@/components/pdp/ReconstitutionAddon";
+import { StockNotice } from "@/components/pdp/StockNotice";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -328,6 +329,7 @@ function ProductPage() {
                   ? "Added to basket"
                   : `Add to basket  ${gbp(chosen.total)}`}
             </button>
+            {!orderable ? <StockNotice slug={c.slug} strength={s.label} name={c.name} /> : null}
             <Link
               to="/lab-reports"
               data-testid="check-lab-report"

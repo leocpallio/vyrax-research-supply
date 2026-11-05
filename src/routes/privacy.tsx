@@ -33,7 +33,15 @@ function Privacy() {
           When you opt in for the laboratory guide and updates: your email address and subscription
           choice, stored with our email provider Resend.
         </li>
-        <li>Your basket, which stays in your own browser until you check out.</li>
+        <li>
+          Your basket, which stays in your own browser unless you tick the optional box to be
+          emailed about your basket or restocks. If you do, we store your email address and your
+          basket contents until you unsubscribe or we no longer need them.
+        </li>
+        <li>
+          If you ask to be told when a product is back in stock: your email address, the product
+          and the strength you asked about.
+        </li>
       </ul>
       <h2>Why we use it</h2>
       <ul>
@@ -41,9 +49,9 @@ function Privacy() {
         <li>To keep accounting and tax records (legal obligation).</li>
         <li>To prevent fraud and enforce our research use policy (legitimate interests).</li>
         <li>
-          To email the requested guide and, with your separate opt-in, research updates and
-          occasional offers (consent). You can unsubscribe using a marketing email link or by
-          contacting us.
+          To email the requested guide and, with your separate opt-in, research updates,
+          reminders about a saved basket, restock notices and occasional offers (consent). You can
+          unsubscribe using a marketing email link or by contacting us.
         </li>
       </ul>
       <p>We do not send marketing email unless you ask us to.</p>

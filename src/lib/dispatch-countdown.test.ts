@@ -3,7 +3,7 @@ import { dispatchText } from "@/components/pdp/DispatchCountdown";
 
 describe("dispatch countdown copy", () => {
   it("states the cut-off before the clock is known", () => {
-    expect(dispatchText(null, 3)).toBe("Order before 2pm for same-day dispatch");
+    expect(dispatchText(null, 3)).toBe("Order before 3pm for same-day dispatch");
   });
 
   it("counts down in hours and padded minutes", () => {
