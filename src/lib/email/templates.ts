@@ -63,16 +63,16 @@ export const escapeHtml = (value: unknown) =>
     /[&<>"']/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
   );
-const gbp = (value: number) =>
+export const gbp = (value: number) =>
   new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
-const oneLine = (value: unknown) =>
+export const oneLine = (value: unknown) =>
   String(value ?? "")
     .replace(/[\r\n\t]+/g, " ")
     .trim();
 const e = escapeHtml;
 
 // Accept only store-owned links, except a caller-provided HTTPS carrier tracking or hosted checkout link.
-function safeUrl(url: string, external = false): string {
+export function safeUrl(url: string, external = false): string {
   const parsed = new URL(url);
   if (
     parsed.protocol !== "https:" ||
@@ -87,11 +87,11 @@ function safeUrl(url: string, external = false): string {
     throw new Error("Unsafe email link");
   return parsed.toString();
 }
-function link(label: string, url: string, external = false, colour = "#14213D") {
+export function link(label: string, url: string, external = false, colour = "#14213D") {
   const href = url === `mailto:${SUPPORT_EMAIL}` ? url : safeUrl(url, external);
   return `<a class="${colour === "#14213D" ? "lk" : "lkf"}" href="${e(href)}" style="color:${colour};text-decoration:underline">${e(label)}</a>`;
 }
-function button(label: string, url: string, external = false) {
+export function button(label: string, url: string, external = false) {
   const href = safeUrl(url, external);
   return `<table role="presentation" cellspacing="0" cellpadding="0" style="margin:4px 0 24px"><tr><td class="btn" bgcolor="#14213D" style="background:#14213D;border-radius:999px"><a href="${e(href)}" style="display:inline-block;padding:16px 28px;font-size:15px;font-weight:700;letter-spacing:.01em;color:#F6F8FC;text-decoration:none">${e(label)}</a></td></tr></table>`;
 }
@@ -109,7 +109,7 @@ const css = {
 const darkStyle = `<style>:root{color-scheme:light dark;supported-color-schemes:light dark}@media (prefers-color-scheme:dark){.bg{background:#14213D!important}.card{background:#0B1232!important;border-color:#1B2C56!important}.tx{color:#F6F8FC!important}.mute{color:#A9B0C9!important}.rule{border-color:#1B2C56!important}.tint{background:#111A3F!important}.btn{background:#F6F8FC!important}.btn a{color:#14213D!important}.step-on{background:#F6F8FC!important;color:#14213D!important}.step-off{background:#1B2C56!important;color:#A9B0C9!important}.hero{background:#1B2C56!important}.fcard{background:#1B2C56!important}.lk{color:#F6F8FC!important}.vx{color:#F6F8FC!important}}@media (max-width:620px){.pad{padding:22px!important}.thumb{width:52px!important;height:52px!important}.thumbtd{width:62px!important;padding-right:10px!important}}</style>`;
 
 /** Three-step fulfilment strip. `current` is 1-based and passed by the caller, never inferred. */
-function steps(current: 1 | 2 | 3): { html: string; text: string } {
+export function steps(current: 1 | 2 | 3): { html: string; text: string } {
   const labels = ["Payment confirmed", "Packed", "Dispatched"] as const;
   const cells = labels
     .map((label, i) => {
@@ -132,7 +132,7 @@ function steps(current: 1 | 2 | 3): { html: string; text: string } {
 
 // Product thumbnail cell, UKPL pattern: 64px JPEG (Outlook-safe) with a hairline and radius, linking to the product page.
 // Only store-origin images are embedded; anything else renders as the text-only row.
-function thumb(l: Line): string {
+export function thumb(l: Line): string {
   if (!l.image)
     return `<td class="rule" style="${css.cell};width:0;padding-left:0;padding-right:0"></td>`;
   let img: string;
@@ -154,7 +154,7 @@ function thumb(l: Line): string {
   return `<td class="rule thumbtd" width="78" style="${css.cell};width:78px;padding-right:14px;vertical-align:middle">${href ? `<a href="${e(href)}">${pic}</a>` : pic}</td>`;
 }
 
-function table(s: Summary): { html: string; text: string[] } {
+export function table(s: Summary): { html: string; text: string[] } {
   const subtotal = s.lines.reduce((sum, l) => sum + l.lineTotal, 0);
   const rows = s.lines
     .map(
@@ -181,7 +181,7 @@ function table(s: Summary): { html: string; text: string[] } {
   };
 }
 
-type Content = {
+export type Content = {
   heading: string;
   preheader: string;
   paragraphs: string[];
@@ -195,7 +195,7 @@ type Content = {
   unsubscribeUrl?: string;
   step?: 1 | 2 | 3;
 };
-const longDate = (d?: string) => {
+export const longDate = (d?: string) => {
   if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d;
   return new Date(d.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-GB", {
     day: "numeric",
@@ -204,7 +204,7 @@ const longDate = (d?: string) => {
     timeZone: "UTC",
   });
 };
-function wrap(c: Content): RenderedEmail {
+export function wrap(c: Content): RenderedEmail {
   c = { ...c, orderDate: longDate(c.orderDate) };
   const meta = c.reference
     ? `Order reference: ${oneLine(c.reference)}${c.orderDate ? ` · ${oneLine(c.orderDate)}` : ""}`
