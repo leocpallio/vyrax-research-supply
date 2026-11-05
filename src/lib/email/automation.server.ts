@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { orderRef } from "../checkout-form";
 import { summarise } from "./order-email.server";
 import { renderEmail, type EmailEvent, type RenderedEmail } from "./templates";
+import { postpurchaseD7Storage, reorderReminder0 } from "./v4/lifecycle";
 import { sendTransactional } from "./send.server";
 import {
   claimOutbox,
@@ -126,6 +127,24 @@ function mailFor(row: OutboxRow): RenderedEmail {
       unsubscribeUrl,
       checkoutUrl: `https://checkout.spicepay.net/pay/${encodeURIComponent(row.merchant_id)}/${encodeURIComponent(row.payment_id)}`,
     };
+  } else if (row.kind === "postPurchase" || row.kind === "reorder") {
+    // v4 lifecycle templates. They need the order lines, so an order with none falls back to the
+    // original template rather than sending an empty basket.
+    const items = (Array.isArray(row.items) ? row.items : []) as {
+      slug?: string;
+      strength?: string;
+      quantity?: number;
+    }[];
+    const lines = items
+      .filter((i) => i && typeof i.slug === "string" && typeof i.strength === "string")
+      .map((i) => ({ slug: i.slug as string, strength: i.strength as string, quantity: Number(i.quantity) || 1 }));
+    const first = String(row.name ?? "").trim().split(/\s+/)[0] ?? "";
+    if (lines.length > 0) {
+      const ctx = { reference: base.reference, items: lines, firstName: first, unsubscribeUrl };
+      const v4 = row.kind === "postPurchase" ? postpurchaseD7Storage(ctx) : reorderReminder0(ctx);
+      return { ...v4, listUnsubscribe: v4.listUnsubscribe ?? unsubscribeUrl };
+    }
+    event = { kind: row.kind, ...base, unsubscribeUrl };
   } else {
     event = { kind: row.kind, ...base, unsubscribeUrl };
   }
