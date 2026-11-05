@@ -42,6 +42,7 @@ import { GuideCards, RelatedProducts } from "@/components/pdp/RelatedProducts";
 import { BoughtTogether, BuyBoxTrustStrip, PriceBlock } from "@/components/pdp/PortMoves";
 import { DispatchCountdown } from "@/components/pdp/DispatchCountdown";
 import { ReconstitutionAddon } from "@/components/pdp/ReconstitutionAddon";
+import { NotifyMe } from "@/components/pdp/NotifyMe";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -123,6 +124,8 @@ function ProductPage() {
   const cites = citations[c.slug] ?? [];
   const stock = stockOf(s);
   const orderable = stock !== "out" && stock !== "preorder";
+  const reportPending = stat.kind !== "report";
+  const notifyEnabled = import.meta.env["VITE_VYRAX_NOTIFY_ME_ENABLED"] === "true";
   const packs = packOptions(c, s);
   const chosen = packs.find((p) => p.count === pack) ?? packs[0]!;
   const heading = `${c.name} ${s.label}${c.useCases?.[0] ? ` for ${c.useCases[0]}` : ""}`;
@@ -328,6 +331,14 @@ function ProductPage() {
                   ? "Added to basket"
                   : `Add to basket  ${gbp(chosen.total)}`}
             </button>
+            {c.slug === "tirzepatide" && notifyEnabled && (!orderable || reportPending) && (
+              <NotifyMe
+                key={s.label}
+                strength={s.label}
+                outOfStock={!orderable}
+                reportPending={reportPending}
+              />
+            )}
             <Link
               to="/lab-reports"
               data-testid="check-lab-report"

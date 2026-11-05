@@ -184,6 +184,7 @@ export type EventName =
   | "checkout_step"
   | "hosted_payment_opened"
   | "payment_confirmed"
+  | "notify_me_submitted"
   | "page_error";
 
 export type SafeValue = string | number | boolean | null | undefined;

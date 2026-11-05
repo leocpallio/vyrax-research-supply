@@ -34,6 +34,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
 import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
+import { Route as ApiNotifyMeRouteImport } from './routes/api.notify-me'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -172,6 +173,11 @@ const ApiGuideSignupRoute = ApiGuideSignupRouteImport.update({
   path: '/api/guide-signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNotifyMeRoute = ApiNotifyMeRouteImport.update({
+  id: '/api/notify-me',
+  path: '/api/notify-me',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   id: '/api/order-status',
   path: '/api/order-status',
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByTo {
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -338,6 +346,7 @@ export interface FileRoutesById {
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -379,6 +388,7 @@ export interface FileRouteTypes {
     | '/api/checkout'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/api/checkout'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -457,6 +468,7 @@ export interface FileRouteTypes {
     | '/api/checkout'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/category/$slug'
@@ -497,6 +509,7 @@ export interface RootRouteChildren {
   ApiCheckoutRoute: typeof ApiCheckoutRoute
   ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
+  ApiNotifyMeRoute: typeof ApiNotifyMeRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -688,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGuideSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/notify-me': {
+      id: '/api/notify-me'
+      path: '/api/notify-me'
+      fullPath: '/api/notify-me'
+      preLoaderRoute: typeof ApiNotifyMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/order-status': {
       id: '/api/order-status'
       path: '/api/order-status'
@@ -801,6 +821,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCheckoutRoute: ApiCheckoutRoute,
   ApiEmailAutomationRoute: ApiEmailAutomationRoute,
   ApiGuideSignupRoute: ApiGuideSignupRoute,
+  ApiNotifyMeRoute: ApiNotifyMeRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   CategorySlugRoute: CategorySlugRoute,
