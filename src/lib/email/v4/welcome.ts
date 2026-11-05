@@ -211,7 +211,7 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
   }));
   const cell = "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:middle;text-align:left";
   const row = (l: Line, price: string, detail?: string) =>
-    `<tr>${thumb(l)}<td class="rule tx" align="left" style="${cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(spaceMg(l.strength))} · ${detail ? e(detail) : l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${l.quantity}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${cell};white-space:nowrap">${e(price)}</td></tr>`;
+    `<tr>${thumb(l)}<td class="rule tx" align="left" style="${cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(spaceMg(l.strength))} · ${detail ? e(detail) : l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${l.quantity}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${cell};text-align:right;white-space:nowrap">${e(price)}</td></tr>`;
   const g = site.firstOrderGift;
   const giftRow =
     p.gift && g
@@ -290,6 +290,34 @@ export function welcomeCode(ctx: BaseContext = {}): RenderedEmail {
       note("The code works on your first paid order. Everything we sell is for research use only."),
     ),
     action: { label: "Browse the catalogue", url: utm(SHOP_URL, "welcome-code") },
+    lines: fine([dispatchClaim()]),
+  });
+}
+
+/** Sent straight after the free guide sign-up: the PDF link first, then the welcome code. */
+export function guideWelcome(ctx: BaseContext & { guideUrl?: string } = {}): RenderedEmail {
+  const guide = ctx.guideUrl ?? `${SITE_URL}/guides/reconstitution-lab-guide.pdf`;
+  return build({
+    id: "welcome-code",
+    ctx,
+    subject: "Your guide and your code for " + PROMO.pct + "% off",
+    heading: "Your guide and your code",
+    preheader: "Download the reconstitution guide. Code " + CODE + " is inside.",
+    paragraphs: [
+      hello(ctx.firstName),
+      "Thanks for signing up. Your reconstitution guide is ready to download, and your welcome code for a first order is below it.",
+    ],
+    body: join(
+      codeBox(CODE, codeLine()),
+      label("How to use the code"),
+      numbered([
+        "Add your products to the basket.",
+        "Open the basket or checkout and find the discount code field.",
+        "Enter the code and apply it. The discount shows before you pay.",
+      ]),
+      note("The code works on your first paid order. Everything we sell is for research use only."),
+    ),
+    action: { label: "Download the guide", url: guide },
     lines: fine([dispatchClaim()]),
   });
 }

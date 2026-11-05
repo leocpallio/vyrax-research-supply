@@ -3,7 +3,7 @@ import { promos } from "../../data/promos";
 const WELCOME_CODE = promos[0]?.code ?? "FIRST10";
 import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
-import { buildWelcomeEmail } from "./welcome-image";
+import { guideWelcome } from "./v4/welcome";
 
 // Pure rendering only. Sending and consent/idempotency decisions belong to the caller.
 export type Line = {
@@ -350,19 +350,12 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
       });
     }
     case "guideWelcome": {
-      const w = buildWelcomeEmail({
-        code: WELCOME_CODE,
-        shopUrl: SHOP_URL,
-        contactEmail: SUPPORT_EMAIL,
-        unsubscribe: event.unsubscribeUrl,
+      const w = guideWelcome({
+        ...(event.name ? { firstName: event.name } : {}),
+        ...(event.unsubscribeUrl ? { unsubscribeUrl: event.unsubscribeUrl } : {}),
         guideUrl: GUIDE_URL,
       });
-      return {
-        subject: subject("Your code for 10% off"),
-        html: w.html,
-        text: w.text.join("\n"),
-        listUnsubscribe: event.unsubscribeUrl,
-      };
+      return w;
     }
     case "postPurchase":
       return wrap({
@@ -394,7 +387,7 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     case "reorder":
       return wrap({
         ...base,
-        heading: "Restock when you need to",
+        heading: "Restocking when you are ready",
         preheader: "Browse the current catalogue if you need to restock.",
         subject: subject("Restock your shelf"),
         paragraphs: [

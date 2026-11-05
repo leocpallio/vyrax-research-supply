@@ -211,7 +211,7 @@ function basketBlock(items: OrderItem[], totalLabel: string, code?: string): Blo
   }));
   const cell = "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:middle;text-align:left";
   const row = (l: Line, price: string, detail?: string) =>
-    `<tr>${thumb(l)}<td class="rule tx" align="left" style="${cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(spaceMg(l.strength))} · ${detail ? e(detail) : l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${l.quantity}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${cell};white-space:nowrap">${e(price)}</td></tr>`;
+    `<tr>${thumb(l)}<td class="rule tx" align="left" style="${cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(spaceMg(l.strength))} · ${detail ? e(detail) : l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${l.quantity}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${cell};text-align:right;white-space:nowrap">${e(price)}</td></tr>`;
   const g = site.firstOrderGift;
   const giftRow =
     p.gift && g
