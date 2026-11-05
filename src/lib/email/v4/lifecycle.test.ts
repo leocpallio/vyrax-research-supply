@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { SITE_URL, site, spendTierLine } from "../../../data/site";
+import { claimGate } from "../../claims";
 import { lifecycleEntries } from "./index-lifecycle";
 
 const BANNED = [
@@ -117,7 +118,7 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
   it("contact auto-reply confirms receipt and quotes the message", () => {
     const m = byId("contact-auto-reply");
     expect(m.text).toContain("certificate for the BPC-157 batch");
-    expect(m.text).toContain("We aim to reply within one working day.");
+    expect(m.text).toContain(claimGate("support.reply-time"));
   });
 
   it("contact-owner is internal and carries a reply link", () => {
