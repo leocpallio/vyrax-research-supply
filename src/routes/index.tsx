@@ -441,7 +441,9 @@ function Home() {
                             {t.title}
                           </h3>
                           <p className="mt-1 text-[10px] md:text-sm leading-snug text-white/90">
-                            {[...new Set(t.names.filter((n) => !n.includes("+")))].slice(0, 3).join(" · ")}
+                            {[...new Set(t.names.filter((n) => !n.includes("+")))]
+                              .slice(0, 3)
+                              .join(" · ")}
                           </p>
                         </div>
                       </Link>
