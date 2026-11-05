@@ -253,7 +253,7 @@ function productRow(slug: string, strength: string, campaign: string): Block {
 // Shared builder
 // ---------------------------------------------------------------------------------------------
 const fine = (extra: (string | null)[] = []): string[] =>
-  present([...extra, site.registeredOffice ? `${site.name}, ${site.registeredOffice}` : null]);
+  present(extra);
 
 type Spec = {
   subject: string;

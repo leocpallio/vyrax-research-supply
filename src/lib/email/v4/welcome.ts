@@ -242,7 +242,7 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
 // Fine print shared by every email here
 // ---------------------------------------------------------------------------------------------
 const fine = (extra: (string | null)[] = []): string[] =>
-  present([...extra, site.registeredOffice ? `${site.name}, ${site.registeredOffice}` : null]);
+  present(extra);
 
 type Spec = {
   id: WelcomeEmailId;

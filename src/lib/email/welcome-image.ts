@@ -1,4 +1,4 @@
-import { SITE_URL } from "../../data/site";
+import { SITE_URL, site } from "../../data/site";
 
 const IMG = (n: number, alt: string, href: string) =>
   `<tr><td style="padding:0;font-size:0;line-height:0"><a href="${href}" style="text-decoration:none"><img src="${SITE_URL}/email/welcome-${n}.png" width="600" alt="${alt}" style="width:100%;max-width:600px;height:auto;display:block;border:0;outline:none;text-decoration:none"></a></td></tr>`;
@@ -22,12 +22,12 @@ export function buildWelcomeEmail(o: {
   const legal = `Sold for research use only. Not a licensed medicine. No dose is on the label.`;
   const policy = `Research use policy: ${SITE_URL}/research-use-policy`;
   const links = `<a href="${o.shopUrl}" style="color:#14213D">Shop</a> · <a href="mailto:${o.contactEmail}" style="color:#14213D">${o.contactEmail}</a>${foot ? ` · ${foot}` : ""}`;
-  const tail = `<p style="margin:0;font-size:12px;line-height:1.7;color:#6B7688">${legal}<br><a href="${SITE_URL}/research-use-policy" style="color:#14213D">Research use policy</a><br>${links}</p></td></tr></table></td></tr></table></body></html>`;
+  const tail = `<p style="margin:0;font-size:12px;line-height:1.7;color:#6B7688">${legal}<br>${site.postalAddress ? `${site.name}, ${site.postalAddress}<br>` : ""}<a href="${SITE_URL}/research-use-policy" style="color:#14213D">Research use policy</a><br>${links}</p></td></tr></table></td></tr></table></body></html>`;
   const brand = `<tr><td align="center" style="padding:22px 0 14px"><a href="${o.shopUrl}" style="text-decoration:none"><span class="vx" style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:.22em;color:#14213D">VYRAX</span><span style="display:inline-block;width:44px;height:2px;background:#5B8DEF;vertical-align:middle;margin:0 10px"></span><span style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.34em;color:#5B8DEF">LABS</span></a><div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:.16em;color:#6B7688;margin-top:8px">Vyrax Labs &middot; vyraxlabs.co.uk</div></td></tr>`;
   const guide = o.guideUrl
     ? `<tr><td align="center" style="padding:0 28px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif"><p style="margin:0;font-size:13px;line-height:1.6;color:#4A5568">Your reconstitution guide is ready: <a href="${o.guideUrl}" style="color:#14213D;font-weight:700">download the PDF</a></p></td></tr>`
     : "";
   const html = head + brand + guide + imgs + bits + tail;
-  const text = [`Vyrax Labs`, ``, `Your code: ${o.code}`, "", "Up to 20% off your first order.", "How the discount works: code FIRST10 takes 10% off any order. Spend 150 and the basket takes 10% off, 250 takes 15%, 400 takes 20%, added automatically. Third vial free on retatrutide and tirzepatide. Free delivery over 50, five free bac water vials over 100.", o.guideUrl ? `Guide: ${o.guideUrl}` : "", "", legal, policy, o.unsubscribe ? `Unsubscribe: ${o.unsubscribe}` : "Unsubscribe: mailto:"+o.contactEmail, o.shopUrl, o.contactEmail];
+  const text = [`Vyrax Labs`, ``, `Your code: ${o.code}`, "", "Up to 20% off your first order.", "How the discount works: code FIRST10 takes 10% off any order. Spend 150 and the basket takes 10% off, 250 takes 15%, 400 takes 20%, added automatically. Third vial free on retatrutide and tirzepatide. Free delivery over 50, five free bac water vials over 100.", o.guideUrl ? `Guide: ${o.guideUrl}` : "", "", legal, site.postalAddress ? `${site.name}, ${site.postalAddress}` : "", policy, o.unsubscribe ? `Unsubscribe: ${o.unsubscribe}` : "Unsubscribe: mailto:"+o.contactEmail, o.shopUrl, o.contactEmail];
   return { html, text };
 }
