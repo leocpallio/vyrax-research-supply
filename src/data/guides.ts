@@ -510,7 +510,7 @@ export const guides: Guide[] = [
   },
   {
     slug: "buy-retatrutide-uk",
-    title: "Buying retatrutide in the UK for weight loss: what to check",
+    title: "Buying retatrutide in the UK: what to check",
     seoTitle: "Buy Retatrutide UK: Vial Sizes and Batch Checks",
     description:
       "Retatrutide UK buyer's checklist: vial sizes and cost per mg, what a certificate must show, fill and identity checks.",
