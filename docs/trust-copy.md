@@ -25,7 +25,7 @@ fact is not confirmed, the copy states the process, the threshold or the date in
 ### Variant C
 
 - Headline: Research compounds for laboratory work, sent from the UK.
-- Subhead: Sealed vials, plain packaging, tracked delivery, and same-day dispatch on working days before 2pm.
+- Subhead: Sealed vials, plain packaging, tracked delivery, and same-day dispatch on working days before 3pm.
 - Primary CTA: See all {N} compounds
 - Reasoning: no quality or outcome claim, only logistics and packaging facts.
 
@@ -33,7 +33,7 @@ fact is not confirmed, the copy states the process, the threshold or the date in
 
 ## 2. Trust rail (4 items)
 
-1. Dispatched same day before 2pm
+1. Dispatched same day before 3pm
 2. Free tracked UK delivery over £50
 3. Padded vials, plain outer parcel
 4. Free reship if lost or damaged
@@ -85,7 +85,7 @@ automatically in the basket. Retatrutide 10mg and Tirzepatide 20mg are also on a
 third free offer. Research institutions and trade buyers can contact us about larger volumes.
 
 **How quickly do you dispatch?**
-Orders confirmed before 2pm on a working day are dispatched the same day. Orders confirmed after 2pm,
+Orders confirmed before 3pm on a working day are dispatched the same day. Orders confirmed after 3pm,
 at weekends or on bank holidays are dispatched on the next working day. Dispatch is by Royal Mail
 Tracked 24.
 
@@ -137,8 +137,8 @@ confirmed, the site says so.
 ## 5. Delivery, returns and guarantee
 
 **Delivery**
-Orders confirmed before 2pm on a working day are dispatched the same day by Royal Mail Tracked 24.
-Orders confirmed after 2pm, at weekends or on bank holidays are dispatched on the next working day.
+Orders confirmed before 3pm on a working day are dispatched the same day by Royal Mail Tracked 24.
+Orders confirmed after 3pm, at weekends or on bank holidays are dispatched on the next working day.
 UK delivery is free on orders over £50; below that a flat fee of £4.99 applies. Every parcel is
 tracked and the tracking number is sent on dispatch. Vials are padded inside a plain outer parcel with
 no product names on the outside. We currently deliver to UK addresses only, including Northern
@@ -173,7 +173,7 @@ identity confirmation. No certificates are published yet: they appear on the Lab
 launch batch clears testing. We would rather show an empty page than a claim we cannot document.
 
 Orders are packed as padded vials in a plain outer parcel with no product names on the outside, and
-dispatched the same working day when confirmed before 2pm. UK delivery is free over £50 and tracked on
+dispatched the same working day when confirmed before 3pm. UK delivery is free over £50 and tracked on
 every order.
 
 All products are supplied strictly for in-vitro laboratory research. They are not medicines, foods or

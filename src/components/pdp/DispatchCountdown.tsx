@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
  * Client-side only: the server cannot know the shopper's clock, and a cached page would show a
  * stale number. Until the effect runs it renders a static promise, so there is no layout jump.
  */
-const CUTOFF_HOUR = 14; // 2pm UK, matches the announcement bar
+const CUTOFF_HOUR = 15; // 3pm UK, matches the announcement bar
 
 /** Copy for the time left before cut-off. Pure so it is testable without a clock. */
 export function dispatchText(remainingMs: number | null, weekday?: number): string {
   if (weekday === 0 || weekday === 6) return "Orders placed now are dispatched Monday";
-  if (remainingMs === null) return "Order before 2pm for same-day dispatch";
+  if (remainingMs === null) return "Order before 3pm for same-day dispatch";
   if (remainingMs <= 0) return "Order now, dispatched tomorrow";
   const h = Math.floor(remainingMs / 3_600_000);
   const m = Math.floor((remainingMs % 3_600_000) / 60_000);

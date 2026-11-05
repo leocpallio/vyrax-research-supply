@@ -26,7 +26,7 @@ export const site = {
   whatsapp: "447575894339" as string | null, // international format without +, e.g. '447700900000'
   supportHours: "Monday to Friday, 9am to 5pm (UK time)",
   // Fulfilment
-  dispatchCutoffHour: 14, // paid orders confirmed before 2pm UK time on working days, subject to stock
+  dispatchCutoffHour: 15, // paid orders confirmed before 3pm UK time on working days, subject to stock
   coldChainPacked: true, // operator-confirmed packing practice; transit temperature is not monitored
   minOrderValue: 20,
   freeDeliveryThreshold: 50,
