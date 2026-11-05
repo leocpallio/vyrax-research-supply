@@ -67,6 +67,9 @@ export function PaymentCheckout() {
     postcode: "",
   });
   const [agree, setAgree] = useState(false);
+  // Optional and unticked by default. Nothing is sent about the visitor unless they tick it.
+  const [marketing, setMarketing] = useState(false);
+  const consentSent = useRef("");
   const [showItems, setShowItems] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
@@ -77,6 +80,35 @@ export function PaymentCheckout() {
   const lock = useRef(false);
   const addressStarted = useRef(false);
   const summaryRef = useRef<HTMLDivElement>(null);
+
+  // Only when the visitor has ticked the optional box and the address looks valid: record consent
+  // once per address, then save the basket. Both calls are best effort and never block checkout.
+  useEffect(() => {
+    const email = form.email.trim().toLowerCase();
+    if (!marketing || !items.length || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    const timer = window.setTimeout(async () => {
+      const post = (url: string, body: unknown) =>
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      try {
+        if (consentSent.current !== email) {
+          const res = await post("/api/checkout-consent", { email, consent: true });
+          if (!res.ok) return;
+          consentSent.current = email;
+        }
+        await post("/api/cart-capture", {
+          email,
+          items: items.map(({ slug, strength, quantity }) => ({ slug, strength, quantity })),
+        });
+      } catch {
+        /* checkout carries on without email follow-up */
+      }
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [marketing, form.email, items]);
 
   useEffect(() => {
     setItems(readCart());
@@ -485,6 +517,24 @@ export function PaymentCheckout() {
                     {errors.agree}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="-m-2 flex cursor-pointer items-start gap-3 rounded-lg p-2 text-sm">
+                  <input
+                    id="co-marketing"
+                    type="checkbox"
+                    checked={marketing}
+                    disabled={busy}
+                    onChange={(e) => setMarketing(e.target.checked)}
+                    className="mt-0.5 size-5 shrink-0 accent-primary sm:size-5"
+                  />
+                  <span>
+                    Email me about my basket and restocks (optional). We will use this address to
+                    save your basket and tell you when a product is back. You can unsubscribe from
+                    any email.
+                  </span>
+                </label>
               </div>
 
               <section

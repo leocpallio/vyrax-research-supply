@@ -64,6 +64,7 @@ test("claimed work is finalized with a stable key and claim token", async () => 
       rpc: async (name, args) => {
         calls.push(name);
         if (name === "claim_email_outbox") return { data: [row], error: null };
+        if (name === "claim_contact_outbox") return { data: [], error: null };
         if (name === "recheck_email_outbox") return { data: true, error: null };
         if (name === "finish_email_outbox") {
           expect(args.p_claim_token).toBe(row.claim_token);
@@ -79,8 +80,18 @@ test("claimed work is finalized with a stable key and claim token", async () => 
     },
   });
   expect(response.status).toBe(200);
-  expect(await response.json()).toEqual({ claimed: 1, sent: 1, failed: 0 });
-  expect(calls).toEqual(["claim_email_outbox", "recheck_email_outbox", "finish_email_outbox"]);
+  expect(await response.json()).toEqual({
+    claimed: 1,
+    sent: 1,
+    failed: 0,
+    contacts: { claimed: 0, sent: 0, failed: 0 },
+  });
+  expect(calls).toEqual([
+    "claim_email_outbox",
+    "recheck_email_outbox",
+    "finish_email_outbox",
+    "claim_contact_outbox",
+  ]);
 });
 
 test("marketing unsubscribe at Resend suppresses send and records local suppression", async () => {
@@ -110,7 +121,9 @@ test("marketing unsubscribe at Resend suppresses send and records local suppress
                     payment_id: null,
                   },
                 ]
-              : true,
+              : name === "claim_contact_outbox"
+                ? []
+                : true,
           error: null,
         };
       },
@@ -120,11 +133,17 @@ test("marketing unsubscribe at Resend suppresses send and records local suppress
       throw new Error("must not send");
     },
   });
-  expect(await response.json()).toEqual({ claimed: 1, sent: 0, failed: 1 });
+  expect(await response.json()).toEqual({
+    claimed: 1,
+    sent: 0,
+    failed: 1,
+    contacts: { claimed: 0, sent: 0, failed: 0 },
+  });
   expect(calls).toEqual([
     "claim_email_outbox",
     "unsubscribe_email_marketing",
     "finish_email_outbox",
+    "claim_contact_outbox",
   ]);
 });
 

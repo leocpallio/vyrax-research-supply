@@ -5,6 +5,7 @@ import { summarise } from "./order-email.server";
 import { renderEmail, type EmailEvent, type RenderedEmail } from "./templates";
 import { postpurchaseD7Storage, reorderReminder0 } from "./v4/lifecycle";
 import { sendTransactional } from "./send.server";
+import { runContactQueue, type ContactStats } from "./contact-automation.server";
 import {
   claimOutbox,
   finishOutbox,
@@ -204,7 +205,16 @@ export async function runEmailAutomation(
         await finishOutbox(db, row.id, row.claim_token, "failed");
       }
     }
-    return json({ claimed: rows.length, sent, failed });
+    // Contact-level queue (welcome, basket, back in stock) rides the same cron call and enable flag.
+    // It is isolated: a failure there never hides the order queue result.
+    let contacts: ContactStats | { error: string };
+    try {
+      contacts = await runContactQueue({ env, db, send, ...(deps.fetcher ? { fetcher: deps.fetcher } : {}) }, 20);
+    } catch (error) {
+      console.error("[vyrax contact outbox]", error instanceof Error ? error.message : "worker failed");
+      contacts = { error: "unavailable" };
+    }
+    return json({ claimed: rows.length, sent, failed, contacts });
   } catch (error) {
     console.error("[vyrax outbox]", error instanceof Error ? error.message : "worker failed");
     return json({ error: "Email automation unavailable" }, 503);

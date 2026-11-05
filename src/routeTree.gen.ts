@@ -31,11 +31,14 @@ import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiCartCaptureRouteImport } from './routes/api.cart-capture'
 import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
+import { Route as ApiCheckoutConsentRouteImport } from './routes/api.checkout-consent'
 import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
+import { Route as ApiStockNoticeRouteImport } from './routes/api.stock-notice'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout_.return'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
@@ -157,9 +160,19 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCartCaptureRoute = ApiCartCaptureRouteImport.update({
+  id: '/api/cart-capture',
+  path: '/api/cart-capture',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
   id: '/api/checkout',
   path: '/api/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutConsentRoute = ApiCheckoutConsentRouteImport.update({
+  id: '/api/checkout-consent',
+  path: '/api/checkout-consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiEmailAutomationRoute = ApiEmailAutomationRouteImport.update({
@@ -180,6 +193,11 @@ const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
 const ApiSpicepayWebhookRoute = ApiSpicepayWebhookRouteImport.update({
   id: '/api/spicepay-webhook',
   path: '/api/spicepay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStockNoticeRoute = ApiStockNoticeRouteImport.update({
+  id: '/api/stock-notice',
+  path: '/api/stock-notice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -256,11 +274,14 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -295,11 +316,14 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -335,11 +359,14 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
+  '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout_/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -376,11 +403,14 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/cart-capture'
     | '/api/checkout'
+    | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/stock-notice'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -415,11 +445,14 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/cart-capture'
     | '/api/checkout'
+    | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/stock-notice'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -454,11 +487,14 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/cart-capture'
     | '/api/checkout'
+    | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/order-status'
     | '/api/spicepay-webhook'
+    | '/api/stock-notice'
     | '/category/$slug'
     | '/checkout_/return'
     | '/collections/$slug'
@@ -494,11 +530,14 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiCartCaptureRoute: typeof ApiCartCaptureRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
+  ApiCheckoutConsentRoute: typeof ApiCheckoutConsentRoute
   ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
+  ApiStockNoticeRoute: typeof ApiStockNoticeRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
@@ -667,11 +706,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cart-capture': {
+      id: '/api/cart-capture'
+      path: '/api/cart-capture'
+      fullPath: '/api/cart-capture'
+      preLoaderRoute: typeof ApiCartCaptureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/checkout': {
       id: '/api/checkout'
       path: '/api/checkout'
       fullPath: '/api/checkout'
       preLoaderRoute: typeof ApiCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout-consent': {
+      id: '/api/checkout-consent'
+      path: '/api/checkout-consent'
+      fullPath: '/api/checkout-consent'
+      preLoaderRoute: typeof ApiCheckoutConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/email-automation': {
@@ -700,6 +753,13 @@ declare module '@tanstack/react-router' {
       path: '/api/spicepay-webhook'
       fullPath: '/api/spicepay-webhook'
       preLoaderRoute: typeof ApiSpicepayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stock-notice': {
+      id: '/api/stock-notice'
+      path: '/api/stock-notice'
+      fullPath: '/api/stock-notice'
+      preLoaderRoute: typeof ApiStockNoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -798,11 +858,14 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiCartCaptureRoute: ApiCartCaptureRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
+  ApiCheckoutConsentRoute: ApiCheckoutConsentRoute,
   ApiEmailAutomationRoute: ApiEmailAutomationRoute,
   ApiGuideSignupRoute: ApiGuideSignupRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
+  ApiStockNoticeRoute: ApiStockNoticeRoute,
   CategorySlugRoute: CategorySlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
