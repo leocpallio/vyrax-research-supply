@@ -300,7 +300,7 @@ export function postpurchaseD7Storage(ctx: OrderContext): RenderedEmail {
         "Keep sealed vials cool and dry, out of the light.",
         "The original box or a closed drawer keeps light off them.",
         "Refrigerate once reconstituted.",
-        "The batch number is printed on each vial. Keep it with your notes. It can be matched to its document on the Lab Reports page.",
+        "Keep your order reference with your notes. Batch documents are published on the Lab Reports page.",
       ]),
       note("These notes are for storing material that is sold for research use only."),
     ),
@@ -359,10 +359,7 @@ export function reorderReminder2(ctx: BaseContext = {}): RenderedEmail {
       hello(ctx.firstName),
       "We have not seen an order from you for a few months. The catalogue and the lab reports are open whenever you need them.",
     ],
-    body: join(
-      bullets(present([certClaim(), dispatchClaim(), deliveryClaim(), ladderLine()])),
-      note("If you would rather not hear from us about restocking, use the unsubscribe link at the bottom of this email."),
-    ),
+    body: bullets(present([certClaim(), dispatchClaim(), deliveryClaim(), ladderLine()])),
     action: { label: "See the lab reports", url: utm(LABS_URL, "reorder-reminder-2") },
     lines: fine([unsubNote]),
   });
@@ -451,10 +448,10 @@ export function pending1hCard(ctx: OrderContext): RenderedEmail {
       label("To finish"),
       numbered([
         "Return to checkout and pay by card on the secure payment page.",
-        "If your bank declined the card, a different card usually works.",
+        "If your bank declined the card, you can try a different card or contact your bank.",
         "If you already paid or can see a charge, do not pay again. Contact us with the order reference above.",
       ]),
-      note("Card details are entered on a secure hosted page. We never see or store them."),
+      note("Card payment is taken on a secure hosted payment page."),
     ),
     action: { label: "Return to checkout", url: utm(CHECKOUT_URL, "pending-1h-card") },
     lines: fine(),
@@ -494,7 +491,7 @@ export function pending72h(ctx: OrderContext): RenderedEmail {
     preheader: "This is our last email about this order.",
     paragraphs: [
       hello(ctx.firstName),
-      `This is our last email about order ${oneLine(ctx.reference)}. We have not received payment for it, so it has not been placed.`,
+      "This is our last email about this order. We have not received payment for it, so it has not been placed.",
       "If you still want these items, return to checkout and start again. If you do not, there is nothing more to do.",
     ],
     body: join(
