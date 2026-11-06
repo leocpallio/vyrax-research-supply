@@ -23,22 +23,22 @@ Project: Vyrax Labs (EU cloud, project 291775). Token and host live in `.env.pro
 
 ## Event list (exact names)
 
-| Event | Fired from | Key properties |
-| --- | --- | --- |
-| `$pageview` | `trackPage` via router subscribe (`__root.tsx`) | `$current_url` (no query), `$pathname` |
-| `product_viewed` | `trackPage` on `/product/*` | `product_id`, `name`, `category`, `variant`, `price`, `currency`, `quantity`, `value`, `product_slug`, `is_hub` |
-| `product_list_viewed` | `trackPage` on `/shop`, `/category/*`, `/collections/*`; `trackList()` | `list_id`, `list_name`, `listing_type`, `item_count`, `items[]` (max 24), `currency` |
-| `search` | header and shop search (SHELL/PAGES lanes) | `source`, `result_count` (never the query) |
-| `basket_added` | `trackBasketChange` (catalog writeCart) | product props + `value`, `basket_quantity`, `basket_value` |
-| `basket_removed` | `trackBasketChange` | same as basket_added |
-| `basket_viewed` | `trackPage` on `/basket` | `items[]`, `item_count`, `value`, `currency` |
-| `checkout_started` | `trackPage` on `/checkout` with items | `checkout_type`, `items[]`, `item_count`, `value`, `currency` |
-| `checkout_step` | `PaymentCheckout` first address keystroke / submit | `step` = `address` or `payment`, items props |
-| `hosted_payment_opened` | `PaymentCheckout` after `/api/checkout` OK | `order_id`, `value`, `currency`, `item_count`, `test_mode` |
-| `payment_confirmed` | `checkout_.return.tsx` when status is paid (once per order) | `order_id`, `value`, `revenue`, `currency`, `payment_type`, `test_mode` |
-| `page_error` | `__root.tsx` error boundary | `stage` |
-| `collection_viewed`, `shop_viewed` | legacy aliases still emitted for existing insights | `collection_slug`, `listing_type` |
-| `$set` | once after SDK load | `$set_once.initial_utm_*`, `initial_landing_path` |
+| Event                              | Fired from                                                             | Key properties                                                                                                  |
+| ---------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `$pageview`                        | `trackPage` via router subscribe (`__root.tsx`)                        | `$current_url` (no query), `$pathname`                                                                          |
+| `product_viewed`                   | `trackPage` on `/product/*`                                            | `product_id`, `name`, `category`, `variant`, `price`, `currency`, `quantity`, `value`, `product_slug`, `is_hub` |
+| `product_list_viewed`              | `trackPage` on `/shop`, `/category/*`, `/collections/*`; `trackList()` | `list_id`, `list_name`, `listing_type`, `item_count`, `items[]` (max 24), `currency`                            |
+| `search`                           | header and shop search (SHELL/PAGES lanes)                             | `source`, `result_count` (never the query)                                                                      |
+| `add_to_cart`                      | `trackBasketChange` (catalog writeCart)                                | product props + `value`, `basket_quantity`, `basket_value`                                                      |
+| `basket_removed`                   | `trackBasketChange`                                                    | same as add_to_cart                                                                                             |
+| `basket_viewed`                    | `trackPage` on `/basket`                                               | `items[]`, `item_count`, `value`, `currency`                                                                    |
+| `checkout_started`                 | `trackPage` on `/checkout` with items                                  | `checkout_type`, `items[]`, `item_count`, `value`, `currency`                                                   |
+| `checkout_step`                    | `PaymentCheckout` first address keystroke / submit                     | `step` = `address` or `payment`, items props                                                                    |
+| `hosted_payment_opened`            | `PaymentCheckout` after `/api/checkout` OK                             | `order_id`, `value`, `currency`, `item_count`, `test_mode`                                                      |
+| `payment_confirmed`                | `checkout_.return.tsx` when status is paid (once per order)            | `order_id`, `value`, `revenue`, `currency`, `payment_type`, `test_mode`                                         |
+| `page_error`                       | `__root.tsx` error boundary                                            | `stage`                                                                                                         |
+| `collection_viewed`, `shop_viewed` | legacy aliases still emitted for existing insights                     | `collection_slug`, `listing_type`                                                                               |
+| `$set`                             | once after SDK load                                                    | `$set_once.initial_utm_*`, `initial_landing_path`                                                               |
 
 Standard e-commerce item shape: `{ product_id: "<slug>|<strength>", name, category, variant, price,
 currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `value`.
@@ -46,11 +46,11 @@ currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `va
 ## Funnel definitions
 
 1. **Purchase funnel (strict order, 7 day window, unique persons):**
-   `$pageview` -> `product_viewed` -> `basket_added` -> `basket_viewed` -> `checkout_started` ->
+   `$pageview` -> `product_viewed` -> `add_to_cart` -> `basket_viewed` -> `checkout_started` ->
    `checkout_step[step=address]` -> `checkout_step[step=payment]` -> `hosted_payment_opened` ->
    `payment_confirmed`. Breakdown by `initial_utm_source`.
 2. **Browse to product:** `product_list_viewed` -> `product_viewed`, breakdown `list_id`.
-3. **Search funnel:** `search` -> `product_viewed` -> `basket_added`, breakdown `source`.
+3. **Search funnel:** `search` -> `product_viewed` -> `add_to_cart`, breakdown `source`.
 4. **Hosted payment leakage:** `hosted_payment_opened` -> `payment_confirmed`. Filter `test_mode = false`.
 
 ## Insight setup checklist
@@ -60,9 +60,9 @@ currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `va
 - [ ] Data management: mark `payment_confirmed.value` and `revenue` as numeric; set `currency` as
       property of type string; define `items` as JSON.
 - [ ] Actions: `Checkout address step` = `checkout_step` where `step = address`; `Checkout payment
-      step` = `checkout_step` where `step = payment`.
+    step` = `checkout_step` where `step = payment`.
 - [ ] Funnels 1 to 4 above, saved to a "Vyrax storefront" dashboard.
-- [ ] Trends: `payment_confirmed` sum of `revenue` by day; `basket_added` count by `name`;
+- [ ] Trends: `payment_confirmed` sum of `revenue` by day; `add_to_cart` count by `name`;
       `product_viewed` count by `category`; `page_error` count.
 - [ ] Trend: `$pageview` by `initial_utm_source` and `initial_utm_campaign` (persons mode).
 - [ ] Retention is not meaningful without identify(); skip.
@@ -75,5 +75,5 @@ currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `va
 
 - `bun test src/lib/analytics-events.test.ts` covers payload shapes, UTM reading and sanitising.
 - In the browser: decline, confirm no `/i/v0/e/` or `/static/array.js` request; accept, confirm the
-  posthog chunk loads and `$set` + `$pageview` fire; add to basket and check `basket_added` has
+  posthog chunk loads and `$set` + `$pageview` fire; add to basket and check `add_to_cart` has
   `product_id`, `price`, `value`, `currency: "GBP"`.

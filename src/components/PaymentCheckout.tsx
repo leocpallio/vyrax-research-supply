@@ -7,7 +7,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { findPromo } from "@/data/promos";
-import { capture, trackCheckoutStep } from "@/lib/analytics";
+import { capture, orderAttribution, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
@@ -179,6 +179,7 @@ export function PaymentCheckout() {
           postcode: formatPostcode(form.postcode),
           researchAgreement: agree,
           code: promoCode,
+          attribution: orderAttribution(),
           items: items.map(({ slug, strength, quantity }) => ({ slug, strength, quantity })),
         }),
       });
@@ -247,13 +248,23 @@ export function PaymentCheckout() {
           aria-controls="co-summary-items"
           className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-3 text-sm font-medium md:hidden"
         >
-          {showItems ? "Hide" : `${items.reduce((n, i) => n + i.quantity, 0)} item${items.reduce((n, i) => n + i.quantity, 0) === 1 ? "" : "s"}`}
-          <span aria-hidden className={showItems ? "rotate-180" : ""}>▾</span>
+          {showItems
+            ? "Hide"
+            : `${items.reduce((n, i) => n + i.quantity, 0)} item${items.reduce((n, i) => n + i.quantity, 0) === 1 ? "" : "s"}`}
+          <span aria-hidden className={showItems ? "rotate-180" : ""}>
+            ▾
+          </span>
         </button>
       </div>
-      <ul id="co-summary-items" className={`mt-3 divide-y divide-border ${showItems ? "" : "hidden md:block"}`}>
+      <ul
+        id="co-summary-items"
+        className={`mt-3 divide-y divide-border ${showItems ? "" : "hidden md:block"}`}
+      >
         {items.map((i) => (
-          <li key={`${i.slug}:${i.strength}`} className="flex items-start justify-between gap-3 py-2.5 text-sm">
+          <li
+            key={`${i.slug}:${i.strength}`}
+            className="flex items-start justify-between gap-3 py-2.5 text-sm"
+          >
             <span className="flex min-w-0 items-start gap-3">
               <img
                 src={productImage(i.slug, i.strength).small ?? productImage(i.slug, i.strength).src}
@@ -502,7 +513,10 @@ export function PaymentCheckout() {
                   </span>
                 </label>
                 <div className="mt-1 flex flex-wrap gap-x-4 pl-8 text-sm">
-                  <Link to="/terms" className="inline-flex min-h-11 items-center underline underline-offset-2">
+                  <Link
+                    to="/terms"
+                    className="inline-flex min-h-11 items-center underline underline-offset-2"
+                  >
                     Read the terms
                   </Link>
                   <Link
@@ -563,8 +577,8 @@ export function PaymentCheckout() {
                   role="alert"
                   className="rounded-lg border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive"
                 >
-                  Minimum order is £{quote.minimum.toFixed(0)}. Add £{quote.minimumGap.toFixed(2)} more
-                  to continue.
+                  Minimum order is £{quote.minimum.toFixed(0)}. Add £{quote.minimumGap.toFixed(2)}{" "}
+                  more to continue.
                 </div>
               )}
               <Button
@@ -599,7 +613,10 @@ export function PaymentCheckout() {
                     </a>
                   ) : null}
                   {site.phone ? " or " : "Email "}
-                  <a className="inline-flex min-h-11 items-center underline" href={`mailto:${site.email}`}>
+                  <a
+                    className="inline-flex min-h-11 items-center underline"
+                    href={`mailto:${site.email}`}
+                  >
                     {site.email}
                   </a>
                   .

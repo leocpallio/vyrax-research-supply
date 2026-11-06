@@ -5,7 +5,7 @@
 // Public API (stable for other lanes):
 //   capture(name, props?)            fire an event (dropped before consent, queued while SDK loads)
 //   trackPage(path)                  manual $pageview + view events for approved paths
-//   trackBasketChange(before, after) basket_added / basket_removed per changed SKU
+//   trackBasketChange(before, after) add_to_cart / basket_removed per changed SKU
 //   trackList(list, compounds)       product_list_viewed
 //   trackCheckoutStep("address"|"payment", items)
 //   onFeatureFlags(cb) / featureFlag(key) / featureFlagPayload(key)
@@ -28,6 +28,8 @@ import {
   listProps,
   productProps,
   readUtm,
+  readAttribution,
+  type Attribution,
   sanitizeProperties,
   stripQuery,
   type FirstTouch,
@@ -38,8 +40,10 @@ import {
 export * from "./analytics-events";
 
 // The public project token and capture host must BOTH belong to Vyrax. Never use a different brand's token.
-const key = import.meta.env["VITE_POSTHOG_KEY"]?.trim();
-const host = import.meta.env["VITE_POSTHOG_HOST"]?.trim();
+// Public Vyrax project token (project 291775, EU). Fallback because .env.production is untracked and Lovable builds omit it.
+const key =
+  import.meta.env["VITE_POSTHOG_KEY"]?.trim() || "phc_mgjmEQUYX3pQE3rs7t9WjMRfAtG234oZxMoHa4HKsuVU";
+const host = import.meta.env["VITE_POSTHOG_HOST"]?.trim() || "https://eu.i.posthog.com";
 const captureHost = (() => {
   try {
     const url = new URL(host || "");
@@ -149,6 +153,8 @@ async function shutdown() {
     ph?.opt_out_capturing();
     ph?.reset(true);
     sessionStorage.removeItem(firstTouchKey);
+    sessionStorage.removeItem(attributionKey);
+    memoryAttribution = null;
   } catch {
     /* ignore */
   }
@@ -168,6 +174,43 @@ export function firstTouch(): FirstTouch {
   }
 }
 
+/**
+ * Order attribution (UTMs + gclid/fbclid/ttclid). Held in module memory from first load (no device
+ * storage, nothing sent anywhere); written to sessionStorage only once analytics is accepted, so it
+ * survives full page loads for consenting visitors. Sent with the checkout request so the order
+ * carries its source (first-party business record).
+ */
+const attributionKey = "vyrax-attribution";
+let memoryAttribution: Attribution | null = null;
+export function orderAttribution(): Attribution {
+  if (typeof window === "undefined") return {};
+  const fresh = readAttribution(window.location.href);
+  let stored: Attribution = {};
+  if (analyticsConsent() === "accepted") {
+    try {
+      stored = JSON.parse(sessionStorage.getItem(attributionKey) ?? "{}") as Attribution;
+    } catch {
+      stored = {};
+    }
+  }
+  // First touch wins: earliest source seen in memory or storage.
+  const first = Object.keys(stored).length ? stored : (memoryAttribution ?? fresh);
+  if (!memoryAttribution && Object.keys(first).length) memoryAttribution = first;
+  if (
+    analyticsConsent() === "accepted" &&
+    !Object.keys(stored).length &&
+    Object.keys(first).length
+  ) {
+    try {
+      sessionStorage.setItem(attributionKey, JSON.stringify(first));
+    } catch {
+      /* ignore */
+    }
+  }
+  return first;
+}
+if (typeof window !== "undefined") orderAttribution();
+
 // ------------------------------------------------------------------ capture
 export type EventName =
   | "$pageview"
@@ -177,7 +220,7 @@ export type EventName =
   | "collection_viewed" // legacy alias still emitted alongside product_list_viewed
   | "shop_viewed" // legacy alias, kept for other lanes
   | "search"
-  | "basket_added"
+  | "add_to_cart"
   | "basket_removed"
   | "basket_viewed"
   | "checkout_started"
@@ -343,7 +386,7 @@ export function trackBasketChange(before: CartItem[], after: CartItem[]) {
       after.find((i) => i.slug === item.slug && i.strength === item.strength)?.quantity ?? 0;
     const difference = newQuantity - oldQuantity;
     if (!difference) continue;
-    capture(difference > 0 ? "basket_added" : "basket_removed", {
+    capture(difference > 0 ? "add_to_cart" : "basket_removed", {
       ...productProps(line(compound, item.strength, item.price, Math.abs(difference))),
       product_slug: item.slug,
       basket_quantity: newQuantity,

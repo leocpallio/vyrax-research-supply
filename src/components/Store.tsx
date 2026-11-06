@@ -24,6 +24,7 @@ import {
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
 import { claimFilled, claimText } from "@/lib/claims";
+import { AnalyticsConsentBanner } from "@/components/AnalyticsConsent";
 import { AnnouncementBar } from "@/components/shell/AnnouncementBar";
 import { Header } from "@/components/shell/Header";
 import { WhatsAppButton } from "@/components/shell/WhatsAppButton";
@@ -107,6 +108,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <SearchDialog open={search} onOpenChange={setSearch} />
       <CartDrawer open={cart} onOpenChange={setCart} />
       <AddedToast />
+      <AnalyticsConsentBanner />
     </div>
   );
 }

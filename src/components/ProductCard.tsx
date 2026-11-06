@@ -70,7 +70,7 @@ export function ProductCard({
 
   const add = (strength: Strength) => {
     addCart(cartLine(product, strength));
-    openCartDrawer(); // writeCart fires basket_added through trackBasketChange.
+    openCartDrawer(); // writeCart fires add_to_cart through trackBasketChange.
     setOpen(false);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);

@@ -159,7 +159,7 @@ function ProductPage() {
   const dispatchLine = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
 
-  // addCart -> writeCart -> trackBasketChange fires capture("basket_added") once per changed SKU
+  // addCart -> writeCart -> trackBasketChange fires capture("add_to_cart") once per changed SKU
   // with the canonical property set. Calling capture() here too would double-count every add.
   const add = () => {
     addCart(cartLine(c, s, chosen.count));

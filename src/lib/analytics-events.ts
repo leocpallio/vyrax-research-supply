@@ -50,7 +50,7 @@ export function ecommerceItem(line: LineLike): EcommerceItem {
   return item;
 }
 
-/** Flat props for single-product events (product_viewed, basket_added, basket_removed). */
+/** Flat props for single-product events (product_viewed, add_to_cart, basket_removed). */
 export function productProps(line: LineLike): EcommerceItem & { value: number } {
   const item = ecommerceItem(line);
   return { ...item, value: round2(item.price * item.quantity) };
@@ -154,4 +154,40 @@ export function sanitizeProperties<T extends Record<string, unknown>>(props: T):
 export function stripQuery(url: string): string {
   const i = url.search(/[?#]/);
   return i === -1 ? url : url.slice(0, i);
+}
+
+// ---- Order attribution (first touch). UTMs plus ad click ids, validated and length-capped.
+export const CLICK_ID_KEYS = ["gclid", "fbclid", "ttclid"] as const;
+export type Attribution = Partial<
+  Record<UtmKey | (typeof CLICK_ID_KEYS)[number] | "landing_path", string>
+>;
+const ATTR_KEYS = [...UTM_KEYS, ...CLICK_ID_KEYS, "landing_path"] as const;
+const SAFE_ATTR = /^[\w .:/+~%@-]{1,200}$/;
+
+/** Read utm_* and gclid/fbclid/ttclid from a URL. Anything not matching a conservative charset is dropped. */
+export function readAttribution(url: string): Attribution {
+  const out: Attribution = {};
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return out;
+  }
+  for (const k of [...UTM_KEYS, ...CLICK_ID_KEYS]) {
+    const v = u.searchParams.get(k)?.trim().slice(0, 200);
+    if (v && SAFE_ATTR.test(v)) out[k] = v;
+  }
+  if (Object.keys(out).length) out.landing_path = u.pathname.slice(0, 200);
+  return out;
+}
+
+/** Server-side: accept only known keys with safe string values. */
+export function cleanAttribution(raw: unknown): Attribution {
+  const out: Attribution = {};
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const k of ATTR_KEYS) {
+    const v = (raw as Record<string, unknown>)[k];
+    if (typeof v === "string" && SAFE_ATTR.test(v.trim())) out[k] = v.trim();
+  }
+  return out;
 }
