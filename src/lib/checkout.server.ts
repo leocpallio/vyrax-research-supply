@@ -8,6 +8,7 @@ import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
 import { checkFirstOrderCode } from "./first-order-gate";
+import { insertOrderWithAttributionFallback } from "./order-insert";
 import { cleanAttribution } from "./analytics-events";
 import { capturePaymentConfirmed } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
@@ -136,38 +137,36 @@ export async function createCheckout(request: Request): Promise<Response> {
     const attr = cleanAttribution(body["attribution"]);
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
-    const { data: order, error: insertError } = await store
-      .from("orders")
-      .insert({
-        name,
-        email,
-        phone,
-        address,
-        address2,
-        city,
-        postcode: postcode.toUpperCase(),
-        country: "GB",
-        items: quote.items,
-        total: quote.totalPence / 100,
-        total_pence: quote.totalPence,
-        currency: "GBP",
-        merchant_id: c.merchant,
-        test_mode: c.testMode,
-        checkout_state: "creating",
-        status: "pending_payment",
-        guest_token: token,
-        utm_source: attr.utm_source ?? null,
-        utm_medium: attr.utm_medium ?? null,
-        utm_campaign: attr.utm_campaign ?? null,
-        utm_term: attr.utm_term ?? null,
-        utm_content: attr.utm_content ?? null,
-        gclid: attr.gclid ?? null,
-        fbclid: attr.fbclid ?? null,
-        ttclid: attr.ttclid ?? null,
-        landing_path: attr.landing_path ?? null,
-      })
-      .select("id")
-      .single();
+    const { data: order, error: insertError } = await insertOrderWithAttributionFallback<{
+      id: string;
+    }>((row) => store.from("orders").insert(row).select("id").single(), {
+      name,
+      email,
+      phone,
+      address,
+      address2,
+      city,
+      postcode: postcode.toUpperCase(),
+      country: "GB",
+      items: quote.items,
+      total: quote.totalPence / 100,
+      total_pence: quote.totalPence,
+      currency: "GBP",
+      merchant_id: c.merchant,
+      test_mode: c.testMode,
+      checkout_state: "creating",
+      status: "pending_payment",
+      guest_token: token,
+      utm_source: attr.utm_source ?? null,
+      utm_medium: attr.utm_medium ?? null,
+      utm_campaign: attr.utm_campaign ?? null,
+      utm_term: attr.utm_term ?? null,
+      utm_content: attr.utm_content ?? null,
+      gclid: attr.gclid ?? null,
+      fbclid: attr.fbclid ?? null,
+      ttclid: attr.ttclid ?? null,
+      landing_path: attr.landing_path ?? null,
+    });
     if (insertError || !order) throw new Error("Order insert failed");
     const basePayment = {
       amount: quote.totalPence,
