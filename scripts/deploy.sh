@@ -6,6 +6,15 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.bun/bin:$PATH"
 
+# DEPLOY GUARD (6 Nov 2026): never ship a tree that lacks main or is dirty. Revert = delete this block.
+git fetch -q origin main
+if ! git merge-base --is-ancestor origin/main HEAD; then
+  echo "REFUSED: HEAD does not contain origin/main" >&2; exit 1
+fi
+if [ -n "$(git status --porcelain)" ]; then
+  echo "REFUSED: working tree is not clean" >&2; exit 1
+fi
+
 set -a
 # shellcheck disable=SC1091
 . /srv/hermes/secrets/cloudflare-dratercool.env
