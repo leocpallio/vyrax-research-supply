@@ -13,7 +13,7 @@ function RelatedCard({ c }: { c: Compound }) {
       data-testid="related-product-card"
       className="group block rounded-2xl border border-border overflow-hidden bg-background transition-colors duration-150 hover:bg-tint"
     >
-      <div className="aspect-[4/5] rounded-[20px] bg-white ring-1 ring-[#040825]/10 overflow-hidden">
+      <div className="aspect-[4/5] rounded-[20px] bg-white ring-1 ring-[#0B1B3B]/10 overflow-hidden">
         <img
           src={img.small ?? img.src}
           alt={`${c.name} vial`}

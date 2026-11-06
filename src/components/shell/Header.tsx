@@ -23,9 +23,9 @@ const NAV: NavGroup[] = [
         testid: "nav-shop-all",
       },
       {
-        label: "Best sellers",
+        label: "Featured",
         to: "/shop",
-        hint: `${featured.length} most ordered`,
+        hint: `${featured.length} core compounds`,
         testid: "nav-shop-best",
       },
       {
@@ -248,8 +248,8 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
       className="sticky top-0 z-40 bg-paper/90 backdrop-blur-md border-b border-line"
       data-testid="site-header"
     >
-      <div className="container-main flex h-16 items-center gap-3 justify-between">
-        <div className="flex items-center gap-2 lg:gap-6">
+      <div className="container-main grid grid-cols-[1fr_auto_1fr] h-16 items-center gap-3">
+        <div className="flex items-center gap-2 lg:gap-6 justify-self-start">
           <button
             type="button"
             className="icon-link lg:hidden -ml-2"
@@ -259,14 +259,6 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
           >
             <Menu size={22} />
           </button>
-          <Link
-            to="/"
-            className="flex items-center shrink-0"
-            aria-label={`${site.name} home`}
-            data-testid="logo"
-          >
-            <Wordmark className="h-[30px] sm:h-[38px] w-auto" />
-          </Link>
           <nav className="hidden lg:flex items-center gap-1" aria-label="Primary">
             {NAV.map((g) => (
               <Dropdown
@@ -286,7 +278,15 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
             </Link>
           </nav>
         </div>
-        <div className="flex items-center gap-0.5 sm:gap-1">
+        <Link
+          to="/"
+          className="flex items-center shrink-0 justify-self-center"
+          aria-label={`${site.name} home`}
+          data-testid="logo"
+        >
+          <Wordmark className="h-[28px] sm:h-[36px] w-auto" />
+        </Link>
+        <div className="flex items-center gap-0.5 sm:gap-1 justify-self-end">
           <button
             type="button"
             onClick={onSearch}

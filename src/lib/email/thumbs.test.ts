@@ -3,6 +3,19 @@ import { lineMedia, summarise } from "./order-email.server";
 import { renderEmail } from "./templates";
 
 describe("email product thumbnails", () => {
+  test("review request shows only a supplied order item, with no invented ratings", () => {
+    const mail = renderEmail({
+      kind: "reviewAsk", name: "Alex", reference: "VX-TEST", unsubscribeUrl: "mailto:support@vyraxlabs.co.uk",
+      lines: [{ name: "BPC-157", strength: "10mg", quantity: 1, lineTotal: 25, ...lineMedia("bpc-157", "10mg") }],
+    });
+    expect(mail.html).toContain('alt="BPC-157"');
+    expect(mail.html).toContain("From your order: BPC-157 10mg");
+    expect(mail.html).not.toContain("151 verified");
+    expect(mail.html).not.toContain("4.99 average");
+    expect(mail.text).toContain("positive feedback is not expected");
+    const withoutImage = renderEmail({ kind: "reviewAsk", name: "Alex", reference: "VX-TEST", unsubscribeUrl: "mailto:support@vyraxlabs.co.uk" });
+    expect(withoutImage.html).not.toContain("From your order:");
+  });
   test("known catalogue line gets a store-origin thumb and product link", () => {
     const m = lineMedia("adamax", "5mg");
     expect(m.image).toBe("https://vyraxlabs.co.uk/email-thumbs/adamax__5mg.jpg");

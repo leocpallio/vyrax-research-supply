@@ -29,7 +29,6 @@ import { Header } from "@/components/shell/Header";
 import { WhatsAppButton } from "@/components/shell/WhatsAppButton";
 import { OfferPopup } from "@/components/shell/OfferPopup";
 import { Footer } from "@/components/shell/Footer";
-import { FooterSignup } from "@/components/shell/FooterSignup";
 import { SearchDialog } from "@/components/shell/SearchDialog";
 import { CartDrawer } from "@/components/shell/CartDrawer";
 import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/shell/cart-store";
@@ -102,7 +101,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <main id="main" className="flex-1">
         {children}
       </main>
-      <FooterSignup />
       <Footer />
       <OfferPopup />
       <WhatsAppButton />

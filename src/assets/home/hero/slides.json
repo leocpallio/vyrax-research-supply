@@ -1,0 +1,61 @@
+{
+ "count": 7,
+ "slides": [
+  {
+   "file": "slide-1.webp",
+   "mobile": "slide-1-m.webp",
+   "kicker": "Growth Hormone",
+   "field": "growth-hormone",
+   "alt": "Ipamorelin 5 mg, CJC-1295 + Ipamorelin 5+5 mg and Tesamorelin 10 mg vials on a periwinkle backdrop",
+   "scrim": "#4a589a"
+  },
+  {
+   "file": "slide-2.webp",
+   "mobile": "slide-2-m.webp",
+   "kicker": "Recovery & Repair",
+   "field": "recovery-repair",
+   "alt": "TB-500 5 mg, Wolverine Stack 5+5 mg and BPC-157 5 mg vials on a navy backdrop",
+   "scrim": "#132546"
+  },
+  {
+   "file": "slide-3.webp",
+   "mobile": "slide-3-m.webp",
+   "kicker": "Metabolic",
+   "field": "metabolic",
+   "alt": "Tirzepatide 10 mg, Retatrutide 10 mg and Semaglutide 10 mg vials on a terracotta backdrop",
+   "scrim": "#762d19"
+  },
+  {
+   "file": "slide-4.webp",
+   "mobile": "slide-4-m.webp",
+   "kicker": "Brain & Focus",
+   "field": "brain-focus",
+   "alt": "Selank 5 mg, Semax 5 mg and Selank + Semax 10+10 mg vials on a sage-teal backdrop",
+   "scrim": "#294746"
+  },
+  {
+   "file": "slide-5.webp",
+   "mobile": "slide-5-m.webp",
+   "kicker": "Longevity & Cellular",
+   "field": "longevity-cellular",
+   "alt": "Epithalon 10 mg, NAD+ 500 mg and SS-31 10 mg vials on a berry-rose backdrop",
+   "scrim": "#773d46"
+  },
+  {
+   "file": "slide-6.webp",
+   "mobile": "slide-6-m.webp",
+   "kicker": "Glow Stack",
+   "field": "glow-klow",
+   "alt": "Selank 5 mg, GLOW 70 mg and KLOW 80 mg vials on an ocean-teal backdrop",
+   "scrim": "#0d434e"
+  },
+  {
+   "file": "slide-8.webp",
+   "mobile": "slide-8-m.webp",
+   "kicker": "Skin & Glow",
+   "field": "glow-klow-bpc",
+   "alt": "GLOW 70 mg, KLOW 80 mg and BPC-157 5 mg vials on a sand-gold backdrop",
+   "scrim": "#a5804a"
+  }
+ ]
+}

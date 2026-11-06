@@ -32,23 +32,23 @@ export function ReconstitutionAddon({ show }: { show: boolean }) {
   return (
     <div
       data-testid="reconstitution-addon"
-      className="mt-3 flex items-center justify-between gap-3 rounded-[16px] border border-[#040825]/10 bg-white/60 px-4 py-3"
+      className="mt-3 flex items-center justify-between gap-3 rounded-[16px] border border-[#0B1B3B]/10 bg-white/60 px-4 py-3"
     >
       <div className="min-w-0">
-        <p className="text-[13px] font-bold text-[#040825]">
+        <p className="text-[13px] font-bold text-[#0B1B3B]">
           Needed for reconstitution: Bacteriostatic Water 10ml
         </p>
-        <p className="text-[12px] text-[#040825]/60">£{strength.price.toFixed(2)} · sterile, with 0.9% benzyl alcohol</p>
+        <p className="text-[12px] text-[#0B1B3B]/60">£{strength.price.toFixed(2)} · sterile, with 0.9% benzyl alcohol</p>
       </div>
       {inBasket ? (
-        <span className="shrink-0 rounded-full bg-[#040825]/8 px-3 py-1.5 text-[12px] font-bold text-[#040825]/60">
+        <span className="shrink-0 rounded-full bg-[#0B1B3B]/8 px-3 py-1.5 text-[12px] font-bold text-[#0B1B3B]/60">
           Added
         </span>
       ) : (
         <button
           type="button"
           onClick={add}
-          className="shrink-0 rounded-full bg-[#040825] px-4 py-2 text-[12px] font-bold text-[#F5F0E5] transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-full bg-[#0B1B3B] px-4 py-2 text-[12px] font-bold text-[#EEF2F8] transition-opacity hover:opacity-90"
         >
           Add £{strength.price.toFixed(2)}
         </button>

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { sendTransactional } from "./email/send.server";
+import { welcomeCodeFor } from "./welcome-code.server";
 import { renderEmail } from "./email/templates";
 import { recordMarketingConsent, type Rpc } from "./email/outbox.server";
 
@@ -97,6 +98,7 @@ export async function subscribeToGuide(
           key: `vyrax-guide-${hash}`,
           mail: renderEmail({
             kind: "guideWelcome",
+            code: await welcomeCodeFor(email),
             unsubscribeUrl: `https://vyraxlabs.co.uk/api/email-automation?unsubscribe=${token}`,
           }),
         },

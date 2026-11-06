@@ -1,7 +1,13 @@
 import { useMemo, useState } from "react";
-import { StoreShell, Breadcrumbs, FAQ } from "@/components/Store";
+import { StoreShell, Breadcrumbs } from "@/components/Store";
 import { ProductCardGrid } from "@/components/ProductCard";
 import { CategoryPills, type Pill, type SortKey } from "@/components/CategoryPills";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Link } from "@tanstack/react-router";
 import { featuredSlugs, fromPrice, productPath, type Compound } from "@/lib/catalog";
 import type { CategoryContent } from "@/data/category-content";
@@ -35,7 +41,7 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
             <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight">
               {b.heading}
             </h2>
-            <div className="mt-3 space-y-3 text-[15px] leading-relaxed text-[#040825]/75">
+            <div className="mt-3 space-y-3 text-[15px] leading-relaxed text-[#0B1B3B]/75">
               {b.paragraphs.map((p) => (
                 <p key={p.slice(0, 48)}>{p}</p>
               ))}
@@ -47,10 +53,21 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
         <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight mb-4">
           Frequently asked questions
         </h2>
-        {/* Native <details> so both the question and the answer are in the server-rendered HTML and
-            the FAQPage JSON-LD above describes text that is actually on the page. Open by default:
-            hub copy should not be hidden from a buyer or from a crawler that does not run JS. */}
-        <FAQ items={content.faqs} defaultOpen />
+        <Accordion type="single" collapsible className="border-t border-[#0B1B3B]/10">
+          {content.faqs.map(([q, a], i) => (
+            <AccordionItem key={q} value={`faq-${i}`} className="border-b border-[#0B1B3B]/10">
+              <AccordionTrigger
+                data-testid="faq-question"
+                className="py-4 text-left font-heading font-semibold text-[15px] md:text-base hover:no-underline hover:text-[#0B1B3B] transition-colors duration-150"
+              >
+                {q}
+              </AccordionTrigger>
+              <AccordionContent className="text-[15px] leading-relaxed text-[#0B1B3B]/75">
+                {a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );
@@ -91,7 +108,7 @@ export function ListingPage({
           >
             {title}
           </h1>
-          <p className="mt-3 text-[#040825]/70 text-base md:text-lg leading-relaxed">{lede}</p>
+          <p className="mt-3 text-[#0B1B3B]/70 text-base md:text-lg leading-relaxed">{lede}</p>
         </header>
         {children}
       </div>
@@ -100,7 +117,7 @@ export function ListingPage({
       </div>
       <div className="container-main pt-5 pb-20">
         <p
-          className="text-sm text-[#040825]/60 mb-4"
+          className="text-sm text-[#0B1B3B]/60 mb-4"
           role="status"
           aria-live="polite"
           data-testid="result-count"
@@ -110,7 +127,7 @@ export function ListingPage({
         {sorted.length ? (
           <ProductCardGrid list={sorted} priorityCount={4} />
         ) : (
-          <p className="py-20 text-center text-[#040825]/60">{emptyText}</p>
+          <p className="py-20 text-center text-[#0B1B3B]/60">{emptyText}</p>
         )}
         {sorted.some((c) => c.strengths.length > 1) && (
           <nav aria-label="Browse by strength" className="mt-12 border-t border-border pt-8">

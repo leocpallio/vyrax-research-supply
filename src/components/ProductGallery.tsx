@@ -24,7 +24,7 @@ export function ProductGallery({
       <figure
         data-testid="pdp-gallery"
         data-pdp-gallery
-        className={`relative overflow-hidden rounded-[20px] bg-white ${showReport ? "" : "aspect-[4/5]"}`}
+        className={`relative overflow-hidden rounded-[20px] bg-white ${showReport ? "" : "aspect-[1/1] sm:aspect-[4/5]"}`}
       >
         {showReport && report ? (
           <a
@@ -39,7 +39,7 @@ export function ProductGallery({
               width={1600}
               height={2360}
               decoding="async"
-              className="size-full select-none object-contain p-6"
+              className="size-full select-none object-contain p-1 sm:p-6"
             />
           </a>
         ) : (

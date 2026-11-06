@@ -79,7 +79,7 @@ export function BuyBoxTrustStrip() {
       {rows.map((r) => (
         <div
           key={r.k}
-          className="grid grid-cols-[88px_1fr] gap-4 px-4 py-3 border-b border-border last:border-b-0"
+          className="grid grid-cols-1 sm:grid-cols-[88px_1fr] gap-1 sm:gap-4 px-4 py-3 text-center sm:text-left border-b border-border last:border-b-0"
         >
           <dt className="text-[11px] font-bold tracking-[0.08em] text-muted-foreground uppercase pt-0.5">
             {r.k}

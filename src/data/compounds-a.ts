@@ -77,9 +77,9 @@ export const metabolicAndRegenerative: Compound[] = [
     useCases: ["Weight Loss", "Appetite Control", "Blood Sugar"],
     kind: "peptide",
     strengths: [
-      { label: "10mg", amount: 10, unit: "mg", price: 34.99 },
-      { label: "20mg", amount: 20, unit: "mg", price: 59.99 },
-      { label: "30mg", amount: 30, unit: "mg", price: 79.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 44.99 },
+      { label: "20mg", amount: 20, unit: "mg", price: 69.99 },
+      { label: "30mg", amount: 30, unit: "mg", price: 89.99 },
     ],
     summary:
       "Semaglutide is a long-acting GLP-1 receptor agonist peptide with 94% sequence homology to native GLP-1. Supplied as a lyophilised powder.",
