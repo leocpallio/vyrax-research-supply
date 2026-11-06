@@ -42,7 +42,7 @@ const faqs: QA[] = [
 
 export const Route = createFileRoute("/reconstitution")({
   head: () => {
-    const title = "Reconstitution and Dilution Reference | Every Compound | Vyrax Labs";
+    const title = "Reconstitution and Dilution Reference | Vyrax Labs";
     const description =
       "Reconstitution reference for every compound in the catalogue: solvent, solvent volumes, resulting concentration in mg/ml, storage, stability evidence and handling cautions.";
     const article = {

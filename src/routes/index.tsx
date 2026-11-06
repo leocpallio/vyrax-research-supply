@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileCheck2, FlaskConical, Truck } from "lucide-react";
 import { StoreShell } from "@/components/Store";
 import {
@@ -17,6 +17,7 @@ import { claimFilled, claimGate, claimText, isClaimAllowed } from "@/lib/claims"
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
+import { guideBySlug } from "@/data/guides";
 import { clampDescription, ogImageFor } from "@/lib/seo";
 import fieldMetabolic from "@/assets/home/v3-field-metabolic.webp";
 import fieldGh from "@/assets/home/v3-field-growth-hormone.webp";
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/")({
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery & Growth | Vyrax`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery & Growth | Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
     const desc = clampDescription(
       `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
@@ -260,6 +261,19 @@ function Home() {
           ) : null
         }
       />
+
+      <nav aria-label="Guides" className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+        <h2 className="text-lg font-semibold">Guides</h2>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+          {["bpc-157-vs-tb-500", "peptide-purity-testing", "retatrutide-vs-tirzepatide-vs-semaglutide"].map((slug) => (
+            <li key={slug}>
+              <Link to="/guides/$slug" params={{ slug }} className="underline underline-offset-4">
+                {guideBySlug(slug)?.title ?? slug}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {/* Indicative "from" prices for the hero compounds, for crawlers and quick scanning. */}
       <p className="sr-only">

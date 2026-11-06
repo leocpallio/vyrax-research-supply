@@ -43,6 +43,7 @@ const SHARED_FILES = [
   "src/routes/lab-reports.tsx",
   "src/routes/privacy.tsx",
   "src/routes/research-use-policy.tsx",
+  "src/routes/reconstitution.tsx",
   "src/routes/returns.tsx",
   "src/routes/shipping.tsx",
   "src/routes/terms.tsx",

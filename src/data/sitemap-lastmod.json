@@ -22,6 +22,7 @@
     "src/routes/lab-reports.tsx": "2026-10-28",
     "src/routes/privacy.tsx": "2026-11-05",
     "src/routes/product.$slug.tsx": "2026-11-06",
+    "src/routes/reconstitution.tsx": "2026-11-02",
     "src/routes/research-use-policy.tsx": "2026-10-28",
     "src/routes/returns.tsx": "2026-10-28",
     "src/routes/shipping.tsx": "2026-10-13",
