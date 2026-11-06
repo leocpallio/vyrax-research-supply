@@ -12,15 +12,15 @@ const signupOpen = import.meta.env["VITE_VYRAX_GUIDE_SIGNUP_ENABLED"] === "true"
 
 // Pass 3: link columns sit on the navy footer body, so links are light.
 const linkCls =
-  "inline-flex min-h-8 md:min-h-10 items-center text-[13.5px] md:text-[14px] text-[#EEF2F8]/70 hover:text-white transition-colors duration-150";
+  "inline-flex min-h-6 md:min-h-10 items-center text-[12px] md:text-[14px] text-[#EEF2F8]/70 hover:text-white transition-colors duration-150";
 
 function Col({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#8FB0F5] mb-2 md:mb-3">
+      <h3 className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#8FB0F5] mb-0.5 md:mb-3">
         {title}
       </h3>
-      <ul className="flex flex-wrap gap-x-5 md:block md:space-y-0.5">{children}</ul>
+      <ul className="flex flex-wrap gap-x-3.5 md:block md:space-y-0.5">{children}</ul>
     </div>
   );
 }
@@ -77,15 +77,15 @@ function Newsletter() {
 
   return (
     <div
-      className="grid gap-5 md:grid-cols-[1fr_minmax(0,460px)] md:items-center p-5 md:p-9 rounded-[6px] bg-[#EEF2F8] border-l-[3px] border-[#5B8DEF]"
+      className="grid gap-5 md:grid-cols-[1fr_minmax(0,460px)] md:items-center p-4 md:p-9 rounded-[6px] bg-[#EEF2F8] border-l-[3px] border-[#5B8DEF]"
       data-testid="footer-newsletter"
       id="free-guide"
     >
       <div>
-        <h3 className="font-heading text-[22px] md:text-[26px] font-black tracking-[-0.03em] leading-tight">
+        <h3 className="font-heading text-[18px] md:text-[26px] font-black tracking-[-0.03em] leading-tight">
           {signupOpen ? "Stay in the loop." : "Free reconstitution lab guide."}
         </h3>
-        <p className="mt-1.5 text-[14px] text-[#0B1B3B]/65 leading-relaxed max-w-md">
+        <p className="mt-1 text-[12.5px] md:text-[14px] text-[#0B1B3B]/65 leading-relaxed max-w-md">
           {signupOpen
             ? "New batch reports, restocks and the free reconstitution lab guide. Unsubscribe anytime."
             : "Preparation, concentration maths, labelling and traceability in one PDF. No email or purchase needed."}
@@ -198,26 +198,26 @@ export function Footer() {
   const inCheckout = path.startsWith("/checkout");
 
   return (
-    <footer className="mt-10 md:mt-16 footer-after-navy" data-testid="site-footer">
+    <footer className="mt-6 md:mt-16 footer-after-navy" data-testid="site-footer">
       {/* (a) Guide / newsletter card on white, before the navy body */}
       {!inCheckout && (
         <div className="bg-white">
-          <div className="container-main pb-8 md:pb-16">
+          <div className="container-main pb-5 md:pb-16">
             <Newsletter />
           </div>
         </div>
       )}
 
       {/* (b) Navy body: brand + research-use statement on the left, link columns on the right */}
-      <div className="bg-[#0B1B3B] text-[#EEF2F8] pb-20 sm:pb-12">
+      <div className="bg-[#0B1B3B] text-[#EEF2F8] pb-16 sm:pb-12">
         <div className="container-main">
-          <div className="grid gap-7 md:gap-10 lg:gap-16 pt-8 md:pt-16 pb-6 md:pb-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.4fr)]">
+          <div className="grid gap-4 md:gap-10 lg:gap-16 pt-5 md:pt-16 pb-4 md:pb-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.4fr)]">
             <div>
-              <Wordmark tone="light" title={site.name} className="h-[40px] w-auto" />
-              <p className="mt-4 text-[14px] text-[#EEF2F8]/72 leading-relaxed max-w-sm">
+              <Wordmark tone="light" title={site.name} className="h-[28px] md:h-[40px] w-auto" />
+              <p className="mt-2 md:mt-4 text-[12.5px] md:text-[14px] text-[#EEF2F8]/72 leading-snug md:leading-relaxed max-w-sm">
                 Research peptides dispatched from the UK, each batch matched to its certificate.
               </p>
-              <div className="mt-3 text-[14px]">
+              <div className="mt-1.5 md:mt-3 text-[12.5px] md:text-[14px]">
                 <p>
                   <a
                     href={`mailto:${site.email}`}
@@ -240,17 +240,17 @@ export function Footer() {
               </div>
 
               <section
-                className="mt-5 md:mt-8 border-l-[3px] border-[#AC4821] pl-5 py-1"
+                className="mt-3 md:mt-8 border-l-[3px] border-[#AC4821] pl-5 py-1"
                 data-testid="footer-ruo"
               >
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#EEF2F8]/55">
                   Important
                 </p>
-                <p className="mt-2 font-heading font-bold tracking-[-0.02em] leading-[1.15] text-[20px] md:text-[22px]">
+                <p className="mt-1 font-heading font-bold tracking-[-0.02em] leading-[1.15] text-[16px] md:text-[22px]">
                   For research use only.{" "}
                   <span className="text-[#EEF2F8]/55">Not for human consumption.</span>
                 </p>
-                <p className="mt-3 text-[13.5px] leading-relaxed text-[#EEF2F8]/70 max-w-md">
+                <p className="mt-1.5 text-[11.5px] md:text-[13.5px] leading-snug md:leading-relaxed text-[#EEF2F8]/70 max-w-md">
                   Sold strictly for laboratory research. Not for human or animal consumption. Not a
                   medicine: no UK marketing authorisation, and not presented to diagnose, treat,
                   cure, prevent or mitigate any condition. Not a pharmacy. No dosing, medical,
@@ -258,14 +258,14 @@ export function Footer() {
                 </p>
                 <Link
                   to="/research-use-policy"
-                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-[14px] font-semibold text-[#EEF2F8] underline underline-offset-4 decoration-[#EEF2F8]/35 hover:decoration-[#EEF2F8]"
+                  className="mt-0 inline-flex min-h-9 md:min-h-11 items-center gap-1.5 text-[12.5px] md:text-[14px] font-semibold text-[#EEF2F8] underline underline-offset-4 decoration-[#EEF2F8]/35 hover:decoration-[#EEF2F8]"
                 >
                   Read the full research use policy <ArrowRight size={15} />
                 </Link>
               </section>
             </div>
 
-            <div className="grid gap-x-6 gap-y-5 md:gap-y-8 grid-cols-1 min-[560px]:grid-cols-2 md:grid-cols-4 content-start">
+            <div className="grid gap-x-6 gap-y-3 md:gap-y-8 grid-cols-1 min-[560px]:grid-cols-2 md:grid-cols-4 content-start">
               <Col title="Shop">
                 <L to="/shop">All peptides</L>
                 <L to="/lab-reports">Lab reports</L>
@@ -302,7 +302,7 @@ export function Footer() {
           </div>
 
           {/* (c) Legal strip: only facts held in site.ts and the claim registry */}
-          <div className="pt-4 md:pt-6 border-t border-[#EEF2F8]/12 grid gap-2 md:gap-3 md:grid-cols-[1fr_auto] text-[12.5px] text-[#EEF2F8]/55 leading-relaxed">
+          <div className="pt-4 md:pt-6 border-t border-[#EEF2F8]/12 grid gap-2 md:gap-3 md:grid-cols-[1fr_auto] text-[11px] md:text-[12.5px] text-[#EEF2F8]/55 leading-snug md:leading-relaxed">
             <div className="space-y-1">
               {dispatch && <p>{dispatch} Not a delivery guarantee.</p>}
               {coldChain && <p>{coldChain}. Tracked, not temperature-controlled in transit.</p>}
