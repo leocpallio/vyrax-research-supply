@@ -39,6 +39,7 @@ import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as ApiStockNoticeRouteImport } from './routes/api.stock-notice'
+import { Route as ApiWelcomeCodeRouteImport } from './routes/api.welcome-code'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout_.return'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
@@ -200,6 +201,11 @@ const ApiStockNoticeRoute = ApiStockNoticeRouteImport.update({
   path: '/api/stock-notice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWelcomeCodeRoute = ApiWelcomeCodeRouteImport.update({
+  id: '/api/welcome-code',
+  path: '/api/welcome-code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -367,6 +375,7 @@ export interface FileRoutesById {
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
+  '/api/welcome-code': typeof ApiWelcomeCodeRoute
   '/category/$slug': typeof CategorySlugRoute
   '/checkout_/return': typeof CheckoutReturnRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout/return'
     | '/collections/$slug'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
+    | '/api/welcome-code'
     | '/category/$slug'
     | '/checkout_/return'
     | '/collections/$slug'
@@ -538,6 +550,7 @@ export interface RootRouteChildren {
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   ApiStockNoticeRoute: typeof ApiStockNoticeRoute
+  ApiWelcomeCodeRoute: typeof ApiWelcomeCodeRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
@@ -762,6 +775,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStockNoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/welcome-code': {
+      id: '/api/welcome-code'
+      path: '/api/welcome-code'
+      fullPath: '/api/welcome-code'
+      preLoaderRoute: typeof ApiWelcomeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -866,6 +886,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   ApiStockNoticeRoute: ApiStockNoticeRoute,
+  ApiWelcomeCodeRoute: ApiWelcomeCodeRoute,
   CategorySlugRoute: CategorySlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,

@@ -48,9 +48,9 @@ const fixtures: EmailEvent[] = [
   { kind: "paymentExpired", ...who },
   { kind: "packed", ...who },
   { kind: "dispatched", ...who, trackingNumber: "EXAMPLE123" },
-  { kind: "guideWelcome", name: who.name, code: "WELCOME-7K3QX9M", ...optOut },
+  { kind: "guideWelcome", name: who.name, ...optOut },
   { kind: "postPurchase", ...who, ...optOut },
-  { kind: "reviewAsk", ...who, ...optOut, lines: [{ name: "BPC-157", strength: "10mg", quantity: 1, lineTotal: 25, ...lineMedia("bpc-157", "10mg") }] },
+  { kind: "reviewAsk", ...who, ...optOut },
   { kind: "reorder", ...who, ...optOut },
   { kind: "paymentRecovery", ...who, checkoutUrl: `${SITE_URL}/checkout`, ...optOut },
 ];
