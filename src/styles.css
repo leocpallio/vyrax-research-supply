@@ -704,6 +704,8 @@ textarea:focus-visible,
    joins it directly instead of leaving a white gap between two dark bands. */
 main:has(> [data-testid="lab-report-band"]:last-child) + .footer-after-navy {
   margin-top: 0;
+}
+
 /* Syringe tool: vial surface ripple when the stock concentration changes. */
 @keyframes vx-swirl {
   0% {
