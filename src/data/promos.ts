@@ -1,4 +1,5 @@
 import { site } from "./site";
+import { WELCOME_MIN_SPEND, WELCOME_PCT, isWellFormedWelcomeCode } from "../lib/welcome-code";
 
 /** Discount codes. Server-authoritative: the same lookup runs in the basket (display) and in
  *  quoteCheckout (what is actually charged), so the page can never show a price the payment
@@ -18,7 +19,14 @@ export const normaliseCode = (code?: string | null) => (code ?? "").trim().toUpp
 
 export const findPromo = (code?: string | null) => {
   const c = normaliseCode(code);
-  return c ? promos.find((p) => p.code === c) : undefined;
+  if (!c) return undefined;
+  const fixed = promos.find((p) => p.code === c);
+  if (fixed) return fixed;
+  // Personal welcome codes are verified against the buyer's email on the server; here they only
+  // need the same terms so the basket total never disagrees with what will be charged.
+  if (isWellFormedWelcomeCode(c))
+    return { code: c, pct: WELCOME_PCT, minSpend: WELCOME_MIN_SPEND, label: "Welcome code" };
+  return undefined;
 };
 
 /** Pence off, or 0 when the code is unknown or the basket is under its minimum. */

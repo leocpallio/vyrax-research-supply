@@ -77,14 +77,14 @@ export function ProductCard({
   };
 
   const quickAddClass =
-    "size-11 rounded-full bg-white text-[#040825] ring-1 ring-[#040825]/15 shadow-[0_2px_10px_rgba(4,8,37,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#040825] hover:text-white hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#040825] disabled:opacity-40 disabled:hover:scale-100";
+    "size-11 rounded-full bg-white text-[#0B1B3B] ring-1 ring-[#0B1B3B]/15 shadow-[0_2px_10px_rgba(11,27,59,0.10)] grid place-items-center transition-[transform,opacity] duration-150 hover:bg-[#0B1B3B] hover:text-white hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0B1B3B] disabled:opacity-40 disabled:hover:scale-100";
 
   return (
     <article
       data-testid="product-wrapper"
       className="group flex flex-col"
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#040825]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(4,8,37,0.45)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[20px] bg-white ring-1 ring-[#0B1B3B]/10 transition-shadow duration-300 group-hover:shadow-[0_18px_40px_-26px_rgba(11,27,59,0.45)]">
         <a href={href} className="block size-full" tabIndex={-1} aria-hidden="true">
           <img
             src={img.small ?? img.src}
@@ -104,7 +104,7 @@ export function ProductCard({
           data-stock={stock}
           title={stockLabel[stock]}
           className={`absolute top-3 left-3 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${
-            pill.warm ? "bg-[#AC4821] text-[#F5F0E5]" : "bg-white/95 text-[#040825]"
+            pill.warm ? "bg-[#AC4821] text-[#EEF2F8]" : "bg-white/95 text-[#0B1B3B]"
           }`}
         >
           {pill.text}
@@ -127,9 +127,9 @@ export function ProductCard({
               <PopoverContent
                 align="end"
                 sideOffset={8}
-                className="w-56 rounded-2xl border-[#040825]/10 bg-white p-1.5 shadow-xl"
+                className="w-56 rounded-2xl border-[#0B1B3B]/10 bg-white p-1.5 shadow-xl"
               >
-                <p className="px-3 pt-1.5 pb-1 text-[11px] uppercase tracking-wider text-[#040825]/60">
+                <p className="px-3 pt-1.5 pb-1 text-[11px] uppercase tracking-wider text-[#0B1B3B]/60">
                   Choose amount
                 </p>
                 <ul>
@@ -140,14 +140,14 @@ export function ProductCard({
                         data-testid="quick-add-option"
                         disabled={!orderable(x)}
                         onClick={() => add(x)}
-                        className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm hover:bg-[#F6F5F1] disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-[#040825]"
+                        className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm hover:bg-[#EDF1F7] disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:outline-[#0B1B3B]"
                       >
                         <span className="font-mono">{x.label}</span>
                         <span className="tabular-nums font-semibold">
                           {(() => {
                             const l = ladderSaving(product, x);
                             return l ? (
-                              <s className="mr-1.5 font-normal text-[#040825]/50">{gbp(l.was)}</s>
+                              <s className="mr-1.5 font-normal text-[#0B1B3B]/68">{gbp(l.was)}</s>
                             ) : null;
                           })()}
                           {gbp(x.price)}
@@ -177,13 +177,13 @@ export function ProductCard({
           <a
             href={href}
             data-testid="product-title"
-            className="hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#040825]"
+            className="hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[#0B1B3B]"
           >
             {product.name}
           </a>
         </h3>
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-[#040825]/60">
+          <p className="text-xs text-[#0B1B3B]/60">
             {product.kind === "blend" && product.composition?.length
               ? product.composition.join(" · ")
               : label}
@@ -192,14 +192,14 @@ export function ProductCard({
             <a
               href={`${href}#lab-report`}
               data-testid="card-coa-link"
-              className="shrink-0 rounded-full bg-[#040825]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#040825]/70 ring-1 ring-[#040825]/10 transition-colors hover:bg-[#040825] hover:text-white"
+              className="shrink-0 rounded-full bg-[#0B1B3B]/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#0B1B3B]/70 ring-1 ring-[#0B1B3B]/10 transition-colors hover:bg-[#0B1B3B] hover:text-white"
             >
               COA
             </a>
           )}
         </div>
         <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
-          {multi && <span className="text-xs text-[#040825]/60">From</span>}
+          {multi && <span className="text-xs text-[#0B1B3B]/60">From</span>}
           <span data-testid="product-price" className="text-[16px] font-bold tabular-nums">
             {gbp(fromPrice(product))}
           </span>

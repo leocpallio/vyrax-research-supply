@@ -9,7 +9,6 @@ const STEMS: readonly string[] = [
   "bacteriostatic-water__10ml",
   "bpc-157__10mg",
   "bpc-157__5mg",
-  "cagrilintide__5mg",
   "cjc-1295-dac__5mg",
   "cjc-1295-ipamorelin__5-5mg",
   "cjc-1295-no-dac__5mg",

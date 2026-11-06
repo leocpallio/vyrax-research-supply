@@ -254,7 +254,7 @@ function ProductPage() {
 
             <PurityStatBlock stat={stat} productName={heading} />
 
-            <div className="mt-5 flex flex-wrap items-start gap-3">
+            <div className="mt-6 flex flex-wrap items-start gap-3">
               <PriceBlock c={c} s={s} />
               <span
                 data-testid="stock-badge"
@@ -315,7 +315,7 @@ function ProductPage() {
               data-testid="add-product-button"
               disabled={!orderable}
               onClick={add}
-              className="mt-6 w-full h-12 rounded-full bg-[#040825] text-[#F5F0E5] font-bold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="mt-6 w-full h-12 rounded-full bg-[#0B1B3B] text-[#EEF2F8] font-bold text-sm transition-opacity duration-150 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {!orderable
                 ? stockLabel[stock]
@@ -326,7 +326,7 @@ function ProductPage() {
             <Link
               to="/lab-reports"
               data-testid="check-lab-report"
-              className="mt-2 w-full h-11 inline-flex items-center justify-center rounded-full border border-[#040825]/25 text-sm font-bold transition-colors duration-150 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="mt-2 w-full h-11 inline-flex items-center justify-center rounded-full border border-[#0B1B3B]/25 text-sm font-bold transition-colors duration-150 hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Check lab report
             </Link>
@@ -335,7 +335,7 @@ function ProductPage() {
               to="/reconstitution"
               hash={c.slug}
               data-testid="pdp-dilution-reference"
-              className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 decoration-[#040825]/30 hover:decoration-[#040825]"
+              className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold underline underline-offset-4 decoration-[#0B1B3B]/30 hover:decoration-[#0B1B3B]"
             >
               Dilution reference: {c.name}
             </Link>
@@ -495,7 +495,7 @@ function ProductPage() {
           type="button"
           disabled={!orderable}
           onClick={add}
-          className="h-11 rounded-full bg-[#040825] text-[#F5F0E5] px-6 text-sm font-bold disabled:opacity-40"
+          className="h-11 rounded-full bg-[#0B1B3B] text-[#EEF2F8] px-6 text-sm font-bold disabled:opacity-40"
         >
           {!orderable ? stockLabel[stock] : "Add to basket"}
         </button>

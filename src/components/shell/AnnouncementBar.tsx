@@ -12,11 +12,11 @@ export function announcementStrings(): string[] {
     freeShippingThreshold: String(site.freeDeliveryThreshold),
   });
   const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
-  if (!site.checkoutOpen)
-    out.push("Site not live yet. Checkout is disabled; no orders or payments are taken.");
-  if (site.checkoutOpen && free) out.push(free);
-  if (dispatch) out.push(dispatch);
-  return out.slice(0, 2);
+  void free;
+  void dispatch;
+  // One short line. Fulfilment promises stay in the claim registry surfaces (shipping, FAQ, terms).
+  out.push("UK supplied · Research use only");
+  return out.slice(0, 1);
 }
 
 export function AnnouncementBar() {
@@ -33,29 +33,11 @@ export function AnnouncementBar() {
   const current = strings[n] ?? strings[0] ?? "";
   return (
     <>
-      {site.whatsapp && !onCheckout && (
-        <a
-          href={`https://wa.me/${site.whatsapp}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block bg-[#040825] text-white text-[13px] leading-tight sm:text-[15px] font-semibold hover:brightness-95"
-          data-testid="whatsapp-banner"
-        >
-          <div className="container-main min-h-10 py-1.5 sm:min-h-11 sm:py-2 flex items-center justify-center text-center">
-            <p>
-              <span className="sm:hidden">WhatsApp support: +44 7575 894339</span>
-              <span className="hidden sm:inline">
-                Message us on WhatsApp for product or order support: +44 7575 894339
-              </span>
-            </p>
-          </div>
-        </a>
-      )}
       <div
-        className="bg-ink text-ink-foreground text-[13px] font-medium"
+        className="bg-[#0B1B3B] text-white/85 font-mono text-[11px] uppercase tracking-[0.14em]"
         data-testid="announcement-bar"
       >
-        <div className="container-main h-9 flex items-center justify-center text-center">
+        <div className="container-main h-9 flex items-center justify-center text-center relative">
           <p
             key={current}
             aria-live="polite"
@@ -64,6 +46,17 @@ export function AnnouncementBar() {
           >
             {current}
           </p>
+          {site.whatsapp && !onCheckout && (
+            <a
+              href={`https://wa.me/${site.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute right-4 hidden md:inline text-[#8FB0F5] hover:text-white"
+              data-testid="whatsapp-banner"
+            >
+              WhatsApp support
+            </a>
+          )}
         </div>
       </div>
     </>

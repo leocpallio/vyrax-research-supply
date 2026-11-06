@@ -1,3 +1,4 @@
+process.env["WELCOME_CODE_SECRET"] ??= "test-only-welcome-secret";
 import { test, expect } from "bun:test";
 import { subscribeToGuide } from "./guide-signup.server";
 

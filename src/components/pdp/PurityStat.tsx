@@ -44,13 +44,13 @@ export function PurityStatBlock({ stat, productName }: { stat: PurityStat; produ
         data-state="report"
         aria-label={stat.ariaLabel}
         onClick={() => setOpen(true)}
-        className="mt-5 group flex items-baseline gap-3 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="mt-5 mb-2 group flex flex-wrap items-center gap-x-4 gap-y-3 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="font-heading text-5xl font-semibold tabular-nums leading-none">
           {stat.purityLabel}
         </span>
-        <span className="text-xs font-bold tracking-[0.08em] underline-offset-4 group-hover:underline">
-          VIEW LAB REPORT
+        <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#0B1B3B] px-4 h-9 text-xs font-bold tracking-[0.08em] text-[#0B1B3B] transition-colors group-hover:bg-[#0B1B3B] group-hover:text-white group-active:bg-[#0B1B3B] group-active:text-white">
+          VIEW LAB REPORT <span aria-hidden>→</span>
         </span>
       </button>
       <Sheet open={open} onOpenChange={setOpen}>

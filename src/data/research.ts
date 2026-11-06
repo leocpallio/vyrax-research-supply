@@ -24,11 +24,6 @@ export const chem: Record<string, Chem> = {
     formula: "C187H291N45O59",
     mw: "4,114.0",
   },
-  cagrilintide: {
-    cas: "1415456-99-3",
-    formula: "C194H312N54O59S2",
-    mw: "4,409.0",
-  },
   "aod-9604": {
     cas: "221231-10-3",
     formula: "C78H123N23O23S2",
@@ -247,31 +242,6 @@ export const citations: Record<string, Citation[]> = {
       journal: "Drug Des Devel Ther",
       year: "2024",
       author: "Yang XD",
-    },
-  ],
-  cagrilintide: [
-    {
-      pmid: "42251860",
-      title:
-        "Efficacy and safety of once-weekly cagrilintide-semaglutide (CagriSema) in adults with type 2 diabetes inadequately controlled on diet and exercise (REIMAGINE 1): a randomised, double-blind, placebo-controlled, phase 3a study",
-      journal: "Lancet Diabetes Endocrinol",
-      year: "2026",
-      author: "Aroda VR",
-    },
-    {
-      pmid: "34798060",
-      title:
-        "Once-weekly cagrilintide for weight management in people with overweight and obesity: a multicentre, randomised, double-blind, placebo-controlled and active-controlled, dose-finding phase 2 trial",
-      journal: "Lancet",
-      year: "2021",
-      author: "Lau DCW",
-    },
-    {
-      pmid: "36883831",
-      title: "Cagrilintide: A Long-Acting Amylin Analog for the Treatment of Obesity",
-      journal: "Cardiol Rev",
-      year: "2024",
-      author: "D'Ascanio AM",
     },
   ],
   "aod-9604": [

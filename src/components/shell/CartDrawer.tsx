@@ -64,7 +64,7 @@ export function DeliveryLadder({ items }: { items: CartItem[] }) {
         className="h-1.5 w-full rounded-full bg-line overflow-hidden"
       >
         <div
-          className={`h-full rounded-full transition-[width] duration-300 ${unlocked ? "bg-verify" : "bg-ink"}`}
+          className={`ladder-fill h-full rounded-full ${unlocked ? "bg-verify" : "bg-ink"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -219,7 +219,7 @@ export function CartDrawer({
         <DialogPrimitive.Content
           aria-describedby={undefined}
           data-testid="cart-drawer"
-          className="fixed z-[81] inset-y-0 right-0 w-[92vw] sm:w-[440px] bg-white border-l border-[#DDD9D2] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-200"
+          className="fixed z-[81] inset-y-0 right-0 w-[92vw] sm:w-[440px] bg-white border-l border-[#D9E1EC] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-200"
         >
           <div className="relative flex items-center justify-between px-5 h-14 border-b border-line">
             <DialogPrimitive.Close
@@ -249,7 +249,7 @@ export function CartDrawer({
                     to="/shop"
                     className="mt-5 inline-flex items-center justify-center rounded-full bg-ink text-ink-foreground h-12 px-7 text-sm font-semibold hover:bg-ink/90 transition-colors duration-150"
                   >
-                    Shop best sellers
+                    Shop all peptides
                   </Link>
                 </DialogPrimitive.Close>
                 <DialogPrimitive.Close asChild>
@@ -324,7 +324,7 @@ export function CartDrawer({
                 {!site.checkoutOpen
                   ? "Site not live yet"
                   : quote.belowMinimum
-                    ? `${gbp(quote.minimumGap)} away from ${gbp(quote.minimum)} minimum`
+                    ? `${gbp(quote.minimumGap)} to go until the ${gbp(quote.minimum)} minimum`
                     : "Checkout securely"}
               </button>
               {blocked && (

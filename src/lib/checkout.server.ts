@@ -7,6 +7,8 @@ import { validatePaymentEvent, verifySignature } from "./spicepay";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
+import { isWelcomeCode } from "./welcome-code";
+import { findPromo } from "../data/promos";
 
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -114,10 +116,24 @@ export async function createCheckout(request: Request): Promise<Response> {
       body["researchAgreement"] !== true
     )
       return fail("Check your contact and UK delivery details", 400);
-    const quote = quoteCheckout(
-      body["items"],
-      typeof body["code"] === "string" ? body["code"] : null,
-    );
+    const submittedCode = typeof body["code"] === "string" ? body["code"] : null;
+    const hasCode = !!findPromo(submittedCode);
+    if (hasCode) {
+      if (isWelcomeCode(submittedCode)) {
+        const { verifyWelcomeCode } = await import("./welcome-code.server");
+        if (!(await verifyWelcomeCode(email, submittedCode!)))
+          return fail("That code is not valid for this email address", 400);
+      }
+      // Every discount code here is a first-order code: any earlier paid order spends it.
+      const prior = await db(c.url, c.key)
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("email", email)
+        .eq("status", "paid");
+      if ((prior.count ?? 0) > 0)
+        return fail("That code has already been used on a previous order", 400);
+    }
+    const quote = quoteCheckout(body["items"], submittedCode);
     if (quote.belowMinimum)
       return fail(`Minimum order is £${Math.round(quote.minimumPence / 100)}`, 400);
     const store = db(c.url, c.key);

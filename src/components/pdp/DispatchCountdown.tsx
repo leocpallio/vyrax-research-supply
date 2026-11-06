@@ -52,7 +52,7 @@ export function DispatchCountdown({ className = "" }: { className?: string }) {
   return (
     <p
       data-testid="dispatch-countdown"
-      className={`flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#040825]/70 ${className}`}
+      className={`flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[#0B1B3B]/70 ${className}`}
     >
       <span aria-hidden="true" className="inline-block size-1.5 rounded-full bg-[#AC4821]" />
       {dispatchText(remaining, now?.getDay())}

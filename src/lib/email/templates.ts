@@ -3,7 +3,7 @@ import { promos } from "../../data/promos";
 const WELCOME_CODE = promos[0]?.code ?? "FIRST10";
 import { claimFilled, claimText } from "../claims";
 import { dispatchCutoffLabel } from "../delivery";
-import { buildWelcomeEmail } from "./welcome-image";
+import { renderWelcomeEmail } from "./welcome";
 
 // Pure rendering only. Sending and consent/idempotency decisions belong to the caller.
 export type Line = {
@@ -30,8 +30,9 @@ export type EmailEvent =
   | ({ kind: "paymentPending" | "paymentFailed" | "paymentExpired" } & Referenced)
   | ({ kind: "packed" } & Referenced)
   | ({ kind: "dispatched"; trackingNumber?: string; trackingUrl?: string } & Referenced)
-  | ({ kind: "guideWelcome"; name?: string } & Marketing)
-  | ({ kind: "postPurchase" | "reviewAsk" | "reorder" } & Referenced & Marketing)
+  | ({ kind: "guideWelcome"; name?: string; code?: string } & Marketing)
+  | ({ kind: "postPurchase" | "reorder" } & Referenced & Marketing)
+  | ({ kind: "reviewAsk"; lines?: readonly Line[] } & Referenced & Marketing)
   | ({ kind: "paymentRecovery"; checkoutUrl: string } & Referenced & Marketing);
 export type RenderedEmail = {
   subject: string;
@@ -154,6 +155,20 @@ function thumb(l: Line): string {
   return `<td class="rule thumbtd" width="78" style="${css.cell};width:78px;padding-right:14px;vertical-align:middle">${href ? `<a href="${e(href)}">${pic}</a>` : pic}</td>`;
 }
 
+/** A single real order item, never stock imagery or an invented customer rating. */
+function reviewHero(lines?: readonly Line[]): string {
+  for (const line of lines ?? []) {
+    if (!line.image) continue;
+    try {
+      const src = safeUrl(line.image);
+      return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 26px;border:1px solid #E1E6EF;border-radius:14px;background:#F6F8FC"><tr><td align="center" style="padding:24px 12px"><img src="${e(src)}" width="160" height="160" alt="${e(oneLine(line.name))}" style="display:block;width:160px;height:160px;background:#fff;border-radius:12px"><p style="margin:12px 0 0;color:#4A5568;font-size:14px;line-height:1.5">From your order: ${e(oneLine(line.name))} ${e(oneLine(line.strength))}</p></td></tr></table>`;
+    } catch {
+      // External imagery must not become an email tracking pixel.
+    }
+  }
+  return "";
+}
+
 function table(s: Summary): { html: string; text: string[] } {
   const subtotal = s.lines.reduce((sum, l) => sum + l.lineTotal, 0);
   const rows = s.lines
@@ -194,6 +209,7 @@ type Content = {
   lines?: string[];
   unsubscribeUrl?: string;
   step?: 1 | 2 | 3;
+  heroHtml?: string;
 };
 const longDate = (d?: string) => {
   if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d;
@@ -226,7 +242,7 @@ function wrap(c: Content): RenderedEmail {
   const metaHtml = c.reference
     ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px"><tr><td class="mute" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">Order</td><td class="mute" align="right" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568">${c.orderDate ? "Date" : ""}</td></tr><tr><td class="tx" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:15px;font-weight:600;color:#14213D">${e(oneLine(c.reference))}</td><td class="tx" align="right" style="font-size:15px;color:#14213D">${c.orderDate ? e(oneLine(c.orderDate)) : ""}</td></tr></table>`
     : "";
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F6F8FC"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#4A5568">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}"><h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#14213D">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#6B7688">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#4A5568">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#14213D;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title>${darkStyle}</head><body class="bg" style="${css.body}"><div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(c.preheader)}</div><table class="bg" role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F6F8FC"><tr><td align="center" style="padding:32px 12px"><table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" style="${css.card}"><tr><td class="pad rule" style="${css.head}"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td class="tx" style="font-size:16px;font-weight:700;letter-spacing:.22em"><span style="color:#14213D">VYRAX</span> <span style="color:#5B8DEF">LABS</span></td><td class="mute" align="right" style="font-size:12px;color:#4A5568">${c.reference ? "Order update" : ""}</td></tr></table></td></tr><tr><td class="pad tx" style="${css.main}">${c.heroHtml ?? ""}<h1 class="tx" style="margin:0 0 20px;font-size:26px;line-height:1.25;letter-spacing:-.015em;font-weight:700;color:#14213D">${e(c.heading)}</h1>${metaHtml}${c.paragraphs.map((p) => `<p style="${css.p}">${e(p)}</p>`).join("")}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.lines?.map((p) => `<p class="mute" style="${css.p};font-size:12.5px;line-height:1.6;color:#6B7688">${e(p)}</p>`).join("") ?? ""}${c.action ? button(c.action.label, c.action.url, c.action.external) : ""}<p class="mute" style="margin:0;font-size:14px;color:#4A5568">Questions? ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:#14213D;text-decoration:underline">${e(site.phone)}</a>` : ""}</p></td></tr><tr><td class="pad rule mute" style="${css.foot}">${e(RESEARCH_NOTICE)}<br>${link("Research use policy", POLICY_URL)} · ${link("Contact", CONTACT_URL)}<br>${e(LEGAL_FOOTER)}${unsubscribe ? ` · ${link("Unsubscribe", unsubscribe, true)}` : ""}</td></tr></table></td></tr></table></body></html>`;
   const text = [
     c.heading,
     "",
@@ -350,17 +366,15 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
       });
     }
     case "guideWelcome": {
-      const w = buildWelcomeEmail({
-        code: WELCOME_CODE,
-        shopUrl: SHOP_URL,
-        contactEmail: SUPPORT_EMAIL,
-        unsubscribe: event.unsubscribeUrl,
+      const w = renderWelcomeEmail({
+        code: event.code ?? WELCOME_CODE,
+        unsubscribeUrl: event.unsubscribeUrl,
         guideUrl: GUIDE_URL,
       });
       return {
-        subject: subject("Your code for 10% off"),
+        subject: subject(w.subject),
         html: w.html,
-        text: w.text.join("\n"),
+        text: w.text,
         listUnsubscribe: event.unsubscribeUrl,
       };
     }
@@ -380,15 +394,16 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
     case "reviewAsk":
       return wrap({
         ...base,
-        heading: "How was your order?",
+        heading: "Your words matter.",
         preheader: "Share honest feedback about your ordering experience.",
         subject: subject("Feedback on order"),
+        heroHtml: reviewHero(event.lines),
         paragraphs: [
           hello,
           "If your order has arrived, we would welcome honest feedback about your ordering experience. There is no reward for a review, and positive feedback is not expected.",
-          `You can email ${SUPPORT_EMAIL} with your feedback and order reference.`,
+          `Reply to this message with your thoughts and order reference, or contact ${SUPPORT_EMAIL}.`,
         ],
-        action: { label: "Contact Vyrax Labs", url: CONTACT_URL },
+        action: { label: "Share your feedback", url: CONTACT_URL },
         unsubscribeUrl: event.unsubscribeUrl,
       });
     case "reorder":

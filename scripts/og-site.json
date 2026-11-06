@@ -33,14 +33,6 @@
       ]
     },
     {
-      "slug": "cagrilintide",
-      "name": "Cagrilintide",
-      "category": "metabolic-research",
-      "strengths": [
-        "5mg"
-      ]
-    },
-    {
       "slug": "aod-9604",
       "name": "AOD-9604",
       "category": "metabolic-research",
@@ -473,7 +465,6 @@
         "retatrutide",
         "tirzepatide",
         "semaglutide",
-        "cagrilintide",
         "aod-9604",
         "5-amino-1mq",
         "mots-c",
