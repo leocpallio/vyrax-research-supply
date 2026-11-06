@@ -64,6 +64,12 @@ function PaymentReturn() {
           currency: (r.currency ?? "GBP").toUpperCase(),
           payment_type: "hosted_payment",
         });
+        capture("purchase", {
+          order_id: order,
+          ...(pence !== null ? { value: pence / 100, revenue: pence / 100 } : {}),
+          currency: (r.currency ?? "GBP").toUpperCase(),
+          test_mode: r.test_mode === true,
+        });
       }
       return done;
     } catch {

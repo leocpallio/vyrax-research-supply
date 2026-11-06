@@ -171,10 +171,6 @@ function AnalyticsRouteListener() {
     return () => window.removeEventListener("vyrax-analytics-consent", onConsent);
   }, []);
   useEffect(() => {
-    if (consent !== "accepted") {
-      lastPath.current = null;
-      return;
-    }
     if (lastPath.current === path) return;
     lastPath.current = path;
     trackPage(path);

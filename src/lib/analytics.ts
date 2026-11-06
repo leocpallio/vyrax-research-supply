@@ -1,6 +1,8 @@
-// Consent-gated PostHog. Nothing (SDK, cookie, request) happens until the visitor presses "Allow
-// analytics"; "Decline" opts out, resets and drops the queue. The SDK is a dynamic import so it is
-// not even downloaded for visitors who decline.
+// Two-stage PostHog (Leo/chief decision, 6 Nov 2026).
+//   Before consent (and if declined): cookieless. persistence "memory", so no cookie and no
+//   localStorage; pageviews, $pageleave, autocapture and UTM are captured for every visitor. No replay.
+//   After "Allow analytics": persistence switches to "localStorage+cookie", the visitor is identified
+//   and session replay starts. Decline drops back to cookieless memory mode and stops replay.
 //
 // Public API (stable for other lanes):
 //   capture(name, props?)            fire an event (dropped before consent, queued while SDK loads)
@@ -78,7 +80,7 @@ export function setAnalyticsConsent(value: Exclude<AnalyticsConsent, null>) {
     return;
   }
   if (value === "declined") void shutdown();
-  else void ensureClient();
+  else void upgrade();
   window.dispatchEvent(new Event("vyrax-analytics-consent"));
 }
 
@@ -89,8 +91,7 @@ let queue: { event: string; properties: Record<string, unknown> }[] = [];
 const MAX_QUEUE = 50;
 
 async function ensureClient(): Promise<PostHog | null> {
-  if (typeof window === "undefined" || !analyticsConfigured || analyticsConsent() !== "accepted")
-    return null;
+  if (typeof window === "undefined" || !analyticsConfigured) return null;
   if (client) return client;
   if (loading) return loading;
   loading = (async () => {
@@ -100,16 +101,16 @@ async function ensureClient(): Promise<PostHog | null> {
         api_host: captureHost!,
         ui_host: "https://eu.posthog.com",
         person_profiles: "identified_only",
-        autocapture: false,
-        capture_pageview: false, // manual via trackPage()/router subscribe
-        capture_pageleave: false,
+        autocapture: true,
+        capture_pageview: false, // manual via trackPage()/router subscribe (sanitised paths)
+        capture_pageleave: true,
         capture_dead_clicks: false,
         capture_performance: false,
-        disable_session_recording: true,
+        disable_session_recording: analyticsConsent() !== "accepted",
         disable_surveys: true,
         disable_web_experiments: true,
         rageclick: false,
-        persistence: "localStorage", // no cookie, even after consent
+        persistence: analyticsConsent() === "accepted" ? "localStorage+cookie" : "memory",
         cross_subdomain_cookie: false,
         secure_cookie: true,
         ip: false,
@@ -128,6 +129,7 @@ async function ensureClient(): Promise<PostHog | null> {
           const ft = firstTouch();
           const once = firstTouchSetOnce(ft);
           if (Object.keys(once).length) ph.capture("$set", { $set_once: once });
+          if (analyticsConsent() === "accepted") identifyConsented(ph);
         },
       });
       client = posthog;
@@ -145,12 +147,36 @@ async function ensureClient(): Promise<PostHog | null> {
   return loading;
 }
 
-async function shutdown() {
-  queue = [];
-  const ph = client ?? (loading ? await loading : null);
-  client = null;
+function identifyConsented(
+  ph: Pick<PostHog, "set_config" | "startSessionRecording" | "identify" | "get_distinct_id">,
+) {
   try {
-    ph?.opt_out_capturing();
+    ph.set_config({ disable_session_recording: false });
+    ph.startSessionRecording();
+    ph.identify(ph.get_distinct_id());
+  } catch {
+    /* ignore */
+  }
+}
+
+// Consent given: move from memory-only to cookie + localStorage, identify, start replay.
+async function upgrade() {
+  const ph = await ensureClient();
+  if (!ph) return;
+  try {
+    ph.set_config({ persistence: "localStorage+cookie" });
+    identifyConsented(ph);
+  } catch {
+    /* ignore */
+  }
+}
+
+// Declined (or withdrawn): back to cookieless memory mode, replay off, stored identity cleared.
+async function shutdown() {
+  const ph = client ?? (loading ? await loading : null);
+  try {
+    ph?.stopSessionRecording();
+    ph?.set_config({ persistence: "memory", disable_session_recording: true });
     ph?.reset(true);
     sessionStorage.removeItem(firstTouchKey);
     sessionStorage.removeItem(attributionKey);
@@ -216,6 +242,9 @@ export type EventName =
   | "$pageview"
   | "$set"
   | "product_viewed"
+  | "view_product"
+  | "begin_checkout"
+  | "purchase"
   | "product_list_viewed"
   | "collection_viewed" // legacy alias still emitted alongside product_list_viewed
   | "shop_viewed" // legacy alias, kept for other lanes
@@ -233,8 +262,7 @@ export type SafeValue = string | number | boolean | null | undefined;
 export type SafeProperties = Record<string, SafeValue | SafeValue[] | Record<string, unknown>[]>;
 
 export function capture(event: EventName, properties: SafeProperties = {}) {
-  if (typeof window === "undefined" || !analyticsConfigured || analyticsConsent() !== "accepted")
-    return;
+  if (typeof window === "undefined" || !analyticsConfigured) return;
   const props: Record<string, unknown> = { ...properties };
   if (client) {
     client.capture(event, props);
@@ -340,14 +368,18 @@ export function trackPage(path: string) {
     trackList({ id: "shop", name: "All products", type: "shop" }, compounds);
   } else if (path === "/basket") capture("basket_viewed", basketValue());
   else if (path === "/checkout") {
-    if (site.checkoutOpen && readCart().length)
+    if (site.checkoutOpen && readCart().length) {
       capture("checkout_started", { checkout_type: "hosted_payment", ...basketValue() });
+      capture("begin_checkout", { ...basketValue() });
+    }
   } else if (product && !product.redirectTo) {
-    capture("product_viewed", {
+    const viewProps = {
       ...productProps(line(product.compound, product.strength.label, product.strength.price)),
       product_slug: product.compound.slug,
       is_hub: product.isHub,
-    });
+    };
+    capture("product_viewed", viewProps);
+    capture("view_product", viewProps);
   } else if (collectionSlug) {
     const section = shopSections.find((s) => s.slug === collectionSlug);
     if (section) {
@@ -394,3 +426,6 @@ export function trackBasketChange(before: CartItem[], after: CartItem[]) {
     });
   }
 }
+
+// Cookieless capture for every visitor from first load (memory persistence until consent).
+if (typeof window !== "undefined" && analyticsConfigured) void ensureClient();
