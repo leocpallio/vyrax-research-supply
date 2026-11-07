@@ -30,6 +30,10 @@ function Privacy() {
         <li>Account data if you register, such as your email address.</li>
         <li>Messages you send us, including your email address.</li>
         <li>
+          When you request a one-time product update: your email, chosen strength, request type and
+          consent time.
+        </li>
+        <li>
           When you opt in for the laboratory guide and updates: your email address and subscription
           choice, stored with our email provider Resend.
         </li>
@@ -53,6 +57,10 @@ function Privacy() {
           reminders about a saved basket, restock notices and occasional offers (consent). You can
           unsubscribe using a marketing email link or by contacting us.
         </li>
+        <li>
+          To email a product stock or batch-report update you specifically request (consent). This
+          does not subscribe you to marketing.
+        </li>
       </ul>
       <p>We do not send marketing email unless you ask us to.</p>
       <h2>Who we share it with</h2>
@@ -65,6 +73,10 @@ function Privacy() {
       <p>
         We have not set a fixed retention schedule yet. We keep order records for as long as tax and
         accounting law requires, and delete other data when we no longer need it.
+      </p>
+      <p>
+        One-time product requests are kept until the update is fulfilled or the request is withdrawn.
+        Contact us to withdraw before an update. We do not use these requests for marketing.
       </p>
       <h2>Your rights</h2>
       <p>

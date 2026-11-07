@@ -108,7 +108,9 @@ export const metabolicAndRegenerative: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "5mg", amount: 5, unit: "mg", price: 34.99 },
-      { label: "10mg", amount: 10, unit: "mg", price: 44.99 },
+      // No supplier cost for the 10mg size (never bought from LKB, no UKPL stock).
+      // Out of stock keeps the page honest and blocks checkout until a price exists.
+      { label: "10mg", amount: 10, unit: "mg", price: 44.99, stock: "out" },
     ],
     summary:
       "AOD-9604 is a modified 16-amino-acid fragment of the C-terminal region of human growth hormone, residues 177 to 191 with an added N-terminal tyrosine.",

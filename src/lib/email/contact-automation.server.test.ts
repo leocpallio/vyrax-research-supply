@@ -10,6 +10,7 @@ const UNSUB = "dddddddd-dddd-4ddd-dddd-dddddddddddd";
 const env = {
   RESEND_API_KEY: "mock",
   VYRAX_EMAIL_AUTOMATION_ENABLED: "true",
+  VYRAX_EMAIL_PROVIDER_APPROVED: "true",
   VYRAX_EMAIL_CRON_SECRET: "a sufficiently long unique secret",
 };
 const row = (over: Partial<ContactRow> = {}): ContactRow => ({
