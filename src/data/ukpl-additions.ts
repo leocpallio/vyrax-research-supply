@@ -96,7 +96,8 @@ export const ukplAdditions: Compound[] = [
     kind: "small-molecule",
     form: "Solution; 600mg/ml, 10ml",
     appearance: "Solution",
-    strengths: [{ label: "600mg/ml, 10ml", amount: 6000, unit: "mg", price: 29.99 }],
+    // Never bought from LKB; no supplier cost basis for the 10ml solution.
+    strengths: [{ label: "600mg/ml, 10ml", amount: 6000, unit: "mg", price: 29.99, stock: "out" }],
     summary:
       "L-Carnitine solution at 600mg/ml in a 10ml vial, 6,000mg total. Carries long-chain fatty acyl groups into mitochondria.",
     overview: [

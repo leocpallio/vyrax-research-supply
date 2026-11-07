@@ -10,6 +10,19 @@ undercut the only GLP-1 competitors on per-mg price at higher strengths, and hol
 competitor was observed. Rows marked "no benchmark" were priced by per-mg interpolation from the same
 compound or its closest analogue, and should be checked against supplier cost before launch.
 
+## Supplier cost basis (authoritative for margin maths)
+
+Competitor benchmarks above decide the selling price; this decides whether the selling price leaves a margin.
+Landed cost per vial for all 76 listed variants: `/srv/hermes/ops/ukpl/stock/vyrax_cost_basis.csv`
+(built 3 Nov 2026 from paid LKB lines, basket ties and the LKB book; FX £/$ 0.7469 stamped 2 Nov 2026).
+
+- `tier`: `T1` paid line price / `T1*` inferred from a basket residual / `T2` book price tied inside a paid basket / `T3` book price only, PROVISIONAL / `T4` no source, UNSELLABLE.
+- `cost_gbp_per_vial` is the per-vial basis. A blank value means there is no cost basis, so that strength must not be sold.
+- Deliberately provisional: RT10 is carried at the $90 book price and flagged `PENDING_AARON_SHEET` (the $115 implied by the LKB-19 residual is *not* adopted); IP5 is a $45/kit residual derivation with no book row.
+- Six strengths have no cost basis and are flagged `stock: "out"` in `src/data/` (AOD-9604 10mg, GHRP-6 10mg, Hexarelin 2mg, Sermorelin 2mg, Hulk Stack 20mg, L-Carnitine 600mg/ml 10ml). Re-list only after an LKB quote for that size.
+
+Analysis and method: `/srv/hermes/ops/ukpl/stock/2026-11-03-vyrax-actual-cogs.md`.
+
 | Compound | Strength | Vyrax | Per unit | Competitors seen | Min | Median | Max | Position |
 |---|---|---|---|---|---|---|---|---|
 | Retatrutide | 10mg | £59.99 | £6.00/mg | astralabs £59.99, peptideslabuk £98.99 | £59.99 | £79.49 | £98.99 | 25% below median |
