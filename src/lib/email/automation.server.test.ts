@@ -15,7 +15,7 @@ const env = {
 test("migration guards consent, suppression, frequency and subsequent purchase", () => {
   const sql = readFileSync(
     new URL(
-      "../../../supabase/migrations/20261006000000_email_outbox_automation.sql",
+      "../../../supabase/migrations/20261107000000_email_consent_lifecycle.sql",
       import.meta.url,
     ),
     "utf8",

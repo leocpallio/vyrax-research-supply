@@ -36,32 +36,31 @@ export const productForm = (c: Compound) =>
  * A second search term for the title. Aliases are the synonyms buyers actually type ("GLP-3",
  * "BPC 157", "afamelanotide"), so the first usable one is appended when it fits the SERP limit.
  */
+// "GLP-2" on tirzepatide is a catalogue alias but pharmacologically wrong (GIP/GLP-1 agonist), so it is
+// never promoted into a title.
+const TITLE_SYNONYM_SKIP = new Set(["GLP-2"]);
 const titleSynonym = (c: Compound) => {
-  const a = c.aliases.find((x) => /^[A-Za-z0-9][A-Za-z0-9 -]{2,}$/.test(x));
+  const a = c.aliases.find(
+    (x) => !TITLE_SYNONYM_SKIP.has(x) && /^[A-Za-z0-9][A-Za-z0-9 -]{2,}$/.test(x),
+  );
   return a ? a.trim() : "";
 };
 
 export const productTitle = (c: Compound, s: Strength) => {
   const base = `Buy ${c.name} ${s.label} UK`;
   const syn = titleSynonym(c);
-  // The use case ("Weight Loss Peptide") outranks a chemical synonym: it is the phrase people type.
-  // Only peptide and blend kinds take the "Peptide" suffix; NAD+ and glutathione are not peptides.
-  const isPeptide = c.kind === "peptide" || c.kind === "blend";
-  const useCase = c.useCases?.[0] ? `${c.useCases[0]}${isPeptide ? " Peptide" : ""}` : "";
-  const withUse = useCase ? `${base} | ${useCase} | ${site.name}` : "";
-  if (withUse && withUse.length <= 60) return withUse;
+  // Research-use catalogue: no use-case or condition term in the title (MHRA / ASA). A chemical
+  // synonym is the only second search term, appended when it fits the SERP limit.
   const withSyn = syn ? `${base} | ${syn} | ${site.name}` : "";
   if (withSyn && withSyn.length <= 60) return withSyn;
-  const full = `${base} | ${site.name}`;
-  return full.length <= 60 ? full : `${base} | ${site.name}`;
+  return `${base} | ${site.name}`;
 };
 
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
   const syn = c.aliases.slice(0, 2).join(", ");
-  // Two keywords in the lead sentence, then the summary. The first is the title keyword.
-  const use = c.useCases?.length ? ` for ${c.useCases.slice(0, 2).join(", ").toLowerCase()}` : "";
-  const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK${use}.`;
+  // Lead sentence names the compound, strength and form only: no use-case or condition term.
+  const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK.`;
   const room = 155 - ` ${DESC_TAIL}`.length;
   // Summary first so the sentence that survives truncation is the informative one; aliases only
   // pad the tail when there is room left over.
@@ -115,15 +114,10 @@ export function productFaqs(c: Compound, s: Strength): QA[] {
         : "Ordering runs through the basket."
     } Stock status is shown on this page and is not a delivery guarantee.`,
   ]);
-  if (c.useCases?.length)
-    list.push([
-      `What is ${c.name} used for?`,
-      `It is sold under ${c.useCases.join(", ").toLowerCase()}. ${
-        c.useCases[0] === "Weight Loss"
-          ? "The incretin and metabolic peptides are the ones people search for weight loss, and this page lists the vial sizes and the cost per mg so the options can be compared."
-          : `It sits in the ${(c.useCases[0] ?? "").toLowerCase()} group in our catalogue, alongside the other compounds listed under the same heading.`
-      }`,
-    ]);
+  list.push([
+    `How is ${c.name} listed?`,
+    `${c.name} is listed in our catalogue alongside the other compounds in the same category, linked from the breadcrumb above. This page lists the vial sizes and the cost per mg so the options can be compared. It is sold for research use only and is not a licensed medicine.`,
+  ]);
   if (c.compare) {
     const other = getCompound(c.compare.slug);
     if (other)
