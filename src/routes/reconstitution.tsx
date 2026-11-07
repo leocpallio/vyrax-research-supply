@@ -385,7 +385,19 @@ function ReconstitutionReference() {
           >
             storage guide
           </Link>
-          .
+          . Batch documents are on the{" "}
+          <Link to="/lab-reports" className="text-primary underline underline-offset-4">
+            lab reports
+          </Link>{" "}
+          page, and the{" "}
+          <Link
+            to="/guides/$slug"
+            params={{ slug: "how-to-read-a-certificate-of-analysis" }}
+            className="text-primary underline underline-offset-4"
+          >
+            guide to reading a certificate of analysis
+          </Link>{" "}
+          explains what each field means.
         </p>
       </div>
       <Disclaimer />
