@@ -19,7 +19,7 @@ const RUO =
 const COMMON_FAQS: QA[] = [
   [
     "Who can order these compounds?",
-    "Anyone aged 18 or over in the UK. Most buyers use them themselves. They are sold for research use only rather than as licensed medicines, so the label carries no dose. See the Research use policy for the full terms.",
+    "Anyone aged 18 or over in the UK. They are sold for research use only rather than as licensed medicines, so the label carries no dose. See the Research use policy for the full terms.",
   ],
   [
     "How are prices shown?",
