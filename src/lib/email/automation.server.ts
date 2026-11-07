@@ -170,6 +170,10 @@ export async function runEmailAutomation(
 ): Promise<Response> {
   const env = deps.env ?? process.env;
   if (!authorizeAutomation(request, env)) return json({ error: "Forbidden" }, 403);
+  // A configured API key is not approval for this product category or recipient stream.
+  // A transport adapter must be independently reviewed before any queue is claimed.
+  if (env["VYRAX_EMAIL_PROVIDER_APPROVED"] !== "true")
+    return json({ error: "Email provider not approved" }, 503);
   try {
     const db = deps.db ?? serviceDb(env);
     const send = deps.send ?? ((message: Message) => sendTransactional(message, { env }));

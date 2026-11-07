@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
   authorizeAutomation,
   emailAutomationGet,
@@ -8,8 +9,23 @@ import {
 
 const env = {
   VYRAX_EMAIL_AUTOMATION_ENABLED: "true",
+  VYRAX_EMAIL_PROVIDER_APPROVED: "true",
   VYRAX_EMAIL_CRON_SECRET: "a sufficiently long unique secret",
 };
+test("migration guards consent, suppression, frequency and subsequent purchase", () => {
+  const sql = readFileSync(
+    new URL(
+      "../../../supabase/migrations/20261006000000_email_outbox_automation.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  expect(sql).toContain("CREATE TABLE public.email_delivery_suppression");
+  expect(sql).toContain("pref.unsubscribed_at IS NULL");
+  expect(sql).toContain("j.sent_at > now() - interval '7 days'");
+  expect(sql).toContain("newer.created_at > (p_order).created_at");
+  expect(sql).toContain("j.attempts >= 8 OR j.created_at < now() - interval '48 hours'");
+});
 const req = (value?: string) =>
   new Request("https://vyraxlabs.co.uk/api/email-automation", {
     method: "POST",
@@ -42,6 +58,24 @@ test("unauthorized route never touches database or transport", async () => {
     },
   });
   expect(response.status).toBe(403);
+  expect(calls).toBe(0);
+});
+test("provider approval defaults closed before claiming any outbox rows", async () => {
+  let calls = 0;
+  const response = await runEmailAutomation(req(env.VYRAX_EMAIL_CRON_SECRET), {
+    env: { ...env, VYRAX_EMAIL_PROVIDER_APPROVED: undefined },
+    db: {
+      rpc: async () => {
+        calls++;
+        return { data: [], error: null };
+      },
+    },
+    send: async () => {
+      calls++;
+      return "id";
+    },
+  });
+  expect(response.status).toBe(503);
   expect(calls).toBe(0);
 });
 test("claimed work is finalized with a stable key and claim token", async () => {
