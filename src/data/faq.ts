@@ -15,7 +15,7 @@ export const faqGroups: FaqGroup[] = [
     items: [
       [
         "Who can order from Vyrax Labs?",
-        "Adults aged 18 or over. Most buyers use these themselves. They are sold as research compounds, not as licensed medicines, foods or cosmetics, and the label carries no dose. See the Research use policy.",
+        "Adults aged 18 or over. They are sold as research compounds, not as licensed medicines, foods or cosmetics, and the label carries no dose. See the Research use policy.",
       ],
       [
         "How do I pay?",

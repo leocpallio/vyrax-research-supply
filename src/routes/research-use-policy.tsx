@@ -32,8 +32,7 @@ function Policy() {
           the label and no marketing authorisation.
         </li>
         <li>
-          You can use them yourself. Most buyers do. What you get is the vial, the certificate for
-          its batch and the published literature, and you work the rest out from there.
+          What you get is the vial, the certificate for its batch and the published literature.
         </li>
         <li>
           Buyers must be 18 or over and handle products in line with sensible practice for
