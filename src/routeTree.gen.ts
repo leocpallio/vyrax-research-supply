@@ -36,6 +36,7 @@ import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
 import { Route as ApiCheckoutConsentRouteImport } from './routes/api.checkout-consent'
 import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
+import { Route as ApiNotifyMeRouteImport } from './routes/api.notify-me'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as ApiStockNoticeRouteImport } from './routes/api.stock-notice'
@@ -185,6 +186,11 @@ const ApiGuideSignupRoute = ApiGuideSignupRouteImport.update({
   path: '/api/guide-signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNotifyMeRoute = ApiNotifyMeRouteImport.update({
+  id: '/api/notify-me',
+  path: '/api/notify-me',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   id: '/api/order-status',
   path: '/api/order-status',
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
+  '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
@@ -408,6 +417,7 @@ export interface FileRouteTypes {
     | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/api/checkout-consent'
     | '/api/email-automation'
     | '/api/guide-signup'
+    | '/api/notify-me'
     | '/api/order-status'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
@@ -535,6 +547,7 @@ export interface RootRouteChildren {
   ApiCheckoutConsentRoute: typeof ApiCheckoutConsentRoute
   ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
+  ApiNotifyMeRoute: typeof ApiNotifyMeRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   ApiStockNoticeRoute: typeof ApiStockNoticeRoute
@@ -741,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGuideSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/notify-me': {
+      id: '/api/notify-me'
+      path: '/api/notify-me'
+      fullPath: '/api/notify-me'
+      preLoaderRoute: typeof ApiNotifyMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/order-status': {
       id: '/api/order-status'
       path: '/api/order-status'
@@ -863,6 +883,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCheckoutConsentRoute: ApiCheckoutConsentRoute,
   ApiEmailAutomationRoute: ApiEmailAutomationRoute,
   ApiGuideSignupRoute: ApiGuideSignupRoute,
+  ApiNotifyMeRoute: ApiNotifyMeRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   ApiStockNoticeRoute: ApiStockNoticeRoute,
