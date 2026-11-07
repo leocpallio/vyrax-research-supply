@@ -22,7 +22,7 @@ function Shipping() {
       <p>
         {site.checkoutOpen
           ? "We deliver to UK addresses by courier. You pay by card at checkout."
-          : "Card checkout is not open yet, so we cannot take orders. The delivery terms below are what will apply when it opens."}
+          : "Orders are not being taken yet. The delivery terms below are what will apply when checkout opens."}
       </p>
       <h2>Service and cost</h2>
       <div className="overflow-x-auto border border-border not-prose" data-testid="delivery-table">
