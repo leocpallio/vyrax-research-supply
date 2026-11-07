@@ -20,7 +20,7 @@ test("migration guards consent, suppression, frequency and subsequent purchase",
     ),
     "utf8",
   );
-  expect(sql).toContain("CREATE TABLE public.email_delivery_suppression");
+  expect(sql).toContain("CREATE TABLE IF NOT EXISTS public.email_delivery_suppression");
   expect(sql).toContain("pref.unsubscribed_at IS NULL");
   expect(sql).toContain("j.sent_at > now() - interval '7 days'");
   expect(sql).toContain("newer.created_at > (p_order).created_at");
