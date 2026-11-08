@@ -25,6 +25,9 @@ export CLOUDFLARE_API_TOKEN="$CF_DRATERCOOL_TOKEN"
 
 WORKER="dratercool-debug-vyrax-research-supply"
 
+# Checkout flag lives in a gitignored env file that clean worktrees lack; without it the build ships "Site not live yet".
+export VITE_SPICEPAY_CHECKOUT_ENABLED=true
+
 bun run build
 
 /srv/hermes/venv-ops/bin/python - "$WORKER" <<'PY'
