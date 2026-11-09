@@ -414,7 +414,15 @@ function CalculatorPage() {
                 >
                   reconstitution guide
                 </Link>{" "}
-                for handling steps.
+                for handling steps. Compound-by-compound figures are in the{" "}
+                <Link to="/reconstitution" className="text-primary underline">
+                  reconstitution reference
+                </Link>
+                , and batch documents are on the{" "}
+                <Link to="/lab-reports" className="text-primary underline">
+                  lab reports
+                </Link>{" "}
+                page.
               </p>
             </div>
           </section>

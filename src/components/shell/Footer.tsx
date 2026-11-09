@@ -284,6 +284,7 @@ export function Footer() {
               <Col title="Learn">
                 <L to="/guides">Guides</L>
                 <L to="/calculator">Reconstitution calculator</L>
+                <L to="/reconstitution">Reconstitution reference</L>
                 <L href={guidePath}>Preparation PDF</L>
                 <L to="/shipping">Shipping</L>
                 <L to="/returns">Returns</L>
