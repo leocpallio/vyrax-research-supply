@@ -98,7 +98,7 @@ async function ensureClient(): Promise<PostHog | null> {
     try {
       const { default: posthog } = await import("posthog-js");
       posthog.init(key!, {
-        api_host: captureHost!,
+        api_host: `${window.location.origin}/ingest`, // first-party proxy, src/routes/ingest.$.ts
         ui_host: "https://eu.posthog.com",
         person_profiles: "identified_only",
         autocapture: true,
