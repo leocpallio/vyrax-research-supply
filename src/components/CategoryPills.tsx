@@ -96,7 +96,7 @@ export function CategoryPills({
   return (
     <div
       data-testid="category-pills"
-      className="sticky top-[72px] z-30 -mx-5 px-5 bg-white/95 backdrop-blur border-b border-[#0B1B3B]/10"
+      className="sticky top-[72px] z-30 -mx-4 px-4 md:-mx-5 md:px-5 bg-white/95 backdrop-blur border-b border-[#0B1B3B]/10"
     >
       <div className="flex items-center gap-3 py-2.5">
         <nav
