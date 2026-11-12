@@ -90,24 +90,7 @@ let loading: Promise<PostHog | null> | null = null;
 let queue: { event: string; properties: Record<string, unknown> }[] = [];
 const MAX_QUEUE = 50;
 
-// Google Tag Manager (container requested by the ad agency). Consent-gated like PostHog: the script
-// is injected only after "Allow analytics"; nothing loads for declined or undecided visitors.
-const GTM_ID = "GTM-WV7THGRS";
-function loadGtm() {
-  if (typeof window === "undefined" || analyticsConsent() !== "accepted") return;
-  if (document.querySelector(`script[data-gtm="${GTM_ID}"]`)) return;
-  const w = window as unknown as { dataLayer?: unknown[] };
-  w.dataLayer = w.dataLayer || [];
-  w.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
-  const el = document.createElement("script");
-  el.async = true;
-  el.dataset["gtm"] = GTM_ID;
-  el.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`;
-  document.head.appendChild(el);
-}
-
 async function ensureClient(): Promise<PostHog | null> {
-  loadGtm();
   if (typeof window === "undefined" || !analyticsConfigured) return null;
   if (client) return client;
   if (loading) return loading;
