@@ -143,7 +143,7 @@ export const titles = {
   // The testing modifier comes from the claims registry: "Lab-Tested" until certificates exist.
   // Both of these are held under the 60-character SERP limit: the brand tail drops to "Vyrax" on the
   // home title rather than cutting the use-case phrase, which is the part buyers scan.
-  home: () => `Buy Peptides UK | Weight Loss, Recovery & Growth | Vyrax`,
+  home: () => `Buy Peptides UK | Weight Loss, Recovery and Growth | Vyrax`,
   /** "Lab-Tested" only when claim-gated evidence exists, otherwise empty string. */
   testingModifier: () =>
     isClaimAllowed("testing.page-title") ? claimGate("testing.page-title") : "",
