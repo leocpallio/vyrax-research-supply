@@ -125,6 +125,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     // Site-wide entity graph. Routes add their own BreadcrumbList / FAQPage / Product etc.
     scripts: [
+      // Google Tag Manager for the ad agency: loads for every visitor (Leo's call, 12 Nov).
+      { src: "https://www.googletagmanager.com/gtm.js?id=GTM-WV7THGRS", async: true },
+      {
+        children:
+          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());",
+      },
       { type: "application/ld+json", children: serializeJsonLd(organizationJsonLd()) },
       { type: "application/ld+json", children: serializeJsonLd(webSiteJsonLd()) },
     ],
