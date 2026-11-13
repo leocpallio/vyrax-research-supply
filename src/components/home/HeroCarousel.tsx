@@ -37,6 +37,9 @@ const slides = (
 
 const INTERVAL = 6000;
 
+// Slide 1 URLs for the route-level <link rel=preload> (LCP image); other slides stay lazy.
+export const heroPreload = { src: slides[0]?.src, msrc: slides[0]?.msrc };
+
 export function HeroCarousel({
   eyebrow,
   lead,

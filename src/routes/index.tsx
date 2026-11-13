@@ -32,12 +32,14 @@ import { shopSections, productsInSection } from "@/data/shop-sections";
 // Imagery: fal nano-banana-pro edits of the real Blender vial renders (src/assets/products) as references,
 // every label read by eye against the catalogue (p3/gen.py, p3/verify_*.jpg).
 
+import { heroPreload } from "@/components/home/HeroCarousel";
+
 export const Route = createFileRoute("/")({
   head: () => {
     const modifier = isClaimAllowed("testing.page-title")
       ? `${claimGate("testing.page-title")} `
       : "";
-    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss, Recovery and Growth | Vyrax Labs`;
+    const title = `${site.checkoutOpen ? "Buy" : "Browse"} Peptides UK | Weight Loss and Recovery | Vyrax Labs`;
     const batchTesting = claimText("testing.hplc-ms-batch-testing");
     const desc = clampDescription(
       `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
@@ -77,6 +79,28 @@ export const Route = createFileRoute("/")({
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [
+        ...(heroPreload.src
+          ? [
+              {
+                rel: "preload",
+                as: "image",
+                href: heroPreload.msrc ?? heroPreload.src,
+                media: heroPreload.msrc ? "(max-width: 1023px)" : undefined,
+                fetchPriority: "high",
+              },
+              ...(heroPreload.msrc
+                ? [
+                    {
+                      rel: "preload",
+                      as: "image",
+                      href: heroPreload.src,
+                      media: "(min-width: 1024px)",
+                      fetchPriority: "high",
+                    },
+                  ]
+                : []),
+            ]
+          : []),
         { rel: "canonical", href: abs("/") },
         { rel: "alternate", hrefLang: "en-GB", href: abs("/") },
         { rel: "alternate", hrefLang: "x-default", href: abs("/") },

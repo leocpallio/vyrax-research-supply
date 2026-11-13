@@ -698,8 +698,8 @@ export function FeaturedBlock({
           </Link>
         </div>
         <div data-testid="product-grid" className="grid grid-cols-2 gap-3 md:gap-5">
-          {products.map((p, i) => (
-            <HomeProductCard key={p.slug} product={p} priority={i < 2} />
+          {products.map((p) => (
+            <HomeProductCard key={p.slug} product={p} />
           ))}
         </div>
       </div>

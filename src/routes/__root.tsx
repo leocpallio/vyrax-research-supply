@@ -126,10 +126,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Site-wide entity graph. Routes add their own BreadcrumbList / FAQPage / Product etc.
     scripts: [
       // Google Tag Manager for the ad agency: loads for every visitor (Leo's call, 12 Nov).
-      { src: "https://www.googletagmanager.com/gtm.js?id=GTM-WV7THGRS", async: true },
+      // Deferred: dataLayer is ready immediately, gtm.js loads after window load + idle so it never competes with the LCP image.
       {
         children:
-          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());",
+          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){var l=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id=GTM-WV7THGRS';document.head.appendChild(s)};var i=function(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:3000}):setTimeout(l,1500)};document.readyState==='complete'?i():window.addEventListener('load',i)})();",
       },
       { type: "application/ld+json", children: serializeJsonLd(organizationJsonLd()) },
       { type: "application/ld+json", children: serializeJsonLd(webSiteJsonLd()) },
