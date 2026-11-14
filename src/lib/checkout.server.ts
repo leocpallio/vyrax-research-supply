@@ -3,13 +3,14 @@ import { quoteCheckout } from "./checkout-pricing";
 import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { sendSaleAlert } from "./email/admin-alert.server";
-import { validatePaymentEvent, verifySignature } from "./spicepay";
+import { validatePaymentEvent, verifySignature, type PaymentOrder } from "./spicepay";
+import type { OrderRow } from "./email/order-email.server";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
-import { checkFirstOrderCode } from "./first-order-gate";
-import { insertOrderWithAttributionFallback } from "./order-insert";
-import { cleanAttribution } from "./analytics-events";
+import { checkFirstOrderCode, emailIlikePattern } from "./first-order-gate";
+import { insertOrderWithAttributionFallback, selectOrderWithPhFallback } from "./order-insert";
+import { cleanAttribution, cleanPhIds } from "./analytics-events";
 import { capturePaymentConfirmed } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
@@ -135,6 +136,7 @@ export async function createCheckout(request: Request): Promise<Response> {
     if (quote.belowMinimum)
       return fail(`Minimum order is £${Math.round(quote.minimumPence / 100)}`, 400);
     const attr = cleanAttribution(body["attribution"]);
+    const ph = cleanPhIds(body);
     const store = db(c.url, c.key);
     const token = crypto.randomUUID();
     const { data: order, error: insertError } = await insertOrderWithAttributionFallback<{
@@ -166,6 +168,8 @@ export async function createCheckout(request: Request): Promise<Response> {
       fbclid: attr.fbclid ?? null,
       ttclid: attr.ttclid ?? null,
       landing_path: attr.landing_path ?? null,
+      ph_distinct_id: ph.ph_distinct_id ?? null,
+      ph_session_id: ph.ph_session_id ?? null,
     });
     if (insertError || !order) throw new Error("Order insert failed");
     const basePayment = {
@@ -273,6 +277,15 @@ export async function orderStatus(request: Request): Promise<Response> {
   }
 }
 
+type WebhookOrder = PaymentOrder &
+  OrderRow & {
+    id: string;
+    email: string;
+    test_mode?: boolean | null;
+    ph_distinct_id?: string | null;
+    ph_session_id?: string | null;
+  };
+
 export async function spicepayWebhook(request: Request): Promise<Response> {
   if (request.method !== "POST") return fail("Method not allowed", 405);
   try {
@@ -299,13 +312,11 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     )
       return fail("Payment mismatch", 409);
     const store = db(c.url, c.key);
-    const { data: order, error } = await store
-      .from("orders")
-      .select(
-        "id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,ttclid,landing_path",
-      )
-      .eq("payment_id", paymentId)
-      .maybeSingle();
+    const { data: order, error } = await selectOrderWithPhFallback<WebhookOrder>(
+      (columns) =>
+        store.from("orders").select(columns).eq("payment_id", paymentId).maybeSingle() as never,
+      "id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,ttclid,landing_path,ph_distinct_id,ph_session_id",
+    );
     if (error) throw error;
     if (!order) return fail("Unknown payment", 503); // Binding may still be in flight: request delivery retry.
     let decision: "paid" | "ignored";
@@ -349,7 +360,28 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     if (applied === "paid") {
       // Aggregate order event. Fires only on the DB paid transition (exactly once per order, retries
       // return 'duplicate'). Never blocks or fails the webhook.
-      await capturePaymentConfirmed(order as never);
+      let isFirstOrder: boolean | null = null;
+      try {
+        const prior = await store
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .ilike("email", emailIlikePattern(String(order.email ?? "")))
+          .eq("status", "paid")
+          .neq("id", order.id);
+        if (!prior.error && typeof prior.count === "number") isFirstOrder = prior.count === 0;
+      } catch {
+        /* analytics only: leave the property out */
+      }
+      const stamp = [event["created_at"], event["timestamp"], event["created"]]
+        .map((v) =>
+          typeof v === "number"
+            ? new Date(v < 1e12 ? v * 1000 : v)
+            : typeof v === "string"
+              ? new Date(v)
+              : null,
+        )
+        .find((d) => d && !Number.isNaN(d.getTime()));
+      await capturePaymentConfirmed(order as never, { paidAt: stamp ?? new Date(), isFirstOrder });
       // Owner alert first: the sale must never depend on the outbox drain.
       await sendSaleAlert(order as never, String(event["event_id"]));
       // Drain inline. There is no reliable cron on this worker, and a paid receipt that sits queued

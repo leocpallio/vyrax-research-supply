@@ -7,7 +7,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { findPromo } from "@/data/promos";
-import { capture, orderAttribution, trackCheckoutStep } from "@/lib/analytics";
+import { capture, orderAttribution, phIds, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
@@ -180,6 +180,7 @@ export function PaymentCheckout() {
           researchAgreement: agree,
           code: promoCode,
           attribution: orderAttribution(),
+          ...phIds(),
           items: items.map(({ slug, strength, quantity }) => ({ slug, strength, quantity })),
         }),
       });
@@ -207,9 +208,10 @@ export function PaymentCheckout() {
       )
         throw new Error("Checkout unavailable");
       sessionStorage.setItem(`vyrax-order-${data.order_id}`, data.guest_token);
-      capture("hosted_payment_opened", {
+      capture("payment_initiated", {
         test_mode: data.test_mode === true,
         order_id: data.order_id,
+        method: "card",
         value: quote.total,
         currency: "GBP",
         item_count: items.reduce((n, i) => n + i.quantity, 0),

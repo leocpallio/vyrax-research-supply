@@ -50,13 +50,13 @@ export function ecommerceItem(line: LineLike): EcommerceItem {
   return item;
 }
 
-/** Flat props for single-product events (product_viewed, add_to_cart, basket_removed). */
+/** Flat props for single-product events (viewed_product, added_to_cart, removed_from_cart). */
 export function productProps(line: LineLike): EcommerceItem & { value: number } {
   const item = ecommerceItem(line);
   return { ...item, value: round2(item.price * item.quantity) };
 }
 
-/** Flat props for multi-line events (basket_viewed, checkout_*, payment_*). */
+/** Flat props for multi-line events (cart_viewed, began_checkout, payment_*). */
 export function itemsProps(lines: LineLike[]): ItemsPayload {
   const items = lines.map(ecommerceItem);
   return {
@@ -69,27 +69,37 @@ export function itemsProps(lines: LineLike[]): ItemsPayload {
 
 export type ListProps = {
   list_id: string;
-  list_name: string;
-  listing_type: "shop" | "category" | "collection" | "search" | "featured";
+  list_type: "shop" | "category" | "collection" | "search" | "featured";
   item_count: number;
-  items: EcommerceItem[];
-  currency: typeof CURRENCY;
+  out_of_stock_count: number;
 };
 
-/** product_list_viewed: only the first `limit` items are serialised to keep the payload small. */
+/** viewed_product_list: counts only, no item array. */
 export function listProps(
-  list: { id: string; name: string; type: ListProps["listing_type"] },
-  lines: LineLike[],
-  limit = 24,
+  list: { id: string; type: ListProps["list_type"] },
+  count: number,
+  outOfStockCount = 0,
 ): ListProps {
   return {
     list_id: list.id,
-    list_name: list.name,
-    listing_type: list.type,
-    item_count: lines.length,
-    items: lines.slice(0, limit).map(ecommerceItem),
-    currency: CURRENCY,
+    list_type: list.type,
+    item_count: count,
+    out_of_stock_count: outOfStockCount,
   };
+}
+
+/** Browser PostHog ids sent with the checkout request so the server purchase joins the visit. */
+export type PhIds = { ph_distinct_id?: string; ph_session_id?: string };
+const PH_ID = /^[\w.:@|-]{1,80}$/;
+export function cleanPhIds(raw: unknown): PhIds {
+  const out: PhIds = {};
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  const r = raw as Record<string, unknown>;
+  for (const k of ["ph_distinct_id", "ph_session_id"] as const) {
+    const v = r[k];
+    if (typeof v === "string" && PH_ID.test(v.trim())) out[k] = v.trim();
+  }
+  return out;
 }
 
 export const UTM_KEYS = [

@@ -57,16 +57,10 @@ function PaymentReturn() {
       if (view === "paid" && !confirmed.current) {
         confirmed.current = true; // one purchase event per order, even if the poll repeats
         const pence = typeof r.total_pence === "number" ? r.total_pence : null;
-        capture("payment_confirmed", {
-          test_mode: r.test_mode === true,
+        // Browser page-view event only. `payment_confirmed` is the server's name (webhook).
+        capture("order_confirmation_viewed", {
           order_id: order,
-          ...(pence !== null ? { value: pence / 100, revenue: pence / 100 } : {}),
-          currency: (r.currency ?? "GBP").toUpperCase(),
-          payment_type: "hosted_payment",
-        });
-        capture("purchase", {
-          order_id: order,
-          ...(pence !== null ? { value: pence / 100, revenue: pence / 100 } : {}),
+          ...(pence !== null ? { value: pence / 100 } : {}),
           currency: (r.currency ?? "GBP").toUpperCase(),
           test_mode: r.test_mode === true,
         });

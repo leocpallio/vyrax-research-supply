@@ -46,7 +46,7 @@ export function SearchDialog({
     return () => window.removeEventListener("keydown", on);
   }, [onOpenChange]);
   const report = () => {
-    if (typed) capture("search", { source: "header", result_count: matches.length });
+    if (typed) capture("search_performed", { source: "header", results: matches.length });
   };
   const go = (c?: Compound) => {
     report();
