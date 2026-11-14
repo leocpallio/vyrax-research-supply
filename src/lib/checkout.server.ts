@@ -3,12 +3,13 @@ import { quoteCheckout } from "./checkout-pricing";
 import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { sendSaleAlert } from "./email/admin-alert.server";
-import { validatePaymentEvent, verifySignature } from "./spicepay";
+import { validatePaymentEvent, verifySignature, type PaymentOrder } from "./spicepay";
+import type { OrderRow } from "./email/order-email.server";
 import { spicepayCardUrl, spicepayOrderFields } from "./spicepay-order";
 import { orderRef } from "./checkout-form";
 import { site } from "../data/site";
 import { checkFirstOrderCode, emailIlikePattern } from "./first-order-gate";
-import { insertOrderWithAttributionFallback } from "./order-insert";
+import { insertOrderWithAttributionFallback, selectOrderWithPhFallback } from "./order-insert";
 import { cleanAttribution, cleanPhIds } from "./analytics-events";
 import { capturePaymentConfirmed } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
@@ -276,6 +277,15 @@ export async function orderStatus(request: Request): Promise<Response> {
   }
 }
 
+type WebhookOrder = PaymentOrder &
+  OrderRow & {
+    id: string;
+    email: string;
+    test_mode?: boolean | null;
+    ph_distinct_id?: string | null;
+    ph_session_id?: string | null;
+  };
+
 export async function spicepayWebhook(request: Request): Promise<Response> {
   if (request.method !== "POST") return fail("Method not allowed", 405);
   try {
@@ -302,13 +312,11 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     )
       return fail("Payment mismatch", 409);
     const store = db(c.url, c.key);
-    const { data: order, error } = await store
-      .from("orders")
-      .select(
-        "id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,ttclid,landing_path,ph_distinct_id,ph_session_id",
-      )
-      .eq("payment_id", paymentId)
-      .maybeSingle();
+    const { data: order, error } = await selectOrderWithPhFallback<WebhookOrder>(
+      (columns) =>
+        store.from("orders").select(columns).eq("payment_id", paymentId).maybeSingle() as never,
+      "id,name,email,items,payment_id,merchant_id,total_pence,currency,test_mode,utm_source,utm_medium,utm_campaign,utm_term,utm_content,gclid,fbclid,ttclid,landing_path,ph_distinct_id,ph_session_id",
+    );
     if (error) throw error;
     if (!order) return fail("Unknown payment", 503); // Binding may still be in flight: request delivery retry.
     let decision: "paid" | "ignored";
