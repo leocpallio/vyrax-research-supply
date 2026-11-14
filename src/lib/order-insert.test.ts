@@ -1,5 +1,9 @@
 import { test, expect } from "bun:test";
-import { insertOrderWithAttributionFallback, ATTRIBUTION_COLUMNS } from "./order-insert";
+import {
+  insertOrderWithAttributionFallback,
+  ATTRIBUTION_COLUMNS,
+  PH_COLUMNS,
+} from "./order-insert";
 
 const row: Record<string, unknown> = { name: "A", email: "a@b.co", total_pence: 100 };
 for (const k of ATTRIBUTION_COLUMNS) row[k] = "x";
@@ -35,4 +39,20 @@ test("does not retry on success or unrelated errors", async () => {
   );
   expect(n).toBe(1);
   expect(r.error?.code).toBe("23505");
+});
+
+test("ph id columns are dropped on the missing-column retry too", async () => {
+  const seen: Record<string, unknown>[] = [];
+  const withPh = { ...row, ph_distinct_id: "d", ph_session_id: "s" };
+  await insertOrderWithAttributionFallback(async (r) => {
+    seen.push(r);
+    return seen.length === 1
+      ? { data: null, error: { code: "42703" } }
+      : { data: { id: "o1" }, error: null };
+  }, withPh);
+  expect(seen.length).toBe(2);
+  for (const k of PH_COLUMNS) {
+    expect(k in seen[0]!).toBe(true);
+    expect(k in seen[1]!).toBe(false);
+  }
 });

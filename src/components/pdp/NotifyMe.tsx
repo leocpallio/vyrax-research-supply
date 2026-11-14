@@ -35,8 +35,9 @@ export function NotifyMe({ strength, outOfStock, reportPending }: Props) {
       if (!response.ok) throw new Error(result.message || "Please try again later.");
       setState("saved");
       setFeedback("Request received. We will only email if this update becomes available.");
-      capture("notify_me_submitted", {
-        product_slug: "tirzepatide",
+      capture("back_in_stock_requested", {
+        product_id: `tirzepatide|${strength}`,
+        slug: "tirzepatide",
         strength,
         notification_type: reason,
       });

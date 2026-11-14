@@ -7,8 +7,8 @@
 // Public API (stable for other lanes):
 //   capture(name, props?)            fire an event (dropped before consent, queued while SDK loads)
 //   trackPage(path)                  manual $pageview + view events for approved paths
-//   trackBasketChange(before, after) add_to_cart / basket_removed per changed SKU
-//   trackList(list, compounds)       product_list_viewed
+//   trackBasketChange(before, after) added_to_cart / removed_from_cart per changed SKU
+//   trackList(list, compounds)       viewed_product_list
 //   trackCheckoutStep("address"|"payment", items)
 //   onFeatureFlags(cb) / featureFlag(key) / featureFlagPayload(key)
 //   productProps / itemsProps / listProps  (from ./analytics-events) for custom payloads
@@ -19,6 +19,7 @@ import {
   getCompound,
   readCart,
   resolveProductSlug,
+  stockOf,
   type CartItem,
   type Compound,
 } from "./catalog";
@@ -128,7 +129,11 @@ async function ensureClient(): Promise<PostHog | null> {
         loaded: (ph) => {
           const ft = firstTouch();
           const once = firstTouchSetOnce(ft);
-          if (Object.keys(once).length) ph.capture("$set", { $set_once: once });
+          // Once per tab, not once per page load.
+          if (Object.keys(once).length && !firstTouchSent()) {
+            ph.capture("$set", { $set_once: once });
+            markFirstTouchSent();
+          }
           if (analyticsConsent() === "accepted") identifyConsented(ph);
         },
       });
@@ -186,6 +191,36 @@ async function shutdown() {
   }
 }
 
+const firstTouchSentKey = "vyrax-first-touch-sent";
+function firstTouchSent(): boolean {
+  try {
+    return sessionStorage.getItem(firstTouchSentKey) === "1";
+  } catch {
+    return false;
+  }
+}
+function markFirstTouchSent() {
+  try {
+    sessionStorage.setItem(firstTouchSentKey, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Browser PostHog ids for the checkout request (server purchase join). Empty until the SDK is up. */
+export function phIds(): { ph_distinct_id?: string; ph_session_id?: string } {
+  const out: { ph_distinct_id?: string; ph_session_id?: string } = {};
+  try {
+    const d = client?.get_distinct_id();
+    const s = client?.get_session_id();
+    if (d) out.ph_distinct_id = String(d).slice(0, 80);
+    if (s) out.ph_session_id = String(s).slice(0, 80);
+  } catch {
+    /* ignore */
+  }
+  return out;
+}
+
 /** First-touch UTM: read from the URL once per tab session, stored in sessionStorage only. */
 export function firstTouch(): FirstTouch {
   if (typeof window === "undefined") return {};
@@ -241,22 +276,17 @@ if (typeof window !== "undefined") orderAttribution();
 export type EventName =
   | "$pageview"
   | "$set"
-  | "product_viewed"
-  | "view_product"
-  | "begin_checkout"
-  | "purchase"
-  | "product_list_viewed"
-  | "collection_viewed" // legacy alias still emitted alongside product_list_viewed
-  | "shop_viewed" // legacy alias, kept for other lanes
-  | "search"
-  | "add_to_cart"
-  | "basket_removed"
-  | "basket_viewed"
-  | "checkout_started"
+  | "viewed_product"
+  | "viewed_product_list"
+  | "added_to_cart"
+  | "removed_from_cart"
+  | "cart_viewed"
+  | "began_checkout"
+  | "search_performed"
   | "checkout_step"
-  | "hosted_payment_opened"
-  | "payment_confirmed"
-  | "notify_me_submitted"
+  | "payment_initiated"
+  | "order_confirmation_viewed"
+  | "back_in_stock_requested"
   | "page_error";
 
 export type SafeValue = string | number | boolean | null | undefined;
@@ -300,17 +330,13 @@ const cartLines = (items: CartItem[]): LineLike[] =>
 
 const basketValue = () => itemsProps(cartLines(readCart()));
 
-export function trackList(
-  list: { id: string; name: string; type: ListProps["listing_type"] },
-  items: Compound[],
-) {
-  capture(
-    "product_list_viewed",
-    listProps(
-      list,
-      items.map((c) => line(c, c.strengths[0]?.label ?? "", c.strengths[0]?.price ?? 0)),
-    ),
-  );
+// A product is out of stock on a listing when every strength is out or pre-order.
+const compoundOut = (c: Compound) =>
+  c.strengths.length > 0 &&
+  c.strengths.every((s) => stockOf(s) === "out" || stockOf(s) === "preorder");
+
+export function trackList(list: { id: string; type: ListProps["list_type"] }, items: Compound[]) {
+  capture("viewed_product_list", listProps(list, items.length, items.filter(compoundOut).length));
 }
 
 export function trackCheckoutStep(step: "address" | "payment", items: CartItem[] = readCart()) {
@@ -365,37 +391,34 @@ export function trackPage(path: string) {
     $pathname: safePath,
   });
   if (path === "/shop") {
-    capture("shop_viewed");
-    trackList({ id: "shop", name: "All products", type: "shop" }, compounds);
-  } else if (path === "/basket") capture("basket_viewed", basketValue());
+    trackList({ id: "shop", type: "shop" }, compounds);
+  } else if (path === "/basket") capture("cart_viewed", { ...basketValue(), surface: "page" });
   else if (path === "/checkout") {
     if (site.checkoutOpen && readCart().length) {
-      capture("checkout_started", { checkout_type: "hosted_payment", ...basketValue() });
-      capture("begin_checkout", { ...basketValue() });
+      const { item_count, value, currency } = basketValue();
+      capture("began_checkout", { item_count, value, currency });
     }
   } else if (product && !product.redirectTo) {
     const viewProps = {
       ...productProps(line(product.compound, product.strength.label, product.strength.price)),
-      product_slug: product.compound.slug,
+      slug: product.compound.slug,
+      in_stock: stockOf(product.strength) !== "out" && stockOf(product.strength) !== "preorder",
       is_hub: product.isHub,
     };
-    capture("product_viewed", viewProps);
-    capture("view_product", viewProps);
+    capture("viewed_product", viewProps);
   } else if (collectionSlug) {
     const section = shopSections.find((s) => s.slug === collectionSlug);
     if (section) {
-      capture("collection_viewed", { collection_slug: collectionSlug, listing_type: "collection" });
       trackList(
-        { id: `collection:${section.slug}`, name: section.name, type: "collection" },
+        { id: `collection:${section.slug}`, type: "collection" },
         section.products.map(getCompound).filter((c): c is Compound => Boolean(c)),
       );
     }
   } else if (categorySlug) {
     const category = categories.find((c) => c.slug === categorySlug);
     if (category) {
-      capture("collection_viewed", { collection_slug: categorySlug, listing_type: "category" });
       trackList(
-        { id: `category:${category.slug}`, name: category.name, type: "category" },
+        { id: `category:${category.slug}`, type: "category" },
         compounds.filter((c) => c.category === category.slug),
       );
     }
@@ -419,9 +442,9 @@ export function trackBasketChange(before: CartItem[], after: CartItem[]) {
       after.find((i) => i.slug === item.slug && i.strength === item.strength)?.quantity ?? 0;
     const difference = newQuantity - oldQuantity;
     if (!difference) continue;
-    capture(difference > 0 ? "add_to_cart" : "basket_removed", {
+    capture(difference > 0 ? "added_to_cart" : "removed_from_cart", {
       ...productProps(line(compound, item.strength, item.price, Math.abs(difference))),
-      product_slug: item.slug,
+      slug: item.slug,
       basket_quantity: newQuantity,
       basket_value: itemsProps(cartLines(after)).value,
     });

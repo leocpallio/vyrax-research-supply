@@ -52,12 +52,15 @@ describe("ecommerce payloads", () => {
     expect(p.items).toHaveLength(2);
     expect(itemsProps([])).toEqual({ items: [], item_count: 0, value: 0, currency: "GBP" });
   });
-  test("listProps caps items but keeps full count", () => {
-    const many = Array.from({ length: 40 }, (_, i) => ({ ...bpc, slug: `p${i}` }));
-    const p = listProps({ id: "shop", name: "All", type: "shop" }, many);
-    expect(p.item_count).toBe(40);
-    expect(p.items).toHaveLength(24);
-    expect(p.listing_type).toBe("shop");
+  test("listProps carries counts only, no item array", () => {
+    const p = listProps({ id: "shop", type: "shop" }, 40, 3);
+    expect(p).toEqual({
+      list_id: "shop",
+      list_type: "shop",
+      item_count: 40,
+      out_of_stock_count: 3,
+    });
+    expect("items" in p).toBe(false);
   });
 });
 

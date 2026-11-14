@@ -205,7 +205,16 @@ export function CartDrawer({
   const [announce, setAnnounce] = useState("");
   const count = cartCount(items);
   useEffect(() => {
-    if (open) capture("basket_viewed", { item_count: cartCount(readCart()), source: "drawer" });
+    if (open) {
+      const lines = readCart();
+      const value = Math.round(lines.reduce((n, i) => n + i.price * i.quantity, 0) * 100) / 100;
+      capture("cart_viewed", {
+        item_count: cartCount(lines),
+        value,
+        currency: "GBP",
+        surface: "drawer",
+      });
+    }
   }, [open]);
   useEffect(() => {
     setAnnounce(count ? `Basket: ${count} item${count === 1 ? "" : "s"}` : "Basket is empty");

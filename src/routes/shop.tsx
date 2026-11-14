@@ -9,7 +9,7 @@ import { shopSeo } from "@/data/category-content";
 import { abs, site } from "@/data/site";
 import { clampDescription, ogImageFor } from "@/lib/seo";
 import { claimGate, claimText, isClaimAllowed } from "@/lib/claims";
-import { capture } from "@/lib/analytics";
+import { capture, trackList } from "@/lib/analytics";
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (s: Record<string, unknown>): { q?: string; cat?: string } => ({
@@ -60,7 +60,9 @@ function Shop() {
   const cat =
     search.cat && shopSections.some((s) => s.slug === search.cat) ? search.cat : undefined;
   useEffect(() => {
-    if (cat) capture("collection_viewed", { collection_slug: cat, listing_type: "shop_filter" });
+    if (!cat) return;
+    const inCat = compounds.filter((p) => sectionFor(p)?.slug === cat);
+    trackList({ id: `collection:${cat}`, type: "collection" }, inCat);
   }, [cat]);
   const list = useMemo(() => {
     const query = text.trim();
@@ -77,7 +79,7 @@ function Shop() {
     const timer = setTimeout(() => {
       if (lastSearch.current === text.trim()) return;
       lastSearch.current = text.trim();
-      capture("search", { source: "shop", result_count: list.length });
+      capture("search_performed", { source: "shop", results: list.length });
     }, 600);
     return () => clearTimeout(timer);
   }, [text, search.q, list.length]);

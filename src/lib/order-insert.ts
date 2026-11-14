@@ -10,6 +10,9 @@ export const ATTRIBUTION_COLUMNS = [
   "landing_path",
 ] as const;
 
+/** Browser PostHog ids stored on the order so the server purchase joins the visit. */
+export const PH_COLUMNS = ["ph_distinct_id", "ph_session_id"] as const;
+
 type InsertResult<T> = { data: T | null; error: { code?: string; message?: string } | null };
 
 const isMissingColumn = (e: { code?: string } | null) =>
@@ -30,6 +33,6 @@ export async function insertOrderWithAttributionFallback<T>(
     first.error?.code,
   );
   const bare = { ...row };
-  for (const k of ATTRIBUTION_COLUMNS) delete bare[k];
+  for (const k of [...ATTRIBUTION_COLUMNS, ...PH_COLUMNS]) delete bare[k];
   return insert(bare);
 }
