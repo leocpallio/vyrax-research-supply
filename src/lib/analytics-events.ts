@@ -123,7 +123,7 @@ export function readUtm(url: string): FirstTouch {
   }
   for (const k of UTM_KEYS) {
     const v = u.searchParams.get(k)?.trim().slice(0, 100);
-    if (v) out[k] = v;
+    if (v && !isUnrenderedMacro(v)) out[k] = v;
   }
   if (Object.keys(out).length) out.landing_path = u.pathname;
   return out;
@@ -148,6 +148,8 @@ export function sanitizeProperties<T extends Record<string, unknown>>(props: T):
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(props)) {
     if (REFERRER_KEYS.has(k)) continue;
+    // PostHog reads utm_* from the URL itself; drop an unrendered ad macro such as {{campaign.name}}.
+    if (/(^|_)utm_/.test(k) && typeof v === "string" && isUnrenderedMacro(v)) continue;
     if ((k === "$current_url" || k === "$initial_current_url") && typeof v === "string") {
       out[k] = stripQuery(v);
       continue;
@@ -174,7 +176,19 @@ export type Attribution = Partial<
 const ATTR_KEYS = [...UTM_KEYS, ...CLICK_ID_KEYS, "landing_path"] as const;
 const SAFE_ATTR = /^[\w .:/+~%@-]{1,200}$/;
 
-/** Read utm_* and gclid/fbclid/ttclid from a URL. Anything not matching a conservative charset is dropped. */
+/**
+ * An ad platform that did not fill its dynamic parameter leaves the literal macro in the URL, for
+ * example `{{campaign.name}}` or `{campaign_name}` or `__CAMPAIGN__`. Store nothing rather than the macro.
+ */
+export function isUnrenderedMacro(v: string): boolean {
+  return /\{\{.*\}\}|\{[a-z_.]+\}|%7B%7B|%7Bcampaign|^__[A-Z_]+__$|^\[[A-Z_]+\]$/i.test(v);
+}
+
+/**
+ * Read utm_* and gclid/fbclid/ttclid from a URL. Anything not matching a conservative charset, or
+ * an unrendered ad macro, is dropped. `landing_path` is the path of the first page of the visit,
+ * recorded whether or not the URL carried any campaign tag.
+ */
 export function readAttribution(url: string): Attribution {
   const out: Attribution = {};
   let u: URL;
@@ -185,9 +199,9 @@ export function readAttribution(url: string): Attribution {
   }
   for (const k of [...UTM_KEYS, ...CLICK_ID_KEYS]) {
     const v = u.searchParams.get(k)?.trim().slice(0, 200);
-    if (v && SAFE_ATTR.test(v)) out[k] = v;
+    if (v && SAFE_ATTR.test(v) && !isUnrenderedMacro(v)) out[k] = v;
   }
-  if (Object.keys(out).length) out.landing_path = u.pathname.slice(0, 200);
+  out.landing_path = u.pathname.slice(0, 200);
   return out;
 }
 
@@ -197,7 +211,20 @@ export function cleanAttribution(raw: unknown): Attribution {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
   for (const k of ATTR_KEYS) {
     const v = (raw as Record<string, unknown>)[k];
-    if (typeof v === "string" && SAFE_ATTR.test(v.trim())) out[k] = v.trim();
+    if (typeof v === "string" && SAFE_ATTR.test(v.trim()) && !isUnrenderedMacro(v.trim()))
+      out[k] = v.trim();
   }
   return out;
 }
+
+/** Hosts that carry real customers. Anything else (localhost, preview, workers.dev, lovable) is non-production. */
+const PRODUCTION_HOSTS = new Set(["vyraxlabs.co.uk", "www.vyraxlabs.co.uk"]);
+export function siteEnvFor(hostname: string): "production" | "non_production" {
+  return PRODUCTION_HOSTS.has(hostname.toLowerCase()) ? "production" : "non_production";
+}
+
+/** Whether the first-touch order attribution may be copied to sessionStorage. Declined always wins. */
+export const mayPersistAttribution = (
+  consent: "accepted" | "declined" | null,
+  flag: boolean,
+): boolean => consent === "accepted" || (flag && consent !== "declined");
