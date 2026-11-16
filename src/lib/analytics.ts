@@ -26,6 +26,8 @@ import {
 import { shopSections } from "../data/shop-sections";
 import { site } from "../data/site";
 import {
+  mayPersistAttribution,
+  siteEnvFor,
   firstTouchSetOnce,
   itemsProps,
   listProps,
@@ -243,11 +245,23 @@ export function firstTouch(): FirstTouch {
  */
 const attributionKey = "vyrax-attribution";
 let memoryAttribution: Attribution | null = null;
+/**
+ * Why this exists: orders carried no source because the page URL (and its UTMs) is gone by
+ * checkout. Memory alone does not survive the full page loads the shop does between routes, and the
+ * consent banner leaves most visitors undecided, so 0 of 17 orders in the 30 days to 10 Nov had any
+ * attribution. A first-party, session-only, business-record copy for undecided visitors fixes that,
+ * but it is a privacy call, so it ships OFF: set VITE_ATTRIBUTION_SESSION_STORAGE=true to enable.
+ * An explicit "declined" always wins and nothing is written.
+ */
+export const attributionSessionStorageEnabled = (): boolean =>
+  import.meta.env["VITE_ATTRIBUTION_SESSION_STORAGE"]?.trim() === "true";
+const mayPersist = (consent: AnalyticsConsent) =>
+  mayPersistAttribution(consent, attributionSessionStorageEnabled());
 export function orderAttribution(): Attribution {
   if (typeof window === "undefined") return {};
   const fresh = readAttribution(window.location.href);
   let stored: Attribution = {};
-  if (analyticsConsent() === "accepted") {
+  if (mayPersist(analyticsConsent())) {
     try {
       stored = JSON.parse(sessionStorage.getItem(attributionKey) ?? "{}") as Attribution;
     } catch {
@@ -255,13 +269,16 @@ export function orderAttribution(): Attribution {
     }
   }
   // First touch wins: earliest source seen in memory or storage.
-  const first = Object.keys(stored).length ? stored : (memoryAttribution ?? fresh);
-  if (!memoryAttribution && Object.keys(first).length) memoryAttribution = first;
+  const hasSource = (a: Attribution) => Object.keys(a).some((k) => k !== "landing_path");
+  let first = Object.keys(stored).length ? stored : (memoryAttribution ?? fresh);
+  // A visit that began on an untagged page and later arrives on a tagged URL takes the tagged touch.
+  if (!hasSource(first) && hasSource(fresh)) first = fresh;
   if (
-    analyticsConsent() === "accepted" &&
-    !Object.keys(stored).length &&
-    Object.keys(first).length
-  ) {
+    Object.keys(first).length &&
+    (!memoryAttribution || (!hasSource(memoryAttribution) && hasSource(first)))
+  )
+    memoryAttribution = first;
+  if (mayPersist(analyticsConsent()) && !hasSource(stored) && first.landing_path) {
     try {
       sessionStorage.setItem(attributionKey, JSON.stringify(first));
     } catch {
@@ -294,7 +311,11 @@ export type SafeProperties = Record<string, SafeValue | SafeValue[] | Record<str
 
 export function capture(event: EventName, properties: SafeProperties = {}) {
   if (typeof window === "undefined" || !analyticsConfigured) return;
-  const props: Record<string, unknown> = { ...properties };
+  // Tag every event so localhost, previews, workers.dev and lovable.app can be filtered out in PostHog.
+  const props: Record<string, unknown> = {
+    ...properties,
+    site_env: siteEnvFor(window.location.hostname),
+  };
   if (client) {
     client.capture(event, props);
     return;
