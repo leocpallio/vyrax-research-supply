@@ -2,7 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import { sendTransactional } from "./email/send.server";
 import { renderEmail } from "./email/templates";
 import { recordMarketingConsent, type Rpc } from "./email/outbox.server";
+import { clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
+const GUIDE_SIGNUP_LIMIT = { limit: 6, windowMs: 60_000 } as const;
 const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 const json = (message: string, status: number) =>
   Response.json({ message }, { status, headers: { "Cache-Control": "no-store" } });
@@ -39,6 +41,9 @@ export async function subscribeToGuide(
     origin !== "http://localhost:5173"
   )
     return json("Invalid request origin", 403);
+  // Each accepted request can reach Resend and the consent table, so bound it per client.
+  const limit = takeRateLimit(`guide-signup:${clientKey(request)}`, GUIDE_SIGNUP_LIMIT);
+  if (!limit.allowed) return tooManyRequests(limit);
   if (Number(request.headers.get("content-length") || 0) > 2048)
     return json("Request too large", 413);
   let data: Record<string, unknown>;
