@@ -7,6 +7,7 @@ import { shopSections } from "../data/shop-sections";
 import { SITE_URL, site, spendTierLine } from "../data/site";
 import { coas } from "../data/coa";
 import { dispatchCutoffLabel } from "./delivery";
+import { hasUnitCost } from "./price-ladder";
 import { CONTENT_UPDATED, TRUST_PAGES } from "./seo";
 
 const RUO =
@@ -101,7 +102,7 @@ export function buildPricingMd(): string {
     for (const c of items)
       for (const s of c.strengths)
         lines.push(
-          `| ${c.name} | ${s.label} | ${gbp(s.price)} | ${s.amount > 0 ? `${gbp(s.price / s.amount)}/${s.unit}` : "n/a"} | ${url(productPath(c.slug, s.label))} |`,
+          `| ${c.name} | ${s.label} | ${gbp(s.price)} | ${hasUnitCost(s) ? `${gbp(s.price / s.amount)}/${s.unit}` : "n/a"} | ${url(productPath(c.slug, s.label))} |`,
         );
     lines.push("");
   }

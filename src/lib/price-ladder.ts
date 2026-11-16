@@ -65,8 +65,19 @@ export function bestLadderPct(c: Compound): number | null {
   return best > 0 ? best : null;
 }
 
-/** Cost per mg (or ml) of active per vial, as plain text. */
+/**
+ * True when a per-unit cost is a meaningful figure for this strength. A label that states a
+ * concentration (e.g. "600mg/ml, 10ml") carries the TOTAL active in `amount`, so price / amount is
+ * a fraction of a penny and rounds to a false "£0.00". Omit the metric there rather than print it.
+ */
+export function hasUnitCost(s: Strength): boolean {
+  if (!s.amount || s.amount <= 0) return false;
+  if (/\d\s*(mg|mcg|g|iu)\s*\/\s*(ml|l)\b/i.test(s.label)) return false;
+  return Math.round((s.price / s.amount) * 100) >= 1;
+}
+
+/** Cost per mg (or ml) of active per vial, as plain text. Null when the figure would mislead. */
 export function perActiveLabel(s: Strength, gbp: (n: number) => string): string | null {
-  if (!s.amount || s.amount <= 0) return null;
+  if (!hasUnitCost(s)) return null;
   return `${gbp(s.price / s.amount)} per ${s.unit} of active per vial`;
 }

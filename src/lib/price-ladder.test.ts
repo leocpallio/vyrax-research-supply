@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { bestLadderPct, ladderSaving, perActiveLabel } from "./price-ladder";
+import { bestLadderPct, hasUnitCost, ladderSaving, perActiveLabel } from "./price-ladder";
 import type { Compound } from "../data/types";
 
 const gbp = (n: number) => `£${n.toFixed(2)}`;
@@ -58,5 +58,30 @@ describe("ladderSaving", () => {
   test("bestLadderPct and perActiveLabel", () => {
     expect(bestLadderPct(reta)).toBe(39);
     expect(perActiveLabel(reta.strengths[0]!, gbp)).toBe("£6.00 per mg of active per vial");
+  });
+});
+
+describe("concentration labels", () => {
+  const carnitine = {
+    label: "600mg/ml, 10ml",
+    amount: 6000,
+    unit: "mg",
+    price: 29.99,
+  } as Compound["strengths"][number];
+  test("no per-mg line for a 600mg/ml, 10ml vial (was a false £0.00)", () => {
+    expect(hasUnitCost(carnitine)).toBe(false);
+    expect(perActiveLabel(carnitine, gbp)).toBeNull();
+  });
+  test("a sub-penny figure is never printed as £0.00", () => {
+    const s = {
+      label: "5g",
+      amount: 5000,
+      unit: "mg",
+      price: 9.99,
+    } as Compound["strengths"][number];
+    expect(perActiveLabel(s, gbp)).toBeNull();
+  });
+  test("ordinary mg vials keep their per-mg line", () => {
+    expect(hasUnitCost(reta.strengths[0]!)).toBe(true);
   });
 });

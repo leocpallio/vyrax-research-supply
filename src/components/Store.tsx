@@ -21,6 +21,7 @@ import {
   type Compound,
   type CartItem,
 } from "@/lib/catalog";
+import { hasUnitCost } from "@/lib/price-ladder";
 import { coreFaqs, type QA } from "@/data/faq";
 import { latestCoa } from "@/data/coa";
 import { claimFilled, claimText } from "@/lib/claims";
@@ -181,7 +182,8 @@ export function ProductCard({ product }: { product: Compound }) {
             <p className="font-heading text-xl font-bold">{gbp(fromPrice(product))}</p>
             {product.category !== "peptide-blends" &&
               product.category !== "lab-supplies" &&
-              s.unit === "mg" && (
+              s.unit === "mg" &&
+              hasUnitCost(product.strengths.find((x) => x.price === fromPrice(product)) ?? s) && (
                 <p className="text-xs text-muted-foreground">
                   {costPerUnitLabel(
                     product.strengths.find((x) => x.price === fromPrice(product)) ?? s,
