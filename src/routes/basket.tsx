@@ -17,6 +17,7 @@ import { site } from "@/data/site";
 import { findPromo } from "@/data/promos";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 export const Route = createFileRoute("/basket")({
   head: () => ({
@@ -325,7 +326,11 @@ function Basket() {
                 asChild
                 className={`w-full mt-6 rounded-full h-12 text-base ${p.belowMinimum ? "pointer-events-none opacity-60" : ""}`}
               >
-                <Link to="/checkout" aria-disabled={p.belowMinimum}>
+                <Link
+                  to="/checkout"
+                  aria-disabled={p.belowMinimum}
+                  onClick={() => !p.belowMinimum && trackBeginCheckout()}
+                >
                   {ctaLabel} <ArrowRight />
                 </Link>
               </Button>
@@ -361,7 +366,7 @@ function Basket() {
             <p className="font-semibold">{gbp(p.total)}</p>
           </div>
           <Button asChild className="flex-1 rounded-full h-12">
-            <Link to="/checkout">
+            <Link to="/checkout" onClick={() => !p.belowMinimum && trackBeginCheckout()}>
               {ctaLabel} <ArrowRight />
             </Link>
           </Button>

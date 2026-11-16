@@ -19,7 +19,7 @@ import {
 } from "@/lib/catalog";
 import { claimFilled } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
-import { capture } from "@/lib/analytics";
+import { capture, trackBeginCheckout } from "@/lib/analytics";
 import { cartCount, useCartItems } from "./cart-store";
 import { TierRail } from "./TierRail";
 
@@ -323,7 +323,9 @@ export function CartDrawer({
                 data-testid="cart-checkout"
                 disabled={blocked || !site.checkoutOpen || quote.belowMinimum}
                 onClick={() => {
-                  // checkout_started fires once, from trackPage("/checkout") with full basket props.
+                  // PostHog began_checkout fires once, from trackPage("/checkout") with full basket props.
+                  // GTM begin_checkout fires here, synchronously, before the redirect.
+                  trackBeginCheckout();
                   onOpenChange(false);
                   navigate({ to: "/checkout" });
                 }}

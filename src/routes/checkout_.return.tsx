@@ -3,6 +3,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { capture } from "@/lib/analytics";
+import { getCompound, categories } from "@/lib/catalog";
+import {
+  buildPurchase,
+  claimPurchase,
+  mayPushPurchase,
+  pushDataLayer,
+  type DlLine,
+} from "@/lib/datalayer";
 import { site } from "@/data/site";
 import { classifyStatus, orderRef, type ReturnView } from "@/lib/checkout-form";
 
@@ -50,6 +58,14 @@ function PaymentReturn() {
         test_mode: boolean;
         total_pence?: number;
         currency?: string;
+        lines?: {
+          slug: string;
+          name: string;
+          strength: string;
+          unit_pence: number;
+          quantity: number;
+        }[];
+        shipping_pence?: number | null;
       };
       const view = classifyStatus(r.status);
       const done = view !== "processing";
@@ -64,6 +80,28 @@ function PaymentReturn() {
           currency: (r.currency ?? "GBP").toUpperCase(),
           test_mode: r.test_mode === true,
         });
+        // GTM purchase: real paid orders only (never test mode), once per order per session.
+        const lines: DlLine[] = (r.lines ?? []).map((l) => {
+          const c = getCompound(l.slug);
+          return {
+            slug: l.slug,
+            name: l.name,
+            strength: l.strength,
+            category:
+              categories.find((x) => x.slug === c?.category)?.name ?? c?.category ?? "unknown",
+            price: l.unit_pence / 100,
+            quantity: l.quantity,
+          };
+        });
+        if (
+          pence !== null &&
+          mayPushPurchase(view, r.test_mode === true, lines.length) &&
+          claimPurchase(sessionStorage, order)
+        ) {
+          pushDataLayer(
+            buildPurchase({ order, lines, totalPence: pence, shippingPence: r.shipping_pence }),
+          );
+        }
       }
       return done;
     } catch {
