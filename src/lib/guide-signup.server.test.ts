@@ -1,6 +1,10 @@
 process.env["WELCOME_CODE_SECRET"] ??= "test-only-welcome-secret";
 import { test, expect } from "bun:test";
+import { beforeEach } from "bun:test";
+import { resetRateLimits } from "./rate-limit";
 import { subscribeToGuide } from "./guide-signup.server";
+
+beforeEach(() => resetRateLimits());
 
 const env = {
   RESEND_API_KEY: "test-key",
@@ -82,4 +86,20 @@ test("previous subscriber is not re-enabled or emailed on duplicate request", as
 test("missing segment fails closed", async () => {
   const response = await subscribeToGuide(request(valid), { env: { RESEND_API_KEY: "test-key" } });
   expect(response.status).toBe(503);
+});
+
+test("rate limits repeated signups from one client and checks origin first", async () => {
+  const env2 = { ...env, VYRAX_GUIDE_SIGNUP_ENABLED: "false" };
+  const statuses: number[] = [];
+  for (let i = 0; i < 8; i++)
+    statuses.push((await subscribeToGuide(request(valid), { env: env2 })).status);
+  expect(statuses.slice(0, 6).every((s) => s === 503)).toBe(true);
+  expect(statuses.slice(6)).toEqual([429, 429]);
+  // Foreign origins are refused before they consume the bucket.
+  resetRateLimits();
+  for (let i = 0; i < 10; i++)
+    expect((await subscribeToGuide(request(valid, "https://evil.example"), { env })).status).toBe(
+      403,
+    );
+  expect((await subscribeToGuide(request(valid), { env: env2 })).status).toBe(503);
 });

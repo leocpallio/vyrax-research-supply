@@ -1,0 +1,4 @@
+Contact: mailto:support@vyraxlabs.co.uk
+Expires: 2027-11-16T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://vyraxlabs.co.uk/.well-known/security.txt

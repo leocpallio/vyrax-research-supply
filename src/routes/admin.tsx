@@ -109,9 +109,11 @@ function Admin() {
       const data = (await response.json()) as { error?: string; [key: string]: unknown };
       if (!response.ok)
         throw new Error(
-          response.status === 403
-            ? "This account is not authorised for operations."
-            : (data.error ?? "Request failed"),
+          response.status === 401
+            ? "Your session has expired. Sign in again."
+            : response.status === 403
+              ? "This account is not authorised for operations."
+              : (data.error ?? "Request failed"),
         );
       return data;
     },

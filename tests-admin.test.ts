@@ -8,6 +8,7 @@ import {
   validateFulfilmentTransition,
   parseWorkflowChange,
   adminPatch,
+  adminGet,
 } from "./src/lib/admin.server";
 
 describe("admin authorization", () => {
@@ -43,7 +44,7 @@ describe("internal £0 test order", () => {
         body: JSON.stringify({ action: "create_internal_test_order" }),
       }),
     );
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 });
 
@@ -134,7 +135,7 @@ describe("fulfilment transitions", () => {
         body: JSON.stringify({ workflow: "dispatched", trackingNumber: "RM123" }),
       }),
     );
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 });
 
@@ -245,4 +246,44 @@ test("admin dispatch uses paid-live compare-and-swap, persists tracking, and ret
       process.env.SUPABASE_SERVICE_ROLE_KEY,
     ] = oldEnv;
   }
+});
+
+describe("admin API rejects callers without a valid token", () => {
+  const url = "https://example.test/api/admin/orders";
+  const base = { origin: "https://example.test", "content-type": "application/json" };
+  const cases: [string, Record<string, string>][] = [
+    ["no Authorization header", {}],
+    ["empty bearer", { authorization: "Bearer " }],
+    ["non-bearer scheme", { authorization: "Basic YWRtaW46YWRtaW4=" }],
+    ["oversized token", { authorization: "Bearer " + "a".repeat(5000) }],
+    ["token containing whitespace", { authorization: "Bearer abc def" }],
+  ];
+  for (const [name, headers] of cases) {
+    test(`GET, POST and PATCH return 401: ${name}`, async () => {
+      const get = await adminGet(new Request(url, { headers }));
+      const post = await adminPost(
+        new Request(url, {
+          method: "POST",
+          headers: { ...base, ...headers },
+          body: '{"action":"create_internal_test_order"}',
+        }),
+      );
+      const patch = await adminPatch(
+        new Request(url + "?id=aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa", {
+          method: "PATCH",
+          headers: { ...base, ...headers },
+          body: '{"workflow":"on_hold"}',
+        }),
+      );
+      expect([get.status, post.status, patch.status]).toEqual([401, 401, 401]);
+      expect(await get.json()).toEqual({ error: "Unauthorized" });
+    });
+  }
+});
+
+describe("authorizeAdmin: a signed-in non-admin is refused (server-side role check)", () => {
+  const user = { id: "u1", email: "customer@example.com", email_confirmed_at: "2026-01-01" };
+  test("customer account with an active membership row still fails", () => {
+    expect(authorizeAdmin(user, { user_id: "u1", active: true })).toBe(false);
+  });
 });
