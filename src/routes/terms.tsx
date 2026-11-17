@@ -18,9 +18,13 @@ export const Route = createFileRoute("/terms")({
 
 function Terms() {
   return (
-    <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-10-06">
+    <InfoPage title="Terms and conditions" crumb="Terms" updated="2026-11-17">
       <h2>1. About us</h2>
-      <p>This website is operated under the trading name {site.name}.</p>
+      <p>
+        This website is operated under the trading name {site.name} by {site.legalEntity.name}, a
+        company registered in {site.legalEntity.registeredIn} with company number{" "}
+        {site.legalEntity.companyNumber}. Registered office: {site.legalEntity.registeredOffice}.
+      </p>
       <h2>2. What you are buying</h2>
       <p>
         All products are supplied for research use only. They are not licensed medicines, food

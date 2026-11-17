@@ -16,10 +16,12 @@ export const Route = createFileRoute("/privacy")({
 
 function Privacy() {
   return (
-    <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-10-06">
+    <InfoPage title="Privacy policy" crumb="Privacy" updated="2026-11-17">
       <p>
-        This policy covers the {site.name} website. The data controller is {site.name}. UK GDPR and
-        the Data Protection Act 2018 apply.
+        This policy covers the {site.name} website. The data controller is {site.legalEntity.name}{" "}
+        (company number {site.legalEntity.companyNumber}, registered office{" "}
+        {site.legalEntity.registeredOffice}), trading as {site.name}. UK GDPR and the Data
+        Protection Act 2018 apply.
       </p>
       <h2>What we collect</h2>
       <ul>
