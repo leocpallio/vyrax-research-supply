@@ -212,6 +212,7 @@
   --color-verification: var(--verification);
   --color-promo: var(--promo);
   --color-verify: var(--verification);
+  --color-verify-text: oklch(0.47 0.13 150);
   --color-primary-soft: var(--primary-soft);
   --font-heading: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-sans: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif;

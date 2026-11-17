@@ -291,7 +291,7 @@ export function PaymentCheckout() {
       </ul>
       {quote.promo ? (
         <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
-          <span className="font-medium text-verify">
+          <span className="font-medium text-verify-text">
             {quote.promo.code} applied · {quote.promo.pct}% off
           </span>
           <button
@@ -347,7 +347,7 @@ export function PaymentCheckout() {
           </div>
         )}
         {quote.promo && (
-          <div className="flex justify-between text-verify">
+          <div className="flex justify-between text-verify-text">
             <dt>Discount ({quote.promo.code})</dt>
             <dd className="tabular-nums">-{gbp(quote.promo.amount)}</dd>
           </div>
@@ -362,7 +362,7 @@ export function PaymentCheckout() {
         </div>
       </dl>
       {quote.gift && (
-        <p className="mt-3 text-xs font-semibold text-verify">
+        <p className="mt-3 text-xs font-semibold text-verify-text">
           Free {quote.gift.label} worth £{quote.gift.value.toFixed(2)} included with this order
         </p>
       )}
