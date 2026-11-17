@@ -16,15 +16,6 @@ export const site = {
   companyNumber: null as string | null,
   vatNumber: null as string | null,
   registeredOffice: null as string | null,
-  // Operating company named on /terms and /privacy only (Companies (Names and Trading Disclosures)
-  // Regulations 2015 reg 24-25). Verified on the Companies House register, 17 Nov 2026. Deliberately
-  // NOT wired into the footer, claims registry or emails: those stay as they were.
-  legalEntity: {
-    name: "Oraxis Research Ltd",
-    companyNumber: "17157816",
-    registeredOffice: "71-75 Shelton Street, Covent Garden, London, WC2H 9JQ",
-    registeredIn: "England and Wales",
-  },
   // Sender postal address printed in marketing email footers (PECR). Leo, 5 Nov 2026. Not claimed as the registered office.
   postalAddress: "71-75 Shelton Street" as string | null,
   // Physical address a return can be sent to. Null means returns are handled by arrangement only;
