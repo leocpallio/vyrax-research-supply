@@ -246,26 +246,76 @@ export function maskPiiInText(text: string): string {
  * posthog `before_send` for `capture_exceptions`: mask every string inside
  * `$exception*` properties and drop PII-looking keys. Other events pass through.
  */
-export function scrubExceptionEvent<T extends { event?: string; properties?: Record<string, unknown> } | null>(
-  evt: T,
-): T {
+export function scrubExceptionEvent<T extends { event?: string; properties?: Record<string, unknown> } | null>(evt: T): T {
   if (!evt || evt.event !== "$exception" || !evt.properties) return evt;
-  const walk = (v: unknown, depth: number): unknown => {
-    if (typeof v === "string") return maskPiiInText(v);
-    if (depth > 6) return undefined;
-    if (Array.isArray(v)) return v.map((x) => walk(x, depth + 1));
-    if (v && typeof v === "object") {
-      const out: Record<string, unknown> = {};
-      for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
-        if (EXC_PII_KEY.test(k)) continue;
-        out[k] = walk(x, depth + 1);
-      }
-      return out;
+  // Fail closed: exception free text (message, value, raw stack text) is never
+  // sent, because it can echo a name, address or order note that no pattern
+  // can recognise. Only structural fields that pass a strict token pattern
+  // survive (error type, function name, script path, line and column).
+  const TYPE_RE = /^[A-Za-z][A-Za-z0-9_$.]{0,63}$/;
+  const SYMBOL_RE = /^[A-Za-z0-9_$.<>\/-]{1,120}$/;
+  const PATH_RE = /^[A-Za-z0-9_\-.\/:~%]{1,200}$/;
+  const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
+  const type = (v: unknown): string => (typeof v === "string" && TYPE_RE.test(v) ? v : "Error");
+  const symbol = (v: unknown): string | undefined => (typeof v === "string" && SYMBOL_RE.test(v) ? v : undefined);
+  const path = (v: unknown): string | undefined => {
+    if (typeof v !== "string") return undefined;
+    const p = (v.split(/[?#]/)[0] ?? "");
+    return PATH_RE.test(p) ? p : undefined;
+  };
+  const num = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
+  const bool = (v: unknown): boolean | undefined => (typeof v === "boolean" ? v : undefined);
+  const frame = (f: unknown): Record<string, unknown> => {
+    const o = isObj(f) ? f : {};
+    const out: Record<string, unknown> = {
+      filename: path(o["filename"]),
+      abs_path: path(o["abs_path"]),
+      function: symbol(o["function"]),
+      module: symbol(o["module"]),
+      chunk_id: symbol(o["chunk_id"]),
+      platform: symbol(o["platform"]),
+      lineno: num(o["lineno"]),
+      colno: num(o["colno"]),
+      in_app: bool(o["in_app"]),
+      synthetic: bool(o["synthetic"]),
+      resolved: bool(o["resolved"]),
+    };
+    for (const k of Object.keys(out)) if (out[k] === undefined) delete out[k];
+    return out;
+  };
+  const item = (e: unknown): Record<string, unknown> => {
+    const o = isObj(e) ? e : {};
+    const out: Record<string, unknown> = { type: type(o["type"]), value: "[redacted]" };
+    const mech = o["mechanism"];
+    if (isObj(mech)) {
+      const m: Record<string, unknown> = { handled: bool(mech["handled"]), synthetic: bool(mech["synthetic"]), type: symbol(mech["type"]) };
+      for (const k of Object.keys(m)) if (m[k] === undefined) delete m[k];
+      out["mechanism"] = m;
     }
-    return v;
+    const st = o["stacktrace"];
+    const frames = isObj(st) ? st["frames"] : undefined;
+    if (Array.isArray(frames)) {
+      out["stacktrace"] = { type: "raw", frames: frames.slice(0, 50).map(frame) };
+    }
+    return out;
   };
   const props: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(evt.properties)) props[k] = k.startsWith("$exception") ? walk(v, 0) : v;
+  for (const [k, v] of Object.entries(evt.properties)) {
+    if (k.startsWith("$exception")) {
+      if (k === "$exception_list") props[k] = Array.isArray(v) ? v.slice(0, 10).map(item) : [];
+      else if (k === "$exception_types") props[k] = Array.isArray(v) ? v.slice(0, 10).map(type) : [];
+      else if (k === "$exception_message" || k === "$exception_values") props[k] = "[redacted]";
+      else if (k === "$exception_handled") props[k] = bool(v) ?? false;
+      else if (k === "$exception_level") props[k] = typeof v === "string" && TYPE_RE.test(v) ? v : "error";
+      else if (k === "$exception_sources") props[k] = Array.isArray(v) ? v.slice(0, 10).map(path).filter(Boolean) : [];
+      else if (k === "$exception_functions") props[k] = Array.isArray(v) ? v.slice(0, 20).map(symbol).filter(Boolean) : [];
+      // Any other $exception* field is unknown free text: drop it.
+      continue;
+    }
+    if (EXC_PII_KEY.test(k)) continue;
+    if (typeof v === "string") props[k] = /^https?:\/\//i.test(v) ? v.split(/[?#]/)[0] : maskPiiInText(v);
+    else props[k] = v;
+  }
   return { ...evt, properties: props };
 }
 
