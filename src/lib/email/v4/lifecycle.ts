@@ -38,6 +38,8 @@ export type LifecycleEmailId =
   | "reorder-nudge"
   | "reorder-v2-product"
   | "reorder-v2-water"
+  | "feedback-request"
+  | "winback-d60"
   | "pending-1h-card"
   | "pending-24h"
   | "pending-72h"
@@ -361,6 +363,44 @@ export function reorderReminder2(ctx: BaseContext = {}): RenderedEmail {
     ],
     body: bullets(present([certClaim(), dispatchClaim(), deliveryClaim(), ladderLine()])),
     action: { label: "See the lab reports", url: utm(LABS_URL, "reorder-reminder-2") },
+    lines: fine([unsubNote]),
+  });
+}
+
+// ---------------------------------------------------------------------------------------------
+// Feedback request (about ten days after dispatch) and win-back (day 60). Both marketing class,
+// both staged behind their own flags. Neither carries an offer, a review-site link or any handling
+// or dosing content. The feedback request is one plain message that invites a reply to support.
+// ---------------------------------------------------------------------------------------------
+export function feedbackRequest(ctx: OrderContext | (BaseContext & { reference: string })): RenderedEmail {
+  const mail = build({
+    ctx,
+    reference: ctx.reference,
+    subject: "How was your order?",
+    heading: "How was your order?",
+    preheader: "Honest feedback on ordering and delivery is welcome.",
+    paragraphs: [
+      hello(ctx.firstName),
+      `Your order ${oneLine(ctx.reference)} was dispatched about ten days ago. If it has arrived, we would welcome honest feedback on the ordering experience: the website, our communication, packing and delivery.`,
+      `Reply to this email, or write to ${SUPPORT_EMAIL}, and a person will read it. There is no reward for feedback and positive feedback is not expected.`,
+    ],
+    lines: fine([unsubNote]),
+  });
+  return { ...mail, replyTo: SUPPORT_EMAIL };
+}
+
+export function winback(ctx: BaseContext = {}): RenderedEmail {
+  return build({
+    ctx,
+    subject: "Your last order with us",
+    heading: "It has been about two months",
+    preheader: "The catalogue and the published lab reports are open whenever you need them.",
+    paragraphs: [
+      hello(ctx.firstName),
+      "It has been about two months since your last order. If you need to restock, the catalogue is open and the batch documents we hold are published on the Lab Reports page.",
+    ],
+    body: bullets(present([certClaim(), dispatchClaim(), deliveryClaim()])),
+    action: { label: "Browse the catalogue", url: utm(SHOP_URL, "winback-d60") },
     lines: fine([unsubNote]),
   });
 }

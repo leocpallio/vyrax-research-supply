@@ -35,6 +35,9 @@ export async function sendTransactional(
       subject: message.mail.subject,
       html: message.mail.html,
       text: message.mail.text,
+      ...(message.mail.replyTo && /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(message.mail.replyTo)
+        ? { reply_to: message.mail.replyTo }
+        : {}),
       ...(message.mail.listUnsubscribe
         ? {
             headers: {

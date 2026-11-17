@@ -3,13 +3,14 @@ import { createClient } from "@supabase/supabase-js";
 import { orderRef } from "../checkout-form";
 import { summarise } from "./order-email.server";
 import { renderEmail, type EmailEvent, type RenderedEmail } from "./templates";
-import { postpurchaseD7Storage, reorderReminder0 } from "./v4/lifecycle";
+import { feedbackRequest, postpurchaseD7Storage, reorderReminder0 } from "./v4/lifecycle";
 import { sendTransactional } from "./send.server";
 import { runContactQueue, type ContactStats } from "./contact-automation.server";
 import {
   claimOutbox,
   finishOutbox,
   unsubscribeMarketing,
+  type EmailKind,
   type OutboxRow,
   type Rpc,
 } from "./outbox.server";
@@ -59,7 +60,27 @@ export function authorizeAutomation(request: Request, env: Env = process.env): b
   return timingSafeEqual(Buffer.from(received), Buffer.from(secret));
 }
 const isMarketing = (kind: OutboxRow["kind"]) =>
-  kind === "pendingPayment" || kind === "postPurchase" || kind === "reorder";
+  kind === "pendingPayment" || kind === "postPurchase" || kind === "reorder" || kind === "feedback";
+
+// The seven original kinds are gated by VYRAX_EMAIL_AUTOMATION_ENABLED alone. Each new flow also needs
+// its own flag, which is unset by default, so shipping this code sends nothing new.
+const BASE_KINDS: EmailKind[] = [
+  "orderConfirmation",
+  "paymentFailed",
+  "paymentExpired",
+  "dispatched",
+  "pendingPayment",
+  "postPurchase",
+  "reorder",
+];
+/** Order-queue kinds this call may claim. */
+export function enabledOrderKinds(env: Env): EmailKind[] {
+  return [
+    ...BASE_KINDS,
+    ...(env["VYRAX_PACKED_ENABLED"] === "true" ? (["packed"] as const) : []),
+    ...(env["VYRAX_FEEDBACK_ENABLED"] === "true" ? (["feedback"] as const) : []),
+  ];
+}
 
 async function verifyResendSubscription(
   row: OutboxRow,
@@ -112,8 +133,13 @@ function mailFor(row: OutboxRow): RenderedEmail {
       ...base,
       ...(row.tracking_number ? { trackingNumber: row.tracking_number } : {}),
     };
-  } else if (row.kind === "paymentFailed" || row.kind === "paymentExpired") {
+  } else if (row.kind === "paymentFailed" || row.kind === "paymentExpired" || row.kind === "packed") {
     event = { kind: row.kind, ...base };
+  } else if (row.kind === "feedback") {
+    if (!row.unsubscribe_token) throw new Error("Missing unsubscribe token");
+    const first = String(row.name ?? "").trim().split(/\s+/)[0] ?? "";
+    const mail = feedbackRequest({ reference: base.reference, firstName: first, unsubscribeUrl });
+    return { ...mail, listUnsubscribe: mail.listUnsubscribe ?? unsubscribeUrl };
   } else if (row.kind === "pendingPayment") {
     if (
       !row.payment_id ||
@@ -177,11 +203,13 @@ export async function runEmailAutomation(
   try {
     const db = deps.db ?? serviceDb(env);
     const send = deps.send ?? ((message: Message) => sendTransactional(message, { env }));
-    const rows = await claimOutbox(db, 20);
+    const kinds = enabledOrderKinds(env);
+    const rows = await claimOutbox(db, 20, kinds);
     let sent = 0;
     let failed = 0;
     for (const row of rows) {
       try {
+        if (!kinds.includes(row.kind)) throw new Error("Email kind is not enabled");
         if (
           isMarketing(row.kind) &&
           !(await verifyResendSubscription(row, env, deps.fetcher ?? fetch))
