@@ -11,6 +11,7 @@ import { site } from "../data/site";
 import { checkFirstOrderCode, emailIlikePattern } from "./first-order-gate";
 import { insertOrderWithAttributionFallback, selectOrderWithPhFallback } from "./order-insert";
 import { cleanAttribution, cleanPhIds } from "./analytics-events";
+import { deliveryPenceFor, publicOrderLines } from "./order-lines";
 import { capturePaymentConfirmed } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
@@ -259,18 +260,22 @@ export async function orderStatus(request: Request): Promise<Response> {
       return fail("Not found", 404);
     const { data, error } = await db(c.url, c.key)
       .from("orders")
-      .select("id,checkout_state,total_pence,currency,test_mode")
+      .select("id,checkout_state,total_pence,currency,test_mode,items")
       .eq("id", id)
       .eq("guest_token", token)
       .not("checkout_state", "is", null)
       .maybeSingle();
     if (error) throw error;
     if (!data) return fail("Not found", 404);
+    // Lines only for a paid real order, for the browser purchase event. No customer fields.
+    const paid = String(data.checkout_state).toLowerCase() === "paid" && data.test_mode !== true;
+    const lines = paid ? publicOrderLines(data.items) : [];
     return json({
       status: data.checkout_state,
       total_pence: data.total_pence,
       currency: data.currency,
       test_mode: data.test_mode,
+      ...(paid ? { lines, shipping_pence: deliveryPenceFor(lines) } : {}),
     });
   } catch {
     return fail("Status unavailable", 503);

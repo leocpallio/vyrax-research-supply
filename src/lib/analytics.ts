@@ -23,6 +23,13 @@ import {
   type CartItem,
   type Compound,
 } from "./catalog";
+import {
+  buildAddToCart,
+  buildBeginCheckout,
+  buildViewItem,
+  pushDataLayer,
+  type DlLine,
+} from "./datalayer";
 import { shopSections } from "../data/shop-sections";
 import { site } from "../data/site";
 import {
@@ -349,6 +356,16 @@ const cartLines = (items: CartItem[]): LineLike[] =>
     return c ? [line(c, i.strength, i.price, i.quantity)] : [];
   });
 
+// GTM dataLayer line: display category label, unit price and quantity (see datalayer.ts).
+const dlLine = (c: Compound, strength: string, price: number, quantity = 1): DlLine => ({
+  slug: c.slug,
+  name: c.name,
+  strength,
+  category: categories.find((x) => x.slug === c.category)?.name ?? c.category,
+  price,
+  quantity,
+});
+
 const basketValue = () => itemsProps(cartLines(readCart()));
 
 // A product is out of stock on a listing when every strength is out or pre-order.
@@ -363,6 +380,8 @@ export function trackList(list: { id: string; type: ListProps["list_type"] }, it
 export function trackCheckoutStep(step: "address" | "payment", items: CartItem[] = readCart()) {
   capture("checkout_step", { step, ...itemsProps(cartLines(items)) });
 }
+
+let dlLastViewItem: string | null = null;
 
 export function trackPage(path: string) {
   // Only approved paths, never arbitrary URL segments, query, fragment or user-supplied search.
@@ -407,6 +426,7 @@ export function trackPage(path: string) {
               ? "/verify/:batch"
               : null;
   if (!safePath) return;
+  if (!(product && !product.redirectTo)) dlLastViewItem = null;
   capture("$pageview", {
     $current_url: stripQuery(`${window.location.origin}${safePath}`),
     $pathname: safePath,
@@ -427,6 +447,14 @@ export function trackPage(path: string) {
       is_hub: product.isHub,
     };
     capture("viewed_product", viewProps);
+    // GTM view_item: once per product visit. Switching strength on the same product (a client-side
+    // route change to the variant URL) is not a new view, so it is skipped.
+    if (dlLastViewItem !== product.compound.slug) {
+      dlLastViewItem = product.compound.slug;
+      pushDataLayer(
+        buildViewItem(dlLine(product.compound, product.strength.label, product.strength.price)),
+      );
+    }
   } else if (collectionSlug) {
     const section = shopSections.find((s) => s.slug === collectionSlug);
     if (section) {
@@ -449,6 +477,7 @@ export function trackPage(path: string) {
 // Compare actual persisted quantities. One mutation produces one event per changed SKU, including +/- controls.
 export function trackBasketChange(before: CartItem[], after: CartItem[]) {
   const seen = new Set<string>();
+  const dlAdded: DlLine[] = [];
   for (const item of [...before, ...after]) {
     const id = `${item.slug}|${item.strength}`;
     if (seen.has(id)) continue;
@@ -463,6 +492,7 @@ export function trackBasketChange(before: CartItem[], after: CartItem[]) {
       after.find((i) => i.slug === item.slug && i.strength === item.strength)?.quantity ?? 0;
     const difference = newQuantity - oldQuantity;
     if (!difference) continue;
+    if (difference > 0) dlAdded.push(dlLine(compound, item.strength, item.price, difference));
     capture(difference > 0 ? "added_to_cart" : "removed_from_cart", {
       ...productProps(line(compound, item.strength, item.price, Math.abs(difference))),
       slug: item.slug,
@@ -470,6 +500,21 @@ export function trackBasketChange(before: CartItem[], after: CartItem[]) {
       basket_value: itemsProps(cartLines(after)).value,
     });
   }
+  // GTM add_to_cart: ONE push per cart write, carrying every line that went up ("add all" = one event).
+  if (dlAdded.length) pushDataLayer(buildAddToCart(dlAdded));
+}
+
+/**
+ * GTM begin_checkout: call synchronously from a checkout CTA before navigating. Items come from
+ * the saved cart. Does nothing for an empty cart or while checkout is closed.
+ */
+export function trackBeginCheckout(items: CartItem[] = readCart()) {
+  if (typeof window === "undefined" || !site.checkoutOpen) return;
+  const lines = items.flatMap((i) => {
+    const c = getCompound(i.slug);
+    return c ? [dlLine(c, i.strength, i.price, i.quantity)] : [];
+  });
+  if (lines.length) pushDataLayer(buildBeginCheckout(lines));
 }
 
 // Cookieless capture for every visitor from first load (memory persistence until consent).

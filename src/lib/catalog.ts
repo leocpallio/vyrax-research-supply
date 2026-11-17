@@ -260,6 +260,17 @@ export function addCart(item: CartItem) {
   writeCart(items);
   window.dispatchEvent(new CustomEvent("vyrax-added", { detail: item }));
 }
+/** Add several lines in ONE cart write (one add_to_cart dataLayer push; PostHog still fires per SKU). */
+export function addCartMany(added: CartItem[]) {
+  const items = readCart();
+  for (const item of added) {
+    const existing = items.find((i) => i.slug === item.slug && i.strength === item.strength);
+    if (existing) existing.quantity += item.quantity;
+    else items.push({ ...item });
+  }
+  writeCart(items);
+  for (const item of added) window.dispatchEvent(new CustomEvent("vyrax-added", { detail: item }));
+}
 export const cartLine = (c: Compound, s: Strength, quantity = 1): CartItem => ({
   slug: c.slug,
   name: c.name,

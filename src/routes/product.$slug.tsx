@@ -8,6 +8,7 @@ import {
   productPath,
   gbp,
   addCart,
+  addCartMany,
   cartLine,
   stockOf,
   stockLabel,
@@ -371,7 +372,7 @@ function ProductPage() {
             <BoughtTogether
               lines={bundle}
               onAddAll={() => {
-                for (const l of bundle) addCart(cartLine(l.c, l.s, 1));
+                addCartMany(bundle.map((l) => cartLine(l.c, l.s, 1)));
                 setAdded(true);
                 window.setTimeout(() => setAdded(false), 1800);
               }}
