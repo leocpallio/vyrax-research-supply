@@ -17,7 +17,7 @@ export const Route = createFileRoute("/unsubscribe")({
     pageHead(
       "/unsubscribe",
       titles.info("Unsubscribe"),
-      "Stop marketing email and text messages from Vyrax Labs. Order and service messages are not affected.",
+      "Stop marketing email from Vyrax Labs. Order and service messages are not affected.",
       { crumb: "Unsubscribe", noindex: true },
     ),
   component: Unsubscribe,
@@ -29,14 +29,15 @@ function Unsubscribe() {
     <InfoPage title="Unsubscribe" crumb="Unsubscribe">
       {done ? (
         <p role="status" data-testid="unsubscribe-done">
-          Done. That address will not receive marketing email or text messages from {site.name}.
-          Order and service messages about an order you placed are not affected.
+          Done. That address will not receive marketing email from {site.name}. Order and service
+          messages about an order you placed are not affected. Marketing texts are stopped
+          separately: reply STOP to any text from us.
         </p>
       ) : (
         <>
           <p>
-            Enter the email address you want removed from {site.name} marketing. If you were texted,
-            you can also reply STOP to the message.
+            Enter the email address you want removed from {site.name} marketing. To stop marketing
+            texts, reply STOP to the text message.
           </p>
           {error === "invalid" && (
             <p role="alert" data-testid="unsubscribe-error">

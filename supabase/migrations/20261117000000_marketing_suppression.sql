@@ -1,7 +1,8 @@
--- One marketing suppression list for every channel (site email, cold email via Smartlead, SMS).
+-- One marketing suppression list for email channels (site email, cold email via Smartlead).
+-- Email addresses only: SMS opt-out is keyed by phone number and lives on its own list (STOP replies).
 -- Order and service mail is NOT affected: email_delivery_suppression (bounce/complaint) stays separate.
 -- Written by the public /unsubscribe page and one-click endpoint through suppress_marketing_email().
--- Smartlead and SMS exports read this table; anything listed here is never mailed or texted for marketing.
+-- The site automation (email_contact_ok) reads this table now; the Smartlead export must read it before any cold send.
 CREATE TABLE IF NOT EXISTS public.marketing_suppression (
   email text PRIMARY KEY CHECK (email = lower(btrim(email)) AND length(email) <= 254),
   source text NOT NULL CHECK (source ~ '^[a-z0-9_-]{1,40}$'),
