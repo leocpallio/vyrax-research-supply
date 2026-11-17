@@ -248,32 +248,38 @@ export function maskPiiInText(text: string): string {
  */
 export function scrubExceptionEvent<T extends { event?: string; properties?: Record<string, unknown> } | null>(evt: T): T {
   if (!evt || evt.event !== "$exception" || !evt.properties) return evt;
-  // Fail closed: exception free text (message, value, raw stack text) is never
-  // sent, because it can echo a name, address or order note that no pattern
-  // can recognise. Only structural fields that pass a strict token pattern
-  // survive (error type, function name, script path, line and column).
-  const TYPE_RE = /^[A-Za-z][A-Za-z0-9_$.]{0,63}$/;
-  const SYMBOL_RE = /^[A-Za-z0-9_$.<>\/-]{1,120}$/;
-  const PATH_RE = /^[A-Za-z0-9_\-.\/:~%]{1,200}$/;
+  // Fail closed: no string from the exception ever leaves the browser unless it
+  // is one of a fixed set of constants below. Message, value, stack function
+  // names, script paths, module names and mechanism text are all untrusted
+  // (they can echo a name, address or order note, or be attacker-chosen), so
+  // they are never copied. Only enum values, numbers and booleans survive.
+  const KNOWN_TYPES = new Set([
+    "Error", "TypeError", "ReferenceError", "SyntaxError", "RangeError", "EvalError",
+    "URIError", "AggregateError", "DOMException", "SecurityError", "NetworkError",
+    "AbortError", "NotAllowedError", "QuotaExceededError", "UnhandledRejection",
+  ]);
+  const KNOWN_MECHANISMS = new Set(["onerror", "onunhandledrejection", "generic", "instrument", "auto.browser.global_handlers"]);
+  const KNOWN_LEVELS = new Set(["fatal", "error", "warning", "info", "debug"]);
   const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
-  const type = (v: unknown): string => (typeof v === "string" && TYPE_RE.test(v) ? v : "Error");
-  const symbol = (v: unknown): string | undefined => (typeof v === "string" && SYMBOL_RE.test(v) ? v : undefined);
-  const path = (v: unknown): string | undefined => {
-    if (typeof v !== "string") return undefined;
-    const p = (v.split(/[?#]/)[0] ?? "");
-    return PATH_RE.test(p) ? p : undefined;
-  };
+  const type = (v: unknown): string => (typeof v === "string" && KNOWN_TYPES.has(v) ? v : "Error");
   const num = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
   const bool = (v: unknown): boolean | undefined => (typeof v === "boolean" ? v : undefined);
+  // Derived enum, never the string itself: is the script from our own origin?
+  const ownOrigin = (() => {
+    try {
+      return typeof location !== "undefined" ? location.origin : "";
+    } catch {
+      return "";
+    }
+  })();
+  const source = (o: Record<string, unknown>): "own" | "other" => {
+    const f = typeof o["filename"] === "string" ? o["filename"] : typeof o["abs_path"] === "string" ? o["abs_path"] : "";
+    return ownOrigin && f.startsWith(ownOrigin + "/") ? "own" : "other";
+  };
   const frame = (f: unknown): Record<string, unknown> => {
     const o = isObj(f) ? f : {};
     const out: Record<string, unknown> = {
-      filename: path(o["filename"]),
-      abs_path: path(o["abs_path"]),
-      function: symbol(o["function"]),
-      module: symbol(o["module"]),
-      chunk_id: symbol(o["chunk_id"]),
-      platform: symbol(o["platform"]),
+      source: source(o),
       lineno: num(o["lineno"]),
       colno: num(o["colno"]),
       in_app: bool(o["in_app"]),
@@ -288,7 +294,12 @@ export function scrubExceptionEvent<T extends { event?: string; properties?: Rec
     const out: Record<string, unknown> = { type: type(o["type"]), value: "[redacted]" };
     const mech = o["mechanism"];
     if (isObj(mech)) {
-      const m: Record<string, unknown> = { handled: bool(mech["handled"]), synthetic: bool(mech["synthetic"]), type: symbol(mech["type"]) };
+      const mt = mech["type"];
+      const m: Record<string, unknown> = {
+        handled: bool(mech["handled"]),
+        synthetic: bool(mech["synthetic"]),
+        type: typeof mt === "string" && KNOWN_MECHANISMS.has(mt) ? mt : "generic",
+      };
       for (const k of Object.keys(m)) if (m[k] === undefined) delete m[k];
       out["mechanism"] = m;
     }
@@ -306,9 +317,8 @@ export function scrubExceptionEvent<T extends { event?: string; properties?: Rec
       else if (k === "$exception_types") props[k] = Array.isArray(v) ? v.slice(0, 10).map(type) : [];
       else if (k === "$exception_message" || k === "$exception_values") props[k] = "[redacted]";
       else if (k === "$exception_handled") props[k] = bool(v) ?? false;
-      else if (k === "$exception_level") props[k] = typeof v === "string" && TYPE_RE.test(v) ? v : "error";
-      else if (k === "$exception_sources") props[k] = Array.isArray(v) ? v.slice(0, 10).map(path).filter(Boolean) : [];
-      else if (k === "$exception_functions") props[k] = Array.isArray(v) ? v.slice(0, 20).map(symbol).filter(Boolean) : [];
+      else if (k === "$exception_level") props[k] = typeof v === "string" && KNOWN_LEVELS.has(v) ? v : "error";
+      else if (k === "$exception_sources" || k === "$exception_functions") props[k] = [];
       // Any other $exception* field is unknown free text: drop it.
       continue;
     }

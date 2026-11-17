@@ -72,10 +72,47 @@ describe("exception scrubbing", () => {
       const first = (out!.properties!.$exception_list as Array<Record<string, any>>)[0];
       expect(first.type).toBe("Error");
       expect(first.value).toBe("[redacted]");
-      expect(first.stacktrace.frames[0].filename).toBe("https://x.test/assets/a.js");
+      expect(first.stacktrace.frames[0].filename).toBeUndefined();
+      expect(first.stacktrace.frames[0].source).toBe("other");
       expect(first.stacktrace.frames[0].lineno).toBe(10);
       expect(first.stacktrace.frames[0].function).toBeUndefined();
     }
+  });
+  test("emits no untrusted string from any exception field (webqa round 2: JaneSmithPrivate)", () => {
+    const P = "JaneSmithPrivate";
+    const out = scrubExceptionEvent({
+      event: "$exception",
+      properties: {
+        $exception_message: P,
+        $exception_values: [P],
+        $exception_types: [P],
+        $exception_sources: [`https://x.test/${P}.js`],
+        $exception_functions: [P],
+        $exception_level: P,
+        $exception_fingerprint: P,
+        $exception_list: [
+          {
+            type: P,
+            value: P,
+            module: P,
+            mechanism: { handled: true, synthetic: false, type: P, description: P },
+            stacktrace: {
+              type: "raw",
+              frames: [{ filename: `https://x.test/${P}.js`, abs_path: `https://x.test/${P}.js`, function: P, module: P, chunk_id: P, platform: P, lineno: 3, colno: 9, in_app: true }],
+            },
+          },
+        ],
+      },
+    });
+    expect(JSON.stringify(out!.properties)).not.toContain(P);
+    const first = (out!.properties!.$exception_list as Array<Record<string, any>>)[0];
+    expect(first.type).toBe("Error");
+    expect(first.stacktrace.frames[0].lineno).toBe(3);
+    expect(first.stacktrace.frames[0].colno).toBe(9);
+    expect(first.stacktrace.frames[0].function).toBeUndefined();
+    expect(first.stacktrace.frames[0].filename).toBeUndefined();
+    const typed = scrubExceptionEvent({ event: "$exception", properties: { $exception_list: [{ type: "TypeError", value: "x" }] } });
+    expect((typed!.properties!.$exception_list as Array<Record<string, any>>)[0].type).toBe("TypeError");
   });
   test("keeps the PostHog project token and distinct id so the event is still ingested", () => {
     const out = scrubExceptionEvent({ event: "$exception", properties: { token: "phc_x", distinct_id: "abc", $exception_list: [{ type: "E", value: "x" }] } });
