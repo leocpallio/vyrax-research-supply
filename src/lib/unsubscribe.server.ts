@@ -1,5 +1,7 @@
 // Public marketing opt-out. One suppression table (public.marketing_suppression) is shared by site
-// email, cold email (Smartlead export) and SMS export. Order and service mail is not affected.
+// email and the cold email (Smartlead) export. It holds email addresses only; SMS opt-out is a
+// separate list keyed by phone number (STOP replies) and is not written here. Order and service
+// mail is not affected.
 // Handlers take injected deps so they are testable without a network. Nothing here sends mail.
 import { cleanEmail, reply, serviceDb, type Env } from "./email/contact-shared.server";
 import type { Rpc } from "./email/outbox.server";
