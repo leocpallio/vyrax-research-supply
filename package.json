@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/write-build-sha.mjs .output/public",
     "prebuild": "node scripts/gen-sitemap-lastmod.mjs",
     "sitemap:check": "node scripts/gen-sitemap-lastmod.mjs --check",
     "build:dev": "vite build --mode development",
