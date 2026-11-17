@@ -136,6 +136,30 @@ export function firstTouchSetOnce(ft: FirstTouch): Record<string, string> {
   return out;
 }
 
+/** Where an address was captured. Never the address itself. */
+export type EmailSurface =
+  "welcome_popup" | "footer_newsletter" | "guide_signup" | "back_in_stock" | "batch_report_notify";
+
+export const emailCapturedProps = (surface: EmailSurface) => ({ surface });
+
+export type DiscountCodeType = "fixed" | "welcome" | "unknown";
+
+/** discount_code_applied payload. Never the code: personal welcome codes are tied to one address. */
+export function discountCodeProps(args: {
+  success: boolean;
+  discountPence?: number;
+  codeType: DiscountCodeType;
+}) {
+  const pence = args.success ? Math.max(0, Math.round(args.discountPence ?? 0)) : 0;
+  return {
+    success: args.success,
+    discount_gbp: pence / 100,
+    code_type: args.codeType,
+  };
+}
+
+export type AccountMethod = "password";
+
 const REFERRER_KEYS = new Set([
   "$referrer",
   "$referring_domain",

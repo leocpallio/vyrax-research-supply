@@ -7,10 +7,17 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { findPromo } from "@/data/promos";
-import { capture, orderAttribution, phIds, trackCheckoutStep } from "@/lib/analytics";
+import {
+  capture,
+  orderAttribution,
+  phIds,
+  trackCheckoutStep,
+  trackDiscountCode,
+} from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
+  completedCheckoutSteps,
   formatPostcode,
   validateFields,
   type CheckoutFields,
@@ -78,7 +85,7 @@ export function PaymentCheckout() {
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState("");
   const lock = useRef(false);
-  const addressStarted = useRef(false);
+  const stepsSent = useRef(new Set<string>());
   const summaryRef = useRef<HTMLDivElement>(null);
 
   // Only when the visitor has ticked the optional box and the address looks valid: record consent
@@ -126,9 +133,20 @@ export function PaymentCheckout() {
 
   const quote = priceBasket(items, promoCode);
 
+  // Funnel: each checkout block fires once, when it is first completed. Validity only, no values.
+  useEffect(() => {
+    if (!items.length) return;
+    for (const step of completedCheckoutSteps(form)) {
+      if (stepsSent.current.has(step)) continue;
+      stepsSent.current.add(step);
+      trackCheckoutStep(step, items);
+    }
+  }, [form, items]);
+
   function applyCode(e: React.FormEvent) {
     e.preventDefault();
     const promo = findPromo(codeInput);
+    trackDiscountCode(codeInput, quote.goods);
     if (!promo) {
       setCodeError("That code isn't recognised.");
       return;
@@ -144,10 +162,6 @@ export function PaymentCheckout() {
   }
 
   function set(key: FieldKey, value: string) {
-    if (!addressStarted.current) {
-      addressStarted.current = true; // funnel step: first keystroke in the address form (no values sent)
-      trackCheckoutStep("address", items);
-    }
     setForm((f) => ({ ...f, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   }
@@ -169,7 +183,10 @@ export function PaymentCheckout() {
     lock.current = true;
     setBusy(true);
     setError("");
-    trackCheckoutStep("payment", items);
+    if (!stepsSent.current.has("payment")) {
+      stepsSent.current.add("payment");
+      trackCheckoutStep("payment", items);
+    }
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
+  discountCodeProps,
   ecommerceItem,
+  emailCapturedProps,
   firstTouchSetOnce,
   itemsProps,
   listProps,
@@ -110,5 +112,23 @@ describe("sanitizeProperties", () => {
       keep: 1,
     });
     expect(stripQuery("/a?b=c")).toBe("/a");
+  });
+});
+
+describe("lead and discount payloads", () => {
+  test("email_captured carries the surface only, never an address", () => {
+    expect(emailCapturedProps("footer_newsletter")).toEqual({ surface: "footer_newsletter" });
+  });
+  test("discount_code_applied never carries the code", () => {
+    expect(discountCodeProps({ success: true, discountPence: 550, codeType: "fixed" })).toEqual({
+      success: true,
+      discount_gbp: 5.5,
+      code_type: "fixed",
+    });
+    expect(discountCodeProps({ success: false, discountPence: 999, codeType: "unknown" })).toEqual({
+      success: false,
+      discount_gbp: 0,
+      code_type: "unknown",
+    });
   });
 });

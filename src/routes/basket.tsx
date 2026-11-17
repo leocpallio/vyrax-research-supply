@@ -17,7 +17,7 @@ import { site } from "@/data/site";
 import { findPromo } from "@/data/promos";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
-import { trackBeginCheckout } from "@/lib/analytics";
+import { trackBeginCheckout, trackDiscountCode } from "@/lib/analytics";
 
 export const Route = createFileRoute("/basket")({
   head: () => ({
@@ -232,6 +232,7 @@ function Basket() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const promo = findPromo(codeInput);
+                  trackDiscountCode(codeInput, p.goods);
                   if (!promo) {
                     setCodeError("That code isn't recognised.");
                     return;
