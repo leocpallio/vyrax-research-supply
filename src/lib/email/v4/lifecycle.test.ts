@@ -10,10 +10,11 @@ const BANNED = [
 const byId = (id: string) => lifecycleEntries.find((e) => e.id === id)!.render();
 
 describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact", () => {
-  it("renders all twelve", () => {
+  it("renders all fourteen", () => {
     expect(lifecycleEntries.map((e) => e.id)).toEqual([
       "postpurchase-d7-storage", "reorder-reminder-0", "reorder-reminder-1", "reorder-reminder-2",
       "reorder-nudge", "reorder-v2-product", "reorder-v2-water",
+      "feedback-request", "winback-d60",
       "pending-1h-card", "pending-24h", "pending-72h", "contact-auto-reply", "contact-owner",
     ]);
   });

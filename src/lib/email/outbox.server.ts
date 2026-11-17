@@ -7,7 +7,9 @@ export type EmailKind =
   | "dispatched"
   | "pendingPayment"
   | "postPurchase"
-  | "reorder";
+  | "reorder"
+  | "packed"
+  | "feedback";
 export type OutboxRow = {
   id: string;
   order_id: string;
@@ -31,7 +33,7 @@ export type Rpc = {
   rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
 };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const kinds: EmailKind[] = [
+const allKinds: EmailKind[] = [
   "orderConfirmation",
   "paymentFailed",
   "paymentExpired",
@@ -39,6 +41,8 @@ const kinds: EmailKind[] = [
   "pendingPayment",
   "postPurchase",
   "reorder",
+  "packed",
+  "feedback",
 ];
 async function call(db: Rpc, name: string, args: Record<string, unknown>): Promise<unknown> {
   const { data, error } = await db.rpc(name, args);
@@ -52,7 +56,7 @@ export async function enqueueOrderEmail(
   kind: EmailKind,
   eventKey: string,
 ): Promise<string | null> {
-  if (!uuid.test(orderId) || !kinds.includes(kind) || !eventKey || eventKey.length > 200)
+  if (!uuid.test(orderId) || !allKinds.includes(kind) || !eventKey || eventKey.length > 200)
     throw new Error("Invalid outbox enqueue request");
   const id = await call(db, "enqueue_order_email", {
     p_order_id: orderId,
@@ -64,9 +68,18 @@ export async function enqueueOrderEmail(
   return id;
 }
 /** PostgreSQL performs SKIP LOCKED claim + eligibility recheck in a single transaction. */
-export async function claimOutbox(db: Rpc, limit = 20): Promise<OutboxRow[]> {
+export async function claimOutbox(
+  db: Rpc,
+  limit = 20,
+  kinds?: readonly EmailKind[],
+): Promise<OutboxRow[]> {
   if (!Number.isInteger(limit) || limit < 1 || limit > 25) throw new Error("Invalid claim limit");
-  const rows = await call(db, "claim_email_outbox", { p_limit: limit });
+  // Without a kind list the database claims only the original seven kinds, so a new flow stays off.
+  if (kinds && kinds.some((k) => !allKinds.includes(k))) throw new Error("Invalid claim kinds");
+  const rows = await call(db, "claim_email_outbox", {
+    p_limit: limit,
+    ...(kinds ? { p_kinds: [...kinds] } : {}),
+  });
   if (!Array.isArray(rows)) throw new Error("Invalid outbox claim response");
   return rows as OutboxRow[];
 }

@@ -38,6 +38,8 @@ export type RenderedEmail = {
   html: string;
   text: string;
   listUnsubscribe?: string;
+  /** Where a customer reply should go. Set on mail that invites a reply. */
+  replyTo?: string;
 };
 
 export const SUPPORT_EMAIL = site.email;

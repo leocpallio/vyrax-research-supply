@@ -38,6 +38,9 @@ export async function sendTransactional(
       text: message.mail.text,
       // flow, stage, send_id, brand on every send so the webhook rows can be tied to a flow.
       tags: vyraxTags(message.tag ?? { flow: "unclassified", stage: "none" }),
+      ...(message.mail.replyTo && /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(message.mail.replyTo)
+        ? { reply_to: message.mail.replyTo }
+        : {}),
       ...(message.mail.listUnsubscribe
         ? {
             headers: {
