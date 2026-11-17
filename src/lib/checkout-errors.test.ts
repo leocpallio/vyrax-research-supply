@@ -77,6 +77,11 @@ describe("exception scrubbing", () => {
       expect(first.stacktrace.frames[0].function).toBeUndefined();
     }
   });
+  test("keeps the PostHog project token and distinct id so the event is still ingested", () => {
+    const out = scrubExceptionEvent({ event: "$exception", properties: { token: "phc_x", distinct_id: "abc", $exception_list: [{ type: "E", value: "x" }] } });
+    expect(out!.properties!.token).toBe("phc_x");
+    expect(out!.properties!.distinct_id).toBe("abc");
+  });
   test("drops PII-named keys inside the exception payload", () => {
     const out = scrubExceptionEvent({ event: "$exception", properties: { $exception_list: [{ email: "a@b.co", type: "E" }] } });
     expect(JSON.stringify(out)).not.toContain("a@b.co");

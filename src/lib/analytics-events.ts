@@ -312,7 +312,8 @@ export function scrubExceptionEvent<T extends { event?: string; properties?: Rec
       // Any other $exception* field is unknown free text: drop it.
       continue;
     }
-    if (EXC_PII_KEY.test(k)) continue;
+    // PostHog needs its own project token to ingest the event; it is not customer data.
+    if (k !== "token" && EXC_PII_KEY.test(k)) continue;
     if (typeof v === "string") props[k] = /^https?:\/\//i.test(v) ? v.split(/[?#]/)[0] : maskPiiInText(v);
     else props[k] = v;
   }
