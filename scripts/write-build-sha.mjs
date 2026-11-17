@@ -4,15 +4,17 @@
 // commit is already live if the live site says which commit it was built from. This file is a
 // static asset: not linked, not in the sitemap, no visible page change, no secret.
 //
-// Usage (last step of the build): node scripts/write-build-sha.mjs <output-dir>
-//   UKPL (Cloudflare Pages):        node scripts/write-build-sha.mjs dist
-//   Norwood / Vyrax (Nitro worker):  node scripts/write-build-sha.mjs .output/public
+// Usage: node scripts/write-build-sha.mjs <output-dir>
+//   UKPL (Cloudflare Pages, static dist/): last build step, node scripts/write-build-sha.mjs dist
+//   Norwood / Vyrax (Nitro worker): FIRST build step, node scripts/write-build-sha.mjs public
+//     (Nitro lists public/ files at build time and the worker only serves listed files, so a file
+//     dropped into .output/public after the build answers 404. public/build.json is gitignored.)
 //
 // Commit source, first match wins: the host's own build commit variable, then git HEAD.
 // If no 40-hex commit can be found the file is NOT written and the build still passes: a missing
 // marker only makes the release checker answer PROCEED (the normal, safe path).
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 
 const SHA40 = /^[0-9a-f]{40}$/;
@@ -44,12 +46,14 @@ const sha = candidates()
   .map((v) => String(v || "").trim().toLowerCase())
   .find((v) => SHA40.test(v));
 
+const outDir = resolve(process.cwd(), outArg);
 if (!sha) {
+  // Never leave a stale marker from an earlier build behind.
+  rmSync(resolve(outDir, "build.json"), { force: true });
   console.warn("[build-sha] no 40-hex commit found (no host variable, no git HEAD): build.json not written");
   process.exit(0);
 }
 
-const outDir = resolve(process.cwd(), outArg);
 if (!existsSync(outDir)) {
   console.error(`[build-sha] output directory missing: ${outDir} (run this after the build step)`);
   process.exit(1);

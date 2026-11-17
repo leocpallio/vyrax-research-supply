@@ -38,3 +38,6 @@ dist-ssr
 *.sln
 *.sw?
 .og-tmp
+
+# Written by scripts/write-build-sha.mjs at build time (release proof)
+public/build.json
