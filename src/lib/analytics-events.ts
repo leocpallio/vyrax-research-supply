@@ -228,3 +228,61 @@ export const mayPersistAttribution = (
   consent: "accepted" | "declined" | null,
   flag: boolean,
 ): boolean => consent === "accepted" || (flag && consent !== "declined");
+
+// ---- Exception autocapture and checkout failure codes.
+
+const EXC_EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+const EXC_PHONE = /(?:\+44\s?|0)\d{3,4}\s?\d{3}\s?\d{3,4}/g;
+const EXC_DIGITS = /\b\d{4}\s?\d{4}\s?\d{4}\s?\d{0,4}\b/g;
+const EXC_PII_KEY =
+  /(email|e_mail|phone|tel|mobile|address|postcode|post_code|zip|full_?name|first_?name|last_?name|customer_?name|user_?name|contact_?name|card|iban|account_?number|dob|birth|token)/i;
+
+/** Blank email addresses, phone numbers and long digit runs in a string. */
+export function maskPiiInText(text: string): string {
+  return text.replace(EXC_EMAIL, "[email]").replace(EXC_PHONE, "[phone]").replace(EXC_DIGITS, "[digits]");
+}
+
+/**
+ * posthog `before_send` for `capture_exceptions`: mask every string inside
+ * `$exception*` properties and drop PII-looking keys. Other events pass through.
+ */
+export function scrubExceptionEvent<T extends { event?: string; properties?: Record<string, unknown> } | null>(
+  evt: T,
+): T {
+  if (!evt || evt.event !== "$exception" || !evt.properties) return evt;
+  const walk = (v: unknown, depth: number): unknown => {
+    if (typeof v === "string") return maskPiiInText(v);
+    if (depth > 6) return undefined;
+    if (Array.isArray(v)) return v.map((x) => walk(x, depth + 1));
+    if (v && typeof v === "object") {
+      const out: Record<string, unknown> = {};
+      for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
+        if (EXC_PII_KEY.test(k)) continue;
+        out[k] = walk(x, depth + 1);
+      }
+      return out;
+    }
+    return v;
+  };
+  const props: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(evt.properties)) props[k] = k.startsWith("$exception") ? walk(v, 0) : v;
+  return { ...evt, properties: props };
+}
+
+export type CheckoutFailStep = "create_order" | "start_payment" | "confirm_payment";
+
+/**
+ * Closed-vocabulary props for `checkout_payment_failed`. `error_code` is a
+ * short machine code (`http_502`, `network`, `no_redirect_url`, `declined`),
+ * never a message, so no customer text or order reference can ride along.
+ */
+export function checkoutFailProps(p: { step: CheckoutFailStep; provider?: string; errorCode?: string | null }) {
+  const code = (p.errorCode ?? "").trim();
+  const provider = (p.provider ?? "spicepay").trim();
+  return {
+    site: "vyrax",
+    step: p.step,
+    provider: /^[a-z0-9_]{1,24}$/.test(provider) ? provider : "unknown",
+    error_code: /^[A-Za-z0-9_.:-]{1,48}$/.test(code) ? code : "unknown",
+  };
+}
