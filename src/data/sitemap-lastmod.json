@@ -12,7 +12,7 @@
     "src/routes/about.tsx": "2026-11-01",
     "src/routes/calculator.tsx": "2026-11-09",
     "src/routes/category.$slug.tsx": "2026-10-28",
-    "src/routes/collections.$slug.tsx": "2026-11-17",
+    "src/routes/collections.$slug.tsx": "2026-11-18",
     "src/routes/contact.tsx": "2026-10-28",
     "src/routes/cookies.tsx": "2026-10-28",
     "src/routes/faq.tsx": "2026-11-01",
