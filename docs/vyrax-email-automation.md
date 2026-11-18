@@ -34,3 +34,7 @@ Target Supabase project ref: `hdjpfuvbcykpbtbyxafg` (from this repository's `.en
 The new cron endpoint requires a secret; without it POST returns 403. The guide signup endpoint returns 503 while off. The checkout webhook retains its previous direct-email path until `VYRAX_EMAIL_AUTOMATION_ENABLED=true`. The admin's tracking column and outbox enqueue are also gated until migration. The PDF can be downloaded without subscribing. Unsubscribe is a confirm-then-POST flow when enabled.
 
 Run `bun test`, `bunx tsc --noEmit -p tsconfig.json`, `bun scripts/check-claims.mjs` and the production build after each change. Do not run repo-wide formatting.
+
+## Dispatched email needs a tracking number (migration 20261118000000)
+
+A `dispatched` outbox row can never hold empty tracking. The trigger queues the shipped email when the order is `dispatched`, paid, live and has a non-blank tracking number, either on the dispatch transition or when tracking is filled in afterwards (one row per order, so a later edit never sends twice). Tracking on an order that is not dispatched queues nothing. An unsent row that froze empty tracking is cancelled by the migration and re-queued once with the real number. Rows already sent are never touched. Tests: `tests/email-dispatch-tracking.test.ts` (runs the real migrations on PGlite, no database or network). Apply with the same gate as 20261006000000: nothing sends until the control row is enabled.
