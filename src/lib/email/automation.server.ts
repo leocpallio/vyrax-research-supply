@@ -5,6 +5,7 @@ import { summarise } from "./order-email.server";
 import { renderEmail, type EmailEvent, type RenderedEmail } from "./templates";
 import { postpurchaseD7Storage, reorderReminder0 } from "./v4/lifecycle";
 import { sendTransactional } from "./send.server";
+import { flowForKind } from "./tags.server";
 import { runContactQueue, type ContactStats } from "./contact-automation.server";
 import {
   claimOutbox,
@@ -15,7 +16,7 @@ import {
 } from "./outbox.server";
 
 type Env = Record<string, string | undefined>;
-type Message = { to: string; mail: RenderedEmail; key: string };
+type Message = { to: string; mail: RenderedEmail; key: string; tag?: { flow: string; stage: string } };
 type Dependencies = {
   env?: Env;
   db?: Rpc;
@@ -199,6 +200,7 @@ export async function runEmailAutomation(
           to: row.email,
           mail: mailFor(row),
           key: `vyrax-email:${row.id}`,
+          tag: flowForKind(row.kind),
         });
         if (!(await finishOutbox(db, row.id, row.claim_token, "sent", providerId)))
           throw new Error("Email claim lost after send");

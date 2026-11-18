@@ -95,6 +95,7 @@ export async function subscribeToGuide(
         {
           to: email,
           key: `vyrax-guide-${hash}`,
+          tag: { flow: "welcome", stage: "guide" },
           mail: renderEmail({
             kind: "guideWelcome",
             unsubscribeUrl: `https://vyraxlabs.co.uk/api/email-automation?unsubscribe=${token}`,

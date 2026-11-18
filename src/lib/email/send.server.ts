@@ -1,4 +1,5 @@
 import type { RenderedEmail } from "./templates";
+import { vyraxTags, type FlowTag } from "./tags.server";
 
 type Env = Record<string, string | undefined>;
 type Dependencies = {
@@ -8,7 +9,7 @@ type Dependencies = {
 
 /** Server only. Never import this module from a client component. */
 export async function sendTransactional(
-  message: { to: string; mail: RenderedEmail; key: string },
+  message: { to: string; mail: RenderedEmail; key: string; tag?: FlowTag },
   dependencies: Dependencies = {},
 ): Promise<string> {
   const env = dependencies.env ?? process.env;
@@ -35,6 +36,8 @@ export async function sendTransactional(
       subject: message.mail.subject,
       html: message.mail.html,
       text: message.mail.text,
+      // flow, stage, send_id, brand on every send so the webhook rows can be tied to a flow.
+      tags: vyraxTags(message.tag ?? { flow: "unclassified", stage: "none" }),
       ...(message.mail.listUnsubscribe
         ? {
             headers: {

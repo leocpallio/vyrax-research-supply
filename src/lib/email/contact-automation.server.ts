@@ -3,6 +3,7 @@
 // claimed in SQL, re-checked in SQL immediately before sending, and verified against Resend so an
 // unsubscribe made there always wins. Nothing here creates consent.
 import { promos } from "../../data/promos";
+import { flowForKind } from "./tags.server";
 import { priceBasket } from "../basket-pricing";
 import {
   UNSUBSCRIBE_BASE,
@@ -33,7 +34,7 @@ export type ContactRow = {
   claim_token: string;
   unsubscribe_token: string | null;
 };
-export type ContactMessage = { to: string; mail: RenderedEmail; key: string };
+export type ContactMessage = { to: string; mail: RenderedEmail; key: string; tag?: { flow: string; stage: string } };
 export type ContactDependencies = {
   env?: Env;
   db: Rpc;
@@ -155,6 +156,7 @@ export async function runContactQueue(
         to: row.email,
         mail: contactMailFor(row),
         key: `vyrax-contact:${row.id}`,
+        tag: flowForKind(row.kind),
       });
       if (!(await finish(db, row, true, providerId))) throw new Error("Email claim lost after send");
       sent++;

@@ -38,6 +38,7 @@ import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-autom
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiNotifyMeRouteImport } from './routes/api.notify-me'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
+import { Route as ApiResendWebhookRouteImport } from './routes/api.resend-webhook'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as ApiStockNoticeRouteImport } from './routes/api.stock-notice'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -197,6 +198,11 @@ const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   path: '/api/order-status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiResendWebhookRoute = ApiResendWebhookRouteImport.update({
+  id: '/api/resend-webhook',
+  path: '/api/resend-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSpicepayWebhookRoute = ApiSpicepayWebhookRouteImport.update({
   id: '/api/spicepay-webhook',
   path: '/api/spicepay-webhook',
@@ -293,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -516,6 +527,7 @@ export interface FileRouteTypes {
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -561,6 +573,7 @@ export interface RootRouteChildren {
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
   ApiNotifyMeRoute: typeof ApiNotifyMeRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
+  ApiResendWebhookRoute: typeof ApiResendWebhookRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   ApiStockNoticeRoute: typeof ApiStockNoticeRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOrderStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/resend-webhook': {
+      id: '/api/resend-webhook'
+      path: '/api/resend-webhook'
+      fullPath: '/api/resend-webhook'
+      preLoaderRoute: typeof ApiResendWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/spicepay-webhook': {
       id: '/api/spicepay-webhook'
       path: '/api/spicepay-webhook'
@@ -905,6 +925,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGuideSignupRoute: ApiGuideSignupRoute,
   ApiNotifyMeRoute: ApiNotifyMeRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
+  ApiResendWebhookRoute: ApiResendWebhookRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   ApiStockNoticeRoute: ApiStockNoticeRoute,
   CategorySlugRoute: CategorySlugRoute,
