@@ -1,6 +1,7 @@
 import { quoteCheckout } from "../checkout-pricing";
 import { orderRef } from "../checkout-form";
 import { sendTransactional } from "./send.server";
+import { flowForKind } from "./tags.server";
 import { renderEmail, type EmailEvent } from "./templates";
 import { SITE_URL } from "../../data/site";
 import { metabolicAndRegenerative } from "../../data/compounds-a";
@@ -113,6 +114,7 @@ export async function sendOrderEmail(
       to: order.email,
       mail: renderEmail(event),
       key: `${kind}:${eventId}`.replace(/[^a-zA-Z0-9:_-]/g, "_").slice(0, 256),
+      tag: flowForKind(kind),
     });
     return "sent";
   } catch (error) {
