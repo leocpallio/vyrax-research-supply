@@ -1,0 +1,3 @@
+# Files the build itself rewrites. gate.sh restores them after build and tests and records them in evidence.json (regenerated_files).
+# One tracked path per line. Anything else left changed by a build still fails the gate.
+src/data/sitemap-lastmod.json
