@@ -189,6 +189,8 @@ export async function adminGet(request: Request): Promise<Response> {
       .from("orders")
       .select(emailAutomationEnabled() ? listColumnsWithTracking : listColumns, { count: "exact" });
     if (filters.status !== "all") query = query.eq("status", filters.status);
+    // Abandoned checkouts retired by expire_stale_checkouts() are not live pending orders.
+    if (filters.status === "pending_payment") query = query.is("expired_at", null);
     if (filters.workflow !== "all") query = query.eq("workflow_status", filters.workflow);
     if (filters.q)
       query = uuid.test(filters.q) ? query.eq("id", filters.q) : query.eq("email", filters.q);

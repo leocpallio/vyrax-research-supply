@@ -103,7 +103,10 @@ function Basket() {
           <div className="grid lg:grid-cols-[1fr_370px] gap-10 mt-8">
             <div>
               {unavailable.length > 0 && (
-                <p role="alert" className="border border-destructive rounded-[20px] p-4 mb-6 text-sm">
+                <p
+                  role="alert"
+                  className="border border-destructive rounded-[20px] p-4 mb-6 text-sm"
+                >
                   Not currently available:{" "}
                   {unavailable.map((i) => `${i.name} ${i.strength}`).join(", ")}. Remove{" "}
                   {unavailable.length > 1 ? "them" : "it"} before checkout.
@@ -141,8 +144,7 @@ function Basket() {
                 )}
                 {!p.gift && p.giftGap !== undefined && p.giftGap > 0 && site.firstOrderGift && (
                   <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
-                    <Tag size={13} /> Add {gbp(p.giftGap)} more for{" "}
-                    {site.firstOrderGift.short} free
+                    <Tag size={13} /> Add {gbp(p.giftGap)} more for {site.firstOrderGift.short} free
                   </p>
                 )}
                 {p.nextTier && (
@@ -300,7 +302,11 @@ function Basket() {
                         autoComplete="off"
                         className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
                       />
-                      <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="h-11 min-h-11 rounded-xl px-4"
+                      >
                         Apply
                       </Button>
                     </div>
@@ -382,13 +388,21 @@ function Basket() {
         )}
       </div>
       {items.length > 0 && (
-        <div className="lg:hidden sticky bottom-0 z-30 bg-background border-t border-border p-3 flex items-center gap-3">
+        <div className="lg:hidden sticky bottom-[var(--consent-banner-h,0px)] z-30 bg-background border-t border-border p-3 flex items-center gap-3">
           <div className="text-sm">
             <p className="text-muted-foreground">Total</p>
             <p className="font-semibold">{gbp(p.total)}</p>
           </div>
-          <Button asChild className="flex-1 rounded-full h-12">
-            <Link to="/checkout" onClick={() => !p.belowMinimum && trackBeginCheckout()}>
+          <Button
+            asChild
+            className={`flex-1 rounded-full h-12 ${p.belowMinimum ? "pointer-events-none opacity-60" : ""}`}
+          >
+            <Link
+              to="/checkout"
+              aria-disabled={p.belowMinimum}
+              tabIndex={p.belowMinimum ? -1 : undefined}
+              onClick={() => !p.belowMinimum && trackBeginCheckout()}
+            >
               {ctaLabel} <ArrowRight />
             </Link>
           </Button>

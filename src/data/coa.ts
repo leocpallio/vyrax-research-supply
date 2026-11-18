@@ -35,7 +35,7 @@ export const coas: Coa[] = [
     lab: "Janoshik",
     method: "HPLC-UV and LC-MS (Janoshik)",
     tested: "2026-10-23",
-    file: "/coa/retatrutide-10mg-RET-6121.png",
+    file: "/coa/retatrutide-10mg-RET-6121.webp",
     verifyUrl: "https://verify.janoshik.com/tests/244685-Retatrutide_10mg_IFY9PLTLISZE",
   },
   // Janoshik task #244686, key TKTNYTAA8JRH. Report printed: Retatrutide 21.51 mg, purity 99.910%.
@@ -48,7 +48,7 @@ export const coas: Coa[] = [
     lab: "Janoshik",
     method: "HPLC-UV and LC-MS (Janoshik)",
     tested: "2026-10-23",
-    file: "/coa/retatrutide-20mg-RET-3599.png",
+    file: "/coa/retatrutide-20mg-RET-3599.webp",
     verifyUrl: "https://verify.janoshik.com/tests/244686-Retatrutide_20mg_TKTNYTAA8JRH",
   },
   // Janoshik task #244687, key Q7BBKBYNDAWK. Report printed: Retatrutide 32.78 mg, purity 99.684%.
@@ -61,7 +61,7 @@ export const coas: Coa[] = [
     lab: "Janoshik",
     method: "HPLC-UV and LC-MS (Janoshik)",
     tested: "2026-10-23",
-    file: "/coa/retatrutide-30mg-RET-3610.png",
+    file: "/coa/retatrutide-30mg-RET-3610.webp",
     verifyUrl: "https://verify.janoshik.com/tests/244687-Retatrutide_30mg_Q7BBKBYNDAWK",
   },
   // Janoshik task #244684, key 319C2R5VVVCH. Report printed: Tesamorelin 10.54 mg, purity 97.700% (below 99: shown as measured, never as a pass).
@@ -74,7 +74,7 @@ export const coas: Coa[] = [
     lab: "Janoshik",
     method: "Janoshik Tesamorelin analysis",
     tested: "2026-10-26",
-    file: "/coa/tesamorelin-10mg-TES-9776.png",
+    file: "/coa/tesamorelin-10mg-TES-9776.webp",
     verifyUrl: "https://verify.janoshik.com/tests/244684-Tesamorelin_10mg_319C2R5VVVCH",
   },
   // Janoshik task #244682, key RMC38B3KZP2V. Report printed: Melanotan 2 10.77 mg, purity 99.957%.
@@ -87,7 +87,7 @@ export const coas: Coa[] = [
     lab: "Janoshik",
     method: "Janoshik Melanotan 2 analysis",
     tested: "2026-10-26",
-    file: "/coa/melanotan-2-10mg-MEL-9906.png",
+    file: "/coa/melanotan-2-10mg-MEL-9906.webp",
     verifyUrl: "https://verify.janoshik.com/tests/244682-Melanotan_II_10mg_RMC38B3KZP2V",
   },
 ];

@@ -106,7 +106,7 @@ export function OfferPopup() {
   if (inCheckout) return null;
 
   return (
-    <div className="offer-veil fixed inset-0 z-50 flex items-end justify-center bg-[#0B1B3B]/70 px-0 py-0 sm:items-center sm:px-4 sm:py-6">
+    <div className="offer-veil fixed inset-0 z-[75] flex items-end justify-center bg-[#0B1B3B]/70 px-0 py-0 sm:items-center sm:px-4 sm:py-6">
       <div
         role="dialog"
         aria-modal="true"

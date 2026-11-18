@@ -56,6 +56,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
   let payment: Record<string, unknown> = {};
   let responseProfile: string | undefined;
   let bindings = 0;
+  let retired = 0;
   let state = "pending";
   const events = new Set<string>();
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -87,6 +88,11 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         return result({ id: orderId }, 201);
       }
       if (init?.method === "PATCH") {
+        // A never-bound 'creating' row is expired when checkout fails after the insert (A2-03).
+        if ("expired_at" in payload) {
+          retired++;
+          return result({ id: orderId });
+        }
         bindings++;
         return result({ id: orderId });
       }
@@ -242,6 +248,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
     );
     expect(wrongProfile.status).toBe(502);
     expect(bindings).toBe(previousBindings);
+    expect(retired).toBe(1); // the failed attempt's unbound row is expired, not left pending
   } finally {
     globalThis.fetch = originalFetch;
     for (const [k, v] of Object.entries(previous)) {

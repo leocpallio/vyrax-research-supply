@@ -76,6 +76,7 @@ export async function finishOutbox(
   claimToken: string,
   status: "sent" | "failed",
   providerId?: string,
+  reason?: string,
 ): Promise<boolean> {
   if (!uuid.test(id) || !uuid.test(claimToken)) throw new Error("Invalid outbox claim");
   const result = await call(db, "finish_email_outbox", {
@@ -83,7 +84,12 @@ export async function finishOutbox(
     p_claim_token: claimToken,
     p_success: status === "sent",
     p_provider_id: providerId ?? null,
-    p_error: status === "failed" ? "delivery failed" : null,
+    // Our own fixed messages only ("Email no longer eligible", "Resend rejected email (422)"),
+    // never provider bodies or addresses. Without it a stuck row cannot be diagnosed (audit A3-06).
+    p_error:
+      status === "failed"
+        ? reason?.replace(/[^\x20-\x7E]/g, "").slice(0, 100) || "delivery failed"
+        : null,
   });
   return result === true;
 }

@@ -65,6 +65,9 @@ export const escapeHtml = (value: unknown) =>
   );
 export const gbp = (value: number) =>
   new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
+/** Thresholds ("over £100", "orders of £50 or more"): whole pounds print without pence, so every
+ *  threshold in the same email reads the same way. Money amounts keep gbp(). */
+export const gbpThreshold = (value: number) => (Number.isInteger(value) ? `£${value}` : gbp(value));
 export const oneLine = (value: unknown) =>
   String(value ?? "")
     .replace(/[\r\n\t]+/g, " ")
@@ -274,7 +277,8 @@ export function wrap(c: Content): RenderedEmail {
   const certificates = claimText("testing.public-certificates-body");
   const year = new Date().getUTCFullYear();
   const footStyle = `margin:0 0 12px;font-family:${FONT};font-size:12px;line-height:16px;color:#A9B3C4`;
-  const footLink = (label: string, url: string, external = false) => link(label, url, external, "#FFFFFF");
+  const footLink = (label: string, url: string, external = false) =>
+    link(label, url, external, "#FFFFFF");
   const html = `<!doctype html><html lang="en" dir="ltr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="x-apple-disable-message-reformatting"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${e(c.heading)}</title><!--[if mso]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->${responsiveStyle}</head><body class="bg" style="margin:0;padding:0;background-color:${PAPER};font-family:${FONT};color:${INK};-webkit-font-smoothing:antialiased"><div style="display:none;font-size:1px;color:${PAPER};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all">${e(c.preheader)}${PRE_PAD}</div><table class="bg" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${PAPER}" style="background-color:${PAPER}"><tr><td align="center"><!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]--><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px"><tr><td bgcolor="${PAPER}" style="background-color:${PAPER};padding:14px 14px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${INK}" style="width:100%;background-color:${INK};border-radius:18px"><tr><td class="vx-pad hero" bgcolor="${INK}" style="padding:30px 32px 34px;background-color:${INK};border-radius:18px;font-family:${FONT}"><a href="${e(SITE_URL)}" target="_blank" style="text-decoration:none"><span style="font-family:${FONT};font-size:22px;line-height:28px;font-weight:800;letter-spacing:4px;color:#FFFFFF">VYRAX<span style="font-weight:400;color:${ACCENT}"> LABS</span></span></a><div style="height:24px;line-height:24px;font-size:1px">&nbsp;</div><p style="margin:0 0 8px;font-family:${FONT};font-size:12px;line-height:16px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:${ACCENT}">${e(eyebrow)}</p><h1 class="vx-h1" style="margin:0;font-family:${FONT};font-size:34px;line-height:40px;font-weight:700;letter-spacing:-0.8px;color:#FFFFFF">${e(c.heading)}</h1></td></tr></table></td></tr><tr><td bgcolor="${PAPER}" style="background-color:${PAPER};padding:6px 14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${TINT}" class="card" style="width:100%;background-color:${TINT};border-radius:18px"><tr><td class="vx-pad tx" style="padding:32px;font-family:${FONT};font-size:16px;line-height:24px;color:${INK}">${metaHtml}${c.paragraphs.map((p) => `<p class="tx" style="${pStyle}">${e(p)}</p>`).join("")}${tracking?.html ?? ""}${tracking ? action : ""}${progress?.html ?? ""}${addressHtml}${c.detail?.html ?? ""}${c.after?.map((p) => `<p class="tx" style="${pStyle}">${e(p)}</p>`).join("") ?? ""}${c.lines?.map((p) => `<p class="mute" style="${fineStyle}">${e(p)}</p>`).join("") ?? ""}${tracking ? "" : action}<p class="mute" style="margin:24px 0 0;font-size:14px;line-height:20px;color:${MUTED};font-family:${FONT}">Questions? Reply to this email or write to ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`, true)}${site.phone ? ` · <a href="tel:${e(site.phone.replace(/\s/g, ""))}" style="color:${INK};text-decoration:underline;font-weight:600">${e(site.phone)}</a>` : ""}.</p></td></tr></table></td></tr><tr><td bgcolor="${PAPER}" style="background-color:${PAPER};padding:6px 14px 20px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${INK}" style="width:100%;background-color:${INK};border-radius:18px"><tr><td class="fcard vx-pad" align="center" bgcolor="${INK}" style="padding:28px;background-color:${INK};border-radius:18px;text-align:center;font-family:${FONT}">${certificates ? `<p style="${footStyle}">${e(certificates)} ${footLink("Lab reports", `${SITE_URL}/lab-reports`)}</p>` : ""}<p style="${footStyle}">We will never ask for your password or payment details by email.</p><p style="${footStyle}">${e(RESEARCH_NOTICE)}</p><p style="margin:0;font-family:${FONT};font-size:12px;line-height:20px;color:#A9B3C4">${footLink("Research use policy", POLICY_URL)} · ${footLink("Contact", CONTACT_URL)}${unsubscribe ? ` · ${footLink("Unsubscribe", unsubscribe, true)}` : ""}<br>&copy; ${year} ${e(LEGAL_FOOTER)}</p></td></tr></table></td></tr></table><!--[if mso]></td></tr></table><![endif]--></td></tr></table></body></html>`;
   const text = [
     c.heading,
@@ -282,13 +286,17 @@ export function wrap(c: Content): RenderedEmail {
     ...(meta ? [meta, ""] : []),
     ...c.paragraphs,
     ...(tracking ? ["", tracking.text] : []),
-    ...(tracking && c.action ? ["", `${c.action.label}: ${safeUrl(c.action.url, c.action.external)}`] : []),
+    ...(tracking && c.action
+      ? ["", `${c.action.label}: ${safeUrl(c.action.url, c.action.external)}`]
+      : []),
     ...(progress ? ["", progress.text] : []),
     ...(address ? ["", address] : []),
     ...(c.detail ? ["", ...c.detail.text] : []),
     ...(c.after?.length ? ["", ...c.after] : []),
     ...(c.lines?.length ? ["", ...c.lines] : []),
-    ...(!tracking && c.action ? ["", `${c.action.label}: ${safeUrl(c.action.url, c.action.external)}`] : []),
+    ...(!tracking && c.action
+      ? ["", `${c.action.label}: ${safeUrl(c.action.url, c.action.external)}`]
+      : []),
     "",
     `Questions? ${SUPPORT_EMAIL}${site.phone ? ` · ${site.phone}` : ""}`,
     "",
@@ -387,7 +395,8 @@ export function renderEmail(event: EmailEvent): RenderedEmail {
       });
     case "dispatched": {
       const trackingUrl =
-        event.trackingUrl ?? (event.trackingNumber ? royalMailTrackingUrl(event.trackingNumber) : null);
+        event.trackingUrl ??
+        (event.trackingNumber ? royalMailTrackingUrl(event.trackingNumber) : null);
       const intro = `Order ${oneLine(event.reference)} has left our facility via ${CARRIER}.${
         event.trackingNumber
           ? " You can track delivery directly on the Royal Mail site once your tracking is active."

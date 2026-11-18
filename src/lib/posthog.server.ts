@@ -54,8 +54,8 @@ export function discountUsed(
 }
 
 /** Deterministic RFC 4122 v5-style UUID from the order id (SHA-1 over a fixed namespace + id). */
-export async function orderEventUuid(orderId: string): Promise<string> {
-  const data = new TextEncoder().encode(`vyrax-payment_confirmed:${orderId}`);
+export async function orderEventUuid(orderId: string, name = "payment_confirmed"): Promise<string> {
+  const data = new TextEncoder().encode(`vyrax-${name}:${orderId}`);
   const h = new Uint8Array(await crypto.subtle.digest("SHA-1", data)).slice(0, 16);
   h[6] = (h[6]! & 0x0f) | 0x50;
   h[8] = (h[8]! & 0x3f) | 0x80;
@@ -66,6 +66,23 @@ export async function orderEventUuid(orderId: string): Promise<string> {
 export async function capturePaymentConfirmed(
   order: PaidOrder,
   ctx: PaidContext = {},
+): Promise<boolean> {
+  return captureOrderEvent(order, ctx, "payment_confirmed");
+}
+
+/**
+ * Canonical revenue event (audit A4-01): `purchase` with value, currency, item_count and items,
+ * one per paid real order. Same payload as payment_confirmed, own deterministic uuid, so a retried
+ * webhook dedupes to one event. Build revenue insights on this name; payment_confirmed stays for history.
+ */
+export async function capturePurchase(order: PaidOrder, ctx: PaidContext = {}): Promise<boolean> {
+  return captureOrderEvent(order, ctx, "purchase");
+}
+
+async function captureOrderEvent(
+  order: PaidOrder,
+  ctx: PaidContext,
+  defaultName: "payment_confirmed" | "purchase",
 ): Promise<boolean> {
   try {
     if (order.test_mode) return false; // keep test payments out of revenue reporting
@@ -108,8 +125,8 @@ export async function capturePaymentConfirmed(
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         api_key: key,
-        event: ctx.eventName ?? "payment_confirmed",
-        uuid: await orderEventUuid(order.id),
+        event: ctx.eventName ?? defaultName,
+        uuid: await orderEventUuid(order.id, defaultName),
         timestamp: paidAt.toISOString(),
         distinct_id: order.ph_distinct_id ?? `order:${order.id}`,
         properties: {
