@@ -117,8 +117,7 @@ function whenIdle(): Promise<void> {
     const go = () => {
       if ("requestIdleCallback" in window) {
         window.requestIdleCallback(() => resolve(), { timeout: 2500 });
-      }
-      else setTimeout(resolve, 1500);
+      } else setTimeout(resolve, 1500);
     };
     if (document.readyState === "complete") go();
     else window.addEventListener("load", go, { once: true });
