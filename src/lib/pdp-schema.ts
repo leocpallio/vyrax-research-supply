@@ -12,7 +12,7 @@ import { faqJsonLd, type QA } from "../data/faq";
 import { sectionFor } from "../data/shop-sections";
 import { purityStat } from "./pdp-coa";
 import { claimGate } from "./claims";
-import { DESC_TAIL } from "./seo";
+import { DESC_TAIL, clauseCut } from "./seo";
 
 /** Listing a product belongs to for breadcrumbs: its shop section when it has one, else its category. */
 export function listingFor(c: Compound) {
@@ -67,8 +67,10 @@ export const productDescription = (c: Compound, s: Strength) => {
   const base = `${lead} ${first}`;
   const withSyn = syn ? `${base} Also sold as ${syn}.` : base;
   if (withSyn.length <= room) return `${withSyn} ${DESC_TAIL}`;
-  const clipped = base.length > room ? base.slice(0, room - 1).replace(/\s+\S*$/, "") + "…" : base;
-  return `${clipped} ${DESC_TAIL}`;
+  // Too long: keep the lead and cut the summary at a clause boundary, never mid-clause, no ellipsis.
+  const firstSentence = first.split(/(?<=[.!?])\s+/)[0] ?? first;
+  const clause = clauseCut(firstSentence, room - lead.length - 1);
+  return `${clause ? `${lead} ${clause}` : lead} ${DESC_TAIL}`;
 };
 
 /** Per-product questions, rendered in the Common questions accordion and as FAQPage JSON-LD. */
