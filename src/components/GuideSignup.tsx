@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { ArrowRight, BookOpen, FileDown, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { trackEmailCaptured } from "@/lib/analytics";
 
 const guidePath = "/guides/reconstitution-lab-guide.pdf";
 const signupOpen = import.meta.env["VITE_VYRAX_GUIDE_SIGNUP_ENABLED"] === "true";
@@ -28,7 +29,10 @@ export function GuideSignup() {
       const result = (await response.json()) as { message: string };
       setError(!response.ok && response.status !== 202);
       setMessage(result.message);
-      if (response.ok) setEmail("");
+      if (response.ok) {
+        setEmail("");
+        trackEmailCaptured("guide_signup");
+      }
     } catch {
       setError(true);
       setMessage("Email signup is temporarily unavailable. You can download the guide below.");

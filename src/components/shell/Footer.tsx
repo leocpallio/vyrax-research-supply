@@ -6,6 +6,7 @@ import { site } from "@/data/site";
 import { shopSections } from "@/data/shop-sections";
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
+import { trackEmailCaptured } from "@/lib/analytics";
 
 const guidePath = "/guides/reconstitution-lab-guide.pdf";
 const signupOpen = import.meta.env["VITE_VYRAX_GUIDE_SIGNUP_ENABLED"] === "true";
@@ -66,7 +67,10 @@ function Newsletter() {
       const result = (await res.json()) as { message: string };
       setError(!res.ok && res.status !== 202);
       setMessage(result.message);
-      if (res.ok) setEmail("");
+      if (res.ok) {
+        setEmail("");
+        trackEmailCaptured("footer_newsletter");
+      }
     } catch {
       setError(true);
       setMessage("Signup is temporarily unavailable. The guide is still free to download.");
