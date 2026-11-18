@@ -112,12 +112,28 @@ let loading: Promise<PostHog | null> | null = null;
 let queue: { event: string; properties: Record<string, unknown> }[] = [];
 const MAX_QUEUE = 50;
 
+function whenIdle(): Promise<void> {
+  return new Promise((resolve) => {
+    const go = () => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => resolve(), { timeout: 2500 });
+      }
+      else setTimeout(resolve, 1500);
+    };
+    if (document.readyState === "complete") go();
+    else window.addEventListener("load", go, { once: true });
+  });
+}
+
 async function ensureClient(): Promise<PostHog | null> {
   if (typeof window === "undefined" || !analyticsConfigured) return null;
   if (client) return client;
   if (loading) return loading;
   loading = (async () => {
     try {
+      // Speed (A4-06): the SDK (about 300 KB) is fetched and parsed when the browser is idle, not
+      // during first paint. Events fired meanwhile wait in `queue` and are sent once it is ready.
+      await whenIdle();
       const { default: posthog } = await import("posthog-js");
       posthog.init(key!, {
         api_host: `${window.location.origin}/ingest`, // first-party proxy, src/routes/ingest.$.ts
