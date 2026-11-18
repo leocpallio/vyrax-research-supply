@@ -43,6 +43,9 @@ import {
   readAttribution,
   type Attribution,
   sanitizeProperties,
+  scrubExceptionEvent,
+  checkoutFailProps,
+  type CheckoutFailStep,
   stripQuery,
   type FirstTouch,
   type LineLike,
@@ -129,6 +132,10 @@ async function ensureClient(): Promise<PostHog | null> {
         session_recording: { maskAllInputs: true, maskTextSelector: "*" },
         enable_heatmaps: false,
         sanitize_properties: (props) => sanitizeProperties(props),
+        // Unhandled errors and promise rejections arrive as $exception events;
+        // strings are masked in before_send (analytics-events.ts).
+        capture_exceptions: true,
+        before_send: scrubExceptionEvent,
         property_denylist: [
           "$referrer",
           "$referring_domain",
@@ -311,7 +318,8 @@ export type EventName =
   | "payment_initiated"
   | "order_confirmation_viewed"
   | "back_in_stock_requested"
-  | "page_error";
+  | "page_error"
+  | "checkout_payment_failed";
 
 export type SafeValue = string | number | boolean | null | undefined;
 export type SafeProperties = Record<string, SafeValue | SafeValue[] | Record<string, unknown>[]>;
@@ -519,3 +527,8 @@ export function trackBeginCheckout(items: CartItem[] = readCart()) {
 
 // Cookieless capture for every visitor from first load (memory persistence until consent).
 if (typeof window !== "undefined" && analyticsConfigured) void ensureClient();
+
+/** One event wherever checkout cannot start or confirm a payment (step + provider + short code, no PII). */
+export function trackCheckoutPaymentFailed(p: { step: CheckoutFailStep; provider?: string; errorCode?: string | null }) {
+  capture("checkout_payment_failed", checkoutFailProps(p));
+}

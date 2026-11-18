@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
-import { capture } from "@/lib/analytics";
+import { capture, trackCheckoutPaymentFailed } from "@/lib/analytics";
 import { getCompound, categories } from "@/lib/catalog";
 import {
   buildPurchase,
@@ -39,6 +39,7 @@ function PaymentReturn() {
   const [attempt, setAttempt] = useState(0);
   const orderId = useRef("");
   const confirmed = useRef(false);
+  const failReported = useRef(false);
 
   const check = useCallback(async (): Promise<boolean> => {
     const order = orderId.current;
@@ -70,6 +71,10 @@ function PaymentReturn() {
       const view = classifyStatus(r.status);
       const done = view !== "processing";
       setState({ kind: "result", order, view, test: r.test_mode === true, polling: !done });
+      if ((view === "failed" || view === "expired") && !failReported.current) {
+        failReported.current = true; // once per order, even if the poll repeats
+        trackCheckoutPaymentFailed({ step: "confirm_payment", errorCode: `status_${r.status.toLowerCase()}` });
+      }
       if (view === "paid" && !confirmed.current) {
         confirmed.current = true; // one purchase event per order, even if the poll repeats
         const pence = typeof r.total_pence === "number" ? r.total_pence : null;
@@ -105,6 +110,10 @@ function PaymentReturn() {
       }
       return done;
     } catch {
+      if (!failReported.current) {
+        failReported.current = true;
+        trackCheckoutPaymentFailed({ step: "confirm_payment", errorCode: "status_unreachable" });
+      }
       setState({ kind: "error", order });
       return true;
     }

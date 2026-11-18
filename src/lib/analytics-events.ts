@@ -228,3 +228,122 @@ export const mayPersistAttribution = (
   consent: "accepted" | "declined" | null,
   flag: boolean,
 ): boolean => consent === "accepted" || (flag && consent !== "declined");
+
+// ---- Exception autocapture and checkout failure codes.
+
+const EXC_EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+const EXC_PHONE = /(?:\+44\s?|0)\d{3,4}\s?\d{3}\s?\d{3,4}/g;
+const EXC_DIGITS = /\b\d{4}\s?\d{4}\s?\d{4}\s?\d{0,4}\b/g;
+const EXC_PII_KEY =
+  /(email|e_mail|phone|tel|mobile|address|postcode|post_code|zip|full_?name|first_?name|last_?name|customer_?name|user_?name|contact_?name|card|iban|account_?number|dob|birth|token)/i;
+
+/** Blank email addresses, phone numbers and long digit runs in a string. */
+export function maskPiiInText(text: string): string {
+  return text.replace(EXC_EMAIL, "[email]").replace(EXC_PHONE, "[phone]").replace(EXC_DIGITS, "[digits]");
+}
+
+/**
+ * posthog `before_send` for `capture_exceptions`: mask every string inside
+ * `$exception*` properties and drop PII-looking keys. Other events pass through.
+ */
+export function scrubExceptionEvent<T extends { event?: string; properties?: Record<string, unknown> } | null>(evt: T): T {
+  if (!evt || evt.event !== "$exception" || !evt.properties) return evt;
+  // Fail closed: no string from the exception ever leaves the browser unless it
+  // is one of a fixed set of constants below. Message, value, stack function
+  // names, script paths, module names and mechanism text are all untrusted
+  // (they can echo a name, address or order note, or be attacker-chosen), so
+  // they are never copied. Only enum values, numbers and booleans survive.
+  const KNOWN_TYPES = new Set([
+    "Error", "TypeError", "ReferenceError", "SyntaxError", "RangeError", "EvalError",
+    "URIError", "AggregateError", "DOMException", "SecurityError", "NetworkError",
+    "AbortError", "NotAllowedError", "QuotaExceededError", "UnhandledRejection",
+  ]);
+  const KNOWN_MECHANISMS = new Set(["onerror", "onunhandledrejection", "generic", "instrument", "auto.browser.global_handlers"]);
+  const KNOWN_LEVELS = new Set(["fatal", "error", "warning", "info", "debug"]);
+  const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
+  const type = (v: unknown): string => (typeof v === "string" && KNOWN_TYPES.has(v) ? v : "Error");
+  const num = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
+  const bool = (v: unknown): boolean | undefined => (typeof v === "boolean" ? v : undefined);
+  // Derived enum, never the string itself: is the script from our own origin?
+  const ownOrigin = (() => {
+    try {
+      return typeof location !== "undefined" ? location.origin : "";
+    } catch {
+      return "";
+    }
+  })();
+  const source = (o: Record<string, unknown>): "own" | "other" => {
+    const f = typeof o["filename"] === "string" ? o["filename"] : typeof o["abs_path"] === "string" ? o["abs_path"] : "";
+    return ownOrigin && f.startsWith(ownOrigin + "/") ? "own" : "other";
+  };
+  const frame = (f: unknown): Record<string, unknown> => {
+    const o = isObj(f) ? f : {};
+    const out: Record<string, unknown> = {
+      source: source(o),
+      lineno: num(o["lineno"]),
+      colno: num(o["colno"]),
+      in_app: bool(o["in_app"]),
+      synthetic: bool(o["synthetic"]),
+      resolved: bool(o["resolved"]),
+    };
+    for (const k of Object.keys(out)) if (out[k] === undefined) delete out[k];
+    return out;
+  };
+  const item = (e: unknown): Record<string, unknown> => {
+    const o = isObj(e) ? e : {};
+    const out: Record<string, unknown> = { type: type(o["type"]), value: "[redacted]" };
+    const mech = o["mechanism"];
+    if (isObj(mech)) {
+      const mt = mech["type"];
+      const m: Record<string, unknown> = {
+        handled: bool(mech["handled"]),
+        synthetic: bool(mech["synthetic"]),
+        type: typeof mt === "string" && KNOWN_MECHANISMS.has(mt) ? mt : "generic",
+      };
+      for (const k of Object.keys(m)) if (m[k] === undefined) delete m[k];
+      out["mechanism"] = m;
+    }
+    const st = o["stacktrace"];
+    const frames = isObj(st) ? st["frames"] : undefined;
+    if (Array.isArray(frames)) {
+      out["stacktrace"] = { type: "raw", frames: frames.slice(0, 50).map(frame) };
+    }
+    return out;
+  };
+  const props: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(evt.properties)) {
+    if (k.startsWith("$exception")) {
+      if (k === "$exception_list") props[k] = Array.isArray(v) ? v.slice(0, 10).map(item) : [];
+      else if (k === "$exception_types") props[k] = Array.isArray(v) ? v.slice(0, 10).map(type) : [];
+      else if (k === "$exception_message" || k === "$exception_values") props[k] = "[redacted]";
+      else if (k === "$exception_handled") props[k] = bool(v) ?? false;
+      else if (k === "$exception_level") props[k] = typeof v === "string" && KNOWN_LEVELS.has(v) ? v : "error";
+      else if (k === "$exception_sources" || k === "$exception_functions") props[k] = [];
+      // Any other $exception* field is unknown free text: drop it.
+      continue;
+    }
+    // PostHog needs its own project token to ingest the event; it is not customer data.
+    if (k !== "token" && EXC_PII_KEY.test(k)) continue;
+    if (typeof v === "string") props[k] = /^https?:\/\//i.test(v) ? v.split(/[?#]/)[0] : maskPiiInText(v);
+    else props[k] = v;
+  }
+  return { ...evt, properties: props };
+}
+
+export type CheckoutFailStep = "create_order" | "start_payment" | "confirm_payment";
+
+/**
+ * Closed-vocabulary props for `checkout_payment_failed`. `error_code` is a
+ * short machine code (`http_502`, `network`, `no_redirect_url`, `declined`),
+ * never a message, so no customer text or order reference can ride along.
+ */
+export function checkoutFailProps(p: { step: CheckoutFailStep; provider?: string; errorCode?: string | null }) {
+  const code = (p.errorCode ?? "").trim();
+  const provider = (p.provider ?? "spicepay").trim();
+  return {
+    site: "vyrax",
+    step: p.step,
+    provider: /^[a-z0-9_]{1,24}$/.test(provider) ? provider : "unknown",
+    error_code: /^[A-Za-z0-9_.:-]{1,48}$/.test(code) ? code : "unknown",
+  };
+}

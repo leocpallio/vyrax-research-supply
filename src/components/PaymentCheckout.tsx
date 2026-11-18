@@ -7,7 +7,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { findPromo } from "@/data/promos";
-import { capture, orderAttribution, phIds, trackCheckoutStep } from "@/lib/analytics";
+import { capture, orderAttribution, phIds, trackCheckoutPaymentFailed, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
@@ -170,6 +170,7 @@ export function PaymentCheckout() {
     setBusy(true);
     setError("");
     trackCheckoutStep("payment", items);
+    let failCode = "network";
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -191,7 +192,9 @@ export function PaymentCheckout() {
         test_mode?: boolean;
         error?: string;
       };
+      failCode = `http_${res.status}`;
       if (res.status === 400) {
+        trackCheckoutPaymentFailed({ step: "create_order", errorCode: failCode });
         setError(
           "We could not accept those details. Please check the highlighted fields and try again.",
         );
@@ -205,8 +208,10 @@ export function PaymentCheckout() {
         !data.order_id ||
         !data.guest_token ||
         !/^https:\/\/checkout\.spicepay\.net\/pay\//.test(data.checkout_url)
-      )
+      ) {
+        if (res.ok) failCode = "no_redirect_url";
         throw new Error("Checkout unavailable");
+      }
       sessionStorage.setItem(`vyrax-order-${data.order_id}`, data.guest_token);
       capture("payment_initiated", {
         test_mode: data.test_mode === true,
@@ -219,6 +224,7 @@ export function PaymentCheckout() {
       // Stay locked: the browser is leaving for the payment page.
       window.location.assign(data.checkout_url);
     } catch {
+      trackCheckoutPaymentFailed({ step: "start_payment", errorCode: failCode });
       setError(
         `We could not set up your payment, and nothing has been charged. Your details are still here: press "Try again". If it keeps failing, email ${site.email}.`,
       );
