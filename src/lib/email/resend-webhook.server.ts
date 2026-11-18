@@ -133,7 +133,9 @@ export async function resendWebhook(request: Request, deps: Deps = {}): Promise<
   if (!ok) return json({ error: "Bad signature" }, 401);
   let evt: { type?: unknown; data?: Record<string, unknown> };
   try {
-    evt = JSON.parse(body);
+    const parsed: unknown = JSON.parse(body);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return json({ error: "Bad body" }, 400);
+    evt = parsed as typeof evt;
   } catch {
     return json({ error: "Bad body" }, 400);
   }
