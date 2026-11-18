@@ -14,7 +14,7 @@ import {
   type CartItem,
 } from "@/lib/catalog";
 import { site } from "@/data/site";
-import { findPromo } from "@/data/promos";
+import { PROMO_NO_STACK_NOTE, findPromo } from "@/data/promos";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { trackBeginCheckout } from "@/lib/analytics";
@@ -246,7 +246,27 @@ function Basket() {
                   setCodeInput("");
                 }}
               >
-                {code && p.promo ? (
+                {code && p.promoSkippedForTier ? (
+                  <div
+                    className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+                    data-testid="promo-skipped"
+                  >
+                    <p className="font-medium">
+                      Your {Math.round(p.rate * 100)}% spend saving is applied instead of {code}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+                    <button
+                      type="button"
+                      className="mt-1.5 text-xs underline underline-offset-2"
+                      onClick={() => {
+                        savePromo("");
+                        setCode("");
+                      }}
+                    >
+                      Remove code
+                    </button>
+                  </div>
+                ) : code && p.promo ? (
                   <div className="flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
                     <span className="font-medium text-verify">
                       {p.promo.code} applied · {p.promo.pct}% off
@@ -284,6 +304,7 @@ function Basket() {
                       </Button>
                     </div>
                     {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+                    <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
                   </>
                 )}
               </form>

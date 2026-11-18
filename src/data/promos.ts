@@ -36,3 +36,27 @@ export function promoDiscountPence(code: string | null | undefined, goodsPence: 
   if (goodsPence < promo.minSpend * 100) return 0;
   return Math.round((goodsPence * promo.pct) / 100);
 }
+
+/** Customer wording for the one-discount rule, shared by the basket, checkout and emails. */
+export const PROMO_NO_STACK_NOTE =
+  "Codes do not combine with spend discounts. You get whichever saves more.";
+
+/** One discount per basket (Leo 18 Nov 2026): a spend tier and a code never stack. Both are
+ *  worked out on the same base (goods after the multi-buy), and the customer gets the larger;
+ *  an exact tie goes to the spend tier. Shared by the basket (display) and quoteCheckout
+ *  (what is charged) so the two can never disagree. */
+export function bestSingleDiscount(
+  code: string | null | undefined,
+  afterOfferPence: number,
+  tierRate: number,
+) {
+  const tierP = Math.round(afterOfferPence * tierRate);
+  const codeP = promoDiscountPence(code, afterOfferPence);
+  const promoWins = codeP > tierP;
+  return {
+    tierPence: promoWins ? 0 : tierP,
+    promoPence: promoWins ? codeP : 0,
+    /** A valid code that was not used because the spend discount was at least as good. */
+    promoSkippedForTier: codeP > 0 && !promoWins,
+  };
+}

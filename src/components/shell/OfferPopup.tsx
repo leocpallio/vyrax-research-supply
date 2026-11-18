@@ -280,7 +280,8 @@ export function OfferPopup() {
             </div>
 
             <p className="reveal-line mt-3 text-[14px] leading-[20px] text-ink/70">
-              10% off any order over £50. Yours alone, works once.
+              10% off any order over £50. Yours alone, works once. Not combined with spend
+              discounts.
             </p>
 
             <div className="reveal-line mt-4 space-y-[10px]">

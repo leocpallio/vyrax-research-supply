@@ -64,7 +64,7 @@ const compounds = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...u
 // ---------------------------------------------------------------------------------------------
 const num = (n: number) => String(n);
 const codeLine = () =>
-  `Code ${CODE} takes ${PROMO.pct}% off your first order of ${gbp(PROMO.minSpend)} or more.`;
+  `Code ${CODE} takes ${PROMO.pct}% off your first order of ${gbp(PROMO.minSpend)} or more. It does not combine with spend discounts.`;
 const dispatchClaim = () =>
   claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
 const deliveryClaim = () =>

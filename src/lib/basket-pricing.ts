@@ -1,5 +1,5 @@
 import { site } from "../data/site";
-import { findPromo, normaliseCode, promoDiscountPence } from "../data/promos";
+import { bestSingleDiscount, findPromo, normaliseCode } from "../data/promos";
 
 export type CartItem = {
   slug: string;
@@ -23,9 +23,11 @@ export function priceBasket(items: CartItem[], code?: string | null) {
   const afterP = subtotalP - freeP;
   const tiers = [...site.spendTiers].sort((a, b) => b.over - a.over);
   const rate = tiers.find((t) => afterP >= t.over * 100)?.rate ?? 0;
-  const tierP = Math.round(afterP * rate);
+  // One discount only: the larger of the spend tier and the code, never both.
+  const single = bestSingleDiscount(code, afterP, rate);
+  const tierP = single.tierPence;
   const goodsP = afterP - tierP;
-  const promoP = promoDiscountPence(code, goodsP);
+  const promoP = single.promoPence;
   const promo = findPromo(code);
   const netGoodsP = goodsP - promoP;
   const thresholdP = site.freeDeliveryThreshold * 100;
@@ -49,6 +51,7 @@ export function priceBasket(items: CartItem[], code?: string | null) {
     minimumGap: gbpOf(Math.max(0, minimumP - subtotalP)),
     freeVials: gbpOf(freeP),
     rate,
+    promoSkippedForTier: single.promoSkippedForTier,
     tierDiscount: gbpOf(tierP),
     goods: gbpOf(goodsP),
     delivery: gbpOf(deliveryP),

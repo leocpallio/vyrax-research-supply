@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
-import { findPromo } from "@/data/promos";
+import { PROMO_NO_STACK_NOTE, findPromo } from "@/data/promos";
 import { capture, orderAttribution, phIds, trackCheckoutPaymentFailed, trackCheckoutStep } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
@@ -295,7 +295,27 @@ export function PaymentCheckout() {
           </li>
         ))}
       </ul>
-      {quote.promo ? (
+      {promoCode && quote.promoSkippedForTier ? (
+        <div
+          className="mt-3 rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+          data-testid="promo-skipped"
+        >
+          <p className="font-medium">
+            Your {Math.round(quote.rate * 100)}% spend saving is applied instead of {promoCode}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+          <button
+            type="button"
+            className="mt-1.5 text-xs underline underline-offset-2"
+            onClick={() => {
+              savePromo("");
+              setPromoCode("");
+            }}
+          >
+            Remove code
+          </button>
+        </div>
+      ) : quote.promo ? (
         <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
           <span className="font-medium text-verify">
             {quote.promo.code} applied · {quote.promo.pct}% off
@@ -333,6 +353,7 @@ export function PaymentCheckout() {
             </Button>
           </div>
           {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+          <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
         </form>
       )}
       <dl className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">

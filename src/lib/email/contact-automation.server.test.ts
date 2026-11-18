@@ -138,15 +138,17 @@ test("every kind renders with an unsubscribe link and no em or en dashes", () =>
 });
 
 test("cart1 uses the code variant only while the code still applies to the basket", () => {
-  // A basket of one vial is normally under the code's minimum spend, so the no-code variant is used.
+  // The code gives nothing once a spend tier applies (one discount per basket), so a huge basket
+  // gets the no-code variant. A mid-sized basket over the code minimum but under the first tier
+  // still gets it.
   const big = [{ ...items[0]!, quantity: 99 }];
-  const small = cartCodeStillValid(items);
-  const large = cartCodeStillValid(big);
-  expect(large).toBe(true);
-  const mailLarge = contactMailFor(row({ kind: "cart1", payload: { items: big } }));
-  const mailSmall = contactMailFor(row({ kind: "cart1", payload: { items } }));
-  expect(mailLarge.html.includes("FIRST10")).toBe(true);
-  if (!small) expect(mailSmall.html.includes("FIRST10")).toBe(false);
+  expect(cartCodeStillValid(big)).toBe(false);
+  expect(contactMailFor(row({ kind: "cart1", payload: { items: big } })).html.includes("FIRST10")).toBe(false);
+  const mid = [1, 2, 3, 4, 5, 6, 7, 8]
+    .map((quantity) => [{ ...items[0]!, quantity }])
+    .find((basket) => cartCodeStillValid(basket));
+  expect(mid).toBeDefined();
+  expect(contactMailFor(row({ kind: "cart1", payload: { items: mid } })).html.includes("FIRST10")).toBe(true);
 });
 
 test("cart rows with an unknown product are refused", () => {

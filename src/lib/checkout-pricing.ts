@@ -2,7 +2,7 @@ import { metabolicAndRegenerative } from "../data/compounds-a";
 import { secretagoguesToSupplies } from "../data/compounds-b";
 import { ukplAdditions } from "../data/ukpl-additions";
 import { site } from "../data/site";
-import { findPromo, normaliseCode, promoDiscountPence } from "../data/promos";
+import { bestSingleDiscount, findPromo, normaliseCode } from "../data/promos";
 
 const catalog = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...ukplAdditions];
 export type CheckoutLine = { slug: string; strength: string; quantity: number };
@@ -54,7 +54,9 @@ export function quoteCheckout(input: unknown, code?: string | null) {
   const rate =
     [...site.spendTiers].sort((a, b) => b.over - a.over).find((t) => afterOffer >= t.over * 100)
       ?.rate ?? 0;
-  const tierDiscountPence = Math.round(afterOffer * rate);
+  // One discount only: the larger of the spend tier and the code, never both.
+  const single = bestSingleDiscount(code, afterOffer, rate);
+  const tierDiscountPence = single.tierPence;
   const goodsPence = afterOffer - tierDiscountPence;
   // Free gift: real £0 lines on the order record (not in the payment amount) so the packer
   // dispatches them. Granted on goods value alone; buying the same vial does not cancel it.
@@ -72,7 +74,7 @@ export function quoteCheckout(input: unknown, code?: string | null) {
       }
     : undefined;
   const orderLines = giftLine ? [...items, giftLine] : items;
-  const promoPenceApplied = promoDiscountPence(code, goodsPence);
+  const promoPenceApplied = single.promoPence;
   const promoApplied = findPromo(code);
   const netGoodsPence = goodsPence - promoPenceApplied;
   const deliveryPence =
@@ -95,6 +97,7 @@ export function quoteCheckout(input: unknown, code?: string | null) {
             discountPence: promoPenceApplied,
           }
         : undefined,
+    promoSkippedForTier: single.promoSkippedForTier,
     subtotalPence,
     freeVialsPence,
     tierDiscountPence,
