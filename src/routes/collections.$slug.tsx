@@ -36,8 +36,14 @@ export const Route = createFileRoute("/collections/$slug")({
     // The lede is long enough to eat the whole 155-char budget, so trim it before the price and the
     // tail are appended. Otherwise clampDescription cuts at the lede's full stop and drops both.
     const lede = content.lede.replace(/\.$/, "");
+    // The shared template cut this lede mid-sentence ("reconstituting a lyophilised. 1 compound").
+    // Hardcoded for this one collection (Leo-approved wording, 17 Nov 2026); others still use the template.
+    const descOverrides: Record<string, string> = {
+      "bacteriostatic-water": `Sterile water with 0.9% benzyl alcohol, a standard solvent for lyophilised vials. From ${gbp(low)}, UK supplied.`,
+    };
     const desc = clampDescription(
-      `${lede.length > 95 ? `${lede.slice(0, 95).replace(/[,;:]?\s+\S*$/, "")}` : lede}. ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
+      descOverrides[section.slug] ??
+        `${lede.length > 95 ? `${lede.slice(0, 95).replace(/[,;:]?\s+\S*$/, "")}` : lede}. ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
     );
     const url = abs(`/collections/${section.slug}`);
     const itemList = {
