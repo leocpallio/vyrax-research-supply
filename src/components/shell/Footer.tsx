@@ -17,9 +17,9 @@ const linkCls =
 function Col({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#8FB0F5] mb-0.5 md:mb-3">
+      <h2 className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#8FB0F5] mb-0.5 md:mb-3">
         {title}
-      </h3>
+      </h2>
       <ul className="flex flex-wrap gap-x-3.5 md:block md:space-y-0.5">{children}</ul>
     </div>
   );
@@ -82,9 +82,9 @@ function Newsletter() {
       id="free-guide"
     >
       <div>
-        <h3 className="font-heading text-[18px] md:text-[26px] font-black tracking-[-0.03em] leading-tight">
+        <h2 className="font-heading text-[18px] md:text-[26px] font-black tracking-[-0.03em] leading-tight">
           {signupOpen ? "Stay in the loop." : "Free reconstitution lab guide."}
-        </h3>
+        </h2>
         <p className="mt-1 text-[12.5px] md:text-[14px] text-[#0B1B3B]/65 leading-relaxed max-w-md">
           {signupOpen
             ? "New batch reports, restocks and the free reconstitution lab guide. Unsubscribe anytime."

@@ -2,12 +2,7 @@ import { useMemo, useState } from "react";
 import { StoreShell, Breadcrumbs } from "@/components/Store";
 import { ProductCardGrid } from "@/components/ProductCard";
 import { CategoryPills, type Pill, type SortKey } from "@/components/CategoryPills";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { ChevronDown } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { featuredSlugs, fromPrice, productPath, type Compound } from "@/lib/catalog";
 import type { CategoryContent } from "@/data/category-content";
@@ -53,21 +48,24 @@ export function SeoBlock({ content }: { content: CategoryContent }) {
         <h2 className="font-heading text-xl md:text-2xl font-semibold leading-tight mb-4">
           Frequently asked questions
         </h2>
-        <Accordion type="single" collapsible className="border-t border-[#0B1B3B]/10">
-          {content.faqs.map(([q, a], i) => (
-            <AccordionItem key={q} value={`faq-${i}`} className="border-b border-[#0B1B3B]/10">
-              <AccordionTrigger
+        <div className="border-t border-[#0B1B3B]/10">
+          {content.faqs.map(([q, a]) => (
+            <details key={q} className="group border-b border-[#0B1B3B]/10">
+              <summary
                 data-testid="faq-question"
-                className="py-4 text-left font-heading font-semibold text-[15px] md:text-base hover:no-underline hover:text-[#0B1B3B] transition-colors duration-150"
+                className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left font-heading font-semibold text-[15px] md:text-base transition-colors duration-150 hover:text-[#0B1B3B] [&::-webkit-details-marker]:hidden"
               >
                 {q}
-              </AccordionTrigger>
-              <AccordionContent className="text-[15px] leading-relaxed text-[#0B1B3B]/75">
-                {a}
-              </AccordionContent>
-            </AccordionItem>
+                <ChevronDown
+                  size={16}
+                  aria-hidden
+                  className="shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+                />
+              </summary>
+              <div className="pb-4 pt-0 text-[15px] leading-relaxed text-[#0B1B3B]/75">{a}</div>
+            </details>
           ))}
-        </Accordion>
+        </div>
       </div>
     </section>
   );

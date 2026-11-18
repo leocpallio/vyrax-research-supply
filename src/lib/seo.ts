@@ -123,14 +123,50 @@ export function clampText(text: string, max: number): string {
   return cut.slice(0, Math.max(cut.lastIndexOf(" "), 40)).trimEnd() + "\u2026";
 }
 
-/** Meta description capped at 155 chars, cut at the last full sentence when one fits, else at a word. */
+// Preferred cut points: the word that opens a trailing descriptive clause. Fallbacks: a comma/colon/semicolon or a trailing parenthetical, then any whole word.
+const CLAUSE_OPENER =
+  / (?:acting|that|which|with|carrying|encoded|based|involved|cleaved|modelled|extended|binds|used|first|residues|originally|and one|and a)(?= )/g;
+const CLAUSE_FALLBACK = /[,;:]| \((?=)/g;
+const WORD_BREAK = / (?=\S)/g;
+const DANGLING =
+  /\b(?:a|an|the|of|and|or|to|in|at|for|from|with|by|as|is|are|that|which|one|extended|modelled|used|based|encoded|acting|carrying|cleaved|involved)$/i;
+
+/**
+ * Cut `text` at the last clause boundary that leaves at most `max` characters, ending in a full stop.
+ * Never appends an ellipsis and never ends mid-clause. Returns "" when no clean cut of 25+ chars exists.
+ */
+export function clauseCut(text: string, max: number): string {
+  const t = text
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?]+$/, "");
+  if (t.length + 1 <= max) return `${t}.`;
+  const longest = (re: RegExp) => {
+    let best = "";
+    for (const m of t.matchAll(re)) {
+      const cand = t.slice(0, m.index).replace(/[,;:\s]+$/, "");
+      if (cand.length + 1 > max || cand.length < 25 || DANGLING.test(cand)) continue;
+      if ((cand.match(/\(/g) ?? []).length !== (cand.match(/\)/g) ?? []).length) continue;
+      if (cand.length > best.length) best = cand;
+    }
+    return best;
+  };
+  const best = longest(CLAUSE_OPENER) || longest(CLAUSE_FALLBACK) || longest(WORD_BREAK);
+  return best ? `${best}.` : "";
+}
+
+/** Meta description capped at 155 chars, cut at the last full sentence when one fits, else at a clause. Never ends in an ellipsis. */
 export function clampDescription(text: string, max = 155): string {
   const t = text.replace(/\s+/g, " ").trim();
   if (t.length <= max) return t;
   const head = t.slice(0, max);
   const stop = Math.max(head.lastIndexOf(". "), head.lastIndexOf("? "));
   if (stop >= 90) return head.slice(0, stop + 1);
-  return clampText(t, max);
+  const clause = clauseCut(t, max);
+  if (clause) return clause;
+  // Last resort: whole words, closed with a full stop rather than an ellipsis.
+  const cut = head.slice(0, Math.max(head.lastIndexOf(" "), 40)).replace(/[,;:\s]+$/, "");
+  return `${cut.slice(0, max - 1)}.`;
 }
 
 /** Append the description tail unless the copy already ends with it. */
