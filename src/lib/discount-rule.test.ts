@@ -107,6 +107,67 @@ describe("exempt lines", () => {
   });
 });
 
+describe("an exempt line never changes the discount on the other lines (webqa t_2ef0d9d7)", () => {
+  const discountOf = (q: ReturnType<typeof quoteCheckout>) =>
+    q.freeVialsPence + q.tierDiscountPence + (q.promo?.discountPence ?? 0);
+  const others: [string, ReturnType<typeof line>[]][] = [
+    ["9x RT10 (multi-buy, capped)", [line("retatrutide", "10mg", 9)]],
+    ["30x RT10", [line("retatrutide", "10mg", 30)]],
+    ["30x TIRZ 20mg (multi-buy)", [line("tirzepatide", "20mg", 30)]],
+    ["20x BPC 5mg (tier)", [line("bpc-157", "5mg", 20)]],
+    ["5x BPC 5mg (FIRST10 code)", [line("bpc-157", "5mg", 5)]],
+    ["3x RT10 + 2x TB-500", [line("retatrutide", "10mg", 3), line("tb-500", "5mg", 2)]],
+  ];
+  for (const [name, base] of others) {
+    for (const code of [null, "FIRST10"]) {
+      for (const n of [1, 5, 20]) {
+        test(`${name}, code ${code ?? "none"}: adding ${n}x LL-37 leaves the discount unchanged`, () => {
+          const without = quoteCheckout(base, code);
+          const withLl = quoteCheckout([...base, line("ll-37", "5mg", n)], code);
+          expect(discountOf(withLl)).toBe(discountOf(without));
+          expect(withLl.freeVialsPence).toBe(without.freeVialsPence);
+          expect(withLl.tierDiscountPence).toBe(without.tierDiscountPence);
+          // The exempt line is paid at full list price.
+          const llPence = Math.round(priceOf("ll-37", "5mg") * 100) * n;
+          expect(withLl.subtotalPence - discountOf(withLl)).toBe(
+            without.subtotalPence - discountOf(without) + llPence,
+          );
+          // Basket display agrees with the charge.
+          const b = priceBasket(
+            [...base.map((l) => cart(l.slug, l.strength, l.quantity)), cart("ll-37", "5mg", n)],
+            code,
+          );
+          expect(Math.round((b.total - b.delivery) * 100)).toBe(withLl.subtotalPence - discountOf(withLl));
+        });
+      }
+    }
+  }
+
+  test("the reported case: 9x RT10 + 1x LL-37 discounts exactly what 9x RT10 alone does", () => {
+    const alone = quoteCheckout([line("retatrutide", "10mg", 9)]);
+    const mixed = quoteCheckout([line("retatrutide", "10mg", 9), line("ll-37", "5mg", 1)]);
+    expect(discountOf(mixed)).toBe(discountOf(alone));
+    expect(discountOf(alone)).toBe(
+      Math.floor((alone.subtotalPence * site.maxDiscountPct) / 100),
+    );
+  });
+
+  test("worst case: RT10 pays at least 70% of list and the basket pays at least 70% (so above 60%) of list", () => {
+    for (const qty of [3, 9, 30]) {
+      for (const n of [0, 1, 5]) {
+        const lines = [line("retatrutide", "10mg", qty), ...(n ? [line("ll-37", "5mg", n)] : [])];
+        const q = quoteCheckout(lines, "FIRST10");
+        const d = discountOf(q);
+        const rt = Math.round(priceOf("retatrutide", "10mg") * 100) * qty;
+        // Discount sits wholly on RT10, so RT10 pays >= 70% of its list value.
+        expect(rt - d).toBeGreaterThanOrEqual(Math.ceil(rt * 0.7));
+        // Share of list actually paid by the whole basket; delivery and the free water are extra.
+        expect(q.subtotalPence - d).toBeGreaterThanOrEqual(Math.ceil(q.subtotalPence * 0.7));
+      }
+    }
+  });
+});
+
 describe("six list lifts", () => {
   const lifts: [string, string, number][] = [
     ["tb-500", "5mg", 25.99],

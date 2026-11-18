@@ -9,7 +9,9 @@ import { findPromo, promoDiscountPence } from "../data/promos";
 //       a) multi-buy (every 3rd vial free on the site.b2g1 lines),
 //       b) the spend tier (site.spendTiers),
 //       c) the code (FIRST10 or a welcome code).
-//  2. Hard cap: the discount never exceeds site.maxDiscountPct of the list subtotal.
+//  2. Hard cap: the discount never exceeds site.maxDiscountPct of the list value of the ELIGIBLE
+//     (non-exempt) lines. Exempt lines are outside the cap base, so adding one never raises the
+//     discount on the other lines.
 //  3. Lines in site.discountExempt are outside the spend tier and the code: they do not count
 //     toward the tier or code minimum and are never discounted by either.
 
@@ -54,7 +56,7 @@ export function chooseDiscount(lines: DiscountLine[], code?: string | null) {
       raw = v;
     }
   }
-  const capPence = Math.floor((subtotalPence * site.maxDiscountPct) / 100);
+  const capPence = Math.floor((eligiblePence * site.maxDiscountPct) / 100);
   const discountPence = Math.min(raw, capPence);
   return {
     kind,
