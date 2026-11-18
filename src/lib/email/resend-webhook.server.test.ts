@@ -103,6 +103,15 @@ describe("vyrax resend webhook", () => {
       brand: "vyrax",
     });
   });
+  it("answers 400, not a thrown error, for a signed body that is JSON null or an array", async () => {
+    const { db, rows } = fakeDb();
+    for (const body of ["null", "[]", "42"]) {
+      const res = await call(body, { db });
+      expect(res.status).toBe(400);
+    }
+    expect(rows.length).toBe(0);
+  });
+
   it("ignores non-email events", async () => {
     const { db, rows } = fakeDb();
     const r = await call(evt("domain.updated", { id: "d" }), { db });

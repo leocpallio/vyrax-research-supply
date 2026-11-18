@@ -18,7 +18,9 @@ CREATE TABLE IF NOT EXISTS public.customer_interactions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE public.customer_interactions IS 'Append-only ledger of Resend email events for Vyrax (delivered, bounced, complained, clicked, opened, failed, suppressed). payload carries flow, stage, send_id, brand from the Resend tags.';
-CREATE UNIQUE INDEX IF NOT EXISTS uq_ci_dedupe ON public.customer_interactions (dedupe_key) WHERE dedupe_key IS NOT NULL;
+-- Not a partial index: PostgREST upsert (onConflict=dedupe_key) emits ON CONFLICT (dedupe_key) with no predicate,
+-- which Postgres cannot match to a partial index. NULL keys are still allowed more than once.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ci_dedupe ON public.customer_interactions (dedupe_key);
 CREATE INDEX IF NOT EXISTS idx_ci_occurred_at ON public.customer_interactions (occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ci_event ON public.customer_interactions (event_type, occurred_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ci_email ON public.customer_interactions (lower(customer_email), occurred_at DESC);
