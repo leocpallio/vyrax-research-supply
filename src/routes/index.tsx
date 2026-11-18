@@ -40,9 +40,9 @@ export const Route = createFileRoute("/")({
       ? `${claimGate("testing.page-title")} `
       : "";
     const title = `Peptides UK | Growth Hormone Secretagogues | Vyrax Labs`;
-    const batchTesting = claimText("testing.hplc-ms-batch-testing");
+    // Leo-approved wording (17 Nov 2026): no benefit terms, no price, ends on the lab-report fact.
     const desc = clampDescription(
-      `Buy peptides in the UK for weight loss, recovery, growth hormone and tanning: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds.${batchTesting ? ` ${batchTesting}.` : ""} UK supplied.`,
+      `Research peptides supplied in the UK: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds, with batch lab reports.`,
     );
     const org = {
       "@context": "https://schema.org",
