@@ -110,12 +110,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "font/woff2",
         crossOrigin: "anonymous",
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap",
-      },
       { rel: "icon", href: "/favicon.ico?v=3", sizes: "32x32" },
       { rel: "icon", href: "/favicon-96x96.png?v=3", sizes: "96x96", type: "image/png" },
       { rel: "icon", href: "/favicon.svg?v=3", type: "image/svg+xml" },
