@@ -243,7 +243,7 @@ export function HomeProductCard({
 
   const price = (
     <p className="flex flex-wrap items-baseline gap-x-1.5">
-      {multi && <span className="text-xs text-[#0B1B3B]/60">From</span>}
+      {multi && <span className="text-xs text-[#0B1B3B]/72">From</span>}
       {ladder && !multi && (
         <s className="text-[13px] text-[#0B1B3B]/68 tabular-nums">{gbp(ladder.was)}</s>
       )}
@@ -544,7 +544,7 @@ export function HeroSplit({
                     <t.icon size={15} className="shrink-0" style={{ color: BLUE }} />
                     {t.stat}
                   </span>
-                  <span className="block text-[12.5px] md:text-[13px] text-[#0B1B3B]/60 leading-snug mt-1">
+                  <span className="block text-[12.5px] md:text-[13px] text-[#0B1B3B]/72 leading-snug mt-1">
                     {t.body}
                   </span>
                 </span>
@@ -813,7 +813,7 @@ export function CoaBand({
         </div>
 
         <div>
-          <div className="hidden md:grid grid-cols-[64px_minmax(0,1fr)_120px_110px_88px] gap-4 px-2 pb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#EEF2F8]/45">
+          <div className="hidden md:grid grid-cols-[64px_minmax(0,1fr)_120px_110px_88px] gap-4 px-2 pb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#EEF2F8]/65">
             <span />
             <span>Compound / batch</span>
             <span>HPLC purity</span>

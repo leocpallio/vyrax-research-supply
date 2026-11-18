@@ -138,7 +138,7 @@ function Basket() {
                   />
                 </div>
                 {p.gift && (
-                  <p className="text-xs text-verify mt-3 flex items-center gap-1.5">
+                  <p className="text-xs text-verify-text mt-3 flex items-center gap-1.5">
                     <Tag size={13} /> Free {p.gift.label} worth £{p.gift.value.toFixed(2)} added
                   </p>
                 )}
@@ -271,7 +271,7 @@ function Basket() {
                   </div>
                 ) : code && p.promo ? (
                   <div className="flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
-                    <span className="font-medium text-verify">
+                    <span className="font-medium text-verify-text">
                       {p.promo.code} applied · {p.promo.pct}% off
                     </span>
                     <button
@@ -320,7 +320,7 @@ function Basket() {
                 <strong className="tabular-nums">{gbp(p.subtotal)}</strong>
               </div>
               {p.freeVials > 0 && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
                   <span>
                     {p.discountCapped
                       ? `Multi-buy discount (capped at ${site.maxDiscountPct}% off)`
@@ -330,13 +330,13 @@ function Basket() {
                 </div>
               )}
               {p.tierDiscount > 0 && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
                   <span>Spend saving ({Math.round(p.rate * 100)}%)</span>
                   <span className="tabular-nums">-{gbp(p.tierDiscount)}</span>
                 </div>
               )}
               {p.promo && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
                   <span>Discount ({p.promo.code})</span>
                   <span className="tabular-nums">-{gbp(p.promo.amount)}</span>
                 </div>
