@@ -112,37 +112,12 @@ let loading: Promise<PostHog | null> | null = null;
 let queue: { event: string; properties: Record<string, unknown> }[] = [];
 const MAX_QUEUE = 50;
 
-/**
- * Audit A4-06: posthog-js is ~300 KB and was parsed during first paint (TBT ~1 s on mobile). Wait
- * until the page has loaded and the main thread is idle before importing it. Events captured in the
- * meantime wait in `queue` and are flushed in order. Checkout pages skip the wait so payment
- * events are never held back.
- */
-function whenIdle(): Promise<void> {
-  if (typeof window === "undefined" || window.location.pathname.startsWith("/checkout"))
-    return Promise.resolve();
-  return new Promise((resolve) => {
-    const go = () => {
-      const ric = (
-        window as Window & {
-          requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
-        }
-      ).requestIdleCallback;
-      if (ric) ric(() => resolve(), { timeout: 2500 });
-      else window.setTimeout(resolve, 1500);
-    };
-    if (document.readyState === "complete") go();
-    else window.addEventListener("load", go, { once: true });
-  });
-}
-
 async function ensureClient(): Promise<PostHog | null> {
   if (typeof window === "undefined" || !analyticsConfigured) return null;
   if (client) return client;
   if (loading) return loading;
   loading = (async () => {
     try {
-      await whenIdle();
       const { default: posthog } = await import("posthog-js");
       posthog.init(key!, {
         api_host: `${window.location.origin}/ingest`, // first-party proxy, src/routes/ingest.$.ts
@@ -608,10 +583,6 @@ export function trackBeginCheckout(items: CartItem[] = readCart()) {
 if (typeof window !== "undefined" && analyticsConfigured) void ensureClient();
 
 /** One event wherever checkout cannot start or confirm a payment (step + provider + short code, no PII). */
-export function trackCheckoutPaymentFailed(p: {
-  step: CheckoutFailStep;
-  provider?: string;
-  errorCode?: string | null;
-}) {
+export function trackCheckoutPaymentFailed(p: { step: CheckoutFailStep; provider?: string; errorCode?: string | null }) {
   capture("checkout_payment_failed", checkoutFailProps(p));
 }
