@@ -54,6 +54,21 @@ export const site = {
     { slug: "retatrutide", strength: "10mg" },
     { slug: "tirzepatide", strength: "20mg" },
   ],
+  // One discount per basket, never stacked (src/lib/discount.ts): the largest of the multi-buy,
+  // the spend tier and the code. Leo 18 Nov 2026 (BLK-489).
+  // Hard cap: the discount never exceeds this share of the list subtotal (server and basket).
+  maxDiscountPct: 30,
+  // Thin-margin lines kept out of the spend tier and the code (they sell at list). Cagrilintide
+  // is not in the catalogue today; it is listed so it stays exempt if it is added.
+  discountExempt: [
+    { slug: "cagrilintide", strength: "5mg" },
+    { slug: "ll-37", strength: "5mg" },
+    { slug: "cjc-1295-dac", strength: "5mg" },
+    { slug: "igf-1-lr3", strength: "1mg" },
+    { slug: "thymosin-alpha-1", strength: "10mg" },
+    { slug: "selank", strength: "5mg" },
+    { slug: "glow", strength: "70mg" },
+  ] as { slug: string; strength: string }[],
   // Free gift added automatically once goods reach `over`. Fulfilled as `quantity` real £0 order
   // lines so the packer sees them; mirrored in priceBasket and quoteCheckout. Null disables it.
   firstOrderGift: {

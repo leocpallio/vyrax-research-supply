@@ -35,8 +35,8 @@ describe("server checkout quote", () => {
   test("applies offer and delivery from canonical catalogue", () => {
     const q = quoteCheckout([{ slug: "retatrutide", strength: "10mg", quantity: 3 }]);
     expect(q.subtotalPence).toBe(17997);
-    expect(q.freeVialsPence).toBe(5999);
-    expect(q.totalPence).toBe(11998);
+    expect(q.freeVialsPence).toBe(5399); // third vial free is 33%, the 30% cap binds
+    expect(q.totalPence).toBe(12598);
   });
 });
 

@@ -38,8 +38,7 @@ export function promoDiscountPence(code: string | null | undefined, goodsPence: 
 }
 
 /** Customer wording for the one-discount rule, shared by the basket, checkout and emails. */
-export const PROMO_NO_STACK_NOTE =
-  "Codes do not combine with spend discounts. You get whichever saves more.";
+export const PROMO_NO_STACK_NOTE = `Offers do not combine. You get whichever saves more, up to ${site.maxDiscountPct}% off the list price.`;
 
 /** One discount per basket (Leo 18 Nov 2026): a spend tier and a code never stack. Both are
  *  worked out on the same base (goods after the multi-buy), and the customer gets the larger;

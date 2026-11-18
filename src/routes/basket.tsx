@@ -321,7 +321,11 @@ function Basket() {
               </div>
               {p.freeVials > 0 && (
                 <div className="flex justify-between mt-3 text-sm text-verify">
-                  <span>Multi-buy discount (buy 2, get 1 free)</span>
+                  <span>
+                    {p.discountCapped
+                      ? `Multi-buy discount (capped at ${site.maxDiscountPct}% off)`
+                      : "Multi-buy discount (buy 2, get 1 free)"}
+                  </span>
                   <span className="tabular-nums">-{gbp(p.freeVials)}</span>
                 </div>
               )}

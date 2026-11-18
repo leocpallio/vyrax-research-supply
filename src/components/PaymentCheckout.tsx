@@ -381,7 +381,11 @@ export function PaymentCheckout() {
         </div>
         {quote.freeVials > 0 && (
           <div className="flex justify-between">
-            <dt>Multi-buy saving</dt>
+            <dt>
+              {quote.discountCapped
+                ? `Multi-buy saving (capped at ${site.maxDiscountPct}% off)`
+                : "Multi-buy saving"}
+            </dt>
             <dd className="tabular-nums">-{gbp(quote.freeVials)}</dd>
           </div>
         )}
