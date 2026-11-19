@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { InfoPage, pageHead } from "@/components/InfoPage";
 import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
+import { flags } from "@/lib/flags";
+import { claimText } from "@/lib/claims";
 
 export const Route = createFileRoute("/returns")({
   head: () =>
@@ -36,6 +38,17 @@ function Returns() {
         goods have been handled more than needed to inspect them.
       </p>
       <p>Return postage is free: we cover the cost of sending eligible items back to us.</p>
+      {flags.orderClarity && (
+        <>
+          <h2>Cancelling before dispatch</h2>
+          <p>
+            If your order has not been dispatched yet, email{" "}
+            {site.email ? <a href={`mailto:${site.email}`}>{site.email}</a> : "us"} with your order
+            reference and we will cancel it and refund the card you paid with. Once a parcel has been
+            dispatched, the {site.returnWindowDays}-day change-of-mind window above applies.
+          </p>
+        </>
+      )}
       <h2>Faulty, damaged or wrong items</h2>
       <p>
         Tell us as soon as you can and include your order number and photos. Keep the packaging and
@@ -65,7 +78,10 @@ function Returns() {
         {site.email ? (
           <>
             Email <a href={`mailto:${site.email}`}>{site.email}</a> or use the{" "}
-            <Link to="/contact">contact page</Link>. We do not promise a reply time.
+            <Link to="/contact">contact page</Link>.{" "}
+            {flags.orderClarity && claimText("support.reply-time")
+              ? claimText("support.reply-time")
+              : "We do not promise a reply time."}
           </>
         ) : (
           <>

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { StoreShell, Disclaimer } from "@/components/Store";
 import { Button } from "@/components/ui/button";
 import { capture, trackCheckoutPaymentFailed } from "@/lib/analytics";
-import { getCompound, categories } from "@/lib/catalog";
+import { getCompound, categories, stockOf, productPath } from "@/lib/catalog";
 import {
   buildPurchase,
   claimPurchase,
@@ -12,6 +12,8 @@ import {
   type DlLine,
 } from "@/lib/datalayer";
 import { site } from "@/data/site";
+import { flags } from "@/lib/flags";
+import { gbp } from "@/lib/catalog";
 import { classifyStatus, orderRef, type ReturnView } from "@/lib/checkout-form";
 
 export const Route = createFileRoute("/checkout_/return")({
@@ -30,7 +32,15 @@ type State =
   | { kind: "no-ref" }
   | { kind: "no-token"; order: string }
   | { kind: "error"; order: string }
-  | { kind: "result"; order: string; view: ReturnView; test: boolean; polling: boolean };
+  | {
+      kind: "result";
+      order: string;
+      view: ReturnView;
+      test: boolean;
+      polling: boolean;
+      /** vyrax_postpurchase_bac: the paid order held a powder vial and no diluent. */
+      needsDiluent?: boolean;
+    };
 
 const MAX_CHECKS = 12;
 
@@ -70,7 +80,11 @@ function PaymentReturn() {
       };
       const view = classifyStatus(r.status);
       const done = view !== "processing";
-      setState({ kind: "result", order, view, test: r.test_mode === true, polling: !done });
+      const slugs = (r.lines ?? []).map((l) => l.slug);
+      const needsDiluent =
+        slugs.some((x) => x !== "bacteriostatic-water" && getCompound(x)?.kind !== "supply") &&
+        !slugs.includes("bacteriostatic-water");
+      setState({ kind: "result", order, view, test: r.test_mode === true, polling: !done, needsDiluent });
       if ((view === "failed" || view === "expired") && !failReported.current) {
         failReported.current = true; // once per order, even if the poll repeats
         trackCheckoutPaymentFailed({ step: "confirm_payment", errorCode: `status_${r.status.toLowerCase()}` });
@@ -254,6 +268,26 @@ function PaymentReturn() {
     }
   }
 
+  const bac = getCompound("bacteriostatic-water");
+  const bacStrength = bac?.strengths[0];
+  const bacCard =
+    bac && bacStrength && stockOf(bacStrength) === "in" ? (
+      <aside
+        data-testid="postpurchase-bac"
+        className="mt-8 rounded-2xl border border-border p-5 text-sm"
+      >
+        <h2 className="font-heading text-base font-semibold">Forgot the diluent?</h2>
+        <p className="mt-2 text-muted-foreground">
+          {bac.name} {bacStrength.label} is {gbp(bacStrength.price)}. It would be a separate order,
+          so standard delivery of {gbp(site.standardDeliveryFee)} applies unless that order reaches{" "}
+          {gbp(site.freeDeliveryThreshold)}. Your order above is not changed.
+        </p>
+        <Button asChild variant="outline" className="mt-4 rounded-full">
+          <a href={productPath(bac.slug)}>View {bac.name}</a>
+        </Button>
+      </aside>
+    ) : null;
+
   return (
     <StoreShell>
       <div className="container-main py-10 md:py-12 min-h-[55vh] max-w-2xl">
@@ -273,6 +307,12 @@ function PaymentReturn() {
           </p>
         )}
         {action && <div className="mt-6">{action}</div>}
+        {flags.postpurchaseBac &&
+          state.kind === "result" &&
+          state.view === "paid" &&
+          !state.test &&
+          state.needsDiluent &&
+          bacCard}
         <p className="mt-8 text-sm">
           <Link to="/shop" className="underline">
             Return to shop

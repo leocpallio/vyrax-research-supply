@@ -18,6 +18,10 @@ import { PROMO_NO_STACK_NOTE, findPromo } from "@/data/promos";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { trackBeginCheckout, trackDiscountCode } from "@/lib/analytics";
+import { flags } from "@/lib/flags";
+import { DocsPack } from "@/components/shell/DocsPack";
+import { GapFiller } from "@/components/shell/GapFiller";
+import { BacWaterUpsell } from "@/components/shell/CartDrawer";
 
 export const Route = createFileRoute("/basket")({
   head: () => ({
@@ -154,6 +158,16 @@ function Basket() {
                   </p>
                 )}
               </div>
+              {(flags.gapFiller || flags.bacAddon) && (
+                <div className="mb-6 -mt-2" data-testid="basket-nudges">
+                  <GapFiller items={items} code={code} source="basket" />
+                  {flags.bacAddon && (
+                    <div className="-mx-5 -my-4">
+                      <BacWaterUpsell items={items} source="basket" />
+                    </div>
+                  )}
+                </div>
+              )}
               <div className="divide-y divide-border border-y border-border">
                 {items.map((i, index) => {
                   const img = productImage(i.slug, i.strength);
@@ -224,6 +238,7 @@ function Basket() {
                   );
                 })}
               </div>
+              <DocsPack className="mt-6" />
             </div>
             <aside className="bg-surface p-7 rounded-[20px] h-fit">
               <h2 className="font-heading text-xl font-semibold">

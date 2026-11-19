@@ -4,6 +4,7 @@ import { titles } from "@/lib/seo";
 import { site } from "@/data/site";
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
+import { flags } from "@/lib/flags";
 
 export const Route = createFileRoute("/shipping")({
   head: () =>
@@ -53,6 +54,12 @@ function Shipping() {
         international option is offered.
       </p>
       <h2>Dispatch and delivery</h2>
+      {flags.orderClarity && !site.checkoutOpen && (
+        <p data-testid="clarity-not-open">
+          Checkout is not open yet, so nothing is being dispatched. The dispatch and tracking terms
+          below are what will apply once it opens.
+        </p>
+      )}
       <p>
         {claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() })} Orders paid
         after the cut-off, on weekends or on bank holidays are dispatched on the next working day,
@@ -69,6 +76,7 @@ function Shipping() {
       <p>
         {site.carrier} is a tracked service. When your parcel is sent we will email you the tracking
         details.
+        {flags.orderClarity && " If an item is unavailable or your order is delayed, we will email you."}
       </p>
       <h2>Cold-chain packing and storage</h2>
       <p>

@@ -346,6 +346,7 @@ export type EventName =
   | "payment_initiated"
   | "order_confirmation_viewed"
   | "back_in_stock_requested"
+  | "nudge_added"
   | "page_error"
   | "checkout_payment_failed";
 

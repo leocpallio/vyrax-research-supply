@@ -17,6 +17,9 @@ import {
 } from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
+import { flags } from "@/lib/flags";
+import { claimText } from "@/lib/claims";
+import { DocsPack } from "@/components/shell/DocsPack";
 import {
   completedCheckoutSteps,
   formatPostcode,
@@ -672,7 +675,23 @@ export function PaymentCheckout() {
                   </a>
                   .
                 </li>
+                {flags.orderClarity && (
+                  <>
+                    <li data-testid="clarity-cancel">
+                      Changed your mind before it ships? Email{" "}
+                      <a className="underline" href={`mailto:${site.email}`}>
+                        {site.email}
+                      </a>{" "}
+                      with your order reference and we will cancel it and refund your card.
+                    </li>
+                    {claimText("support.reply-time") && (
+                      <li data-testid="clarity-reply">{claimText("support.reply-time")}</li>
+                    )}
+                    <li>If an item is unavailable or your order is delayed, we will email you.</li>
+                  </>
+                )}
               </ul>
+              <DocsPack />
             </form>
           </div>
         )}
