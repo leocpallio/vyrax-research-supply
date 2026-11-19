@@ -173,7 +173,7 @@ export function ProductCard({
         </div>
       </div>
       <div className="pt-3 px-0.5 flex flex-col gap-0.5">
-        <h2 className="font-heading font-bold text-[17px] md:text-[18px] leading-snug tracking-[-0.02em]">
+        <h3 className="font-heading font-bold text-[17px] md:text-[18px] leading-snug tracking-[-0.02em]">
           <a
             href={href}
             data-testid="product-title"
@@ -181,7 +181,7 @@ export function ProductCard({
           >
             {product.name}
           </a>
-        </h2>
+        </h3>
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-[#0B1B3B]/60">
             {product.kind === "blend" && product.composition?.length

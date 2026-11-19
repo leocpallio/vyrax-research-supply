@@ -15,6 +15,7 @@ import { compounds, featured, getCompound, gbp, fromPrice, productPath } from "@
 import { coas } from "@/data/coa";
 import { claimFilled, claimGate, claimText, isClaimAllowed } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
+import { coreFaqs, faqJsonLd } from "@/data/faq";
 import { site, abs } from "@/data/site";
 import { guideBySlug } from "@/data/guides";
 import { clampDescription, ogImageFor } from "@/lib/seo";
@@ -43,7 +44,26 @@ export const Route = createFileRoute("/")({
     const desc = clampDescription(
       `Research peptides supplied in the UK: retatrutide, tirzepatide, BPC-157, TB-500 and GHK-Cu across ${compounds.length} compounds, with batch lab reports.`,
     );
-    // Organization / OnlineStore and WebSite JSON-LD come from __root.tsx (one node each, with @id).
+    const org = {
+      "@context": "https://schema.org",
+      "@type": "OnlineStore",
+      name: site.name,
+      url: site.url,
+      logo: abs("/logo-512.png"),
+      ...(site.email ? { email: site.email } : {}),
+      ...(site.phone ? { telephone: site.phone } : {}),
+    };
+    const webSite = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: site.name,
+      url: site.url,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: `${site.url}/shop?q={search_term_string}` },
+        "query-input": "required name=search_term_string",
+      },
+    };
     return {
       meta: [
         { title },
@@ -66,7 +86,7 @@ export const Route = createFileRoute("/")({
                 as: "image",
                 href: heroPreload.msrc ?? heroPreload.src,
                 media: heroPreload.msrc ? "(max-width: 1023px)" : undefined,
-                fetchPriority: "high" as const,
+                fetchPriority: "high",
               },
               ...(heroPreload.msrc
                 ? [
@@ -75,7 +95,7 @@ export const Route = createFileRoute("/")({
                       as: "image",
                       href: heroPreload.src,
                       media: "(min-width: 1024px)",
-                      fetchPriority: "high" as const,
+                      fetchPriority: "high",
                     },
                   ]
                 : []),
@@ -85,7 +105,11 @@ export const Route = createFileRoute("/")({
         { rel: "alternate", hrefLang: "en-GB", href: abs("/") },
         { rel: "alternate", hrefLang: "x-default", href: abs("/") },
       ],
-      // No FAQPage JSON-LD here: the homepage renders no FAQ, and FAQPage markup must describe visible text.
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(org) },
+        { type: "application/ld+json", children: JSON.stringify(webSite) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(coreFaqs)) },
+      ],
     };
   },
   component: Home,
