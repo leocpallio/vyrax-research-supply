@@ -7,6 +7,7 @@ import { secretagoguesToSupplies } from "../data/compounds-b";
 import { ukplAdditions } from "../data/ukpl-additions";
 import { threeVialOfferExample } from "../data/offers";
 import { claimText } from "./claims";
+import { readFileSync } from "node:fs";
 
 // Leo 18 Nov 2026 (BLK-489): best single discount, 30% hard cap, exempt lines, six list lifts.
 
@@ -35,6 +36,9 @@ describe("one discount per basket, hard capped", () => {
     expect(offer.label).not.toMatch(/free/i);
     expect(claimText("offer.b2g1")).not.toMatch(/free/i);
     expect(charge.totalPence).toBe(12598);
+    const home = readFileSync(new URL("../components/home/HomeSections.tsx", import.meta.url), "utf8");
+    expect(home).toContain("threeVialOfferExample(product.slug, strength.label)");
+    expect(home).not.toMatch(/strength\.price\s*\*\s*2|takes the third off/i);
   });
   for (const qty of [1, 3, 9, 30]) {
     test(`RT10 x${qty} pays at least 60% of list and matches the basket`, () => {

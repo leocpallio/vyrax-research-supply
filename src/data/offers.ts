@@ -35,10 +35,11 @@ export type OfferGift = {
 export const offerGift = site.firstOrderGift as OfferGift | null;
 
 /** The example in the entry popup uses the same capped quote as the checkout. */
-export const threeVialOfferExample = () => {
-  const quote = quoteCheckout([{ slug: "retatrutide", strength: "10mg", quantity: 3 }]);
+export const threeVialOfferExample = (slug = "retatrutide", strength = "10mg") => {
+  const quote = quoteCheckout([{ slug, strength, quantity: 3 }]);
   return {
-    label: `3 Retatrutide 10mg for £${(quote.totalPence / 100).toFixed(2)}`,
+    label: `3 ${quote.items[0]!.name} ${strength} for £${(quote.totalPence / 100).toFixed(2)}`,
+    goodsPence: quote.subtotalPence - quote.freeVialsPence - quote.tierDiscountPence,
     totalPence: quote.totalPence,
   };
 };
