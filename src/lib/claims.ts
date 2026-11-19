@@ -456,7 +456,7 @@ const DEFS = {
     surfaces: ["src/routes/shipping.tsx"],
   },
   "offer.b2g1": {
-    text: "Buy 2 get 1 free",
+    text: "Buy 3 selected vials, save up to 30%",
     requires: [],
     assertion: false,
     surfaces: ["src/components/Store.tsx", "src/routes/index.tsx"],

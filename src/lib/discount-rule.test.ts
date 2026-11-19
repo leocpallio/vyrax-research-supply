@@ -5,6 +5,8 @@ import { priceBasket } from "./basket-pricing";
 import { metabolicAndRegenerative } from "../data/compounds-a";
 import { secretagoguesToSupplies } from "../data/compounds-b";
 import { ukplAdditions } from "../data/ukpl-additions";
+import { threeVialOfferExample } from "../data/offers";
+import { claimText } from "./claims";
 
 // Leo 18 Nov 2026 (BLK-489): best single discount, 30% hard cap, exempt lines, six list lifts.
 
@@ -24,6 +26,16 @@ const cart = (slug: string, strength: string, quantity: number) => ({
 });
 
 describe("one discount per basket, hard capped", () => {
+  test("displayed three-vial offer equals the capped final checkout charge", () => {
+    const offer = threeVialOfferExample();
+    const charge = quoteCheckout([line("retatrutide", "10mg", 3)]);
+    expect(charge.discountCapped).toBe(true);
+    expect(charge.freeVialsPence).toBe(Math.floor(charge.subtotalPence * 0.3));
+    expect(offer.label).toBe(`3 Retatrutide 10mg for £${(charge.totalPence / 100).toFixed(2)}`);
+    expect(offer.label).not.toMatch(/free/i);
+    expect(claimText("offer.b2g1")).not.toMatch(/free/i);
+    expect(charge.totalPence).toBe(12598);
+  });
   for (const qty of [1, 3, 9, 30]) {
     test(`RT10 x${qty} pays at least 60% of list and matches the basket`, () => {
       const q = quoteCheckout([line("retatrutide", "10mg", qty)]);

@@ -103,6 +103,18 @@ SELECT pg_temp.check('guard: enqueue_order_email(packed) enqueues a packed row f
 SELECT pg_temp.check('guard: email_outbox_dispatched_needs_tracking constraint present',
   EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.email_outbox'::regclass AND conname='email_outbox_dispatched_needs_tracking'));
 
+-- A signed payment expiry now changes checkout_state to expired; the claim guard must agree.
+SELECT pg_temp.mk('77777777-7777-4777-8777-777777777777','expiry@example.co.uk','Eve',false,'reviewing','1 hour'::interval);
+UPDATE public.orders SET status='pending_payment', checkout_state='pending' WHERE id='77777777-7777-4777-8777-777777777777';
+SELECT pg_temp.check('paymentExpired is not eligible while checkout is pending',
+  NOT public.email_job_eligible('paymentExpired',(SELECT o FROM public.orders o WHERE id='77777777-7777-4777-8777-777777777777')));
+UPDATE public.orders SET checkout_state='expired', expired_at=now() WHERE id='77777777-7777-4777-8777-777777777777';
+SELECT pg_temp.check('paymentExpired is eligible after signed expiry',
+  public.email_job_eligible('paymentExpired',(SELECT o FROM public.orders o WHERE id='77777777-7777-4777-8777-777777777777')));
+UPDATE public.orders SET checkout_state='paid', status='paid', expired_at=NULL WHERE id='77777777-7777-4777-8777-777777777777';
+SELECT pg_temp.check('late payment cancels paymentExpired eligibility',
+  NOT public.email_job_eligible('paymentExpired',(SELECT o FROM public.orders o WHERE id='77777777-7777-4777-8777-777777777777')));
+
 -- intended cron schedule set after the full chain: the three email jobs plus the 18 Nov stale-checkout expiry job
 -- (run on a freshly reset scratch DB; any other job is a failure)
 SELECT pg_temp.check('exactly the four intended cron jobs with the intended schedules',

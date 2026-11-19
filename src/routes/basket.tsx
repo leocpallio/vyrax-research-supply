@@ -339,7 +339,7 @@ function Basket() {
                   <span>
                     {p.discountCapped
                       ? `Multi-buy discount (capped at ${site.maxDiscountPct}% off)`
-                      : "Multi-buy discount (buy 2, get 1 free)"}
+                      : "Multi-buy discount"}
                   </span>
                   <span className="tabular-nums">-{gbp(p.freeVials)}</span>
                 </div>

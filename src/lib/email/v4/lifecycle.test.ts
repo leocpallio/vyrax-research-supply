@@ -94,9 +94,9 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
   it("reorder emails take offers from site data", () => {
     const r1 = byId("reorder-reminder-1").text;
     expect(r1).toContain(spendTierLine());
-    expect(r1).toContain("Buy two, get the third free");
+    expect(r1).toContain(`Buy three, save up to ${site.maxDiscountPct}%`);
     expect(r1).toContain(`${site.firstOrderGift!.quantity} free bacteriostatic water vials`);
-    expect(byId("reorder-v2-product").text).toContain("Buy two, get the third free");
+    expect(byId("reorder-v2-product").text).toContain(`Buy three, save up to ${site.maxDiscountPct}%`);
     expect(byId("reorder-v2-water").text).toContain("free bacteriostatic water vials");
     expect(byId("reorder-reminder-0").text).toContain("Total at today's prices");
   });

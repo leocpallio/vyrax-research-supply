@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { compounds, productImage } from "@/lib/catalog";
-import { offerGift, researchIntents, topOfferPct } from "@/data/offers";
+import { productImage } from "@/lib/catalog";
+import { offerGift, researchIntents, threeVialOfferExample } from "@/data/offers";
+import { site } from "@/data/site";
 import { savePromo } from "@/lib/promo-client";
 import { trackEmailCaptured } from "@/lib/analytics";
 import { openCartDrawer } from "@/components/shell/cart-store";
@@ -96,10 +97,7 @@ export function OfferPopup() {
   if (!open) return null;
 
   const giftValue = offerGift?.value ?? 0;
-  const retaPrice =
-    compounds.find((x) => x.slug === "retatrutide")?.strengths.find((s) => s.label === "10mg")
-      ?.price ?? 29.99;
-  const freeGoods = (giftValue + retaPrice).toFixed(2);
+  const offer = threeVialOfferExample();
   const giftImg = offerGift ? productImage(offerGift.slug, offerGift.strength) : null;
   const retaImg = productImage("retatrutide", "10mg");
   const inCheckout = path.startsWith("/checkout") || path.startsWith("/basket");
@@ -120,12 +118,12 @@ export function OfferPopup() {
               Welcome offer
             </p>
             <p className="mt-2 font-heading text-[28px] font-bold leading-[32px] tracking-[-0.02em] text-ink">
-              Up to {topOfferPct}% off{" "}
+              Up to {site.maxDiscountPct}% off{" "}
               <span className="font-medium text-ink/70">your first order</span>
             </p>
             <p className="mt-1.5 text-[14px] leading-[20px] text-ink/65">
-              Plus up to <span className="font-semibold text-ink">£{freeGoods}</span> of free goods
-              on qualifying baskets.
+              Plus <span className="font-semibold text-ink">£{giftValue.toFixed(2)}</span> in free
+              gifts on qualifying baskets.
             </p>
 
             <div className="mt-4 grid grid-cols-2 gap-2">
@@ -161,11 +159,10 @@ export function OfferPopup() {
                 </span>
                 <p className="min-w-0 text-left">
                   <span className="block truncate text-[12px] font-semibold leading-[15px] text-paper">
-                    Buy 2, get 3rd
+                    3-vial offer
                   </span>
                   <span className="block text-[11px] leading-[14px] text-paper/55">
-                    <s className="decoration-paper/40">£{retaPrice.toFixed(2)}</s>{" "}
-                    <span className="font-bold uppercase tracking-[1px] text-[#E8764B]">Free</span>
+                    <span className="font-semibold text-[#E8764B]">{offer.label}</span>
                   </span>
                 </p>
               </div>
@@ -203,7 +200,7 @@ export function OfferPopup() {
               One step left
             </p>
             <p className="mt-2 font-heading text-[26px] font-bold leading-[1.1] tracking-[-0.03em] text-ink">
-              Up to {topOfferPct}% off
+              Up to {site.maxDiscountPct}% off
             </p>
             <p className="mt-1 text-[17px] font-bold leading-tight text-ink/70">
               plus a free {offerGift?.short ?? "gift"}

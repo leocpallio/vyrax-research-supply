@@ -6,7 +6,7 @@ import { findPromo, promoDiscountPence } from "../data/promos";
 // two can never disagree. Integer pence throughout.
 //
 //  1. Best single discount only, never stacked: the largest of
-//       a) multi-buy (every 3rd vial free on the site.b2g1 lines),
+//       a) multi-buy (each 3rd vial's list value on the site.b2g1 lines, before the cap),
 //       b) the spend tier (site.spendTiers),
 //       c) the code (FIRST10 or a welcome code).
 //  2. Hard cap: the discount never exceeds site.maxDiscountPct of the list value of the ELIGIBLE

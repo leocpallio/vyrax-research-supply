@@ -25,7 +25,7 @@ export const faqGroups: FaqGroup[] = [
       ],
       [
         "Do you offer multi-buy or volume pricing?",
-        `Yes. The basket applies ${spendTierLine()}. Eligible lines also get a buy two, get one free offer. The basket shows the exact total before you pay.`,
+        `Yes. The basket applies ${spendTierLine()}. Buy three selected vials and save up to ${site.maxDiscountPct}% on eligible goods. Only the best single discount applies, with a ${site.maxDiscountPct}% cap. The basket shows the exact total before you pay.`,
       ],
     ],
   },

@@ -11,6 +11,10 @@ const migration = readFileSync(
   new URL("../../../supabase/migrations/20261117000000_email_lifecycle_gap_flows.sql", import.meta.url),
   "utf8",
 );
+const trackingGuard = readFileSync(
+  new URL("../../../supabase/migrations/20261118000000_email_dispatched_tracking_guard.sql", import.meta.url),
+  "utf8",
+);
 // The shared footer (existing, not ours) says "No dose is on the label."; drop it before scanning.
 const own = (t: string) => t.replace(/No dose is on the label\./g, "");
 const BANNED = [/oraxis/i, /trustpilot/i, /google review/i, /\bdos(e|ing|age)\b/i, /reconstitut/i, /discount/i, /% off/i, /\bcode\b/i];
@@ -46,6 +50,10 @@ describe("lifecycle gap flows are off by default", () => {
 });
 
 describe("migration", () => {
+  it("claims expiry only after the signed checkout expiry, not pending or paid", () => {
+    expect(trackingGuard).toMatch(/WHEN 'paymentExpired' THEN \(p_order\)\.checkout_state = 'expired'/);
+    expect(trackingGuard).not.toMatch(/WHEN 'paymentExpired' THEN \(p_order\)\.checkout_state = 'pending'/);
+  });
   it("adds the kinds to both CHECK constraints and keeps new kinds unclaimable without p_kinds", () => {
     expect(migration).toContain("email_outbox_kind_check");
     expect(migration).toContain("'packed'");

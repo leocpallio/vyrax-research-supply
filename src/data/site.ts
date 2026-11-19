@@ -43,7 +43,7 @@ export const site = {
     { over: 250, rate: 0.15 },
     { over: 150, rate: 0.1 },
   ],
-  // Buy two, get the third free (applied per line, every third vial free).
+  // Multi-buy candidate: each third vial's list value is tested against the single-discount cap.
   b2g1: [
     { slug: "retatrutide", strength: "10mg" },
     { slug: "tirzepatide", strength: "20mg" },

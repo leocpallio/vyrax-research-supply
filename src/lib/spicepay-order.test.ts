@@ -17,7 +17,7 @@ const baskets: [string, { slug: string; strength: string; quantity: number }[], 
     null,
   ],
   [
-    "buy 2 get 1",
+    "three-vial capped multi-buy",
     [{ slug: site.b2g1[0]!.slug, strength: site.b2g1[0]!.strength, quantity: 3 }],
     null,
   ],

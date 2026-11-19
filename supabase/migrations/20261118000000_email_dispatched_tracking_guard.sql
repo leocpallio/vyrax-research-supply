@@ -33,7 +33,7 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
       WHEN 'dispatched' THEN (p_order).checkout_state = 'paid' AND (p_order).workflow_status IN ('dispatched','complete')
         AND public.email_tracking_present((p_order).tracking_number) AND (p_order).created_at > now() - interval '90 days'
       WHEN 'paymentFailed' THEN (p_order).checkout_state = 'pending' AND (p_order).created_at > now() - interval '48 hours'
-      WHEN 'paymentExpired' THEN (p_order).checkout_state = 'pending' AND (p_order).created_at > now() - interval '48 hours'
+      WHEN 'paymentExpired' THEN (p_order).checkout_state = 'expired' AND (p_order).created_at > now() - interval '48 hours'
       WHEN 'pendingPayment' THEN (p_order).checkout_state = 'pending' AND (p_order).created_at BETWEEN now() - interval '24 hours' AND now() - interval '1 hour'
       WHEN 'postPurchase' THEN (p_order).checkout_state = 'paid' AND (p_order).created_at BETWEEN now() - interval '14 days' AND now() - interval '3 days'
       WHEN 'reorder' THEN (p_order).checkout_state = 'paid' AND (p_order).created_at BETWEEN now() - interval '45 days' AND now() - interval '30 days'

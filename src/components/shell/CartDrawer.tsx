@@ -306,7 +306,7 @@ export function CartDrawer({
                   </div>
                   {quote.freeVials > 0 && (
                     <div className="flex justify-between">
-                      <dt>Free vials</dt>
+                      <dt>Multi-buy saving</dt>
                       <dd className="tabular">-{gbp(quote.freeVials)}</dd>
                     </div>
                   )}

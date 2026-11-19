@@ -1,4 +1,5 @@
 import { site } from "./site";
+import { quoteCheckout } from "../lib/checkout-pricing";
 
 /** First-order offer shown in the entry popup. Every figure here is derived from offers the
  *  basket already applies automatically (spend tiers, free delivery, gift rule), so the popup can
@@ -32,6 +33,15 @@ export type OfferGift = {
   over: number;
 };
 export const offerGift = site.firstOrderGift as OfferGift | null;
+
+/** The example in the entry popup uses the same capped quote as the checkout. */
+export const threeVialOfferExample = () => {
+  const quote = quoteCheckout([{ slug: "retatrutide", strength: "10mg", quantity: 3 }]);
+  return {
+    label: `3 Retatrutide 10mg for £${(quote.totalPence / 100).toFixed(2)}`,
+    totalPence: quote.totalPence,
+  };
+};
 
 export const offerLines = () => {
   const tiers = [...site.spendTiers]

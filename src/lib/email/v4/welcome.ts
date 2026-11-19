@@ -88,7 +88,7 @@ const nameOf = (slug: string, strength: string) => {
   return `${c?.name ?? slug} ${strength}`;
 };
 const b2g1Line = () =>
-  `Buy two, get the third free on ${site.b2g1.map((o) => nameOf(o.slug, o.strength)).join(" and ")}.`;
+  `Buy three, save up to ${site.maxDiscountPct}% on ${site.b2g1.map((o) => nameOf(o.slug, o.strength)).join(" and ")}. Best single discount applies.`;
 const giftLine = () =>
   site.firstOrderGift
     ? `${site.firstOrderGift.quantity} free bacteriostatic water vials on orders over ${gbpThreshold(site.firstOrderGift.over)}.`
@@ -246,7 +246,7 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
   const sum = (k: string, v: string, strong = false) =>
     `<tr><td colspan="2" class="${strong ? "tx" : "mute"}" align="left" style="padding:${strong ? "14px 0 0" : "6px 0 0"};font-size:${strong ? 16 : 14}px;font-weight:${strong ? 700 : 400};color:${strong ? "#14213D" : "#4A5568"};text-align:left">${e(k)}</td><td class="tx" align="right" style="padding:${strong ? "14px 0 0" : "6px 0 0"};font-size:${strong ? 16 : 14}px;font-weight:${strong ? 700 : 500};white-space:nowrap">${e(v)}</td></tr>`;
   const entries: [string, string][] = [["Subtotal", gbp(p.subtotal)]];
-  if (p.freeVials > 0) entries.push(["Free third vial", `-${gbp(p.freeVials)}`]);
+  if (p.freeVials > 0) entries.push(["Multi-buy discount", `-${gbp(p.freeVials)}`]);
   if (p.tierDiscount > 0)
     entries.push([`Basket discount (${Math.round(p.rate * 100)}%)`, `-${gbp(p.tierDiscount)}`]);
   if (p.promo) entries.push([`Code ${p.promo.code} (${p.promo.pct}%)`, `-${gbp(p.promo.amount)}`]);
