@@ -18,23 +18,23 @@ export function DocsPack({ className = "" }: { className?: string }) {
       className={`rounded-2xl border border-border p-4 text-sm ${className}`}
     >
       <h2 className="font-heading text-base font-semibold">Included with every order</h2>
-      <ul className="mt-2 space-y-1.5 text-muted-foreground">
+      <ul className="mt-2 space-y-2 text-muted-foreground leading-snug">
         {lookupLive && (
           <li>
-            <Link to="/lab-reports" hash="batch-lookup" className="inline-flex min-h-11 items-center underline">
+            <Link to="/lab-reports" hash="batch-lookup" className="underline">
               Batch lookup
             </Link>
             : enter the number on your vial label to find its certificate of analysis.
           </li>
         )}
         <li>
-          <Link to="/reconstitution" className="inline-flex min-h-11 items-center underline">
+          <Link to="/reconstitution" className="underline">
             Reconstitution and storage guide
           </Link>
           : handling and storage notes for laboratory use.
         </li>
         <li>
-          <Link to="/calculator" className="inline-flex min-h-11 items-center underline">
+          <Link to="/calculator" className="underline">
             Reconstitution calculator
           </Link>
           : stock, molarity and working dilution maths.
