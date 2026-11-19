@@ -9,7 +9,7 @@ beforeEach(() => resetRateLimits());
 const env = {
   RESEND_API_KEY: "test-key",
   VYRAX_GUIDE_SIGNUP_ENABLED: "true",
-  VYRAX_GUIDE_EMAIL_FROM: "Vyrax Labs <support@vyraxlabs.co.uk>",
+  VYRAX_GUIDE_EMAIL_FROM: "Vyrax Labs <hello@vyraxlabs.co.uk>",
   VYRAX_RESEND_SEGMENT_ID: "12345678-1234-1234-1234-123456789012",
 };
 const request = (body: unknown, origin = "https://vyraxlabs.co.uk") =>

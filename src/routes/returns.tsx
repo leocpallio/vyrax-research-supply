@@ -43,11 +43,10 @@ function Returns() {
         {site.returnWindowDays}-day window above does not limit your rights for faulty or wrongly
         described goods.
       </p>
-      <h2>Where to send a return</h2>
+      <h2>Before you send anything back</h2>
       <p>
-        {site.returnsAddress
-          ? `Return address: ${site.returnsAddress}. Contact us first and quote your order number.`
-          : "Our returns address is being finalised. Please do not post anything back until we have confirmed an address in writing."}
+        Please do not post anything back until we have replied. Contact us first and quote your
+        order number, and we will tell you what to do next.
       </p>
       <h2>Refunds</h2>
       <p>

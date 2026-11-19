@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { trackAccount } from "@/lib/analytics";
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
@@ -46,6 +47,7 @@ function Account() {
     const result = signup
       ? await supabase.auth.signUp({ email, password })
       : await supabase.auth.signInWithPassword({ email, password });
+    if (!result.error) trackAccount(signup ? "signed_up" : "logged_in");
     setMessage(
       result.error?.message ||
         (signup ? "Check your email to confirm your account." : "Signed in."),

@@ -14,10 +14,10 @@ import {
   type CartItem,
 } from "@/lib/catalog";
 import { site } from "@/data/site";
-import { findPromo } from "@/data/promos";
+import { PROMO_NO_STACK_NOTE, findPromo } from "@/data/promos";
 import { readPromo, savePromo } from "@/lib/promo-client";
 import { dispatchCutoffLabel } from "@/lib/delivery";
-import { trackBeginCheckout } from "@/lib/analytics";
+import { trackBeginCheckout, trackDiscountCode } from "@/lib/analytics";
 
 export const Route = createFileRoute("/basket")({
   head: () => ({
@@ -103,7 +103,10 @@ function Basket() {
           <div className="grid lg:grid-cols-[1fr_370px] gap-10 mt-8">
             <div>
               {unavailable.length > 0 && (
-                <p role="alert" className="border border-destructive rounded-[20px] p-4 mb-6 text-sm">
+                <p
+                  role="alert"
+                  className="border border-destructive rounded-[20px] p-4 mb-6 text-sm"
+                >
                   Not currently available:{" "}
                   {unavailable.map((i) => `${i.name} ${i.strength}`).join(", ")}. Remove{" "}
                   {unavailable.length > 1 ? "them" : "it"} before checkout.
@@ -135,14 +138,13 @@ function Basket() {
                   />
                 </div>
                 {p.gift && (
-                  <p className="text-xs text-verify mt-3 flex items-center gap-1.5">
+                  <p className="text-xs text-verify-text mt-3 flex items-center gap-1.5">
                     <Tag size={13} /> Free {p.gift.label} worth £{p.gift.value.toFixed(2)} added
                   </p>
                 )}
                 {!p.gift && p.giftGap !== undefined && p.giftGap > 0 && site.firstOrderGift && (
                   <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
-                    <Tag size={13} /> Add {gbp(p.giftGap)} more for{" "}
-                    {site.firstOrderGift.short} free
+                    <Tag size={13} /> Add {gbp(p.giftGap)} more for {site.firstOrderGift.short} free
                   </p>
                 )}
                 {p.nextTier && (
@@ -232,6 +234,7 @@ function Basket() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const promo = findPromo(codeInput);
+                  trackDiscountCode(codeInput, p.goods);
                   if (!promo) {
                     setCodeError("That code isn't recognised.");
                     return;
@@ -246,9 +249,29 @@ function Basket() {
                   setCodeInput("");
                 }}
               >
-                {code && p.promo ? (
+                {code && p.promoSkippedForTier ? (
+                  <div
+                    className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+                    data-testid="promo-skipped"
+                  >
+                    <p className="font-medium">
+                      Your {Math.round(p.rate * 100)}% spend saving is applied instead of {code}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+                    <button
+                      type="button"
+                      className="mt-1.5 text-xs underline underline-offset-2"
+                      onClick={() => {
+                        savePromo("");
+                        setCode("");
+                      }}
+                    >
+                      Remove code
+                    </button>
+                  </div>
+                ) : code && p.promo ? (
                   <div className="flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
-                    <span className="font-medium text-verify">
+                    <span className="font-medium text-verify-text">
                       {p.promo.code} applied · {p.promo.pct}% off
                     </span>
                     <button
@@ -279,11 +302,16 @@ function Basket() {
                         autoComplete="off"
                         className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
                       />
-                      <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="h-11 min-h-11 rounded-xl px-4"
+                      >
                         Apply
                       </Button>
                     </div>
                     {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+                    <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
                   </>
                 )}
               </form>
@@ -292,19 +320,23 @@ function Basket() {
                 <strong className="tabular-nums">{gbp(p.subtotal)}</strong>
               </div>
               {p.freeVials > 0 && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
-                  <span>Multi-buy discount (buy 2, get 1 free)</span>
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
+                  <span>
+                    {p.discountCapped
+                      ? `Multi-buy discount (capped at ${site.maxDiscountPct}% off)`
+                      : "Multi-buy discount (buy 2, get 1 free)"}
+                  </span>
                   <span className="tabular-nums">-{gbp(p.freeVials)}</span>
                 </div>
               )}
               {p.tierDiscount > 0 && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
                   <span>Spend saving ({Math.round(p.rate * 100)}%)</span>
                   <span className="tabular-nums">-{gbp(p.tierDiscount)}</span>
                 </div>
               )}
               {p.promo && (
-                <div className="flex justify-between mt-3 text-sm text-verify">
+                <div className="flex justify-between mt-3 text-sm text-verify-text">
                   <span>Discount ({p.promo.code})</span>
                   <span className="tabular-nums">-{gbp(p.promo.amount)}</span>
                 </div>
@@ -360,13 +392,21 @@ function Basket() {
         )}
       </div>
       {items.length > 0 && (
-        <div className="lg:hidden sticky bottom-0 z-30 bg-background border-t border-border p-3 flex items-center gap-3">
+        <div className="lg:hidden sticky bottom-[var(--consent-banner-h,0px)] z-30 bg-background border-t border-border p-3 flex items-center gap-3">
           <div className="text-sm">
             <p className="text-muted-foreground">Total</p>
             <p className="font-semibold">{gbp(p.total)}</p>
           </div>
-          <Button asChild className="flex-1 rounded-full h-12">
-            <Link to="/checkout" onClick={() => !p.belowMinimum && trackBeginCheckout()}>
+          <Button
+            asChild
+            className={`flex-1 rounded-full h-12 ${p.belowMinimum ? "pointer-events-none opacity-60" : ""}`}
+          >
+            <Link
+              to="/checkout"
+              aria-disabled={p.belowMinimum}
+              tabIndex={p.belowMinimum ? -1 : undefined}
+              onClick={() => !p.belowMinimum && trackBeginCheckout()}
+            >
               {ctaLabel} <ArrowRight />
             </Link>
           </Button>

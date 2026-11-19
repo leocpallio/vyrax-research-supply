@@ -4,6 +4,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { compounds, productImage } from "@/lib/catalog";
 import { offerGift, researchIntents, topOfferPct } from "@/data/offers";
 import { savePromo } from "@/lib/promo-client";
+import { trackEmailCaptured } from "@/lib/analytics";
 import { openCartDrawer } from "@/components/shell/cart-store";
 
 const SEEN = "vyrax_offer_seen";
@@ -46,11 +47,12 @@ export function OfferPopup() {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return;
     setBusy(true);
     try {
-      await fetch("/api/guide-signup", {
+      const signup = await fetch("/api/guide-signup", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, adult: true, consent: true }),
       });
+      if (signup.ok) trackEmailCaptured("welcome_popup");
       window.localStorage.setItem("vyrax_offer_email", email);
     } catch {
       /* the code still shows; the lead write is best-effort */
@@ -104,7 +106,7 @@ export function OfferPopup() {
   if (inCheckout) return null;
 
   return (
-    <div className="offer-veil fixed inset-0 z-50 flex items-end justify-center bg-[#0B1B3B]/70 px-0 py-0 sm:items-center sm:px-4 sm:py-6">
+    <div className="offer-veil fixed inset-0 z-[75] flex items-end justify-center bg-[#0B1B3B]/70 px-0 py-0 sm:items-center sm:px-4 sm:py-6">
       <div
         role="dialog"
         aria-modal="true"
@@ -280,7 +282,8 @@ export function OfferPopup() {
             </div>
 
             <p className="reveal-line mt-3 text-[14px] leading-[20px] text-ink/70">
-              10% off any order over £50. Yours alone, works once.
+              10% off any order over £50. Yours alone, works once. Not combined with other
+              discounts.
             </p>
 
             <div className="reveal-line mt-4 space-y-[10px]">

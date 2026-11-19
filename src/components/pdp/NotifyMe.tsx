@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { capture } from "@/lib/analytics";
+import { capture, trackEmailCaptured } from "@/lib/analytics";
 
 type Props = { strength: string; outOfStock: boolean; reportPending: boolean };
 
@@ -41,6 +41,7 @@ export function NotifyMe({ strength, outOfStock, reportPending }: Props) {
         strength,
         notification_type: reason,
       });
+      trackEmailCaptured(reason === "stock" ? "back_in_stock" : "batch_report_notify");
     } catch (error) {
       setState("error");
       setFeedback(error instanceof Error ? error.message : "Please try again later.");

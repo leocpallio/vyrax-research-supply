@@ -9,7 +9,10 @@
 //   trackPage(path)                  manual $pageview + view events for approved paths
 //   trackBasketChange(before, after) added_to_cart / removed_from_cart per changed SKU
 //   trackList(list, compounds)       viewed_product_list
-//   trackCheckoutStep("address"|"payment", items)
+//   trackCheckoutStep("contact"|"address"|"delivery"|"payment", items)
+//   trackDiscountCode(code, goodsGbp)  discount_code_applied (never the code)
+//   trackEmailCaptured(surface)        email_captured (never the address)
+//   trackAccount("signed_up"|"logged_in")
 //   onFeatureFlags(cb) / featureFlag(key) / featureFlagPayload(key)
 //   productProps / itemsProps / listProps  (from ./analytics-events) for custom payloads
 import type { PostHog } from "posthog-js";
@@ -32,6 +35,7 @@ import {
 } from "./datalayer";
 import { shopSections } from "../data/shop-sections";
 import { site } from "../data/site";
+import { findPromo, promoDiscountPence, promos } from "../data/promos";
 import {
   mayPersistAttribution,
   siteEnvFor,
@@ -41,7 +45,12 @@ import {
   productProps,
   readUtm,
   readAttribution,
+  type AccountMethod,
   type Attribution,
+  type DiscountCodeType,
+  type EmailSurface,
+  discountCodeProps,
+  emailCapturedProps,
   sanitizeProperties,
   scrubExceptionEvent,
   checkoutFailProps,
@@ -103,12 +112,27 @@ let loading: Promise<PostHog | null> | null = null;
 let queue: { event: string; properties: Record<string, unknown> }[] = [];
 const MAX_QUEUE = 50;
 
+function whenIdle(): Promise<void> {
+  return new Promise((resolve) => {
+    const go = () => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => resolve(), { timeout: 2500 });
+      } else setTimeout(resolve, 1500);
+    };
+    if (document.readyState === "complete") go();
+    else window.addEventListener("load", go, { once: true });
+  });
+}
+
 async function ensureClient(): Promise<PostHog | null> {
   if (typeof window === "undefined" || !analyticsConfigured) return null;
   if (client) return client;
   if (loading) return loading;
   loading = (async () => {
     try {
+      // Speed (A4-06): the SDK (about 300 KB) is fetched and parsed when the browser is idle, not
+      // during first paint. Events fired meanwhile wait in `queue` and are sent once it is ready.
+      await whenIdle();
       const { default: posthog } = await import("posthog-js");
       posthog.init(key!, {
         api_host: `${window.location.origin}/ingest`, // first-party proxy, src/routes/ingest.$.ts
@@ -118,7 +142,7 @@ async function ensureClient(): Promise<PostHog | null> {
         capture_pageview: false, // manual via trackPage()/router subscribe (sanitised paths)
         capture_pageleave: true,
         capture_dead_clicks: false,
-        capture_performance: false,
+        capture_performance: { web_vitals: true, network_timing: false }, // web vitals only; same consent rules as every other event
         disable_session_recording: analyticsConsent() !== "accepted",
         disable_surveys: true,
         disable_web_experiments: true,
@@ -315,6 +339,10 @@ export type EventName =
   | "began_checkout"
   | "search_performed"
   | "checkout_step"
+  | "discount_code_applied"
+  | "email_captured"
+  | "signed_up"
+  | "logged_in"
   | "payment_initiated"
   | "order_confirmation_viewed"
   | "back_in_stock_requested"
@@ -385,13 +413,46 @@ export function trackList(list: { id: string; type: ListProps["list_type"] }, it
   capture("viewed_product_list", listProps(list, items.length, items.filter(compoundOut).length));
 }
 
-export function trackCheckoutStep(step: "address" | "payment", items: CartItem[] = readCart()) {
+export function trackCheckoutStep(
+  step: "contact" | "address" | "delivery" | "payment",
+  items: CartItem[] = readCart(),
+) {
   capture("checkout_step", { step, ...itemsProps(cartLines(items)) });
 }
 
+/** discount_code_applied. Called once per apply attempt; reports success and the saving, never the code. */
+export function trackDiscountCode(code: string, goodsGbp: number) {
+  const promo = findPromo(code);
+  const pence = promoDiscountPence(code, Math.round(goodsGbp * 100));
+  const success = Boolean(promo) && pence > 0;
+  const codeType: DiscountCodeType = !promo
+    ? "unknown"
+    : promos.some((x) => x.code === promo.code)
+      ? "fixed"
+      : "welcome";
+  capture("discount_code_applied", discountCodeProps({ success, discountPence: pence, codeType }));
+}
+
+/** email_captured: an address was accepted by a capture surface. The address is never sent. */
+export function trackEmailCaptured(surface: EmailSurface) {
+  capture("email_captured", emailCapturedProps(surface));
+}
+
+/** signed_up / logged_in: account auth succeeded on /account. No email or user id is sent. */
+export function trackAccount(event: "signed_up" | "logged_in") {
+  capture(event, { method: "password" satisfies AccountMethod });
+}
+
+const NOT_FOUND_PATH = "/not-found";
+// Staff and machine paths are never reported as storefront views.
+const isPrivatePath = (path: string) =>
+  path === "/admin" || path.startsWith("/admin/") || /^\/(api|ingest)(\/|$)/.test(path);
+
 let dlLastViewItem: string | null = null;
 
-export function trackPage(path: string) {
+export function trackPage(rawPath: string) {
+  // One view per pathname: "/guides/" and "/guides" are the same page.
+  const path = rawPath.length > 1 ? rawPath.replace(/\/+$/, "") : rawPath;
   // Only approved paths, never arbitrary URL segments, query, fragment or user-supplied search.
   const staticPaths = new Set([
     "/",
@@ -412,6 +473,7 @@ export function trackPage(path: string) {
     "/guides",
     "/lab-reports",
     "/research-use-policy",
+    "/reconstitution",
   ]);
   const product = path.startsWith("/product/")
     ? resolveProductSlug(path.slice("/product/".length))
@@ -432,8 +494,15 @@ export function trackPage(path: string) {
             ? "/guides/:slug"
             : path.startsWith("/verify/")
               ? "/verify/:batch"
-              : null;
-  if (!safePath) return;
+              : path.startsWith("/v/")
+                ? "/v/:batch"
+                : isPrivatePath(path)
+                  ? null
+                  : // A real visit to a page the router could not match (404, retired product): count
+                    // the view under one constant path, never the typed URL.
+                    NOT_FOUND_PATH;
+  // /product/<hub strength> redirects to the hub; the hub's own view is the one that counts.
+  if (!safePath || (product && product.redirectTo)) return;
   if (!(product && !product.redirectTo)) dlLastViewItem = null;
   capture("$pageview", {
     $current_url: stripQuery(`${window.location.origin}${safePath}`),

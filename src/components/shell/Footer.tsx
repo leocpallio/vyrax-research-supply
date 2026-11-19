@@ -6,6 +6,7 @@ import { site } from "@/data/site";
 import { shopSections } from "@/data/shop-sections";
 import { claimFilled, claimText } from "@/lib/claims";
 import { dispatchCutoffLabel } from "@/lib/delivery";
+import { trackEmailCaptured } from "@/lib/analytics";
 
 const guidePath = "/guides/reconstitution-lab-guide.pdf";
 const signupOpen = import.meta.env["VITE_VYRAX_GUIDE_SIGNUP_ENABLED"] === "true";
@@ -66,7 +67,10 @@ function Newsletter() {
       const result = (await res.json()) as { message: string };
       setError(!res.ok && res.status !== 202);
       setMessage(result.message);
-      if (res.ok) setEmail("");
+      if (res.ok) {
+        setEmail("");
+        trackEmailCaptured("footer_newsletter");
+      }
     } catch {
       setError(true);
       setMessage("Signup is temporarily unavailable. The guide is still free to download.");
@@ -181,20 +185,13 @@ function Newsletter() {
 
 export function Footer() {
   const path = useRouterState({ select: (r) => r.location.pathname });
-  // Facts only from the claim registry. No legal entity, company number or VAT number renders here
-  // (site.legalName / companyNumber / registeredOffice are null by Leo's rule: no entity on Vyrax).
+  // Facts only from the claim registry. Vyrax is anonymous (Leo, 18 Nov 2026): no legal entity,
+  // company number, VAT number or address renders here, and none is held in src/data/site.ts.
   const dispatch = claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
   const coldChain = claimText("delivery.cold-chain-packing");
   const payment = claimFilled("payment.methods-live", {
     paymentMethods: `${site.paymentMethods.join(", ")}, entered on our payment provider's secure hosted page`,
   });
-  const legal = [
-    site.legalName,
-    site.companyNumber && `Company no. ${site.companyNumber}`,
-    site.registeredOffice,
-  ]
-    .filter(Boolean)
-    .join(" · ");
   const inCheckout = path.startsWith("/checkout");
 
   return (
@@ -308,10 +305,9 @@ export function Footer() {
               {dispatch && <p>{dispatch} Not a delivery guarantee.</p>}
               {coldChain && <p>{coldChain}. Tracked, not temperature-controlled in transit.</p>}
               {payment && <p>{payment}.</p>}
-              {legal && <p>{legal}</p>}
             </div>
             <p className="md:text-right font-mono text-[11.5px]">
-              © {new Date().getFullYear()} {site.name}. All rights reserved.
+              © {new Date().getFullYear()} {site.name}
             </p>
           </div>
         </div>

@@ -40,7 +40,13 @@ describe("Vyrax paid-checkout emails", () => {
     expect(m.text).toContain("received your payment");
     expect(m.html).toContain("BPC-157 &lt;x&gt;");
     expect(m.html).not.toContain("<x>");
-    expect(m.html).toContain("&lt;Admin &amp; &quot;Co&quot;&gt;");
+    // Unsafe-looking names are never echoed: the greeting uses a plain first name only.
+    expect(m.html).not.toContain("<Admin");
+    expect(m.text).not.toContain("<Admin");
+    expect(m.text).toContain("Hello,");
+    const named = renderEmail({ ...confirmation, name: "Richard Smith" });
+    expect(named.text).toContain("Hello Richard,");
+    expect(named.text).not.toContain("Smith");
   });
   it("renders every event with a coherent HTML and text body and no cross-brand identity", () => {
     expect(all.map((x) => x.kind)).toEqual([
@@ -149,7 +155,20 @@ describe("Vyrax paid-checkout emails", () => {
         ...who,
         trackingUrl: "https://www.royalmail.com/track-your-item",
       }).html,
-    ).toContain("Track your parcel");
+    ).toContain("Track delivery");
+  });
+  it("dispatched email: first-name heading, tracking number in a box and a Royal Mail link", () => {
+    const m = renderEmail({
+      kind: "dispatched",
+      name: "Richard Smith",
+      reference: "VX-5FA968DD",
+      trackingNumber: "MZ670081529GB",
+    });
+    expect(m.text.split("\n")[0]).toBe("On its way, Richard.");
+    expect(m.html).toContain("MZ670081529GB");
+    expect(m.html).toContain("https://www.royalmail.com/track-your-item#/tracking-results/MZ670081529GB");
+    expect(m.html).toContain("Track delivery");
+    expect(m.html).not.toMatch(/shelton|WC2H|ukpeptide|#007A7A|#2EC4C4/i);
   });
   it("keeps review copy voluntary and recovery from recharging a paid order", () => {
     expect(renderEmail({ kind: "reviewAsk", ...who, unsubscribeUrl }).text).toContain(
@@ -189,7 +208,7 @@ describe("Vyrax paid-checkout emails", () => {
   it("strips newlines from customer-controlled values in subject and text", () => {
     const m = renderEmail({ kind: "dispatched", name: "A\r\nBcc: x", reference: "VX-1\nX" });
     expect(m.subject).not.toMatch(/[\r\n]/);
-    expect(m.text.split("\n")[0]).toBe("Your order has been dispatched");
+    expect(m.text.split("\n")[0]).toBe("On its way, A.");
     expect(m.text).not.toContain("A\r\n");
   });
   it("itemises from stored order lines and falls back safely", () => {

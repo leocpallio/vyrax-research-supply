@@ -1,5 +1,10 @@
 import { test, expect } from "bun:test";
-import { capturePaymentConfirmed, discountUsed, orderEventUuid } from "../src/lib/posthog.server";
+import {
+  capturePaymentConfirmed,
+  capturePurchase,
+  discountUsed,
+  orderEventUuid,
+} from "../src/lib/posthog.server";
 import { cleanAttribution, cleanPhIds, readAttribution } from "../src/lib/analytics-events";
 
 const order = {
@@ -115,4 +120,35 @@ test("cleanPhIds caps and validates browser ids", () => {
   });
   expect(cleanPhIds({ ph_distinct_id: "x".repeat(81), ph_session_id: "bad value;" })).toEqual({});
   expect(cleanPhIds(null)).toEqual({});
+});
+
+test("purchase carries value and items, has its own deterministic uuid, skips test orders", async () => {
+  const sent: Record<string, any>[] = [];
+  const f = globalThis.fetch;
+  globalThis.fetch = (async (_u: any, init: any) => {
+    sent.push(JSON.parse(init.body));
+    return new Response("{}", { status: 200 });
+  }) as typeof fetch;
+  try {
+    await capturePurchase(order as never);
+    await capturePurchase(order as never);
+    await capturePaymentConfirmed(order as never);
+    expect(sent[0].event).toBe("purchase");
+    expect(sent[0].uuid).toBe(sent[1].uuid);
+    expect(sent[0].uuid).toBe(await orderEventUuid(order.id, "purchase"));
+    expect(sent[0].uuid).not.toBe(sent[2].uuid); // payment_confirmed keeps its own uuid
+    expect(sent[2].uuid).toBe(await orderEventUuid(order.id));
+    expect(sent[0].properties.value).toBe(123.45);
+    expect(sent[0].properties.currency).toBe("GBP");
+    expect(sent[0].properties.item_count).toBe(2);
+    expect(sent[0].properties.items).toEqual([
+      { slug: "bpc-157", strength: "5mg", quantity: 2, price: 50, gift: false },
+    ]);
+    expect(JSON.stringify(sent[0])).not.toContain("example.org");
+    sent.length = 0;
+    expect(await capturePurchase({ ...order, test_mode: true } as never)).toBe(false);
+    expect(sent.length).toBe(0);
+  } finally {
+    globalThis.fetch = f;
+  }
 });

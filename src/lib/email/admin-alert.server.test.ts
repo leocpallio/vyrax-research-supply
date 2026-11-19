@@ -34,7 +34,7 @@ describe("admin sale alert", () => {
 
   it("skips test-mode payments", async () => {
     const id = await sendSaleAlert({ ...order, test_mode: true } as never, "evt_1", {
-      env: { RESEND_API_KEY: "x", VYRAX_EMAIL_FROM: "orders@vyraxlabs.co.uk" },
+      env: { RESEND_API_KEY: "x", VYRAX_EMAIL_FROM: "hello@vyraxlabs.co.uk" },
       fetcher: (() => {
         throw new Error("should not send");
       }) as never,
@@ -46,7 +46,7 @@ describe("admin sale alert", () => {
     let seen: { url: string; body: Record<string, unknown>; headers: Record<string, string> } | null =
       null;
     const id = await sendSaleAlert(order as never, "evt_42", {
-      env: { RESEND_API_KEY: "re_test", VYRAX_EMAIL_FROM: "orders@vyraxlabs.co.uk" },
+      env: { RESEND_API_KEY: "re_test", VYRAX_EMAIL_FROM: "hello@vyraxlabs.co.uk" },
       fetcher: (async (url: string, init: RequestInit) => {
         seen = {
           url,

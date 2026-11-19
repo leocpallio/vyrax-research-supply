@@ -35,7 +35,7 @@ const existing: EmailEvent[] = [
   { kind: "paymentFailed", ...who },
   { kind: "paymentExpired", ...who },
   { kind: "packed", ...who },
-  { kind: "dispatched", ...who, trackingNumber: "EXAMPLE123" },
+  { kind: "dispatched", ...who, name: "Richard Smith", reference: "VX-5FA968DD", trackingNumber: "MZ670081529GB", trackingUrl: "https://www.royalmail.com/track-your-item#/tracking-results/MZ670081529GB" },
   { kind: "guideWelcome", name: who.name, ...optOut },
   { kind: "postPurchase", ...who, ...optOut },
   { kind: "reviewAsk", ...who, ...optOut },

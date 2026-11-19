@@ -29,10 +29,6 @@ export type EvidenceKey =
   | "batchVerificationLive"
   | "reviewsLive"
   | "reviewCount"
-  | "companyNumber"
-  | "vatNumber"
-  | "registeredOffice"
-  | "returnsAddress"
   | "supportEmail"
   | "supportPhone"
   | "supportHours"
@@ -52,10 +48,6 @@ export type EvidenceValue = {
   batchVerificationLive: boolean;
   reviewsLive: boolean;
   reviewCount: number;
-  companyNumber: string;
-  vatNumber: string;
-  registeredOffice: string;
-  returnsAddress: string;
   supportEmail: string;
   supportPhone: string;
   supportHours: string;
@@ -116,18 +108,6 @@ export const evidence: EvidenceManifest = {
   batchVerificationLive: known(coas.length > 0),
   reviewsLive: unknown(REVIEWS_NOTE),
   reviewCount: unknown(REVIEWS_NOTE),
-  companyNumber: site.companyNumber
-    ? known(site.companyNumber)
-    : unknown("Companies House number is not configured in src/data/site.ts"),
-  vatNumber: site.vatNumber
-    ? known(site.vatNumber)
-    : unknown("VAT registration number is not configured in src/data/site.ts"),
-  registeredOffice: site.registeredOffice
-    ? known(site.registeredOffice)
-    : unknown("Registered office address is not configured in src/data/site.ts"),
-  returnsAddress: site.returnsAddress
-    ? known(site.returnsAddress)
-    : unknown("No physical address for returns is configured, so returns are by arrangement only"),
   supportEmail: site.email
     ? known(site.email)
     : unknown("No support mailbox is configured, so no reply or payment email can be promised"),

@@ -165,8 +165,15 @@ function mailFor(row: OutboxRow): RenderedEmail {
     }[];
     const lines = items
       .filter((i) => i && typeof i.slug === "string" && typeof i.strength === "string")
-      .map((i) => ({ slug: i.slug as string, strength: i.strength as string, quantity: Number(i.quantity) || 1 }));
-    const first = String(row.name ?? "").trim().split(/\s+/)[0] ?? "";
+      .map((i) => ({
+        slug: i.slug as string,
+        strength: i.strength as string,
+        quantity: Number(i.quantity) || 1,
+      }));
+    const first =
+      String(row.name ?? "")
+        .trim()
+        .split(/\s+/)[0] ?? "";
     if (lines.length > 0) {
       const ctx = { reference: base.reference, items: lines, firstName: first, unsubscribeUrl };
       const v4 = row.kind === "postPurchase" ? postpurchaseD7Storage(ctx) : reorderReminder0(ctx);
@@ -236,16 +243,29 @@ export async function runEmailAutomation(
       } catch (error) {
         failed++;
         console.error("[vyrax outbox]", error instanceof Error ? error.message : "delivery failed");
-        await finishOutbox(db, row.id, row.claim_token, "failed");
+        await finishOutbox(
+          db,
+          row.id,
+          row.claim_token,
+          "failed",
+          undefined,
+          error instanceof Error ? error.message : undefined,
+        );
       }
     }
     // Contact-level queue (welcome, basket, back in stock) rides the same cron call and enable flag.
     // It is isolated: a failure there never hides the order queue result.
     let contacts: ContactStats | { error: string };
     try {
-      contacts = await runContactQueue({ env, db, send, ...(deps.fetcher ? { fetcher: deps.fetcher } : {}) }, 20);
+      contacts = await runContactQueue(
+        { env, db, send, ...(deps.fetcher ? { fetcher: deps.fetcher } : {}) },
+        20,
+      );
     } catch (error) {
-      console.error("[vyrax contact outbox]", error instanceof Error ? error.message : "worker failed");
+      console.error(
+        "[vyrax contact outbox]",
+        error instanceof Error ? error.message : "worker failed",
+      );
       contacts = { error: "unavailable" };
     }
     return json({ claimed: rows.length, sent, failed, contacts });

@@ -12,7 +12,7 @@ import { checkFirstOrderCode, emailIlikePattern } from "./first-order-gate";
 import { insertOrderWithAttributionFallback, selectOrderWithPhFallback } from "./order-insert";
 import { cleanAttribution, cleanPhIds } from "./analytics-events";
 import { deliveryPenceFor, publicOrderLines } from "./order-lines";
-import { capturePaymentConfirmed } from "./posthog.server";
+import { capturePaymentConfirmed, capturePurchase } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
 
 const json = (value: unknown, status = 200) =>
@@ -75,12 +75,29 @@ const db = (url: string, key: string) =>
 const validText = (v: unknown, max: number) =>
   typeof v === "string" && v.trim().length > 0 && v.trim().length <= max ? v.trim() : null;
 
+/** Marks a never-bound 'creating' row as expired. Best effort: it must never change the response. */
+async function retireUnboundOrder(row: { url: string; key: string; id: string }): Promise<void> {
+  try {
+    await db(row.url, row.key)
+      .from("orders")
+      .update({ expired_at: new Date().toISOString() })
+      .eq("id", row.id)
+      .eq("checkout_state", "creating")
+      .is("payment_id", null);
+  } catch {
+    /* the hourly expire_stale_checkouts() job catches anything missed here */
+  }
+}
+
 export async function createCheckout(request: Request): Promise<Response> {
   if (request.method !== "POST") return fail("Method not allowed", 405);
   const limit = takeRateLimit(`checkout:${clientKey(request)}`, LIMITS.checkout);
   if (!limit.allowed) return tooManyRequests(limit);
   if (process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"] !== "true")
     return fail("Checkout is not open", 503);
+  // The 'creating' row, until a payment id is bound to it. If anything throws in between, the
+  // catch below retires it so it never lingers as a live pending order (audit A2-03).
+  let unbound: { url: string; key: string; id: string } | null = null;
   try {
     const c = config();
     if (
@@ -173,6 +190,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       ph_session_id: ph.ph_session_id ?? null,
     });
     if (insertError || !order) throw new Error("Order insert failed");
+    unbound = { url: c.url, key: c.key, id: order.id };
     const basePayment = {
       amount: quote.totalPence,
       currency: "GBP",
@@ -232,6 +250,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       .select("id")
       .single();
     if (stampError || !stamped) throw new Error("Payment binding failed");
+    unbound = null;
     return json({
       checkout_url: checkoutUrl,
       order_id: order.id,
@@ -241,6 +260,7 @@ export async function createCheckout(request: Request): Promise<Response> {
     });
   } catch (error) {
     console.error("[vyrax checkout]", error instanceof Error ? error.message : "unknown error");
+    if (unbound) await retireUnboundOrder(unbound);
     return fail(
       "Checkout could not be prepared. No payment was requested on this page. Contact support before retrying if you reached a payment page.",
       502,
@@ -386,7 +406,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
               : null,
         )
         .find((d) => d && !Number.isNaN(d.getTime()));
-      await capturePaymentConfirmed(order as never, { paidAt: stamp ?? new Date(), isFirstOrder });
+      const paidCtx = { paidAt: stamp ?? new Date(), isFirstOrder };
+      await capturePaymentConfirmed(order as never, paidCtx);
+      await capturePurchase(order as never, paidCtx);
       // Owner alert first: the sale must never depend on the outbox drain.
       await sendSaleAlert(order as never, String(event["event_id"]));
       // Drain inline. There is no reliable cron on this worker, and a paid receipt that sits queued

@@ -199,7 +199,7 @@ export function ProductCard({
           )}
         </div>
         <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
-          {multi && <span className="text-xs text-[#0B1B3B]/60">From</span>}
+          {multi && <span className="text-xs text-[#0B1B3B]/72">From</span>}
           <span data-testid="product-price" className="text-[16px] font-bold tabular-nums">
             {gbp(fromPrice(product))}
           </span>

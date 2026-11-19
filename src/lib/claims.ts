@@ -332,35 +332,6 @@ const DEFS = {
   },
 
   // -------------------------------------------------------------------------------------------
-  // Legal identity. A company number, VAT number, registered office or returns address is a fact
-  // about a registered entity; none of them may be invented or implied.
-  // -------------------------------------------------------------------------------------------
-  "identity.company-number": {
-    text: "Registered in England and Wales, company no. {{companyNumber}}",
-    requires: [{ key: "companyNumber", kind: "present" }],
-    assertion: true,
-    surfaces: ["src/components/Store.tsx", "src/routes/terms.tsx"],
-  },
-  "identity.vat-number": {
-    text: "VAT registration number {{vatNumber}}",
-    requires: [{ key: "vatNumber", kind: "present" }],
-    assertion: true,
-    surfaces: ["src/components/Store.tsx", "src/routes/terms.tsx"],
-  },
-  "identity.registered-office": {
-    text: "Registered office: {{registeredOffice}}",
-    requires: [{ key: "registeredOffice", kind: "present" }],
-    assertion: true,
-    surfaces: ["src/components/Store.tsx", "src/routes/terms.tsx"],
-  },
-  "identity.returns-address": {
-    text: "Returns address: {{returnsAddress}}",
-    requires: [{ key: "returnsAddress", kind: "present" }],
-    assertion: true,
-    surfaces: ["src/routes/returns.tsx"],
-  },
-
-  // -------------------------------------------------------------------------------------------
   // Support. A channel that does not exist cannot be offered, and a reply cannot be promised.
   // -------------------------------------------------------------------------------------------
   "support.email-live": {

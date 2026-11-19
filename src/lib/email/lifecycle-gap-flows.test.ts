@@ -119,9 +119,9 @@ describe("send reply_to", () => {
     );
     return body;
   };
-  it("sets reply_to only for a well-formed address", async () => {
-    expect((await run("support@vyraxlabs.co.uk")).reply_to).toBe("support@vyraxlabs.co.uk");
-    expect((await run("bad address,x@y.z")).reply_to).toBeUndefined();
-    expect((await run()).reply_to).toBeUndefined();
+  it("routes every reply to support regardless of a template override", async () => {
+    for (const override of [undefined, "support@vyraxlabs.co.uk", "other@example.org", "bad address,x@y.z"]) {
+      expect((await run(override)).reply_to).toBe("support@vyraxlabs.co.uk");
+    }
   });
 });

@@ -23,23 +23,24 @@ Project: Vyrax Labs (EU cloud, project 291775). Token and host live in `.env.pro
 
 ## Event list (exact names)
 
-| Event                       | Fired from                                                              | Key properties                                                                       |
-| --------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `$pageview`                 | `trackPage` via router subscribe (`__root.tsx`)                         | `$current_url` (no query), `$pathname`                                               |
-| `viewed_product`            | `trackPage` on `/product/*`                                             | `product_id`, `slug`, `name`, `category`, `variant`, `price`, `currency`, `in_stock`, `is_hub` |
-| `viewed_product_list`       | `trackPage` on `/shop`, `/category/*`, `/collections/*`; `trackList()`  | `list_id`, `list_type`, `item_count`, `out_of_stock_count`                           |
-| `search_performed`          | header and shop search                                                  | `source`, `results` (never the query)                                                |
-| `added_to_cart`             | `trackBasketChange` (catalog writeCart)                                 | product props + `slug`, `value`, `basket_quantity`, `basket_value`                   |
-| `removed_from_cart`         | `trackBasketChange`                                                     | same as added_to_cart                                                                |
-| `cart_viewed`               | `trackPage` on `/basket`; `CartDrawer` open                             | `item_count`, `value`, `currency`, `surface` = `page` or `drawer`                    |
-| `began_checkout`            | `trackPage` on `/checkout` with items                                   | `item_count`, `value`, `currency`                                                    |
-| `checkout_step`             | `PaymentCheckout` first address keystroke / submit                      | `step` = `address` or `payment`, items props                                         |
-| `payment_initiated`         | `PaymentCheckout` after `/api/checkout` OK                              | `order_id`, `method` = `card`, `value`, `currency`, `item_count`, `test_mode`        |
-| `order_confirmation_viewed` | `checkout_.return.tsx` when status is paid (once per order)             | `order_id`, `value`, `currency`, `test_mode`                                         |
-| `back_in_stock_requested`   | `pdp/NotifyMe.tsx` after a saved request                                | `product_id`, `slug`, `strength`, `notification_type`                                |
-| `page_error`                | `__root.tsx` error boundary                                             | `stage`                                                                              |
-| `$set`                      | once per tab after SDK load                                             | `$set_once.initial_utm_*`, `initial_landing_path`                                    |
-| `payment_confirmed`         | SERVER ONLY (`posthog.server.ts`, SpicePay webhook paid transition)     | `order_id`, `value`, `value_gbp`, `method`, `is_first_order`, `discount_used`, `$session_id`, attribution |
+| Event                       | Fired from                                                                       | Key properties                                                                                                                       |
+| --------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `$pageview`                 | `trackPage` via router subscribe (`__root.tsx`)                                  | `$current_url` (no query), `$pathname`                                                                                               |
+| `viewed_product`            | `trackPage` on `/product/*`                                                      | `product_id`, `slug`, `name`, `category`, `variant`, `price`, `currency`, `in_stock`, `is_hub`                                       |
+| `viewed_product_list`       | `trackPage` on `/shop`, `/category/*`, `/collections/*`; `trackList()`           | `list_id`, `list_type`, `item_count`, `out_of_stock_count`                                                                           |
+| `search_performed`          | header and shop search                                                           | `source`, `results` (never the query)                                                                                                |
+| `added_to_cart`             | `trackBasketChange` (catalog writeCart)                                          | product props + `slug`, `value`, `basket_quantity`, `basket_value`                                                                   |
+| `removed_from_cart`         | `trackBasketChange`                                                              | same as added_to_cart                                                                                                                |
+| `cart_viewed`               | `trackPage` on `/basket`; `CartDrawer` open                                      | `item_count`, `value`, `currency`, `surface` = `page` or `drawer`                                                                    |
+| `began_checkout`            | `trackPage` on `/checkout` with items                                            | `item_count`, `value`, `currency`                                                                                                    |
+| `checkout_step`             | `PaymentCheckout` first address keystroke / submit                               | `step` = `address` or `payment`, items props                                                                                         |
+| `payment_initiated`         | `PaymentCheckout` after `/api/checkout` OK                                       | `order_id`, `method` = `card`, `value`, `currency`, `item_count`, `test_mode`                                                        |
+| `order_confirmation_viewed` | `checkout_.return.tsx` when status is paid (once per order)                      | `order_id`, `value`, `currency`, `test_mode`                                                                                         |
+| `back_in_stock_requested`   | `pdp/NotifyMe.tsx` after a saved request                                         | `product_id`, `slug`, `strength`, `notification_type`                                                                                |
+| `page_error`                | `__root.tsx` error boundary                                                      | `stage`                                                                                                                              |
+| `$set`                      | once per tab after SDK load                                                      | `$set_once.initial_utm_*`, `initial_landing_path`                                                                                    |
+| `payment_confirmed`         | SERVER ONLY (`posthog.server.ts`, SpicePay webhook paid transition)              | `order_id`, `value`, `value_gbp`, `method`, `is_first_order`, `discount_used`, `$session_id`, attribution                            |
+| `purchase`                  | SERVER ONLY (`posthog.server.ts`, same paid transition; canonical revenue event) | `order_id`, `value`, `value_gbp`, `currency`, `item_count`, `items[]`, `is_first_order`, `discount_used`, `$session_id`, attribution |
 
 The checkout request also sends `ph_distinct_id` and `ph_session_id` (browser PostHog ids, max 80
 chars), stored on `orders` so the server `payment_confirmed` joins the visitor and session.
@@ -47,12 +48,24 @@ chars), stored on `orders` so the server `payment_confirmed` joins the visitor a
 Standard e-commerce item shape: `{ product_id: "<slug>|<strength>", name, category, variant, price,
 currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `value`.
 
+## Canonical event names (audit A4-01, A4-02, 18 Nov 2026)
+
+One name per step. Build every insight on these only:
+`viewed_product`, `viewed_product_list`, `added_to_cart`, `cart_viewed`, `began_checkout`,
+`payment_initiated`, `purchase`. `payment_confirmed` is the same paid transition kept for history
+and reconciliation; it has its own uuid, so counting both double counts revenue. The older
+variants (`product_viewed`, `view_product`, `add_to_cart`, `basket_added`, `checkout_started`,
+`begin_checkout`, `basket_viewed`, `product_list_viewed`, `shop_viewed`) stopped firing on 13 Nov
+and remain only in PostHog history: merge them into the canonical names with a PostHog action,
+never by renaming events in code. The GTM dataLayer keeps the GA4 names (`add_to_cart`,
+`begin_checkout`, `purchase`) because GA4 expects them; that is a separate channel.
+
 ## Funnel definitions
 
 1. **Purchase funnel (strict order, 7 day window, unique persons):**
    `$pageview` -> `viewed_product` -> `added_to_cart` -> `cart_viewed` -> `began_checkout` ->
    `checkout_step[step=address]` -> `checkout_step[step=payment]` -> `payment_initiated` ->
-   `payment_confirmed`. Breakdown by `initial_utm_source`.
+   `purchase`. Breakdown by `initial_utm_source`.
 2. **Browse to product:** `viewed_product_list` -> `viewed_product`, breakdown `list_id`.
 3. **Search funnel:** `search_performed` -> `viewed_product` -> `added_to_cart`, breakdown `source`.
 4. **Hosted payment leakage:** `payment_initiated` -> `payment_confirmed`. Filter `test_mode = false`.
@@ -64,7 +77,7 @@ currency: "GBP", quantity }`. Multi-line events add `items[]`, `item_count`, `va
 - [ ] Data management: mark `payment_confirmed.value` and `value_gbp` as numeric; set `currency` as
       property of type string; define `items` as JSON.
 - [ ] Actions: `Checkout address step` = `checkout_step` where `step = address`; `Checkout payment
-    step` = `checkout_step` where `step = payment`.
+  step` = `checkout_step` where `step = payment`.
 - [ ] Funnels 1 to 4 above, saved to a "Vyrax storefront" dashboard.
 - [ ] Trends: `payment_confirmed` sum of `value` by day; `added_to_cart` count by `name`;
       `viewed_product` count by `category`; `page_error` count.

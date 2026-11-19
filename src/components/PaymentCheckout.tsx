@@ -6,11 +6,19 @@ import { Input } from "@/components/ui/input";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { readCart, gbp, priceBasket, productImage, type CartItem } from "@/lib/catalog";
 import { readPromo, savePromo } from "@/lib/promo-client";
-import { findPromo } from "@/data/promos";
-import { capture, orderAttribution, phIds, trackCheckoutPaymentFailed, trackCheckoutStep } from "@/lib/analytics";
+import { PROMO_NO_STACK_NOTE, findPromo } from "@/data/promos";
+import {
+  capture,
+  orderAttribution,
+  phIds,
+  trackCheckoutPaymentFailed,
+  trackCheckoutStep,
+  trackDiscountCode,
+} from "@/lib/analytics";
 import { dispatchCutoffLabel } from "@/lib/delivery";
 import { site } from "@/data/site";
 import {
+  completedCheckoutSteps,
   formatPostcode,
   validateFields,
   type CheckoutFields,
@@ -78,7 +86,7 @@ export function PaymentCheckout() {
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState("");
   const lock = useRef(false);
-  const addressStarted = useRef(false);
+  const stepsSent = useRef(new Set<string>());
   const summaryRef = useRef<HTMLDivElement>(null);
 
   // Only when the visitor has ticked the optional box and the address looks valid: record consent
@@ -126,9 +134,20 @@ export function PaymentCheckout() {
 
   const quote = priceBasket(items, promoCode);
 
+  // Funnel: each checkout block fires once, when it is first completed. Validity only, no values.
+  useEffect(() => {
+    if (!items.length) return;
+    for (const step of completedCheckoutSteps(form)) {
+      if (stepsSent.current.has(step)) continue;
+      stepsSent.current.add(step);
+      trackCheckoutStep(step, items);
+    }
+  }, [form, items]);
+
   function applyCode(e: React.FormEvent) {
     e.preventDefault();
     const promo = findPromo(codeInput);
+    trackDiscountCode(codeInput, quote.goods);
     if (!promo) {
       setCodeError("That code isn't recognised.");
       return;
@@ -144,10 +163,6 @@ export function PaymentCheckout() {
   }
 
   function set(key: FieldKey, value: string) {
-    if (!addressStarted.current) {
-      addressStarted.current = true; // funnel step: first keystroke in the address form (no values sent)
-      trackCheckoutStep("address", items);
-    }
     setForm((f) => ({ ...f, [key]: value }));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   }
@@ -169,7 +184,10 @@ export function PaymentCheckout() {
     lock.current = true;
     setBusy(true);
     setError("");
-    trackCheckoutStep("payment", items);
+    if (!stepsSent.current.has("payment")) {
+      stepsSent.current.add("payment");
+      trackCheckoutStep("payment", items);
+    }
     let failCode = "network";
     try {
       const res = await fetch("/api/checkout", {
@@ -295,9 +313,29 @@ export function PaymentCheckout() {
           </li>
         ))}
       </ul>
-      {quote.promo ? (
+      {promoCode && quote.promoSkippedForTier ? (
+        <div
+          className="mt-3 rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+          data-testid="promo-skipped"
+        >
+          <p className="font-medium">
+            Your {Math.round(quote.rate * 100)}% spend saving is applied instead of {promoCode}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+          <button
+            type="button"
+            className="mt-1.5 text-xs underline underline-offset-2"
+            onClick={() => {
+              savePromo("");
+              setPromoCode("");
+            }}
+          >
+            Remove code
+          </button>
+        </div>
+      ) : quote.promo ? (
         <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
-          <span className="font-medium text-verify">
+          <span className="font-medium text-verify-text">
             {quote.promo.code} applied · {quote.promo.pct}% off
           </span>
           <button
@@ -333,6 +371,7 @@ export function PaymentCheckout() {
             </Button>
           </div>
           {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+          <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
         </form>
       )}
       <dl className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
@@ -342,7 +381,11 @@ export function PaymentCheckout() {
         </div>
         {quote.freeVials > 0 && (
           <div className="flex justify-between">
-            <dt>Multi-buy saving</dt>
+            <dt>
+              {quote.discountCapped
+                ? `Multi-buy saving (capped at ${site.maxDiscountPct}% off)`
+                : "Multi-buy saving"}
+            </dt>
             <dd className="tabular-nums">-{gbp(quote.freeVials)}</dd>
           </div>
         )}
@@ -353,7 +396,7 @@ export function PaymentCheckout() {
           </div>
         )}
         {quote.promo && (
-          <div className="flex justify-between text-verify">
+          <div className="flex justify-between text-verify-text">
             <dt>Discount ({quote.promo.code})</dt>
             <dd className="tabular-nums">-{gbp(quote.promo.amount)}</dd>
           </div>
@@ -368,7 +411,7 @@ export function PaymentCheckout() {
         </div>
       </dl>
       {quote.gift && (
-        <p className="mt-3 text-xs font-semibold text-verify">
+        <p className="mt-3 text-xs font-semibold text-verify-text">
           Free {quote.gift.label} worth £{quote.gift.value.toFixed(2)} included with this order
         </p>
       )}

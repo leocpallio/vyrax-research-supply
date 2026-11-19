@@ -1,4 +1,5 @@
 import { lineMedia } from "./email/order-email.server";
+import { isDiscountExempt } from "./discount";
 
 // SpicePay order detail for the hosted card page (same contract as UKPL's spicepay-checkout):
 // description, merchant reference, customer id, billing + shipping address and one
@@ -50,28 +51,39 @@ export function orderDetails(
 ): DetailLine[] | null {
   const paid = quote.items.filter((i) => !i.gift);
   const gifts = quote.items.filter((i) => i.gift);
-  // value of each line after its own buy-2-get-1 free vials
-  const afterOffer = paid.map((i) =>
-    b2g1.some((o) => o.slug === i.slug && o.strength === i.strength)
-      ? i.linePence - Math.floor(i.quantity / 3) * i.unitPence
-      : i.linePence,
-  );
-  const base = afterOffer.reduce((a, b) => a + b, 0);
+  // One discount per basket (src/lib/discount.ts). The total discount is what the quote took
+  // off list; it is shared across the lines by weight, with largest remainder so the pence add
+  // up exactly. A multi-buy discount lands on the multi-buy lines only (weight = their free
+  // vials); a spend tier or code lands on every line (weight = line value), as before.
+  const listTotal = paid.reduce((n, i) => n + i.linePence, 0);
   const netGoods = quote.totalPence - quote.deliveryPence;
-  if (base <= 0 || netGoods < 0 || netGoods > base) return null;
-  // spread spend-tier + promo discount pro rata, largest remainder so the pence add up exactly
-  const raw = afterOffer.map((v) => (netGoods * v) / base);
-  const net = raw.map(Math.floor);
-  let left = netGoods - net.reduce((a, b) => a + b, 0);
-  raw
+  const discount = listTotal - netGoods;
+  if (listTotal <= 0 || netGoods < 0 || discount < 0) return null;
+  const weights = paid.map((i) =>
+    quote.freeVialsPence > 0
+      ? b2g1.some((o) => o.slug === i.slug && o.strength === i.strength)
+        ? Math.floor(i.quantity / 3) * i.unitPence
+        : 0
+      : isDiscountExempt(i.slug, i.strength)
+        ? 0
+        : i.linePence,
+  );
+  const wSum = weights.reduce((a, b) => a + b, 0);
+  if (discount > 0 && wSum <= 0) return null;
+  const rawOff = weights.map((w) => (wSum > 0 ? (discount * w) / wSum : 0));
+  const off = rawOff.map(Math.floor);
+  let left = discount - off.reduce((a, b) => a + b, 0);
+  rawOff
     .map((r, i) => ({ i, frac: r - Math.floor(r) }))
     .sort((a, b) => b.frac - a.frac)
     .forEach(({ i }) => {
-      if (left > 0) {
-        net[i] = (net[i] ?? 0) + 1;
+      if (left > 0 && (weights[i] ?? 0) > 0) {
+        off[i] = (off[i] ?? 0) + 1;
         left--;
       }
     });
+  if (left !== 0) return null;
+  const net = paid.map((i, n) => i.linePence - (off[n] ?? 0));
   const lines: DetailLine[] = paid.map((item, n) => {
     const total = net[n] ?? 0;
     const label = `${item.name} ${item.strength}`;
