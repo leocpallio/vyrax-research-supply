@@ -17,8 +17,8 @@ LANGUAGE sql IMMUTABLE SET search_path = '' AS $$
   SELECT nullif(btrim(p_tracking), '') IS NOT NULL;
 $$;
 
--- Same predicate as the current definition (20261107000000: suppression list + frequency cap),
--- plus: a 'dispatched' email needs a tracking number on the order.
+-- Same predicate as the current definition (20261117000000 gap flows: suppression list, frequency cap, packed and
+-- feedback cases), plus: a 'dispatched' email needs a tracking number on the order.
 CREATE OR REPLACE FUNCTION public.email_job_eligible(p_kind text, p_order public.orders) RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
   SELECT ((p_order).test_mode IS FALSE)
@@ -39,16 +39,22 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
       WHEN 'reorder' THEN (p_order).checkout_state = 'paid' AND (p_order).created_at BETWEEN now() - interval '45 days' AND now() - interval '30 days'
         AND NOT EXISTS (SELECT 1 FROM public.orders newer WHERE lower(btrim(newer.email)) = lower(btrim((p_order).email))
           AND newer.id <> (p_order).id AND newer.created_at > (p_order).created_at AND newer.checkout_state = 'paid' AND newer.test_mode IS FALSE)
+      WHEN 'packed' THEN (p_order).checkout_state = 'paid' AND (p_order).workflow_status = 'packing'
+        AND (p_order).created_at > now() - interval '14 days'
+      WHEN 'feedback' THEN (p_order).checkout_state = 'paid' AND (p_order).workflow_status IN ('dispatched','complete')
+        AND (p_order).created_at > now() - interval '60 days'
+        AND EXISTS (SELECT 1 FROM public.email_outbox d WHERE d.order_id = (p_order).id AND d.kind = 'dispatched'
+          AND d.status = 'sent' AND d.sent_at BETWEEN now() - interval '13 days' AND now() - interval '10 days')
       ELSE false
     END
-    AND (p_kind NOT IN ('pendingPayment','postPurchase','reorder') OR EXISTS (
+    AND (p_kind NOT IN ('pendingPayment','postPurchase','reorder','feedback') OR EXISTS (
       SELECT 1 FROM public.email_marketing_preferences pref WHERE pref.email = lower(btrim((p_order).email))
         AND pref.unsubscribed_at IS NULL AND pref.consented_at <= now()
     ))
-    AND (p_kind NOT IN ('pendingPayment','postPurchase','reorder') OR NOT EXISTS (
+    AND (p_kind NOT IN ('pendingPayment','postPurchase','reorder','feedback') OR NOT EXISTS (
       SELECT 1 FROM public.email_outbox j JOIN public.orders prior ON prior.id = j.order_id
       WHERE lower(btrim(prior.email)) = lower(btrim((p_order).email))
-        AND j.kind IN ('pendingPayment','postPurchase','reorder')
+        AND j.kind IN ('pendingPayment','postPurchase','reorder','feedback')
         AND j.status = 'sent' AND j.sent_at > now() - interval '7 days'
     ));
 $$;
@@ -62,7 +68,7 @@ DECLARE v_order public.orders%ROWTYPE; v_id uuid;
 BEGIN
   IF auth.role() <> 'service_role' THEN RAISE EXCEPTION 'Forbidden'; END IF;
   IF length(p_event_key) NOT BETWEEN 1 AND 200 OR p_kind NOT IN
-    ('orderConfirmation','paymentFailed','paymentExpired','dispatched','pendingPayment','postPurchase','reorder')
+    ('orderConfirmation','paymentFailed','paymentExpired','dispatched','pendingPayment','postPurchase','reorder','packed','feedback')
     THEN RAISE EXCEPTION 'Invalid email event'; END IF;
   SELECT * INTO v_order FROM public.orders WHERE id = p_order_id FOR SHARE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Unknown order'; END IF;

@@ -89,11 +89,32 @@ SELECT public.enqueue_due_email_automation();
 SELECT pg_temp.check('switch off enqueues no feedback',
   (SELECT count(*)=0 FROM public.email_outbox WHERE kind='feedback'));
 
--- existing cron jobs unchanged
-SELECT pg_temp.check('exactly the three existing cron jobs, same schedules (run on a freshly reset scratch DB)',
-  (SELECT count(*)=3 AND bool_and((jobname,schedule) IN
-    (('vyrax-email-enqueue','*/15 * * * *'),('vyrax-email-delivery','*/5 * * * *'),('vyrax-contact-enqueue','*/15 * * * *')))
+-- dispatch tracking guard (20261118000000) is retained after the full chain, and did not drop packed or feedback
+SELECT pg_temp.mk('66666666-6666-4666-8666-666666666666','guard@example.co.uk','Gus',false,'dispatched','1 day'::interval);
+SELECT pg_temp.check('guard: dispatched order with empty tracking is not eligible for the dispatched email',
+  NOT public.email_job_eligible('dispatched',(SELECT o FROM public.orders o WHERE id='66666666-6666-4666-8666-666666666666')));
+UPDATE public.orders SET tracking_number='RM123456789GB' WHERE id='66666666-6666-4666-8666-666666666666';
+SELECT pg_temp.check('guard: dispatched order with tracking is eligible for the dispatched email',
+  public.email_job_eligible('dispatched',(SELECT o FROM public.orders o WHERE id='66666666-6666-4666-8666-666666666666')));
+SELECT pg_temp.check('guard: enqueue_order_email still accepts packed and feedback kinds',
+  (SELECT prosrc LIKE '%''packed'',''feedback''%' FROM pg_proc WHERE proname='enqueue_order_email' AND pronamespace='public'::regnamespace));
+SELECT pg_temp.check('guard: enqueue_order_email(packed) enqueues a packed row for a packing order',
+  (SELECT public.enqueue_order_email('11111111-1111-4111-8111-111111111111','packed','packing') IS NOT NULL));
+SELECT pg_temp.check('guard: email_outbox_dispatched_needs_tracking constraint present',
+  EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.email_outbox'::regclass AND conname='email_outbox_dispatched_needs_tracking'));
+
+-- intended cron schedule set after the full chain: the three email jobs plus the 18 Nov stale-checkout expiry job
+-- (run on a freshly reset scratch DB; any other job is a failure)
+SELECT pg_temp.check('exactly the four intended cron jobs with the intended schedules',
+  (SELECT count(*)=4 AND bool_and((jobname,schedule) IN
+    (('vyrax-email-enqueue','*/15 * * * *'),('vyrax-email-delivery','*/5 * * * *'),('vyrax-contact-enqueue','*/15 * * * *'),
+     ('vyrax-expire-stale-checkouts','17 * * * *')))
    FROM cron.job));
 
 SELECT CASE WHEN ok THEN 'PASS' ELSE 'FAIL' END AS result, name FROM results ORDER BY ok, name;
+-- A failed assertion must stop the run with a nonzero exit (psql -v ON_ERROR_STOP=1 exits 3).
+DO $$ DECLARE n integer; BEGIN
+  SELECT count(*) INTO n FROM results WHERE NOT ok;
+  IF n > 0 THEN RAISE EXCEPTION 'verify-lifecycle-gap-migration: % assertion(s) FAILED', n; END IF;
+END $$;
 ROLLBACK;
