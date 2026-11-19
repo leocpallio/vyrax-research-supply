@@ -1,11 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import { quoteCheckout } from "../src/lib/checkout-pricing";
 import { verifySignature, validatePaymentEvent } from "../src/lib/spicepay";
-import { createCheckout } from "../src/lib/checkout.server";
+import { createCheckout, definitePaymentRejection } from "../src/lib/checkout.server";
 
 const line = { slug: "bpc-157", strength: "5mg", quantity: 2 };
 
 describe("server checkout quote", () => {
+  test("only conclusive processor rejections are failed, never uncertain remote outcomes", () => {
+    for (const status of [400, 401, 403, 422]) expect(definitePaymentRejection(status)).toBe(true);
+    for (const status of [0, 408, 409, 429, 500, 502, 503, 504])
+      expect(definitePaymentRejection(status)).toBe(false);
+  });
   test("checkout remains closed without the explicit server switch", async () => {
     const response = await createCheckout(
       new Request("https://vyraxlabs.co.uk/api/checkout", {
@@ -82,6 +87,13 @@ describe("webhook validation", () => {
       },
     };
     expect(validatePaymentEvent(event, order)).toBe("paid");
+    const expiry = {
+      ...event,
+      event_type: "payment_expired",
+      content: { ...event.content, object: { ...event.content.object, status: "expired" } },
+    };
+    expect(validatePaymentEvent(expiry, order)).toBe("expired");
+    expect(() => validatePaymentEvent({ ...expiry, content: event.content }, order)).toThrow();
     for (const bad of [
       { ...event, merchant_id: "merchant_2" },
       {

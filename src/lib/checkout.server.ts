@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { quoteCheckout } from "./checkout-pricing";
-import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { sendSaleAlert } from "./email/admin-alert.server";
 import { validatePaymentEvent, verifySignature, type PaymentOrder } from "./spicepay";
@@ -75,12 +74,22 @@ const db = (url: string, key: string) =>
 const validText = (v: unknown, max: number) =>
   typeof v === "string" && v.trim().length > 0 && v.trim().length <= max ? v.trim() : null;
 
-/** Marks a never-bound 'creating' row as expired. Best effort: it must never change the response. */
-async function retireUnboundOrder(row: { url: string; key: string; id: string }): Promise<void> {
+/** Only a definite processor rejection can be called failed. A timeout or 5xx is unknown. */
+export const definitePaymentRejection = (status: number) => [400, 401, 403, 422].includes(status);
+
+/** Best effort; CAS prevents a late binding or paid transition from being overwritten. */
+async function retireUnboundOrder(
+  row: { url: string; key: string; id: string },
+  rejected: boolean,
+): Promise<void> {
   try {
     await db(row.url, row.key)
       .from("orders")
-      .update({ expired_at: new Date().toISOString() })
+      .update(
+        rejected
+          ? { checkout_state: "failed", expired_at: new Date().toISOString() }
+          : { expired_at: new Date().toISOString() },
+      )
       .eq("id", row.id)
       .eq("checkout_state", "creating")
       .is("payment_id", null);
@@ -98,6 +107,7 @@ export async function createCheckout(request: Request): Promise<Response> {
   // The 'creating' row, until a payment id is bound to it. If anything throws in between, the
   // catch below retires it so it never lingers as a live pending order (audit A2-03).
   let unbound: { url: string; key: string; id: string } | null = null;
+  let rejected = false;
   try {
     const c = config();
     if (
@@ -226,7 +236,10 @@ export async function createCheckout(request: Request): Promise<Response> {
           .replace(/"[^"]*"\s*:\s*"[^"]*"/g, (m) => m.split(":")[0] + ':"…"')
           .slice(0, 300),
       );
-    if (!response.ok) throw new Error(`Payment creation failed: ${response.status}`);
+    if (!response.ok) {
+      rejected = definitePaymentRejection(response.status);
+      throw new Error(`Payment creation failed: ${response.status}`);
+    }
     const payment = (await response.json()) as Record<string, unknown>;
     if (
       typeof payment["payment_id"] !== "string" ||
@@ -260,7 +273,7 @@ export async function createCheckout(request: Request): Promise<Response> {
     });
   } catch (error) {
     console.error("[vyrax checkout]", error instanceof Error ? error.message : "unknown error");
-    if (unbound) await retireUnboundOrder(unbound);
+    if (unbound) await retireUnboundOrder(unbound, rejected);
     return fail(
       "Checkout could not be prepared. No payment was requested on this page. Contact support before retrying if you reached a payment page.",
       502,
@@ -344,7 +357,7 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     );
     if (error) throw error;
     if (!order) return fail("Unknown payment", 503); // Binding may still be in flight: request delivery retry.
-    let decision: "paid" | "ignored";
+    let decision: "paid" | "expired" | "ignored";
     try {
       decision = validatePaymentEvent(event, order);
     } catch {
@@ -362,26 +375,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     });
     if (rpcError) throw rpcError;
     // Paid receipts are queued atomically by the database paid transition trigger.
-    // Failure/expiry notices are idempotent and rechecked against pending state at send time.
-    const type = String(event["event_type"]);
-    const mailKind = /expir/i.test(type)
-      ? "paymentExpired"
-      : /fail|declin/i.test(type)
-        ? "paymentFailed"
-        : null;
-    if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true") {
-      if (mailKind && !order.test_mode) {
-        await enqueueOrderEmail(
-          store as unknown as Rpc,
-          order.id,
-          mailKind,
-          String(event["event_id"]),
-        );
-      }
-    } else {
-      const legacyKind = applied === "paid" ? "orderConfirmation" : mailKind;
-      if (legacyKind) await sendOrderEmail(legacyKind, order, String(event["event_id"]));
-    }
+    // Lifecycle corrections never initiate a customer email. Paid receipts retain their existing path.
+    if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] !== "true" && applied === "paid")
+      await sendOrderEmail("orderConfirmation", order, String(event["event_id"]));
     if (applied === "paid") {
       // Aggregate order event. Fires only on the DB paid transition (exactly once per order, retries
       // return 'duplicate'). Never blocks or fails the webhook.

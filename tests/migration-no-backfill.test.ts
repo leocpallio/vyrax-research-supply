@@ -192,4 +192,74 @@ describe("deploying the 18 Nov migrations backfills nothing", () => {
     // And the one order Leo has not cleared stays quiet until someone moves it to dispatched.
     expect(await outboxFor(db, unshipped)).toEqual([]);
   });
+
+  it("records definite creation failure, but never overwrites a bound payment", async () => {
+    const failed = await newOrder(db, {
+      checkout_state: "creating",
+      status: "pending_payment",
+      payment_id: null,
+    });
+    await db.query(
+      `UPDATE public.orders SET checkout_state='failed', expired_at=now()
+      WHERE id=$1 AND checkout_state='creating' AND payment_id IS NULL`,
+      [failed],
+    );
+    const row = (
+      await db.query<{ checkout_state: string; expired_at: string | null }>(
+        `SELECT checkout_state,expired_at FROM public.orders WHERE id=$1`,
+        [failed],
+      )
+    ).rows[0]!;
+    expect(row.checkout_state).toBe("failed");
+    expect(row.expired_at).not.toBeNull();
+    expect(await outboxFor(db, failed)).toEqual([]);
+    const bound = await newOrder(db, { checkout_state: "pending", status: "pending_payment" });
+    await db.query(
+      `UPDATE public.orders SET checkout_state='failed'
+      WHERE id=$1 AND checkout_state='creating' AND payment_id IS NULL`,
+      [bound],
+    );
+    expect(
+      (
+        await db.query<{ checkout_state: string }>(
+          `SELECT checkout_state FROM public.orders WHERE id=$1`,
+          [bound],
+        )
+      ).rows[0]!.checkout_state,
+    ).toBe("pending");
+  });
+
+  it("applies a signed-equivalent expiry once, sends no email, and still accepts late success", async () => {
+    const id = await newOrder(db, { checkout_state: "pending", status: "pending_payment" });
+    const call = (eventId: string, eventType: string, status: string) =>
+      db.query<{ result: string }>(
+        `SELECT public.apply_spicepay_event($1,$2,$3,'m-test',1000,'GBP',false,$4) AS result`,
+        [eventId, eventType, `pay-${n}`, status],
+      );
+    expect((await call("expiry-test", "payment_expired", "expired")).rows[0]!.result).toBe(
+      "expired",
+    );
+    expect((await call("expiry-test", "payment_expired", "expired")).rows[0]!.result).toBe(
+      "duplicate",
+    );
+    const expired = (
+      await db.query<{ checkout_state: string; expired_at: string | null }>(
+        `SELECT checkout_state,expired_at FROM public.orders WHERE id=$1`,
+        [id],
+      )
+    ).rows[0]!;
+    expect(expired.checkout_state).toBe("expired");
+    expect(expired.expired_at).not.toBeNull();
+    expect(await outboxFor(db, id)).toEqual([]);
+    expect((await call("late-paid-test", "payment_succeeded", "succeeded")).rows[0]!.result).toBe(
+      "paid",
+    );
+    const paid = (
+      await db.query<{ checkout_state: string; status: string; expired_at: string | null }>(
+        `SELECT checkout_state,status,expired_at FROM public.orders WHERE id=$1`,
+        [id],
+      )
+    ).rows[0]!;
+    expect(paid).toMatchObject({ checkout_state: "paid", status: "paid", expired_at: null });
+  });
 });
