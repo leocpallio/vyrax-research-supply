@@ -41,7 +41,7 @@ export type RenderedEmail = {
 };
 
 export const SUPPORT_EMAIL = site.email;
-export const LEGAL_FOOTER = site.postalAddress ? `${site.name}, ${site.postalAddress}` : site.name;
+export const LEGAL_FOOTER = site.name;
 export const RESEARCH_NOTICE =
   "Sold for research use only. Not a licensed medicine. No dose is on the label.";
 const CARRIER = site.carrier;
@@ -302,7 +302,7 @@ export function wrap(c: Content): RenderedEmail {
     "",
     RESEARCH_NOTICE,
     `Research use policy: ${POLICY_URL}`,
-    LEGAL_FOOTER,
+    `© ${year} ${LEGAL_FOOTER}`,
     ...(unsubscribe ? [`Unsubscribe: ${unsubscribe}`] : []),
   ].join("\n");
   return {

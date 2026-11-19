@@ -30,12 +30,11 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
         expect(m.text.toLowerCase()).toContain("not a licensed medicine");
       });
 
-      it("has unsubscribe on marketing kinds and postal address when one is configured", () => {
+      it("has unsubscribe on marketing kinds", () => {
         if (entry.marketing) {
           expect(m.html).toContain("Unsubscribe");
           expect(m.text).toContain("Unsubscribe:");
           expect(m.listUnsubscribe).toBeTruthy();
-          if (site.registeredOffice) expect(m.text).toContain(site.registeredOffice);
         }
       });
 
@@ -123,7 +122,7 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
 
   it("contact-owner is internal and carries a reply link", () => {
     const m = lifecycleEntries.find((e) => e.id === "contact-owner")!.render() as { html: string; text: string; replyTo?: string };
-    expect(m.replyTo).toBe("alex@example.com");
+    expect(m.replyTo).toBeUndefined();
     expect(m.html).toContain("mailto:alex@example.com");
     expect(m.text).toContain("alex@example.com");
   });
@@ -131,7 +130,6 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
   it("contact-owner drops an unusable address instead of building a link from it", async () => {
     const { contactOwner } = await import("./lifecycle");
     const m = contactOwner({ name: "X", email: 'bad"><script>', message: "hi" });
-    expect(m.replyTo).toBeUndefined();
     expect(m.html).not.toContain("<script>");
     expect(m.html).not.toContain("mailto:bad");
   });

@@ -69,7 +69,7 @@ export type ContactContext = {
   /** Already formatted for a person, for example "3 November 2026 at 14:21 (London)". */
   submittedAt?: string;
 };
-export type ContactEmail = RenderedEmail & { replyTo?: string };
+export type ContactEmail = RenderedEmail;
 
 const SHOP_URL = `${SITE_URL}/shop`;
 const LABS_URL = `${SITE_URL}/lab-reports`;
@@ -612,7 +612,7 @@ export function contactOwner(c: ContactContext): ContactEmail {
       replyButton,
     ),
   });
-  return okAddr ? { ...base, replyTo: addr } : base;
+  return base;
 }
 
 export { safeUrl };

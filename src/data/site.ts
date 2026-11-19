@@ -1,5 +1,6 @@
 // Single source of truth for business facts shown across the site.
-// Anything set to null renders as "being finalised" rather than inventing a value.
+// Vyrax is anonymous (Leo, 18 Nov 2026): no legal entity, company number, VAT number, registered
+// office, postal address or returns address is held or shown anywhere. Do not add one.
 export const SITE_URL = "https://vyraxlabs.co.uk";
 
 const checkoutOpen =
@@ -11,16 +12,9 @@ export const site = {
   name: "Vyrax Labs",
   url: SITE_URL,
   tagline: "Peptides dispatched from the UK",
-  // Business details: fill these in before launch. Null values are shown as pending.
-  legalName: null as string | null,
-  companyNumber: null as string | null,
-  vatNumber: null as string | null,
-  registeredOffice: null as string | null,
-  // Sender postal address printed in marketing email footers (PECR). Leo, 5 Nov 2026. Not claimed as the registered office.
-  postalAddress: null as string | null,
-  // Physical address a return can be sent to. Null means returns are handled by arrangement only;
-  // src/lib/claims.ts then withholds any "returns address" line instead of printing a fake one.
-  returnsAddress: null as string | null,
+  // Customer mail is sent From hello@ and Reply-To support@, the only real inbox (Leo, 18 Nov 2026).
+  // `email` is the one address customers are told to write to.
+  senderEmail: "hello@vyraxlabs.co.uk",
   email: "support@vyraxlabs.co.uk",
   phone: "+44 7575 894339" as string | null,
   whatsapp: "447575894339" as string | null, // international format without +, e.g. '447700900000'
