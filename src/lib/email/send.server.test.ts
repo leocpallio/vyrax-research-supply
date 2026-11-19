@@ -40,7 +40,8 @@ describe("sendTransactional headers", () => {
         { to: "a@b.co", mail: mail() as never, key: "k1" },
         {
           env: { RESEND_API_KEY: "re_x", VYRAX_EMAIL_FROM: from },
-          fetcher: (async () => new Response(JSON.stringify({ id: "m1" }), { status: 200 })) as never,
+          fetcher: (async () =>
+            new Response(JSON.stringify({ id: "m1" }), { status: 200 })) as never,
         },
       );
     await expect(send("Vyrax Labs <hello@vyraxlabs.co.uk>")).resolves.toBe("m1");
