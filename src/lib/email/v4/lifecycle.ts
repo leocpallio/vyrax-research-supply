@@ -3,7 +3,7 @@
 // reads recipients.
 //
 // Facts come from src/data/site.ts and src/lib/claims.ts. Offer numbers are never typed here: the
-// ladder comes from spendTierLine(), the free third vial from site.b2g1, free delivery and the gift
+// ladder comes from spendTierLine(), the capped three-vial offer from site.b2g1, free delivery and the gift
 // from site, and every delivery, packing, support and certificate sentence goes through claimText
 // or claimFilled so a claim the evidence does not back drops out of the email.
 //
