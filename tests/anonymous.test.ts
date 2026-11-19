@@ -36,8 +36,11 @@ describe("Vyrax anonymity", () => {
   });
   it("names no other entity and no address in shipped source or public files", () => {
     const files = [...walk("src"), ...walk("public")];
-    const banned = /oraxis|registered office|postal address|companies house|being finalised|returns address is/i;
-    const hits = files.filter((f) => banned.test(readFileSync(f, "utf8").replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, "")));
+    const banned =
+      /oraxis|registered office|postal address|companies house|being finalised|returns address is/i;
+    const hits = files.filter((f) =>
+      banned.test(readFileSync(f, "utf8").replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, "")),
+    );
     expect(hits).toEqual([]);
   });
   it("every email ends its footer with the plain copyright line and no address", () => {
