@@ -13,45 +13,6 @@ import { clampDescription, ogImageFor } from "@/lib/seo";
 const categorySeoNames = new Set(categories.map((c) => c.seoName));
 const sharedSeoName = (name: string) => categorySeoNames.has(name);
 
-// Cannibalisation audit B1 (18 Nov 2026): the /category/* page owns the commercial "... Peptides UK" intent, so
-// these five collection pages present as comparison pages. Title, H1 and meta lead are fixed wording; the
-// compound count and from-price in the meta come from the live catalogue, never typed in.
-const COMPARISON_PAGES: Record<
-  string,
-  { title: string; h1: string; meta: (n: number, from: string) => string }
-> = {
-  "weight-metabolic": {
-    title: "Metabolic Research Compounds Compared",
-    h1: "Metabolic Research Compounds",
-    meta: (n, from) =>
-      `Compare the ${n} metabolic research compounds by type: incretin, fragment and mitochondrial. From ${from}. UK supplied.`,
-  },
-  "recovery-repair": {
-    title: "Regenerative Research Compounds Compared",
-    h1: "Regenerative Research Compounds",
-    meta: (n, from) =>
-      `Compare the ${n} regenerative research compounds, including BPC-157, TB-500 and KPV. From ${from}. UK supplied.`,
-  },
-  "growth-hormone": {
-    title: "Growth Hormone Peptide Range Compared",
-    h1: "Growth Hormone Peptide Range",
-    meta: (n, from) =>
-      `Compare the ${n} growth hormone peptides by class: GHRH analogues and ghrelin receptor agonists. From ${from}. UK supplied.`,
-  },
-  "longevity-cellular": {
-    title: "Longevity Research Compounds Compared",
-    h1: "Longevity Research Compounds",
-    meta: (n, from) =>
-      `Compare the ${n} longevity research compounds: NAD+, SS-31, epithalon and the thymic peptides. From ${from}. UK supplied.`,
-  },
-  "tanning-libido": {
-    title: "Melanocortin Research Compounds Compared",
-    h1: "Melanocortin Research Compounds",
-    meta: (n, from) =>
-      `Compare ${n} melanocortin research compounds: Melanotan 1, Melanotan 2 and PT-141. From ${from}. UK supplied.`,
-  },
-};
-
 export const Route = createFileRoute("/collections/$slug")({
   loader: ({ params }) => {
     const section = shopSections.find((item) => item.slug === params.slug);
@@ -71,10 +32,7 @@ export const Route = createFileRoute("/collections/$slug")({
     const sectionTitle = sharedSeoName(section.seoName)
       ? `${section.seoName} Range`
       : section.seoName;
-    const comparison = COMPARISON_PAGES[section.slug];
-    const title = comparison
-      ? `${comparison.title} | Vyrax Labs`
-      : `${sectionTitle} UK | Vyrax Labs`;
+    const title = `${sectionTitle} UK | Vyrax Labs`;
     // The lede is long enough to eat the whole 155-char budget, so trim it before the price and the
     // tail are appended. Otherwise clampDescription cuts at the lede's full stop and drops both.
     const lede = content.lede.replace(/\.$/, "");
@@ -84,8 +42,7 @@ export const Route = createFileRoute("/collections/$slug")({
       "bacteriostatic-water": `Sterile water with 0.9% benzyl alcohol, a standard solvent for lyophilised vials. From ${gbp(low)}, UK supplied.`,
     };
     const desc = clampDescription(
-      comparison?.meta(list.length, gbp(low)) ??
-        descOverrides[section.slug] ??
+      descOverrides[section.slug] ??
         `${lede.length > 95 ? `${lede.slice(0, 95).replace(/[,;:]?\s+\S*$/, "")}` : lede}. ${list.length} compound${list.length === 1 ? "" : "s"} from ${gbp(low)}. UK supplied.`,
     );
     const url = abs(`/collections/${section.slug}`);
@@ -147,7 +104,7 @@ function CollectionPage() {
   const content = sectionSeo(slug);
   return (
     <ListingPage
-      title={COMPARISON_PAGES[section.slug]?.h1 ?? section.name}
+      title={section.name}
       lede={content.lede}
       crumbs={[{ name: "Home", to: "/" }, { name: "Shop", to: "/shop" }, { name: section.name }]}
       pills={sectionPills(slug)}

@@ -510,8 +510,8 @@ export const guides: Guide[] = [
   },
   {
     slug: "buy-retatrutide-uk",
-    title: "Retatrutide vial sizes and batch checks: what to check",
-    seoTitle: "Retatrutide Vial Sizes and Batch Checks UK",
+    title: "Buying retatrutide in the UK for weight loss: what to check",
+    seoTitle: "Buy Retatrutide UK: Vial Sizes and Batch Checks",
     description:
       "Retatrutide UK buyer's checklist: vial sizes and cost per mg, what a certificate must show, fill and identity checks.",
     updated: "2026-10-27",

@@ -56,22 +56,12 @@ export const productTitle = (c: Compound, s: Strength) => {
   return `${base} | ${site.name}`;
 };
 
-const DESC_SUMMARY_OVERRIDE: Record<string, string> = {
-  "5-amino-1mq": "A small-molecule, membrane-permeable inhibitor.",
-  retatrutide: "A synthetic triple agonist peptide (LY3437943).",
-  tirzepatide: "Dual GIP and GLP-1 agonist peptide, 39 amino acids.",
-};
-
 export const productDescription = (c: Compound, s: Strength) => {
   const first = c.summary.replace(/\s+/g, " ").trim();
   const syn = c.aliases.slice(0, 2).join(", ");
   // Lead sentence names the compound, strength and form only: no use-case or condition term.
   const lead = `Buy ${c.name} ${s.label} ${productForm(c).toLowerCase()} in the UK.`;
   const room = 155 - ` ${DESC_TAIL}`.length;
-  // Owner-specified summary clauses (kw map spec 1, cannibalisation audit B2): same wording as the page summary,
-  // shortened to one clause so size variants differ by strength and nothing is cut mid-clause.
-  const override = DESC_SUMMARY_OVERRIDE[c.slug];
-  if (override) return `${lead} ${override} ${DESC_TAIL}`;
   // Summary first so the sentence that survives truncation is the informative one; aliases only
   // pad the tail when there is room left over.
   const base = `${lead} ${first}`;
