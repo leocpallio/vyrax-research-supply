@@ -274,164 +274,171 @@ export function PaymentCheckout() {
           type="button"
           onClick={() => setShowItems((v) => !v)}
           aria-expanded={showItems}
-          aria-controls="co-summary-items"
+          aria-controls="co-summary-details"
           className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-3 text-sm font-medium md:hidden"
         >
-          {showItems
-            ? "Hide"
-            : `${items.reduce((n, i) => n + i.quantity, 0)} item${items.reduce((n, i) => n + i.quantity, 0) === 1 ? "" : "s"}`}
+          {showItems ? "Hide details" : "Details and discount code"}
           <span aria-hidden className={showItems ? "rotate-180" : ""}>
             ▾
           </span>
         </button>
       </div>
-      <ul
-        id="co-summary-items"
-        className={`mt-3 divide-y divide-border ${showItems ? "" : "hidden md:block"}`}
-      >
-        {items.map((i) => (
-          <li
-            key={`${i.slug}:${i.strength}`}
-            className="flex items-start justify-between gap-3 py-2.5 text-sm"
-          >
-            <span className="flex min-w-0 items-start gap-3">
-              <img
-                src={productImage(i.slug, i.strength).small ?? productImage(i.slug, i.strength).src}
-                alt=""
-                width={48}
-                height={48}
-                loading="lazy"
-                decoding="async"
-                aria-hidden="true"
-                className="size-12 shrink-0 rounded-lg border border-border bg-white object-contain-cover"
-              />
-              <span className="min-w-0">
-                {i.name} {i.strength}
-                <span className="block text-muted-foreground">
-                  Qty {i.quantity} at {gbp(i.price)}
+      <p className="mt-2 flex items-center justify-between text-sm md:hidden">
+        <span>UK delivery</span>
+        <span>{quote.delivery === 0 ? "Free" : gbp(quote.delivery)}</span>
+      </p>
+      <p className="mt-1 flex items-center justify-between text-sm md:hidden">
+        <span>Total (GBP)</span>
+        <strong className="text-base tabular-nums">{gbp(quote.total)}</strong>
+      </p>
+      <div id="co-summary-details" className={showItems ? "" : "hidden md:block"}>
+        <ul id="co-summary-items" className="mt-3 divide-y divide-border">
+          {items.map((i) => (
+            <li
+              key={`${i.slug}:${i.strength}`}
+              className="flex items-start justify-between gap-3 py-2.5 text-sm"
+            >
+              <span className="flex min-w-0 items-start gap-3">
+                <img
+                  src={
+                    productImage(i.slug, i.strength).small ?? productImage(i.slug, i.strength).src
+                  }
+                  alt=""
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                  decoding="async"
+                  aria-hidden="true"
+                  className="size-12 shrink-0 rounded-lg border border-border bg-white object-contain-cover"
+                />
+                <span className="min-w-0">
+                  {i.name} {i.strength}
+                  <span className="block text-muted-foreground">
+                    Qty {i.quantity} at {gbp(i.price)}
+                  </span>
                 </span>
               </span>
-            </span>
-            <span className="shrink-0 tabular-nums">{gbp(i.price * i.quantity)}</span>
-          </li>
-        ))}
-      </ul>
-      {promoCode && quote.promoSkippedForTier ? (
-        <div
-          className="mt-3 rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
-          data-testid="promo-skipped"
-        >
-          <p className="font-medium">
-            Your {Math.round(quote.rate * 100)}% spend saving is applied instead of {promoCode}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
-          <button
-            type="button"
-            className="mt-1.5 text-xs underline underline-offset-2"
-            onClick={() => {
-              savePromo("");
-              setPromoCode("");
-            }}
+              <span className="shrink-0 tabular-nums">{gbp(i.price * i.quantity)}</span>
+            </li>
+          ))}
+        </ul>
+        {promoCode && quote.promoSkippedForTier ? (
+          <div
+            className="mt-3 rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+            data-testid="promo-skipped"
           >
-            Remove code
-          </button>
-        </div>
-      ) : quote.promo ? (
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
-          <span className="font-medium text-verify-text">
-            {quote.promo.code} applied · {quote.promo.pct}% off
-          </span>
-          <button
-            type="button"
-            className="text-xs underline underline-offset-2"
-            onClick={() => {
-              savePromo("");
-              setPromoCode("");
-            }}
-          >
-            Remove
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={applyCode} className="mt-3">
-          <label htmlFor="co-promo" className="text-sm font-medium">
-            Discount code
-          </label>
-          <div className="mt-2 flex gap-2">
-            <input
-              id="co-promo"
-              value={codeInput}
-              onChange={(e) => {
-                setCodeInput(e.target.value);
-                setCodeError("");
+            <p className="font-medium">
+              Your {Math.round(quote.rate * 100)}% spend saving is applied instead of {promoCode}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+            <button
+              type="button"
+              className="mt-1.5 text-xs underline underline-offset-2"
+              onClick={() => {
+                savePromo("");
+                setPromoCode("");
               }}
-              placeholder="Enter code"
-              autoComplete="off"
-              className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
-            />
-            <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
-              Apply
-            </Button>
+            >
+              Remove code
+            </button>
           </div>
-          {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
-          <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
-        </form>
-      )}
-      <dl className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
-        <div className="flex justify-between">
-          <dt>Subtotal</dt>
-          <dd className="tabular-nums">{gbp(quote.subtotal)}</dd>
-        </div>
-        {quote.freeVials > 0 && (
+        ) : quote.promo ? (
+          <div className="mt-3 flex items-center justify-between rounded-xl border border-verify/40 bg-verify/5 px-3 py-2.5 text-sm">
+            <span className="font-medium text-verify-text">
+              {quote.promo.code} applied · {quote.promo.pct}% off
+            </span>
+            <button
+              type="button"
+              className="text-xs underline underline-offset-2"
+              onClick={() => {
+                savePromo("");
+                setPromoCode("");
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={applyCode} className="mt-3">
+            <label htmlFor="co-promo" className="text-sm font-medium">
+              Discount code
+            </label>
+            <div className="mt-2 flex gap-2">
+              <input
+                id="co-promo"
+                value={codeInput}
+                onChange={(e) => {
+                  setCodeInput(e.target.value);
+                  setCodeError("");
+                }}
+                placeholder="Enter code"
+                autoComplete="off"
+                className="h-11 min-h-11 w-full rounded-xl border border-border bg-background px-3 text-base"
+              />
+              <Button type="submit" variant="outline" className="h-11 min-h-11 rounded-xl px-4">
+                Apply
+              </Button>
+            </div>
+            {codeError && <p className="mt-2 text-xs text-destructive">{codeError}</p>}
+            <p className="mt-2 text-xs text-muted-foreground">{PROMO_NO_STACK_NOTE}</p>
+          </form>
+        )}
+        <dl className="mt-3 space-y-1.5 border-t border-border pt-3 text-sm">
           <div className="flex justify-between">
-            <dt>
-              {quote.discountCapped
-                ? `Multi-buy saving (capped at ${site.maxDiscountPct}% off)`
-                : "Multi-buy saving"}
-            </dt>
-            <dd className="tabular-nums">-{gbp(quote.freeVials)}</dd>
+            <dt>Subtotal</dt>
+            <dd className="tabular-nums">{gbp(quote.subtotal)}</dd>
           </div>
-        )}
-        {quote.tierDiscount > 0 && (
+          {quote.freeVials > 0 && (
+            <div className="flex justify-between">
+              <dt>
+                {quote.discountCapped
+                  ? `Multi-buy saving (capped at ${site.maxDiscountPct}% off)`
+                  : "Multi-buy saving"}
+              </dt>
+              <dd className="tabular-nums">-{gbp(quote.freeVials)}</dd>
+            </div>
+          )}
+          {quote.tierDiscount > 0 && (
+            <div className="flex justify-between">
+              <dt>Spend saving</dt>
+              <dd className="tabular-nums">-{gbp(quote.tierDiscount)}</dd>
+            </div>
+          )}
+          {quote.promo && (
+            <div className="flex justify-between text-verify-text">
+              <dt>Discount ({quote.promo.code})</dt>
+              <dd className="tabular-nums">-{gbp(quote.promo.amount)}</dd>
+            </div>
+          )}
           <div className="flex justify-between">
-            <dt>Spend saving</dt>
-            <dd className="tabular-nums">-{gbp(quote.tierDiscount)}</dd>
+            <dt>UK delivery</dt>
+            <dd className="tabular-nums">{quote.delivery === 0 ? "Free" : gbp(quote.delivery)}</dd>
           </div>
-        )}
-        {quote.promo && (
-          <div className="flex justify-between text-verify-text">
-            <dt>Discount ({quote.promo.code})</dt>
-            <dd className="tabular-nums">-{gbp(quote.promo.amount)}</dd>
+          <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
+            <dt>Total (GBP)</dt>
+            <dd className="tabular-nums">{gbp(quote.total)}</dd>
           </div>
+        </dl>
+        {quote.gift && (
+          <p className="mt-3 text-xs font-semibold text-verify-text">
+            Free {quote.gift.label} worth £{quote.gift.value.toFixed(2)} included with this order
+          </p>
         )}
-        <div className="flex justify-between">
-          <dt>UK delivery</dt>
-          <dd className="tabular-nums">{quote.delivery === 0 ? "Free" : gbp(quote.delivery)}</dd>
-        </div>
-        <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
-          <dt>Total (GBP)</dt>
-          <dd className="tabular-nums">{gbp(quote.total)}</dd>
-        </div>
-      </dl>
-      {quote.gift && (
-        <p className="mt-3 text-xs font-semibold text-verify-text">
-          Free {quote.gift.label} worth £{quote.gift.value.toFixed(2)} included with this order
-        </p>
-      )}
-      {quote.freeDeliveryGap > 0 && (
+        {quote.freeDeliveryGap > 0 && (
+          <p className="mt-3 text-xs text-muted-foreground">
+            Free UK delivery on orders of {gbp(site.freeDeliveryThreshold)} or more after savings.
+          </p>
+        )}
         <p className="mt-3 text-xs text-muted-foreground">
-          Free UK delivery on orders of {gbp(site.freeDeliveryThreshold)} or more after savings.
+          Our server re-checks every price against the catalogue before payment is requested. If
+          anything differs, the total on the payment page is the one that applies.
         </p>
-      )}
-      <p className="mt-3 text-xs text-muted-foreground">
-        Our server re-checks every price against the catalogue before payment is requested. If
-        anything differs, the total on the payment page is the one that applies.
-      </p>
-      <p className="mt-2 text-xs text-muted-foreground">
-        <Link to="/basket" className="inline-flex min-h-11 items-center underline">
-          Edit basket
-        </Link>
-      </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          <Link to="/basket" className="inline-flex min-h-11 items-center underline">
+            Edit basket
+          </Link>
+        </p>
+      </div>
     </aside>
   );
 
