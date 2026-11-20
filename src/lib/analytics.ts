@@ -16,6 +16,7 @@
 //   onFeatureFlags(cb) / featureFlag(key) / featureFlagPayload(key)
 //   productProps / itemsProps / listProps  (from ./analytics-events) for custom payloads
 import type { PostHog } from "posthog-js";
+import { isProductionHost } from "./production-host";
 import {
   categories,
   compounds,
@@ -79,6 +80,10 @@ const captureHost = (() => {
   }
 })();
 export const analyticsConfigured = Boolean(key && captureHost);
+export const analyticsEnabled = () =>
+  analyticsConfigured &&
+  typeof window !== "undefined" &&
+  isProductionHost(window.location.hostname);
 export const consentKey = "vyrax-analytics-consent";
 export const firstTouchKey = "vyrax-first-touch";
 export type AnalyticsConsent = "accepted" | "declined" | null;
@@ -125,7 +130,7 @@ function whenIdle(): Promise<void> {
 }
 
 async function ensureClient(): Promise<PostHog | null> {
-  if (typeof window === "undefined" || !analyticsConfigured) return null;
+  if (!analyticsEnabled()) return null;
   if (client) return client;
   if (loading) return loading;
   loading = (async () => {
@@ -596,9 +601,13 @@ export function trackBeginCheckout(items: CartItem[] = readCart()) {
 }
 
 // Cookieless capture for every visitor from first load (memory persistence until consent).
-if (typeof window !== "undefined" && analyticsConfigured) void ensureClient();
+if (analyticsEnabled()) void ensureClient();
 
 /** One event wherever checkout cannot start or confirm a payment (step + provider + short code, no PII). */
-export function trackCheckoutPaymentFailed(p: { step: CheckoutFailStep; provider?: string; errorCode?: string | null }) {
+export function trackCheckoutPaymentFailed(p: {
+  step: CheckoutFailStep;
+  provider?: string;
+  errorCode?: string | null;
+}) {
   capture("checkout_payment_failed", checkoutFailProps(p));
 }

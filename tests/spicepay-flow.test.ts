@@ -78,7 +78,7 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         ...(responseProfile ? { profile_id: responseProfile } : {}),
         amount: payload["amount"],
         currency: "GBP",
-        test_mode: true,
+        test_mode: payload["test_mode"],
         payment_link: {
           link: "https://checkout.spicepay.net/pay/51eb087f-eb16-42d5-8ee1-5aeec8433b22",
           payment_link_id: "51eb087f-eb16-42d5-8ee1-5aeec8433b22",
@@ -279,6 +279,39 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
     expect((await createCheckout(request())).status).toBe(502);
     expect(failed).toBe(1); // uncertain remote outcome must not become a definite failure
     expect(retired).toBe(3);
+    responseStatus = 200;
+    process.env["VYRAX_SPICEPAY_MODE"] = "live";
+    for (const origin of ["http://127.0.0.1:4791", "https://vyrax-research-supply.lovable.app"]) {
+      process.env["VYRAX_CHECKOUT_ORIGIN"] = origin;
+      resetRateLimits();
+      const result = await createCheckout(
+        new Request(`${origin}/api/checkout`, {
+          method: "POST",
+          headers: { origin, "content-type": "application/json" },
+          body: JSON.stringify({
+            items: [{ slug: "bpc-157", strength: "5mg", quantity: 2 }],
+            name: "Researcher",
+            email: "researcher@example.org",
+            address: "1 Lab Road",
+            address2: "",
+            city: "London",
+            postcode: "SW1A 1AA",
+            researchAgreement: true,
+          }),
+        }),
+      );
+      expect(result.status).toBe(200);
+      expect(inserted["test_mode"]).toBe(true);
+      expect(payment["test_mode"]).toBe(true);
+      expect((await result.json()).test_mode).toBe(true);
+    }
+    process.env["VYRAX_CHECKOUT_ORIGIN"] = "https://vyraxlabs.co.uk";
+    resetRateLimits();
+    const live = await createCheckout(request());
+    expect(live.status).toBe(200);
+    expect(inserted["test_mode"]).toBe(false);
+    expect(payment["test_mode"]).toBe(false);
+    expect((await live.json()).test_mode).toBe(false);
   } finally {
     globalThis.fetch = originalFetch;
     for (const [k, v] of Object.entries(previous)) {

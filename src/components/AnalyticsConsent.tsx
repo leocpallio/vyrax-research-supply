@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  analyticsConfigured,
+  analyticsEnabled,
   analyticsConsent,
   setAnalyticsConsent,
   type AnalyticsConsent as Consent,
@@ -17,7 +17,7 @@ export function AnalyticsConsentBanner() {
     window.addEventListener("vyrax-analytics-consent", sync);
     return () => window.removeEventListener("vyrax-analytics-consent", sync);
   }, []);
-  const visible = ready && analyticsConfigured && consent === null;
+  const visible = ready && analyticsEnabled() && consent === null;
   const box = useRef<HTMLElement | null>(null);
   // Publish the banner height so floating buttons (WhatsApp) can sit above it.
   useEffect(() => {
@@ -89,7 +89,8 @@ export function AnalyticsConsentSettings() {
     window.addEventListener("vyrax-analytics-consent", sync);
     return () => window.removeEventListener("vyrax-analytics-consent", sync);
   }, []);
-  if (!analyticsConfigured) return <p>Optional analytics are not configured on this site.</p>;
+  if (ready && !analyticsEnabled())
+    return <p>Optional analytics are not configured on this site.</p>;
   if (!ready) return <p>Loading analytics preferences...</p>;
   return (
     <section aria-label="Analytics preferences">

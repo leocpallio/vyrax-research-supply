@@ -13,6 +13,7 @@ import { cleanAttribution, cleanPhIds } from "./analytics-events";
 import { deliveryPenceFor, publicOrderLines } from "./order-lines";
 import { capturePaymentConfirmed, capturePurchase } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
+import { checkoutIsTestMode } from "./production-host";
 
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -115,6 +116,8 @@ export async function createCheckout(request: Request): Promise<Response> {
       !request.headers.get("content-type")?.startsWith("application/json")
     )
       return fail("Invalid request", 403);
+    // Keep the order, payment request and webhook test flags identical.
+    const testMode = checkoutIsTestMode(c.mode, request.url, c.origin);
     if (Number(request.headers.get("content-length") ?? 0) > 16384)
       return fail("Invalid request", 413);
     const raw = await request.text();
@@ -183,7 +186,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       total_pence: quote.totalPence,
       currency: "GBP",
       merchant_id: c.merchant,
-      test_mode: c.testMode,
+      test_mode: testMode,
       checkout_state: "creating",
       status: "pending_payment",
       guest_token: token,
@@ -209,7 +212,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       customer: { email, name, ...(phone ? { phone } : {}) },
       metadata: { order_id: order.id },
       return_url: `${c.origin}/checkout/return?order=${encodeURIComponent(order.id)}`,
-      test_mode: c.testMode,
+      test_mode: testMode,
     };
     const orderFields = await spicepayOrderFields(
       quote,
@@ -248,7 +251,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       (payment["profile_id"] !== undefined && payment["profile_id"] !== c.profile) ||
       (payment["amount"] !== undefined && payment["amount"] !== quote.totalPence) ||
       (payment["currency"] !== undefined && payment["currency"] !== "GBP") ||
-      (payment["test_mode"] !== undefined && payment["test_mode"] !== c.testMode)
+      (payment["test_mode"] !== undefined && payment["test_mode"] !== testMode)
     )
       throw new Error("Payment response mismatch");
     const paymentId = payment["payment_id"];
@@ -269,7 +272,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       order_id: order.id,
       guest_token: token,
       total_pence: quote.totalPence,
-      test_mode: c.testMode,
+      test_mode: testMode,
     });
   } catch (error) {
     console.error("[vyrax checkout]", error instanceof Error ? error.message : "unknown error");
