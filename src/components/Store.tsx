@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -29,13 +29,47 @@ import { AnalyticsConsentBanner } from "@/components/AnalyticsConsent";
 import { AnnouncementBar } from "@/components/shell/AnnouncementBar";
 import { Header } from "@/components/shell/Header";
 import { WhatsAppButton } from "@/components/shell/WhatsAppButton";
-import { OfferPopup } from "@/components/shell/OfferPopup";
 import { Footer } from "@/components/shell/Footer";
-import { SearchDialog } from "@/components/shell/SearchDialog";
-import { CartDrawer } from "@/components/shell/CartDrawer";
 import { CART_ADDED_EVENT, CART_OPEN_EVENT, openCartDrawer } from "@/components/shell/cart-store";
 
 export { openCartDrawer };
+
+// Speed: the offer popup, search dialog and cart drawer are not on screen at first paint, so their code
+// is split out of the shared shell chunk. Search and cart load on first open (the Cmd/Ctrl+K shortcut and
+// the header buttons both set state here), the offer popup loads when the browser is idle.
+const SearchDialog = lazy(() =>
+  import("@/components/shell/SearchDialog").then((m) => ({ default: m.SearchDialog })),
+);
+const CartDrawer = lazy(() =>
+  import("@/components/shell/CartDrawer").then((m) => ({ default: m.CartDrawer })),
+);
+const OfferPopup = lazy(() =>
+  import("@/components/shell/OfferPopup").then((m) => ({ default: m.OfferPopup })),
+);
+
+/** Mounts children once `when` has been true, and keeps them mounted so close animations still play. */
+function OnceOpened({ when, children }: { when: boolean; children: React.ReactNode }) {
+  const [seen, setSeen] = useState(when);
+  useEffect(() => {
+    if (when) setSeen(true);
+  }, [when]);
+  return seen ? <Suspense fallback={null}>{children}</Suspense> : null;
+}
+
+/** Renders children after first paint, once the browser is idle (never during hydration). */
+function WhenIdle({ children }: { children: React.ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const go = () => setReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(go, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(go, 2000);
+    return () => window.clearTimeout(id);
+  }, []);
+  return ready ? <Suspense fallback={null}>{children}</Suspense> : null;
+}
 
 // ---------------------------------------------------------------- Added-to-basket toast
 function AddedToast() {
@@ -90,6 +124,17 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
     window.addEventListener(CART_OPEN_EVENT, open);
     return () => window.removeEventListener(CART_OPEN_EVENT, open);
   }, []);
+  // Cmd/Ctrl+K opens search from anywhere, before the dialog chunk has loaded (the dialog keeps its own copy).
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearch(true);
+      }
+    };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+  }, []);
   return (
     <div className="min-h-screen bg-paper text-foreground flex flex-col">
       <a
@@ -104,10 +149,16 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
-      <OfferPopup />
+      <WhenIdle>
+        <OfferPopup />
+      </WhenIdle>
       <WhatsAppButton />
-      <SearchDialog open={search} onOpenChange={setSearch} />
-      <CartDrawer open={cart} onOpenChange={setCart} />
+      <OnceOpened when={search}>
+        <SearchDialog open={search} onOpenChange={setSearch} />
+      </OnceOpened>
+      <OnceOpened when={cart}>
+        <CartDrawer open={cart} onOpenChange={setCart} />
+      </OnceOpened>
       <AddedToast />
       <AnalyticsConsentBanner />
     </div>
