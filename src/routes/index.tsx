@@ -86,7 +86,7 @@ export const Route = createFileRoute("/")({
                 as: "image",
                 href: heroPreload.msrc ?? heroPreload.src,
                 media: heroPreload.msrc ? "(max-width: 1023px)" : undefined,
-                fetchPriority: "high",
+                fetchPriority: "high" as const,
               },
               ...(heroPreload.msrc
                 ? [
@@ -95,7 +95,7 @@ export const Route = createFileRoute("/")({
                       as: "image",
                       href: heroPreload.src,
                       media: "(min-width: 1024px)",
-                      fetchPriority: "high",
+                      fetchPriority: "high" as const,
                     },
                   ]
                 : []),
