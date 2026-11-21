@@ -87,7 +87,7 @@ export function Kicker({
   return (
     <p
       className={`flex items-center gap-2 font-mono text-[11px] md:text-[12px] uppercase tracking-[0.14em] ${
-        tone === "dark" ? "text-[#0B1B3B]/60" : "text-[#EEF2F8]/72"
+        tone === "dark" ? "text-[#0B1B3B]/72" : "text-[#EEF2F8]/72"
       }`}
     >
       <span
@@ -196,7 +196,7 @@ export function HomeProductCard({
         <button
           type="button"
           data-testid="quick-add-button"
-          aria-label={`Choose amount for ${product.name}`}
+          aria-label={`Add ${product.name}, choose amount`}
           disabled={!canAdd}
           className={addClass}
         >
@@ -208,7 +208,7 @@ export function HomeProductCard({
         sideOffset={8}
         className="w-56 rounded-[14px] border-[#0B1B3B]/10 bg-white p-1.5 shadow-xl"
       >
-        <p className="px-3 pt-1.5 pb-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#0B1B3B]/60">
+        <p className="px-3 pt-1.5 pb-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#0B1B3B]/72">
           Choose amount
         </p>
         <ul>
@@ -614,7 +614,7 @@ function BentoTile({ t, n }: { t: FieldTile; n: number }) {
             </span>
           </span>
           <span
-            className={`mt-0.5 text-[11.5px] md:text-[12.5px] text-[#0B1B3B]/60 leading-snug ${small ? "hidden md:line-clamp-1" : "line-clamp-1"}`}
+            className={`mt-0.5 text-[11.5px] md:text-[12.5px] text-[#0B1B3B]/72 leading-snug ${small ? "hidden md:line-clamp-1" : "line-clamp-1"}`}
           >
             {t.compounds.join(", ")}
           </span>

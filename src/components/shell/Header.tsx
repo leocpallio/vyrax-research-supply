@@ -290,7 +290,7 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
           <button
             type="button"
             onClick={onSearch}
-            aria-label="Search"
+            aria-label="Search peptides"
             data-testid="search-open"
             className="icon-link lg:flex lg:items-center lg:w-auto lg:min-w-52 lg:h-10 lg:px-4 lg:gap-2 lg:border lg:border-line lg:bg-paper lg:hover:bg-tint lg:text-sm lg:text-muted-foreground"
           >
