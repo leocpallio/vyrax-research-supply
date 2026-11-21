@@ -55,7 +55,10 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
   let inserted: Record<string, unknown> = {};
   let payment: Record<string, unknown> = {};
   let responseProfile: string | undefined;
+  let responseStatus = 200;
   let bindings = 0;
+  let retired = 0;
+  let failed = 0;
   let state = "pending";
   const events = new Set<string>();
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -68,13 +71,14 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
       });
     if (url === "https://api.spicepay.net/payments") {
       payment = payload;
+      if (responseStatus !== 200) return result({ error: "rejected" }, responseStatus);
       return result({
         payment_id: "pay_vyrax",
         merchant_id: "merchant_vyrax",
         ...(responseProfile ? { profile_id: responseProfile } : {}),
         amount: payload["amount"],
         currency: "GBP",
-        test_mode: true,
+        test_mode: payload["test_mode"],
         payment_link: {
           link: "https://checkout.spicepay.net/pay/51eb087f-eb16-42d5-8ee1-5aeec8433b22",
           payment_link_id: "51eb087f-eb16-42d5-8ee1-5aeec8433b22",
@@ -87,6 +91,12 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
         return result({ id: orderId }, 201);
       }
       if (init?.method === "PATCH") {
+        // A never-bound 'creating' row is expired when checkout fails after the insert (A2-03).
+        if ("expired_at" in payload) {
+          retired++;
+          if (payload["checkout_state"] === "failed") failed++;
+          return result({ id: orderId });
+        }
         bindings++;
         return result({ id: orderId });
       }
@@ -242,6 +252,66 @@ test("checkout-to-webhook flow with simulated SpicePay and Supabase transport", 
     );
     expect(wrongProfile.status).toBe(502);
     expect(bindings).toBe(previousBindings);
+    expect(retired).toBe(1); // the failed attempt's unbound row is expired, not left pending
+    responseProfile = undefined;
+    const request = () =>
+      new Request("https://vyraxlabs.co.uk/api/checkout", {
+        method: "POST",
+        headers: { origin: "https://vyraxlabs.co.uk", "content-type": "application/json" },
+        body: JSON.stringify({
+          items: [{ slug: "bpc-157", strength: "5mg", quantity: 2 }],
+          name: "Researcher",
+          email: "researcher@example.org",
+          address: "1 Lab Road",
+          address2: "",
+          city: "London",
+          postcode: "SW1A 1AA",
+          researchAgreement: true,
+        }),
+      });
+    resetRateLimits();
+    responseStatus = 422;
+    expect((await createCheckout(request())).status).toBe(502);
+    expect(failed).toBe(1);
+    expect(bindings).toBe(previousBindings);
+    resetRateLimits();
+    responseStatus = 503;
+    expect((await createCheckout(request())).status).toBe(502);
+    expect(failed).toBe(1); // uncertain remote outcome must not become a definite failure
+    expect(retired).toBe(3);
+    responseStatus = 200;
+    process.env["VYRAX_SPICEPAY_MODE"] = "live";
+    for (const origin of ["http://127.0.0.1:4791", "https://vyrax-research-supply.lovable.app"]) {
+      process.env["VYRAX_CHECKOUT_ORIGIN"] = origin;
+      resetRateLimits();
+      const result = await createCheckout(
+        new Request(`${origin}/api/checkout`, {
+          method: "POST",
+          headers: { origin, "content-type": "application/json" },
+          body: JSON.stringify({
+            items: [{ slug: "bpc-157", strength: "5mg", quantity: 2 }],
+            name: "Researcher",
+            email: "researcher@example.org",
+            address: "1 Lab Road",
+            address2: "",
+            city: "London",
+            postcode: "SW1A 1AA",
+            researchAgreement: true,
+          }),
+        }),
+      );
+      expect(result.status).toBe(200);
+      expect(inserted["test_mode"]).toBe(true);
+      expect(payment["test_mode"]).toBe(true);
+      expect((await result.json()).test_mode).toBe(true);
+    }
+    process.env["VYRAX_CHECKOUT_ORIGIN"] = "https://vyraxlabs.co.uk";
+    resetRateLimits();
+    const live = await createCheckout(request());
+    expect(live.status).toBe(200);
+    expect(inserted["test_mode"]).toBe(false);
+    expect(payment["test_mode"]).toBe(false);
+    expect((await live.json()).test_mode).toBe(false);
   } finally {
     globalThis.fetch = originalFetch;
     for (const [k, v] of Object.entries(previous)) {

@@ -2,7 +2,8 @@ import { metabolicAndRegenerative } from "../data/compounds-a";
 import { secretagoguesToSupplies } from "../data/compounds-b";
 import { ukplAdditions } from "../data/ukpl-additions";
 import { site } from "../data/site";
-import { findPromo, normaliseCode, promoDiscountPence } from "../data/promos";
+import { findPromo, normaliseCode } from "../data/promos";
+import { chooseDiscount } from "./discount";
 
 const catalog = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...ukplAdditions];
 export type CheckoutLine = { slug: string; strength: string; quantity: number };
@@ -42,20 +43,13 @@ export function quoteCheckout(input: unknown, code?: string | null) {
     };
   });
   const subtotalPence = items.reduce((n, i) => n + i.linePence, 0);
-  const freeVialsPence = items.reduce(
-    (n, i) =>
-      n +
-      (site.b2g1.some((o) => o.slug === i.slug && o.strength === i.strength)
-        ? Math.floor(i.quantity / 3) * i.unitPence
-        : 0),
-    0,
-  );
-  const afterOffer = subtotalPence - freeVialsPence;
-  const rate =
-    [...site.spendTiers].sort((a, b) => b.over - a.over).find((t) => afterOffer >= t.over * 100)
-      ?.rate ?? 0;
-  const tierDiscountPence = Math.round(afterOffer * rate);
-  const goodsPence = afterOffer - tierDiscountPence;
+  // One discount only (src/lib/discount.ts): the largest of multi-buy, spend tier and code,
+  // capped at site.maxDiscountPct of the list subtotal; exempt lines never get tier or code.
+  const discount = chooseDiscount(items, code);
+  const freeVialsPence = discount.freeVialsPence;
+  const tierDiscountPence = discount.tierPence;
+  // Gift and free-delivery thresholds read goods before a code, as before (a code never costs the gift).
+  const goodsPence = subtotalPence - freeVialsPence - tierDiscountPence;
   // Free gift: real £0 lines on the order record (not in the payment amount) so the packer
   // dispatches them. Granted on goods value alone; buying the same vial does not cancel it.
   const giftRule = site.firstOrderGift;
@@ -72,7 +66,7 @@ export function quoteCheckout(input: unknown, code?: string | null) {
       }
     : undefined;
   const orderLines = giftLine ? [...items, giftLine] : items;
-  const promoPenceApplied = promoDiscountPence(code, goodsPence);
+  const promoPenceApplied = discount.promoPence;
   const promoApplied = findPromo(code);
   const netGoodsPence = goodsPence - promoPenceApplied;
   const deliveryPence =
@@ -95,6 +89,9 @@ export function quoteCheckout(input: unknown, code?: string | null) {
             discountPence: promoPenceApplied,
           }
         : undefined,
+    promoSkippedForTier: discount.promoSkippedForTier,
+    discountCapped: discount.capped,
+    discountKind: discount.kind,
     subtotalPence,
     freeVialsPence,
     tierDiscountPence,

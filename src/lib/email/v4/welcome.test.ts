@@ -73,7 +73,7 @@ describe("Vyrax v4 welcome, cart and back-in-stock", () => {
     const d0 = welcomeEntries.find((e) => e.id === "welcome-d0")!.render();
     expect(d0.text).toContain(code);
     expect(d0.text).toContain(spendTierLine());
-    expect(d0.text).toContain("Buy two, get the third free");
+    expect(d0.text).toContain(`Buy three, save up to ${site.maxDiscountPct}%`);
     expect(d0.text).toContain("5 free bacteriostatic water vials");
     expect(d0.html).toContain("/email/combo/welcome-popular.jpg");
   });

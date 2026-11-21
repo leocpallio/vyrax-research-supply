@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackEmailCaptured } from "@/lib/analytics";
 
 type Props = { slug: string; strength: string; name: string };
 
@@ -23,6 +24,7 @@ export function StockNotice({ slug, strength, name }: Props) {
         body: JSON.stringify({ email: email.trim(), slug, strength, consent: true }),
       });
       setState(res.ok ? "done" : "error");
+      if (res.ok) trackEmailCaptured("back_in_stock");
     } catch {
       setState("error");
     }

@@ -38,7 +38,7 @@ export async function sendSaleAlert(
   const env = deps.env ?? process.env;
   try {
     return await sendTransactional(
-      { to: adminEmail(env), mail: saleAlert(order), key: `admin-sale-${eventId}`.slice(0, 256) },
+      { to: adminEmail(env), mail: saleAlert(order), key: `admin-sale-${eventId}`.slice(0, 256), tag: { flow: "internal", stage: "sale_alert" } },
       { env, ...(deps.fetcher ? { fetcher: deps.fetcher } : {}) },
     );
   } catch (error) {

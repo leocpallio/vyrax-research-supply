@@ -229,7 +229,7 @@ export const metabolicAndRegenerative: Compound[] = [
     useCases: ["Recovery & Repair", "Flexibility", "Muscle Repair"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 23.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 25.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 39.99 },
     ],
     summary:

@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { quoteCheckout } from "./checkout-pricing";
-import { enqueueOrderEmail, type Rpc } from "./email/outbox.server";
 import { sendOrderEmail } from "./email/order-email.server";
 import { sendSaleAlert } from "./email/admin-alert.server";
 import { validatePaymentEvent, verifySignature, type PaymentOrder } from "./spicepay";
@@ -12,8 +11,9 @@ import { checkFirstOrderCode, emailIlikePattern } from "./first-order-gate";
 import { insertOrderWithAttributionFallback, selectOrderWithPhFallback } from "./order-insert";
 import { cleanAttribution, cleanPhIds } from "./analytics-events";
 import { deliveryPenceFor, publicOrderLines } from "./order-lines";
-import { capturePaymentConfirmed } from "./posthog.server";
+import { capturePaymentConfirmed, capturePurchase } from "./posthog.server";
 import { LIMITS, clientKey, takeRateLimit, tooManyRequests } from "./rate-limit";
+import { checkoutIsTestMode } from "./production-host";
 
 const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), {
@@ -75,12 +75,40 @@ const db = (url: string, key: string) =>
 const validText = (v: unknown, max: number) =>
   typeof v === "string" && v.trim().length > 0 && v.trim().length <= max ? v.trim() : null;
 
+/** Only a definite processor rejection can be called failed. A timeout or 5xx is unknown. */
+export const definitePaymentRejection = (status: number) => [400, 401, 403, 422].includes(status);
+
+/** Best effort; CAS prevents a late binding or paid transition from being overwritten. */
+async function retireUnboundOrder(
+  row: { url: string; key: string; id: string },
+  rejected: boolean,
+): Promise<void> {
+  try {
+    await db(row.url, row.key)
+      .from("orders")
+      .update(
+        rejected
+          ? { checkout_state: "failed", expired_at: new Date().toISOString() }
+          : { expired_at: new Date().toISOString() },
+      )
+      .eq("id", row.id)
+      .eq("checkout_state", "creating")
+      .is("payment_id", null);
+  } catch {
+    /* the hourly expire_stale_checkouts() job catches anything missed here */
+  }
+}
+
 export async function createCheckout(request: Request): Promise<Response> {
   if (request.method !== "POST") return fail("Method not allowed", 405);
   const limit = takeRateLimit(`checkout:${clientKey(request)}`, LIMITS.checkout);
   if (!limit.allowed) return tooManyRequests(limit);
   if (process.env["VYRAX_SPICEPAY_CHECKOUT_ENABLED"] !== "true")
     return fail("Checkout is not open", 503);
+  // The 'creating' row, until a payment id is bound to it. If anything throws in between, the
+  // catch below retires it so it never lingers as a live pending order (audit A2-03).
+  let unbound: { url: string; key: string; id: string } | null = null;
+  let rejected = false;
   try {
     const c = config();
     if (
@@ -88,6 +116,8 @@ export async function createCheckout(request: Request): Promise<Response> {
       !request.headers.get("content-type")?.startsWith("application/json")
     )
       return fail("Invalid request", 403);
+    // Keep the order, payment request and webhook test flags identical.
+    const testMode = checkoutIsTestMode(c.mode, request.url, c.origin);
     if (Number(request.headers.get("content-length") ?? 0) > 16384)
       return fail("Invalid request", 413);
     const raw = await request.text();
@@ -156,7 +186,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       total_pence: quote.totalPence,
       currency: "GBP",
       merchant_id: c.merchant,
-      test_mode: c.testMode,
+      test_mode: testMode,
       checkout_state: "creating",
       status: "pending_payment",
       guest_token: token,
@@ -173,6 +203,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       ph_session_id: ph.ph_session_id ?? null,
     });
     if (insertError || !order) throw new Error("Order insert failed");
+    unbound = { url: c.url, key: c.key, id: order.id };
     const basePayment = {
       amount: quote.totalPence,
       currency: "GBP",
@@ -181,7 +212,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       customer: { email, name, ...(phone ? { phone } : {}) },
       metadata: { order_id: order.id },
       return_url: `${c.origin}/checkout/return?order=${encodeURIComponent(order.id)}`,
-      test_mode: c.testMode,
+      test_mode: testMode,
     };
     const orderFields = await spicepayOrderFields(
       quote,
@@ -208,7 +239,10 @@ export async function createCheckout(request: Request): Promise<Response> {
           .replace(/"[^"]*"\s*:\s*"[^"]*"/g, (m) => m.split(":")[0] + ':"…"')
           .slice(0, 300),
       );
-    if (!response.ok) throw new Error(`Payment creation failed: ${response.status}`);
+    if (!response.ok) {
+      rejected = definitePaymentRejection(response.status);
+      throw new Error(`Payment creation failed: ${response.status}`);
+    }
     const payment = (await response.json()) as Record<string, unknown>;
     if (
       typeof payment["payment_id"] !== "string" ||
@@ -217,7 +251,7 @@ export async function createCheckout(request: Request): Promise<Response> {
       (payment["profile_id"] !== undefined && payment["profile_id"] !== c.profile) ||
       (payment["amount"] !== undefined && payment["amount"] !== quote.totalPence) ||
       (payment["currency"] !== undefined && payment["currency"] !== "GBP") ||
-      (payment["test_mode"] !== undefined && payment["test_mode"] !== c.testMode)
+      (payment["test_mode"] !== undefined && payment["test_mode"] !== testMode)
     )
       throw new Error("Payment response mismatch");
     const paymentId = payment["payment_id"];
@@ -232,15 +266,17 @@ export async function createCheckout(request: Request): Promise<Response> {
       .select("id")
       .single();
     if (stampError || !stamped) throw new Error("Payment binding failed");
+    unbound = null;
     return json({
       checkout_url: checkoutUrl,
       order_id: order.id,
       guest_token: token,
       total_pence: quote.totalPence,
-      test_mode: c.testMode,
+      test_mode: testMode,
     });
   } catch (error) {
     console.error("[vyrax checkout]", error instanceof Error ? error.message : "unknown error");
+    if (unbound) await retireUnboundOrder(unbound, rejected);
     return fail(
       "Checkout could not be prepared. No payment was requested on this page. Contact support before retrying if you reached a payment page.",
       502,
@@ -324,7 +360,7 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     );
     if (error) throw error;
     if (!order) return fail("Unknown payment", 503); // Binding may still be in flight: request delivery retry.
-    let decision: "paid" | "ignored";
+    let decision: "paid" | "expired" | "ignored";
     try {
       decision = validatePaymentEvent(event, order);
     } catch {
@@ -342,26 +378,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
     });
     if (rpcError) throw rpcError;
     // Paid receipts are queued atomically by the database paid transition trigger.
-    // Failure/expiry notices are idempotent and rechecked against pending state at send time.
-    const type = String(event["event_type"]);
-    const mailKind = /expir/i.test(type)
-      ? "paymentExpired"
-      : /fail|declin/i.test(type)
-        ? "paymentFailed"
-        : null;
-    if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true") {
-      if (mailKind && !order.test_mode) {
-        await enqueueOrderEmail(
-          store as unknown as Rpc,
-          order.id,
-          mailKind,
-          String(event["event_id"]),
-        );
-      }
-    } else {
-      const legacyKind = applied === "paid" ? "orderConfirmation" : mailKind;
-      if (legacyKind) await sendOrderEmail(legacyKind, order, String(event["event_id"]));
-    }
+    // Lifecycle corrections never initiate a customer email. Paid receipts retain their existing path.
+    if (process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] !== "true" && applied === "paid")
+      await sendOrderEmail("orderConfirmation", order, String(event["event_id"]));
     if (applied === "paid") {
       // Aggregate order event. Fires only on the DB paid transition (exactly once per order, retries
       // return 'duplicate'). Never blocks or fails the webhook.
@@ -386,7 +405,9 @@ export async function spicepayWebhook(request: Request): Promise<Response> {
               : null,
         )
         .find((d) => d && !Number.isNaN(d.getTime()));
-      await capturePaymentConfirmed(order as never, { paidAt: stamp ?? new Date(), isFirstOrder });
+      const paidCtx = { paidAt: stamp ?? new Date(), isFirstOrder };
+      await capturePaymentConfirmed(order as never, paidCtx);
+      await capturePurchase(order as never, paidCtx);
       // Owner alert first: the sale must never depend on the outbox drain.
       await sendSaleAlert(order as never, String(event["event_id"]));
       // Drain inline. There is no reliable cron on this worker, and a paid receipt that sits queued

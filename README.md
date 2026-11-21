@@ -14,7 +14,7 @@ TITLE FORMULAS: product pages "Buy {Product} {mg} UK | >99% Tested | Vyrax Labs"
 
 LAUNCH PRICES: Retatrutide £59.99/10mg, Tirzepatide £54.99/10mg, Semaglutide £19.99/5mg, BPC-157 £15.99/5mg and £29.99/10mg, TB-500 £21.99/5mg and £37.99/10mg, GHK-Cu £19.99/50mg and £37.99/100mg, CJC-1295 no-DAC £24.99/5mg, Ipamorelin £18.99/5mg, GLOW 70mg £59.99. Launch promo: B2G1 free on Retatrutide 10mg and Tirzepatide 20mg.
 
-MUST-HAVE FEATURES: 18+ age gate with research-purpose confirmation, public CoA/Lab Reports page linked from every product, full footer legal set with UK company number, shipping page naming a tracked courier with discreet packaging, returns page with free-reshipment language, payment icon row plus one non-card option, account system with order history and guest checkout, on-site reviews with star ratings, search with peptide autocomplete, storage and handling guides, FAQ page.
+MUST-HAVE FEATURES: 18+ age gate with research-purpose confirmation, public CoA/Lab Reports page linked from every product, research-use footer set (Vyrax is anonymous: no company, address or returns details), shipping page naming a tracked courier with discreet packaging, returns page with free-reshipment language, payment icon row plus one non-card option, account system with order history and guest checkout, on-site reviews with star ratings, search with peptide autocomplete, storage and handling guides, FAQ page.
 
 This project was built with [Lovable](https://lovable.dev).
 

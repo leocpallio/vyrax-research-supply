@@ -10,10 +10,11 @@ const BANNED = [
 const byId = (id: string) => lifecycleEntries.find((e) => e.id === id)!.render();
 
 describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact", () => {
-  it("renders all twelve", () => {
+  it("renders all fourteen", () => {
     expect(lifecycleEntries.map((e) => e.id)).toEqual([
       "postpurchase-d7-storage", "reorder-reminder-0", "reorder-reminder-1", "reorder-reminder-2",
       "reorder-nudge", "reorder-v2-product", "reorder-v2-water",
+      "feedback-request", "winback-d60",
       "pending-1h-card", "pending-24h", "pending-72h", "contact-auto-reply", "contact-owner",
     ]);
   });
@@ -30,12 +31,11 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
         expect(m.text.toLowerCase()).toContain("not a licensed medicine");
       });
 
-      it("has unsubscribe on marketing kinds and postal address when one is configured", () => {
+      it("has unsubscribe on marketing kinds", () => {
         if (entry.marketing) {
           expect(m.html).toContain("Unsubscribe");
           expect(m.text).toContain("Unsubscribe:");
           expect(m.listUnsubscribe).toBeTruthy();
-          if (site.registeredOffice) expect(m.text).toContain(site.registeredOffice);
         }
       });
 
@@ -94,9 +94,9 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
   it("reorder emails take offers from site data", () => {
     const r1 = byId("reorder-reminder-1").text;
     expect(r1).toContain(spendTierLine());
-    expect(r1).toContain("Buy two, get the third free");
+    expect(r1).toContain(`Buy three, save up to ${site.maxDiscountPct}%`);
     expect(r1).toContain(`${site.firstOrderGift!.quantity} free bacteriostatic water vials`);
-    expect(byId("reorder-v2-product").text).toContain("Buy two, get the third free");
+    expect(byId("reorder-v2-product").text).toContain(`Buy three, save up to ${site.maxDiscountPct}%`);
     expect(byId("reorder-v2-water").text).toContain("free bacteriostatic water vials");
     expect(byId("reorder-reminder-0").text).toContain("Total at today's prices");
   });
@@ -123,7 +123,7 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
 
   it("contact-owner is internal and carries a reply link", () => {
     const m = lifecycleEntries.find((e) => e.id === "contact-owner")!.render() as { html: string; text: string; replyTo?: string };
-    expect(m.replyTo).toBe("alex@example.com");
+    expect(m.replyTo).toBeUndefined();
     expect(m.html).toContain("mailto:alex@example.com");
     expect(m.text).toContain("alex@example.com");
   });
@@ -131,7 +131,6 @@ describe("Vyrax v4 lifecycle: post-purchase, reorder, pending payment, contact",
   it("contact-owner drops an unusable address instead of building a link from it", async () => {
     const { contactOwner } = await import("./lifecycle");
     const m = contactOwner({ name: "X", email: 'bad"><script>', message: "hi" });
-    expect(m.replyTo).toBeUndefined();
     expect(m.html).not.toContain("<script>");
     expect(m.html).not.toContain("mailto:bad");
   });

@@ -21,6 +21,7 @@ import {
   button,
   escapeHtml as e,
   gbp,
+  gbpThreshold,
   oneLine,
   safeUrl,
   thumb,
@@ -64,15 +65,19 @@ const compounds = [...metabolicAndRegenerative, ...secretagoguesToSupplies, ...u
 // ---------------------------------------------------------------------------------------------
 const num = (n: number) => String(n);
 const codeLine = () =>
-  `Code ${CODE} takes ${PROMO.pct}% off your first order of ${gbp(PROMO.minSpend)} or more.`;
+  `Code ${CODE} takes ${PROMO.pct}% off your first order of ${gbpThreshold(PROMO.minSpend)} or more. It does not combine with other discounts.`;
 const dispatchClaim = () =>
   claimFilled("delivery.same-day-dispatch", { cutoff: dispatchCutoffLabel() });
 const deliveryClaim = () =>
-  claimFilled("delivery.free-threshold", { freeShippingThreshold: num(site.freeDeliveryThreshold) });
+  claimFilled("delivery.free-threshold", {
+    freeShippingThreshold: num(site.freeDeliveryThreshold),
+  });
 const carrierClaim = () => claimFilled("delivery.tracked-carrier", { courier: site.carrier });
 const packingClaim = () => {
   const t = claimText("delivery.cold-chain-packing");
-  return t ? `${t}. ${site.carrier} is tracked but not temperature controlled, and transit temperature is not monitored.` : null;
+  return t
+    ? `${t}. ${site.carrier} is tracked but not temperature controlled, and transit temperature is not monitored.`
+    : null;
 };
 const replyClaim = () => claimText("support.reply-time");
 const certClaim = () => claimText("testing.public-certificates-body");
@@ -83,12 +88,13 @@ const nameOf = (slug: string, strength: string) => {
   return `${c?.name ?? slug} ${strength}`;
 };
 const b2g1Line = () =>
-  `Buy two, get the third free on ${site.b2g1.map((o) => nameOf(o.slug, o.strength)).join(" and ")}.`;
+  `Buy three, save up to ${site.maxDiscountPct}% on ${site.b2g1.map((o) => nameOf(o.slug, o.strength)).join(" and ")}. Best single discount applies.`;
 const giftLine = () =>
   site.firstOrderGift
-    ? `${site.firstOrderGift.quantity} free bacteriostatic water vials on orders over ${gbp(site.firstOrderGift.over)}.`
+    ? `${site.firstOrderGift.quantity} free bacteriostatic water vials on orders over ${gbpThreshold(site.firstOrderGift.over)}.`
     : null;
-const present = (xs: (string | null | undefined)[]): string[] => xs.filter((x): x is string => Boolean(x));
+const present = (xs: (string | null | undefined)[]): string[] =>
+  xs.filter((x): x is string => Boolean(x));
 
 const hello = (first?: string) => {
   const n = oneLine(first ?? "").split(/\s+/)[0] ?? "";
@@ -116,7 +122,10 @@ const note = (t: string): Block => ({
   text: [t],
 });
 const text = (t: string): Block => ({ html: `<p style="margin:0 0 20px">${e(t)}</p>`, text: [t] });
-const gap = (px = 8): Block => ({ html: `<div style="height:${px}px;line-height:${px}px;font-size:1px">&nbsp;</div>`, text: [] });
+const gap = (px = 8): Block => ({
+  html: `<div style="height:${px}px;line-height:${px}px;font-size:1px">&nbsp;</div>`,
+  text: [],
+});
 
 /** Accent-dot list. Plain sentences, no bold lead-ins. */
 function bullets(items: string[]): Block {
@@ -159,7 +168,9 @@ function batchStrip(c: Coa): Block {
     `<td class="tint" bgcolor="#EEF2F9" valign="top" style="padding:12px 10px;background:#EEF2F9;text-align:left"><div class="mute" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4A5568;margin:0 0 4px">${e(k)}</div><div class="tx" style="font-size:15px;font-weight:600;color:#14213D">${e(v)}</div></td>`;
   return {
     html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="rule" style="margin:0 0 14px;border:1px solid #E1E6EF;border-radius:12px;border-collapse:separate;overflow:hidden"><tr>${cell("Batch", c.batch)}${cell("Purity", `${c.purity}%`)}${cell("Lab", c.lab)}</tr></table>`,
-    text: [`${nameOf(c.compound, c.strength)}: batch ${c.batch}, purity ${c.purity}%, ${c.lab}, ${c.method}, tested ${c.tested}`],
+    text: [
+      `${nameOf(c.compound, c.strength)}: batch ${c.batch}, purity ${c.purity}%, ${c.lab}, ${c.method}, tested ${c.tested}`,
+    ],
   };
 }
 const spaceMg = (s: string) => s.replace(/(\d)(mg|ml)\b/gi, "$1 $2");
@@ -176,7 +187,11 @@ function priceRows(items: { slug: string; strength: string }[], campaign: string
   const rows = items.map((i) => {
     const f = find(i.slug, i.strength);
     const m = lineMedia(i.slug, i.strength);
-    return { name: nameOf(i.slug, i.strength), price: f.price, url: utm(m.url ?? SHOP_URL, campaign) };
+    return {
+      name: nameOf(i.slug, i.strength),
+      price: f.price,
+      url: utm(m.url ?? SHOP_URL, campaign),
+    };
   });
   return {
     html: `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 24px;font-size:15px">${rows
@@ -209,14 +224,21 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
     lineTotal: i.price * i.quantity,
     ...lineMedia(i.slug, i.strength),
   }));
-  const cell = "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:middle;text-align:left";
+  const cell =
+    "padding:12px 0;border-bottom:1px solid #E1E6EF;vertical-align:middle;text-align:left";
   const row = (l: Line, price: string, detail?: string) =>
     `<tr>${thumb(l)}<td class="rule tx" align="left" style="${cell}"><span style="font-weight:600">${e(oneLine(l.name))}</span><br><span class="mute" style="color:#4A5568;font-size:13px">${e(spaceMg(l.strength))} · ${detail ? e(detail) : l.quantity > 1 ? `${e(gbp(l.lineTotal / l.quantity))} × ${l.quantity}` : "Qty 1"}</span></td><td class="rule tx" align="right" style="${cell};text-align:right;white-space:nowrap">${e(price)}</td></tr>`;
   const g = site.firstOrderGift;
   const giftRow =
     p.gift && g
       ? row(
-          { name: "Bacteriostatic Water", strength: g.strength, quantity: g.quantity, lineTotal: 0, ...lineMedia(g.slug, g.strength) },
+          {
+            name: "Bacteriostatic Water",
+            strength: g.strength,
+            quantity: g.quantity,
+            lineTotal: 0,
+            ...lineMedia(g.slug, g.strength),
+          },
           "Free",
           `Qty ${g.quantity}`,
         )
@@ -224,13 +246,16 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
   const sum = (k: string, v: string, strong = false) =>
     `<tr><td colspan="2" class="${strong ? "tx" : "mute"}" align="left" style="padding:${strong ? "14px 0 0" : "6px 0 0"};font-size:${strong ? 16 : 14}px;font-weight:${strong ? 700 : 400};color:${strong ? "#14213D" : "#4A5568"};text-align:left">${e(k)}</td><td class="tx" align="right" style="padding:${strong ? "14px 0 0" : "6px 0 0"};font-size:${strong ? 16 : 14}px;font-weight:${strong ? 700 : 500};white-space:nowrap">${e(v)}</td></tr>`;
   const entries: [string, string][] = [["Subtotal", gbp(p.subtotal)]];
-  if (p.freeVials > 0) entries.push(["Free third vial", `-${gbp(p.freeVials)}`]);
-  if (p.tierDiscount > 0) entries.push([`Basket discount (${Math.round(p.rate * 100)}%)`, `-${gbp(p.tierDiscount)}`]);
+  if (p.freeVials > 0) entries.push(["Multi-buy discount", `-${gbp(p.freeVials)}`]);
+  if (p.tierDiscount > 0)
+    entries.push([`Basket discount (${Math.round(p.rate * 100)}%)`, `-${gbp(p.tierDiscount)}`]);
   if (p.promo) entries.push([`Code ${p.promo.code} (${p.promo.pct}%)`, `-${gbp(p.promo.amount)}`]);
   entries.push([`Delivery (${site.carrier})`, p.delivery === 0 ? "Free" : gbp(p.delivery)]);
   const html = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:0 0 24px;font-size:15px"><tbody>${lines.map((l) => row(l, gbp(l.lineTotal))).join("")}${giftRow}${entries.map(([k, v]) => sum(k, v)).join("")}${sum("Total", gbp(p.total), true)}</tbody></table>`;
   const textRows = [
-    ...lines.map((l) => `${oneLine(l.name)} ${spaceMg(l.strength)} x ${l.quantity}: ${gbp(l.lineTotal)}`),
+    ...lines.map(
+      (l) => `${oneLine(l.name)} ${spaceMg(l.strength)} x ${l.quantity}: ${gbp(l.lineTotal)}`,
+    ),
     ...(p.gift && g ? [`Bacteriostatic Water ${spaceMg(g.strength)} x ${g.quantity}: Free`] : []),
     ...entries.map(([k, v]) => `${k}: ${v}`),
     `Total: ${gbp(p.total)}`,
@@ -241,8 +266,7 @@ function basketBlock(items: CartItem[], code?: string): { block: Block; total: n
 // ---------------------------------------------------------------------------------------------
 // Fine print shared by every email here
 // ---------------------------------------------------------------------------------------------
-const fine = (extra: (string | null)[] = []): string[] =>
-  present(extra);
+const fine = (extra: (string | null)[] = []): string[] => present(extra);
 
 type Spec = {
   id: WelcomeEmailId;
@@ -278,7 +302,10 @@ export function welcomeCode(ctx: BaseContext = {}): RenderedEmail {
     subject: `Your code for ${PROMO.pct}% off`,
     heading: `Your ${PROMO.pct}% off code`,
     preheader: `Code ${CODE} is inside. ${codeLine()}`,
-    paragraphs: [hello(ctx.firstName), "Thanks for signing up. Your welcome code is below, ready for your first order."],
+    paragraphs: [
+      hello(ctx.firstName),
+      "Thanks for signing up. Your welcome code is below, ready for your first order.",
+    ],
     body: join(
       codeBox(CODE, codeLine()),
       label("How to use it"),
@@ -335,7 +362,10 @@ export function welcomeD0(ctx: BaseContext = {}): RenderedEmail {
     subject: `Your ${PROMO.pct}% off code is inside`,
     heading: `${PROMO.pct}% off your first order`,
     preheader: `Use ${CODE} at checkout. Here is what it does and what else applies to your basket.`,
-    paragraphs: [hello(ctx.firstName), "Thanks for joining. Your code is below, with a plain account of what it does."],
+    paragraphs: [
+      hello(ctx.firstName),
+      "Thanks for joining. Your code is below, with a plain account of what it does.",
+    ],
     body: join(
       codeBox(CODE, codeLine()),
       label("What applies to your basket"),
@@ -424,7 +454,15 @@ export function welcomeD2(ctx: BaseContext = {}): RenderedEmail {
         ]),
       ),
       label("Where it comes down"),
-      bullets(present([ladderLine(), b2g1Line(), deliveryClaim() ? `${deliveryClaim()}.` : null, giftLine(), codeLine()])),
+      bullets(
+        present([
+          ladderLine(),
+          b2g1Line(),
+          deliveryClaim() ? `${deliveryClaim()}.` : null,
+          giftLine(),
+          codeLine(),
+        ]),
+      ),
       {
         html: comboImage(
           "welcome-range",
@@ -446,7 +484,10 @@ export function welcomeD3(ctx: BaseContext = {}): RenderedEmail {
   const lead = coas.find((c) => c.compound === "retatrutide" && c.strength === "10mg") ?? coas[0];
   if (!lead) throw new Error("No certificate on file");
   const others = coas.filter((c) => c !== lead);
-  const labUrl = lead.verifyUrl && /^https:\/\/verify\.janoshik\.com\//.test(lead.verifyUrl) ? lead.verifyUrl : null;
+  const labUrl =
+    lead.verifyUrl && /^https:\/\/verify\.janoshik\.com\//.test(lead.verifyUrl)
+      ? lead.verifyUrl
+      : null;
   const m = lineMedia(lead.compound, lead.strength);
   const leadLine: Line = {
     name: nameOf(lead.compound, lead.strength).replace(` ${lead.strength}`, ""),
@@ -492,7 +533,12 @@ export function welcomeD3(ctx: BaseContext = {}): RenderedEmail {
       ...(others.length
         ? [
             label("Other published reports"),
-            { html: otherRows, text: others.map((c) => `${nameOf(c.compound, c.strength)}, batch ${c.batch}: ${c.purity}%`) },
+            {
+              html: otherRows,
+              text: others.map(
+                (c) => `${nameOf(c.compound, c.strength)}, batch ${c.batch}: ${c.purity}%`,
+              ),
+            },
           ]
         : []),
       note(`Your welcome code ${CODE} still takes ${PROMO.pct}% off your first order.`),
@@ -522,7 +568,10 @@ export function cart1Code(ctx: CartContext): RenderedEmail {
       block,
       codeBox(CODE, `${codeLine()} Enter it in the discount field.`),
     ),
-    action: { label: "Return to your basket", url: utm(ctx.basketUrl ?? BASKET_URL, "cart-1-code") },
+    action: {
+      label: "Return to your basket",
+      url: utm(ctx.basketUrl ?? BASKET_URL, "cart-1-code"),
+    },
     lines: fine([deliveryClaim() ? `${deliveryClaim()}.` : null, dispatchClaim()]),
   });
 }
@@ -539,8 +588,15 @@ export function cart1NoCode(ctx: CartContext): RenderedEmail {
       hello(ctx.firstName),
       "We saved your basket. The button takes you straight back to it, as you left it.",
     ],
-    body: join(label("Your basket"), block, note(`Larger baskets are discounted automatically: ${spendTierLine()}.`)),
-    action: { label: "Return to your basket", url: utm(ctx.basketUrl ?? BASKET_URL, "cart-1-nocode") },
+    body: join(
+      label("Your basket"),
+      block,
+      note(`Larger baskets are discounted automatically: ${spendTierLine()}.`),
+    ),
+    action: {
+      label: "Return to your basket",
+      url: utm(ctx.basketUrl ?? BASKET_URL, "cart-1-nocode"),
+    },
     lines: fine([deliveryClaim() ? `${deliveryClaim()}.` : null, dispatchClaim()]),
   });
 }
@@ -560,7 +616,9 @@ export function cart2(ctx: CartContext): RenderedEmail {
     body: join(
       label("Your basket"),
       block,
-      note("If you have decided against it, no problem. You can ignore this email and nothing further will arrive about this basket."),
+      note(
+        "If you have decided against it, no problem. You can ignore this email and nothing further will arrive about this basket.",
+      ),
     ),
     action: { label: "Back to your basket", url: utm(ctx.basketUrl ?? BASKET_URL, "cart-2") },
     lines: fine(),
@@ -584,10 +642,15 @@ export function backInStock(ctx: StockContext): RenderedEmail {
     subject: `${name} is back in stock`,
     heading: `${name} is back in stock`,
     preheader: `${name} is available again.`,
-    paragraphs: [hello(ctx.firstName), "You asked us to tell you when this product returned. It is available again now."],
+    paragraphs: [
+      hello(ctx.firstName),
+      "You asked us to tell you when this product returned. It is available again now.",
+    ],
     body: join(
       { html: row, text: [`${name}, ${gbp(f.price)}`] },
-      note("You asked for one restock notification for this product. This is not a marketing subscription, and we will not email you about it again."),
+      note(
+        "You asked for one restock notification for this product. This is not a marketing subscription, and we will not email you about it again.",
+      ),
     ),
     action: { label: `View ${name}`, url },
     lines: fine([dispatchClaim()]),

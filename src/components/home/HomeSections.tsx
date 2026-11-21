@@ -21,6 +21,7 @@ import { coaFor, type Coa } from "@/data/coa";
 import { labelColour } from "@/data/label-colours";
 import { HeroCarousel } from "./HeroCarousel";
 import { ladderSaving } from "@/lib/price-ladder";
+import { threeVialOfferExample } from "@/data/offers";
 
 // Homepage building blocks, pass 3 (5 Nov 2026): Vyrax's own composition, not a Kova mirror.
 // Split hero with a batch spec card, numbered mono kickers, bento research fields with caption
@@ -243,7 +244,7 @@ export function HomeProductCard({
 
   const price = (
     <p className="flex flex-wrap items-baseline gap-x-1.5">
-      {multi && <span className="text-xs text-[#0B1B3B]/60">From</span>}
+      {multi && <span className="text-xs text-[#0B1B3B]/72">From</span>}
       {ladder && !multi && (
         <s className="text-[13px] text-[#0B1B3B]/68 tabular-nums">{gbp(ladder.was)}</s>
       )}
@@ -383,7 +384,7 @@ export function HomeProductCard({
 }
 
 // ---------------------------------------------------------------- Bundle feature (real basket offer)
-/** A pack of three vials where the basket really makes every 3rd one free (site.b2g1). */
+/** A pack of three vials priced with the same capped discount as the basket and checkout. */
 export function BundleCard({
   product,
   strength,
@@ -397,7 +398,7 @@ export function BundleCard({
 }) {
   const [added, setAdded] = useState(false);
   const was = strength.price * 3;
-  const now = strength.price * 2;
+  const now = threeVialOfferExample(product.slug, strength.label).goodsPence / 100;
   const href = productPath(product.slug, strength.label);
   const add = () => {
     addCart(cartLine(product, strength, 3));
@@ -435,7 +436,7 @@ export function BundleCard({
           </a>
         </h3>
         <p className="text-[14px] md:text-[15px] text-[#0B1B3B]/70 leading-relaxed max-w-[420px]">
-          Add three vials and the basket takes the third off automatically.
+          Add three vials and the basket applies the best eligible discount, capped at 30%.
         </p>
         <div className="mt-auto pt-3 flex flex-wrap items-center justify-between gap-3">
           <p className="flex items-baseline gap-2">
@@ -544,7 +545,7 @@ export function HeroSplit({
                     <t.icon size={15} className="shrink-0" style={{ color: BLUE }} />
                     {t.stat}
                   </span>
-                  <span className="block text-[12.5px] md:text-[13px] text-[#0B1B3B]/60 leading-snug mt-1">
+                  <span className="block text-[12.5px] md:text-[13px] text-[#0B1B3B]/72 leading-snug mt-1">
                     {t.body}
                   </span>
                 </span>
@@ -813,7 +814,7 @@ export function CoaBand({
         </div>
 
         <div>
-          <div className="hidden md:grid grid-cols-[64px_minmax(0,1fr)_120px_110px_88px] gap-4 px-2 pb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#EEF2F8]/45">
+          <div className="hidden md:grid grid-cols-[64px_minmax(0,1fr)_120px_110px_88px] gap-4 px-2 pb-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#EEF2F8]/65">
             <span />
             <span>Compound / batch</span>
             <span>HPLC purity</span>

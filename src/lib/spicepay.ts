@@ -27,7 +27,10 @@ export async function verifySignature(
   return diff === 0;
 }
 
-export function validatePaymentEvent(payload: unknown, order: PaymentOrder): "paid" | "ignored" {
+export function validatePaymentEvent(
+  payload: unknown,
+  order: PaymentOrder,
+): "paid" | "expired" | "ignored" {
   if (!payload || typeof payload !== "object") throw new Error("Invalid event");
   const e = payload as Record<string, unknown>;
   const content = e["content"] as Record<string, unknown> | undefined;
@@ -48,6 +51,10 @@ export function validatePaymentEvent(payload: unknown, order: PaymentOrder): "pa
   if (e["event_type"] === "payment_succeeded") {
     if (obj["status"] !== "succeeded") throw new Error("Status mismatch");
     return "paid";
+  }
+  if (e["event_type"] === "payment_expired") {
+    if (obj["status"] !== "expired") throw new Error("Status mismatch");
+    return "expired";
   }
   return "ignored";
 }

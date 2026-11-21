@@ -12,7 +12,7 @@ export const secretagoguesToSupplies: Compound[] = [
     tags: ["GHRH analogue", "Pulsatile GH"],
     useCases: ["Growth Hormone", "Muscle Growth", "Recovery"],
     kind: "peptide",
-    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 24.99 }],
+    strengths: [{ label: "5mg", amount: 5, unit: "mg", price: 27.99 }],
     summary:
       "CJC-1295 no-DAC (Modified GRF 1-29) is a 29-amino-acid GHRH analogue with four substitutions that improve stability. Lyophilised powder.",
     overview: [
@@ -207,7 +207,7 @@ export const secretagoguesToSupplies: Compound[] = [
       // 2mg never bought from LKB; 5mg and 10mg are priced off a paid line.
       { label: "2mg", amount: 2, unit: "mg", price: 12.99, stock: "out" },
       { label: "5mg", amount: 5, unit: "mg", price: 27.99 },
-      { label: "10mg", amount: 10, unit: "mg", price: 39.99 },
+      { label: "10mg", amount: 10, unit: "mg", price: 42.99 },
     ],
     summary:
       "Sermorelin is the 29-amino-acid N-terminal fragment of growth hormone-releasing hormone (GHRH 1-29 amide). Lyophilised powder in sealed vials.",
@@ -312,7 +312,7 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 32.99 },
-      { label: "50mg", amount: 50, unit: "mg", price: 99.99 },
+      { label: "50mg", amount: 50, unit: "mg", price: 109.99 },
     ],
     summary:
       "SS-31 (elamipretide) is a mitochondria-targeted tetrapeptide that binds cardiolipin in the inner mitochondrial membrane. Lyophilised powder.",
@@ -339,7 +339,7 @@ export const secretagoguesToSupplies: Compound[] = [
     useCases: ["Sleep", "Recovery", "Brain & Focus"],
     kind: "peptide",
     strengths: [
-      { label: "5mg", amount: 5, unit: "mg", price: 13.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 14.99 },
       { label: "10mg", amount: 10, unit: "mg", price: 27.99 },
     ],
     summary:
@@ -417,7 +417,7 @@ export const secretagoguesToSupplies: Compound[] = [
     kind: "peptide",
     strengths: [
       { label: "10mg", amount: 10, unit: "mg", price: 24.99 },
-      { label: "5mg", amount: 5, unit: "mg", price: 19.99 },
+      { label: "5mg", amount: 5, unit: "mg", price: 21.99 },
     ],
     summary:
       "Semax is a synthetic heptapeptide analogue of the ACTH (4-7) fragment, extended with a Pro-Gly-Pro sequence for stability. Lyophilised powder.",

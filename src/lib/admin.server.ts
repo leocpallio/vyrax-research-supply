@@ -127,19 +127,32 @@ function client(url: string, key: string) {
     },
   });
 }
-async function context(request: Request) {
+type AdminContext = { store: ReturnType<typeof client> } | { denied: 401 | 403 };
+const deny = (c: { denied: 401 | 403 }) =>
+  fail(c.denied, c.denied === 401 ? "Unauthorized" : "Forbidden");
+
+/**
+ * 401 = no usable credential (missing, malformed, expired or forged token).
+ * 403 = a valid Supabase session that is not an active, verified admin member.
+ * The role is checked on the server against admin_members; the client-side sign-in alone grants nothing.
+ */
+async function context(request: Request): Promise<AdminContext> {
   const bearer = request.headers.get("authorization")?.match(/^Bearer ([^\s]+)$/)?.[1];
-  if (!bearer || bearer.length > 4096) return null;
+  if (!bearer || bearer.length > 4096) return { denied: 401 };
   const url = process.env["SUPABASE_URL"];
   const pub = process.env["SUPABASE_PUBLISHABLE_KEY"];
   const secret = process.env["SUPABASE_SERVICE_ROLE_KEY"];
   if (!url || !pub || !secret) throw new Error("Admin configuration missing");
   // getUser validates the JWT with Supabase Auth; never trust a decoded client claim.
-  const {
-    data: { user },
-    error,
-  } = await client(url, pub).auth.getUser(bearer);
-  if (error || !user) return null;
+  let user: Awaited<ReturnType<ReturnType<typeof client>["auth"]["getUser"]>>["data"]["user"] =
+    null;
+  try {
+    const result = await client(url, pub).auth.getUser(bearer);
+    if (!result.error) user = result.data.user;
+  } catch {
+    user = null; // a token the auth server cannot parse is a bad credential, not an outage
+  }
+  if (!user) return { denied: 401 };
   const store = client(url, secret); // server-only; never sent to the browser
   const { data: member, error: membershipError } = await store
     .from("admin_members")
@@ -147,8 +160,8 @@ async function context(request: Request) {
     .eq("user_id", user.id)
     .maybeSingle();
   if (membershipError) throw membershipError;
-  if (!authorizeAdmin(user, member)) return null;
-  return store;
+  if (!authorizeAdmin(user, member)) return { denied: 403 };
+  return { store };
 }
 
 const emailAutomationEnabled = () => process.env["VYRAX_EMAIL_AUTOMATION_ENABLED"] === "true";
@@ -160,8 +173,9 @@ const detailColumnsWithTracking = `${detailColumns},tracking_number`;
 
 export async function adminGet(request: Request): Promise<Response> {
   try {
-    const store = await context(request);
-    if (!store) return fail(403, "Forbidden");
+    const ctx = await context(request);
+    if ("denied" in ctx) return deny(ctx);
+    const { store } = ctx;
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
     if (id) {
@@ -189,6 +203,8 @@ export async function adminGet(request: Request): Promise<Response> {
       .from("orders")
       .select(emailAutomationEnabled() ? listColumnsWithTracking : listColumns, { count: "exact" });
     if (filters.status !== "all") query = query.eq("status", filters.status);
+    // Abandoned checkouts retired by expire_stale_checkouts() are not live pending orders.
+    if (filters.status === "pending_payment") query = query.is("expired_at", null);
     if (filters.workflow !== "all") query = query.eq("workflow_status", filters.workflow);
     if (filters.q)
       query = uuid.test(filters.q) ? query.eq("id", filters.q) : query.eq("email", filters.q);
@@ -227,8 +243,9 @@ export function internalTestOrder() {
 
 export async function adminPost(request: Request): Promise<Response> {
   try {
-    const store = await context(request);
-    if (!store) return fail(403, "Forbidden");
+    const ctx = await context(request);
+    if ("denied" in ctx) return deny(ctx);
+    const { store } = ctx;
     if (
       request.headers.get("origin") !== new URL(request.url).origin ||
       request.headers.get("content-type")?.split(";")[0] !== "application/json"
@@ -252,8 +269,9 @@ export async function adminPost(request: Request): Promise<Response> {
 
 export async function adminPatch(request: Request): Promise<Response> {
   try {
-    const store = await context(request);
-    if (!store) return fail(403, "Forbidden");
+    const ctx = await context(request);
+    if ("denied" in ctx) return deny(ctx);
+    const { store } = ctx;
     const origin = request.headers.get("origin");
     if (
       !origin ||

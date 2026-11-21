@@ -1,4 +1,6 @@
+import { site } from "../../data/site";
 import type { RenderedEmail } from "./templates";
+import { vyraxTags, type FlowTag } from "./tags.server";
 
 type Env = Record<string, string | undefined>;
 type Dependencies = {
@@ -8,17 +10,21 @@ type Dependencies = {
 
 /** Server only. Never import this module from a client component. */
 export async function sendTransactional(
-  message: { to: string; mail: RenderedEmail; key: string },
+  message: { to: string; mail: RenderedEmail; key: string; tag?: FlowTag },
   dependencies: Dependencies = {},
 ): Promise<string> {
   const env = dependencies.env ?? process.env;
   const apiKey = env["RESEND_API_KEY"];
   const from = env["VYRAX_EMAIL_FROM"];
   if (!apiKey || !from) throw new Error("Vyrax outbound email is not configured");
-  // Accept a bare mailbox or a well-formed display-name pair, never a partial angle bracket.
-  const sender = from.match(/^(?:[^\r\n<>]+ <)?[^<>\s@]+@vyraxlabs\.co\.uk(?:>)?$/i);
+  // Customers get mail From hello@ only, with replies routed to support@ (the only real inbox).
+  // Accept a bare mailbox or a well-formed display-name pair, never a partial angle bracket, and
+  // never any mailbox other than the configured sender address.
+  const sender = from.match(/^(?:[^\r\n<>]+ <)?([^<>\s@]+@vyraxlabs\.co\.uk)(?:>)?$/i);
   if (!sender || from.includes("<") !== from.includes(">"))
     throw new Error("Vyrax sender must be on vyraxlabs.co.uk");
+  if (sender[1]!.toLowerCase() !== site.senderEmail)
+    throw new Error(`Vyrax sender must be ${site.senderEmail}`);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(message.to) || /[\r\n]/.test(message.to))
     throw new Error("Invalid recipient");
   if (!/^[a-zA-Z0-9:_-]{1,256}$/.test(message.key)) throw new Error("Invalid idempotency key");
@@ -31,10 +37,14 @@ export async function sendTransactional(
     },
     body: JSON.stringify({
       from,
+      reply_to: site.email,
       to: [message.to],
       subject: message.mail.subject,
       html: message.mail.html,
       text: message.mail.text,
+      // flow, stage, send_id, brand on every send so the webhook rows can be tied to a flow.
+      tags: vyraxTags(message.tag ?? { flow: "unclassified", stage: "none" }),
+
       ...(message.mail.listUnsubscribe
         ? {
             headers: {

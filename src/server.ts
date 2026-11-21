@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { applySecurityHeaders } from "./lib/security-headers";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -44,17 +45,6 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-function withSecurityHeaders(res: Response): Response {
-  const h = new Headers(res.headers);
-  h.set("x-content-type-options", "nosniff");
-  h.set("referrer-policy", "strict-origin-when-cross-origin");
-  h.set("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=(self)");
-  if (!h.has("strict-transport-security")) h.set("strict-transport-security", "max-age=31536000");
-  if ((h.get("content-type") ?? "").startsWith("text/html") && !h.has("cache-control"))
-    h.set("cache-control", "public, max-age=0, must-revalidate");
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
-}
-
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
@@ -71,7 +61,10 @@ export default {
       }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
+      return applySecurityHeaders(
+        await normalizeCatastrophicSsrResponse(response),
+        reqUrl.pathname,
+      );
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

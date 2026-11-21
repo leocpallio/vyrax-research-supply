@@ -22,6 +22,9 @@ import { dispatchCutoffLabel } from "@/lib/delivery";
 import { capture, trackBeginCheckout } from "@/lib/analytics";
 import { cartCount, useCartItems } from "./cart-store";
 import { TierRail } from "./TierRail";
+import { GapFiller } from "./GapFiller";
+import { flags } from "@/lib/flags";
+import { gapFillerPlan } from "@/lib/gap-filler-live";
 
 const BAC_WATER_SLUG = "bacteriostatic-water";
 
@@ -72,10 +75,14 @@ export function DeliveryLadder({ items }: { items: CartItem[] }) {
   );
 }
 
-function BacWaterUpsell({ items }: { items: CartItem[] }) {
+export function BacWaterUpsell({ items, source = "drawer" }: { items: CartItem[]; source?: string }) {
   const bac = getCompound(BAC_WATER_SLUG);
   const s = bac?.strengths[0];
   if (!bac || !s) return null;
+  // vyrax_bac_addon: never offer a line checkout would reject.
+  if (flags.bacAddon && isLineUnavailable(cartLine(bac, s))) return null;
+  // vyrax_gap_filler owns the slot while it has a plan, so the two never stack.
+  if (flags.gapFiller && gapFillerPlan(items, readPromo())) return null;
   if (items.some((i) => i.slug === BAC_WATER_SLUG)) return null;
   // Only prompt when the basket holds a lyophilised vial that actually needs a solvent.
   if (!items.some((i) => getCompound(i.slug)?.kind !== "supply")) return null;
@@ -100,7 +107,10 @@ function BacWaterUpsell({ items }: { items: CartItem[] }) {
       </div>
       <button
         type="button"
-        onClick={() => addCart(cartLine(bac, s))}
+        onClick={() => {
+          addCart(cartLine(bac, s));
+          if (flags.bacAddon) capture("nudge_added", { source: `bac_${source}`, quantity: 1 });
+        }}
         data-testid="cart-upsell-add"
         className="rounded-full border border-ink px-3 h-9 text-xs font-semibold hover:bg-ink hover:text-ink-foreground transition-colors duration-150"
       >
@@ -278,6 +288,7 @@ export function CartDrawer({
                     <CartLineRow key={`${line.slug}-${line.strength}`} line={line} items={items} />
                   ))}
                 </ul>
+                <GapFiller items={items} code={readPromo()} source="drawer" className="mx-5 mt-4" />
                 <BacWaterUpsell items={items} />
               </>
             )}
@@ -295,7 +306,7 @@ export function CartDrawer({
                   </div>
                   {quote.freeVials > 0 && (
                     <div className="flex justify-between">
-                      <dt>Free vials</dt>
+                      <dt>Multi-buy saving</dt>
                       <dd className="tabular">-{gbp(quote.freeVials)}</dd>
                     </div>
                   )}

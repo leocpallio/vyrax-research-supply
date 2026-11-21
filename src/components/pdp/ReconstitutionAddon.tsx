@@ -1,4 +1,6 @@
-import { addCart, getCompound, readCart } from "@/lib/catalog";
+import { addCart, getCompound, readCart, stockOf } from "@/lib/catalog";
+import { capture } from "@/lib/analytics";
+import { flags } from "@/lib/flags";
 import { useEffect, useState } from "react";
 
 /**
@@ -25,9 +27,13 @@ export function ReconstitutionAddon({ show }: { show: boolean }) {
   const bac = getCompound(BAC_SLUG);
   const strength = bac?.strengths[0];
   if (!bac || !strength) return null;
+  // vyrax_bac_addon: do not offer diluent that checkout would reject.
+  if (flags.bacAddon && stockOf(strength) !== "in") return null;
 
-  const add = () =>
+  const add = () => {
     addCart({ slug: bac.slug, name: bac.name, strength: strength.label, price: strength.price, quantity: 1 });
+    if (flags.bacAddon) capture("nudge_added", { source: "pdp_bac_addon", quantity: 1 });
+  };
 
   return (
     <div

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyStatus,
+  completedCheckoutSteps,
   formatPostcode,
   isUkPostcode,
   orderRef,
@@ -34,5 +35,20 @@ describe("checkout-form", () => {
     expect(classifyStatus("expired")).toBe("expired");
     expect(classifyStatus("failed")).toBe("failed");
     expect(orderRef("abcdef12-0000-0000-0000-000000000000")).toBe("VX-ABCDEF12");
+  });
+  test("completed checkout steps", () => {
+    const blank = { ...ok, name: "", email: "", address: "", city: "", postcode: "" };
+    expect(completedCheckoutSteps(blank)).toEqual([]);
+    expect(completedCheckoutSteps({ ...blank, name: "A B", email: "a@b.co" })).toEqual(["contact"]);
+    expect(
+      completedCheckoutSteps({
+        ...blank,
+        address: "1 High St",
+        city: "Leeds",
+        postcode: "LS1 4AP",
+      }),
+    ).toEqual(["address"]);
+    expect(completedCheckoutSteps(ok)).toEqual(["contact", "address", "delivery"]);
+    expect(completedCheckoutSteps({ ...ok, phone: "abc" })).toEqual(["contact", "address"]);
   });
 });

@@ -110,12 +110,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "font/woff2",
         crossOrigin: "anonymous",
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap",
-      },
       { rel: "icon", href: "/favicon.ico?v=3", sizes: "32x32" },
       { rel: "icon", href: "/favicon-96x96.png?v=3", sizes: "96x96", type: "image/png" },
       { rel: "icon", href: "/favicon.svg?v=3", type: "image/svg+xml" },
@@ -126,10 +120,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Site-wide entity graph. Routes add their own BreadcrumbList / FAQPage / Product etc.
     scripts: [
       // Google Tag Manager for the ad agency: loads for every visitor (Leo's call, 12 Nov).
-      // Deferred: dataLayer is ready immediately, gtm.js loads after window load + idle so it never competes with the LCP image.
+      // Deferred: dataLayer is ready immediately (events queue in it), gtm.js loads for every visitor on the first touch, key or scroll after window load, or 8 s after load at the latest, so its tags never compete with the first paint and first taps.
+      // Revert: restore requestIdleCallback(l,{timeout:3000}) in place of the interaction listeners.
       {
         children:
-          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){var l=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id=GTM-WV7THGRS';document.head.appendChild(s)};var i=function(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:3000}):setTimeout(l,1500)};document.readyState==='complete'?i():window.addEventListener('load',i)})();",
+          "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());(function(){var d=false;var l=function(){if(d)return;d=true;var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id=GTM-WV7THGRS';document.head.appendChild(s)};var i=function(){['pointerdown','keydown','scroll','touchstart'].forEach(function(e){window.addEventListener(e,l,{once:true,passive:true})});setTimeout(l,8000)};document.readyState==='complete'?i():window.addEventListener('load',i)})();",
       },
       { type: "application/ld+json", children: serializeJsonLd(organizationJsonLd()) },
       { type: "application/ld+json", children: serializeJsonLd(webSiteJsonLd()) },

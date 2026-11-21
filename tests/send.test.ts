@@ -54,7 +54,7 @@ describe("server-only Resend transport", () => {
     await sendTransactional(
       { to: "user@example.com", mail, key: "support:123" },
       {
-        env: { RESEND_API_KEY: "placeholder", VYRAX_EMAIL_FROM: "Vyrax <mail@vyraxlabs.co.uk>" },
+        env: { RESEND_API_KEY: "placeholder", VYRAX_EMAIL_FROM: "Vyrax Labs <hello@vyraxlabs.co.uk>" },
         fetcher: async (input, init) => {
           request = new Request(input, init);
           return new Response(JSON.stringify({ id: "message-id" }), { status: 200 });
@@ -65,5 +65,7 @@ describe("server-only Resend transport", () => {
     const payload = await request?.json();
     expect(payload.text).toBe(mail.text);
     expect(payload.html).toBe(mail.html);
+    expect(payload.from).toBe("Vyrax Labs <hello@vyraxlabs.co.uk>");
+    expect(payload.reply_to).toBe("support@vyraxlabs.co.uk");
   });
 });

@@ -41,6 +41,25 @@ export function validateFields(f: CheckoutFields, agree: boolean): FieldErrors {
   return e;
 }
 
+export type CheckoutStepName = "contact" | "address" | "delivery";
+
+/**
+ * Which checkout blocks are complete, for the checkout_step funnel event. Reads field validity only;
+ * nothing typed is ever sent. contact: name and a valid email. address: line 1, town and a valid UK
+ * postcode. delivery: every delivery field valid (contact plus address, phone blank or valid), so the
+ * UK delivery fee is settled. The final step, payment, fires on submit.
+ */
+export function completedCheckoutSteps(f: CheckoutFields): CheckoutStepName[] {
+  const e = validateFields(f, true);
+  const out: CheckoutStepName[] = [];
+  const contact = Boolean(f.name.trim()) && !e.email;
+  const address = Boolean(f.address.trim()) && Boolean(f.city.trim()) && !e.postcode;
+  if (contact) out.push("contact");
+  if (address) out.push("address");
+  if (contact && address && !e.phone) out.push("delivery");
+  return out;
+}
+
 export type ReturnView = "paid" | "processing" | "failed" | "expired";
 
 export function classifyStatus(status: string): ReturnView {

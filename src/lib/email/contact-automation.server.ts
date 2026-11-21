@@ -3,6 +3,7 @@
 // claimed in SQL, re-checked in SQL immediately before sending, and verified against Resend so an
 // unsubscribe made there always wins. Nothing here creates consent.
 import { promos } from "../../data/promos";
+import { flowForKind } from "./tags.server";
 import { priceBasket } from "../basket-pricing";
 import {
   UNSUBSCRIBE_BASE,
@@ -16,6 +17,7 @@ import {
 import { unsubscribeMarketing, type Rpc } from "./outbox.server";
 import type { RenderedEmail } from "./templates";
 import { welcomeD1, welcomeD2, welcomeD3, cart1Code, cart1NoCode, cart2, backInStock } from "./v4/welcome";
+import { winback } from "./v4/lifecycle";
 
 export type ContactKind =
   | "welcomeD1"
@@ -23,7 +25,8 @@ export type ContactKind =
   | "welcomeD3"
   | "cart1"
   | "cart2"
-  | "backInStock";
+  | "backInStock"
+  | "winback";
 export type ContactRow = {
   id: string;
   email: string;
@@ -33,7 +36,7 @@ export type ContactRow = {
   claim_token: string;
   unsubscribe_token: string | null;
 };
-export type ContactMessage = { to: string; mail: RenderedEmail; key: string };
+export type ContactMessage = { to: string; mail: RenderedEmail; key: string; tag?: { flow: string; stage: string } };
 export type ContactDependencies = {
   env?: Env;
   db: Rpc;
@@ -43,7 +46,11 @@ export type ContactDependencies = {
 export type ContactStats = { claimed: number; sent: number; failed: number };
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const kinds: ContactKind[] = ["welcomeD1", "welcomeD2", "welcomeD3", "cart1", "cart2", "backInStock"];
+const kinds: ContactKind[] = ["welcomeD1", "welcomeD2", "welcomeD3", "cart1", "cart2", "backInStock", "winback"];
+/** Win-back needs its own flag on top of the automation flag. Unset means it is never claimed or sent. */
+export function enabledContactKinds(env: Env): ContactKind[] {
+  return env["VYRAX_WINBACK_ENABLED"] === "true" ? kinds : kinds.filter((k) => k !== "winback");
+}
 
 /** The welcome code only goes in basket 1 while the promo exists and still applies to this basket. */
 export function cartCodeStillValid(items: CartLine[]): boolean {
@@ -96,6 +103,11 @@ export function contactMailFor(row: ContactRow): RenderedEmail {
       mail = backInStock({ ...ctx, slug, strength });
       break;
     }
+    case "winback": {
+      const first = payload["firstName"];
+      mail = winback({ ...ctx, ...(typeof first === "string" ? { firstName: first } : {}) });
+      break;
+    }
     default:
       throw new Error("Unknown contact email kind");
   }
@@ -129,7 +141,8 @@ export async function runContactQueue(
 ): Promise<ContactStats> {
   const env = deps.env ?? process.env;
   const { db } = deps;
-  const claimed = await call(db, "claim_contact_outbox", { p_limit: limit });
+  const allowed = enabledContactKinds(env);
+  const claimed = await call(db, "claim_contact_outbox", { p_limit: limit, p_kinds: allowed });
   if (!Array.isArray(claimed)) throw new Error("Invalid contact claim response");
   const rows = (claimed as ContactRow[]).filter(
     (r) => r && uuid.test(r.id) && uuid.test(r.claim_token),
@@ -138,7 +151,7 @@ export async function runContactQueue(
   let failed = 0;
   for (const row of rows) {
     try {
-      if (!kinds.includes(row.kind)) throw new Error("Unknown contact email kind");
+      if (!allowed.includes(row.kind)) throw new Error("Unknown contact email kind");
       if (isTestAddress(row.email)) throw new Error("Test address skipped");
       if (!(await verifyResendContact(row.email, row.unsubscribe_token, env, deps.fetcher ?? fetch))) {
         // Resend is the source of truth: mirror the opt-out into SQL so no queue sends again.
@@ -155,6 +168,7 @@ export async function runContactQueue(
         to: row.email,
         mail: contactMailFor(row),
         key: `vyrax-contact:${row.id}`,
+        tag: flowForKind(row.kind),
       });
       if (!(await finish(db, row, true, providerId))) throw new Error("Email claim lost after send");
       sent++;

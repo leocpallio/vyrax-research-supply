@@ -127,10 +127,8 @@ has a quality problem, contact us and we will replace it or refund you. We canno
 vials. See the Returns page for full details.
 
 **Is Vyrax Labs a real company?**
-Vyrax Labs is a UK-based supplier of research materials, operating through this website. Company
-registration details are being finalised and will be published in the site footer once confirmed. We
-would rather show an empty space than invent a registration number, so where a fact is not yet
-confirmed, the site says so.
+Vyrax Labs is a UK-based supplier of research materials, operating through this website. We do not
+publish company or address details. For any question, email support@vyraxlabs.co.uk.
 
 ---
 
@@ -152,7 +150,7 @@ for damage a photograph of the parcel and its contents.
 **Returns**
 Unopened, sealed items can be returned within 14 days of delivery for a refund of the item price. We
 cannot accept opened vials or items whose tamper seal is broken. Contact us before returning anything
-so we can give you the return address and a reference. Refunds are made to the original payment method
+so we can give you a reference and tell you what to do next. Refunds are made to the original payment method
 within 14 days of us receiving the item. This policy does not affect your statutory rights under the
 Consumer Rights Act 2015 and the Consumer Contracts Regulations 2013.
 

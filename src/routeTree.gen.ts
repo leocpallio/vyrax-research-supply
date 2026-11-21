@@ -34,10 +34,12 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCartCaptureRouteImport } from './routes/api.cart-capture'
 import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
 import { Route as ApiCheckoutConsentRouteImport } from './routes/api.checkout-consent'
+import { Route as ApiCspReportRouteImport } from './routes/api.csp-report'
 import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
 import { Route as ApiNotifyMeRouteImport } from './routes/api.notify-me'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
+import { Route as ApiResendWebhookRouteImport } from './routes/api.resend-webhook'
 import { Route as ApiSpicepayWebhookRouteImport } from './routes/api.spicepay-webhook'
 import { Route as ApiStockNoticeRouteImport } from './routes/api.stock-notice'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -177,6 +179,11 @@ const ApiCheckoutConsentRoute = ApiCheckoutConsentRouteImport.update({
   path: '/api/checkout-consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCspReportRoute = ApiCspReportRouteImport.update({
+  id: '/api/csp-report',
+  path: '/api/csp-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiEmailAutomationRoute = ApiEmailAutomationRouteImport.update({
   id: '/api/email-automation',
   path: '/api/email-automation',
@@ -195,6 +202,11 @@ const ApiNotifyMeRoute = ApiNotifyMeRouteImport.update({
 const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   id: '/api/order-status',
   path: '/api/order-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiResendWebhookRoute = ApiResendWebhookRouteImport.update({
+  id: '/api/resend-webhook',
+  path: '/api/resend-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSpicepayWebhookRoute = ApiSpicepayWebhookRouteImport.update({
@@ -289,10 +301,12 @@ export interface FileRoutesByFullPath {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -333,10 +347,12 @@ export interface FileRoutesByTo {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -378,10 +394,12 @@ export interface FileRoutesById {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
   '/api/notify-me': typeof ApiNotifyMeRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/spicepay-webhook': typeof ApiSpicepayWebhookRoute
   '/api/stock-notice': typeof ApiStockNoticeRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -424,10 +442,12 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -468,10 +488,12 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -512,10 +534,12 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
     | '/api/notify-me'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/spicepay-webhook'
     | '/api/stock-notice'
     | '/category/$slug'
@@ -557,10 +581,12 @@ export interface RootRouteChildren {
   ApiCartCaptureRoute: typeof ApiCartCaptureRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
   ApiCheckoutConsentRoute: typeof ApiCheckoutConsentRoute
+  ApiCspReportRoute: typeof ApiCspReportRoute
   ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
   ApiNotifyMeRoute: typeof ApiNotifyMeRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
+  ApiResendWebhookRoute: typeof ApiResendWebhookRoute
   ApiSpicepayWebhookRoute: typeof ApiSpicepayWebhookRoute
   ApiStockNoticeRoute: typeof ApiStockNoticeRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -753,6 +779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckoutConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/csp-report': {
+      id: '/api/csp-report'
+      path: '/api/csp-report'
+      fullPath: '/api/csp-report'
+      preLoaderRoute: typeof ApiCspReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/email-automation': {
       id: '/api/email-automation'
       path: '/api/email-automation'
@@ -779,6 +812,13 @@ declare module '@tanstack/react-router' {
       path: '/api/order-status'
       fullPath: '/api/order-status'
       preLoaderRoute: typeof ApiOrderStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/resend-webhook': {
+      id: '/api/resend-webhook'
+      path: '/api/resend-webhook'
+      fullPath: '/api/resend-webhook'
+      preLoaderRoute: typeof ApiResendWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/spicepay-webhook': {
@@ -901,10 +941,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCartCaptureRoute: ApiCartCaptureRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
   ApiCheckoutConsentRoute: ApiCheckoutConsentRoute,
+  ApiCspReportRoute: ApiCspReportRoute,
   ApiEmailAutomationRoute: ApiEmailAutomationRoute,
   ApiGuideSignupRoute: ApiGuideSignupRoute,
   ApiNotifyMeRoute: ApiNotifyMeRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
+  ApiResendWebhookRoute: ApiResendWebhookRoute,
   ApiSpicepayWebhookRoute: ApiSpicepayWebhookRoute,
   ApiStockNoticeRoute: ApiStockNoticeRoute,
   CategorySlugRoute: CategorySlugRoute,
