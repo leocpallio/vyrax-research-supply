@@ -290,11 +290,11 @@ export function Header({ onSearch, onCart }: { onSearch: () => void; onCart: () 
           <button
             type="button"
             onClick={onSearch}
-            aria-label="Search peptides"
             data-testid="search-open"
             className="icon-link lg:flex lg:items-center lg:w-auto lg:min-w-52 lg:h-10 lg:px-4 lg:gap-2 lg:border lg:border-line lg:bg-paper lg:hover:bg-tint lg:text-sm lg:text-muted-foreground"
           >
-            <Search size={20} className="lg:size-4" />
+            <Search size={20} className="lg:size-4" aria-hidden="true" />
+            <span className="sr-only lg:hidden">Search</span>
             <span className="hidden lg:inline flex-1 text-left">Search peptides</span>
             <kbd className="hidden lg:inline font-mono t-micro border border-line rounded px-1 py-0.5">
               Ctrl K
