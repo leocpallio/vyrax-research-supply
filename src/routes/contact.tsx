@@ -33,17 +33,45 @@ function Contact() {
     name: "",
     email: "",
     order: "",
-    topic: topics[0] ?? "",
+    topic: "",
     message: "",
+    website: "",
   });
-  const [sent, setSent] = useState(false);
-  const submit = (e: React.FormEvent) => {
+  const [errors, setErrors] = useState<{ name?: string; email?: string; topic?: string; message?: string }>({});
+  const [reference, setReference] = useState("");
+  const [failure, setFailure] = useState("");
+  const [sending, setSending] = useState(false);
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!site.email) return;
-    const subject = `${f.topic}${f.order ? ` (order ${f.order})` : ""}`;
-    const body = `${f.message}\n\nName: ${f.name}\nEmail: ${f.email}${f.order ? `\nOrder: ${f.order}` : ""}`;
-    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
+    const next: { name?: string; email?: string; topic?: string; message?: string } = {};
+    if (f.name.trim().length < 2) next.name = "Enter your name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) next.email = "Enter a valid email address.";
+    if (!f.topic) next.topic = "Choose a topic.";
+    if (f.message.trim().length < 10) next.message = "Enter at least 10 characters.";
+    if (f.name.length > 100 || f.email.length > 254 || f.order.length > 80 || f.message.length > 5000)
+      next.message = "One or more fields are too long.";
+    setErrors(next);
+    if (Object.keys(next).length) {
+      document.getElementById(`${Object.keys(next)[0]}-contact`)?.focus();
+      return;
+    }
+    setSending(true);
+    setFailure("");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(f),
+      });
+      const result: { reference?: string; error?: string } = await response.json();
+      if (!response.ok || !result.reference) throw new Error(result.error || "Message could not be sent.");
+      setReference(result.reference);
+    } catch (error) {
+      setFailure(error instanceof Error ? error.message : "Message could not be sent.");
+    } finally {
+      setSending(false);
+    }
   };
   return (
     <StoreShell>
@@ -65,45 +93,55 @@ function Contact() {
         </p>
         <div className="grid lg:grid-cols-[1fr_360px] gap-12 mt-10">
           {site.email ? (
-            <form onSubmit={submit} className="space-y-5 max-w-2xl">
+            <form onSubmit={submit} noValidate className="space-y-5 max-w-2xl">
               <div className="grid sm:grid-cols-2 gap-4">
                 <label className="block text-sm font-semibold">
                   Name
                   <Input
+                    id="name-contact" name="name" autoComplete="name"
                     required
-                    className="mt-2"
+                    className="mt-2 min-h-11"
+                    aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-contact-error" : undefined}
                     value={f.name}
-                    onChange={(e) => setF({ ...f, name: e.target.value })}
+                    onChange={(e) => { setF({ ...f, name: e.target.value }); setErrors({ ...errors, name: "" }); }}
                   />
+                  {errors.name && <span id="name-contact-error" className="block mt-1 text-sm text-destructive">{errors.name}</span>}
                 </label>
                 <label className="block text-sm font-semibold">
                   Email
                   <Input
+                    id="email-contact" name="email" autoComplete="email"
                     required
                     type="email"
-                    className="mt-2"
+                    className="mt-2 min-h-11"
+                    aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-contact-error" : undefined}
                     value={f.email}
-                    onChange={(e) => setF({ ...f, email: e.target.value })}
+                    onChange={(e) => { setF({ ...f, email: e.target.value }); setErrors({ ...errors, email: "" }); }}
                   />
+                  {errors.email && <span id="email-contact-error" className="block mt-1 text-sm text-destructive">{errors.email}</span>}
                 </label>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <label className="block text-sm font-semibold">
                   Topic
                   <select
-                    className="mt-2 w-full h-9 border border-border rounded-md px-3 bg-background text-sm"
+                    id="topic-contact" name="topic"
+                    required aria-invalid={!!errors.topic} aria-describedby={errors.topic ? "topic-contact-error" : undefined}
+                    className="mt-2 w-full min-h-11 border border-border rounded-md px-3 bg-background text-base"
                     value={f.topic}
-                    onChange={(e) => setF({ ...f, topic: e.target.value })}
+                    onChange={(e) => { setF({ ...f, topic: e.target.value }); setErrors({ ...errors, topic: "" }); }}
                   >
+                    <option value="">Choose a topic</option>
                     {topics.map((t) => (
-                      <option key={t}>{t}</option>
+                      <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
+                  {errors.topic && <span id="topic-contact-error" className="block mt-1 text-sm text-destructive">{errors.topic}</span>}
                 </label>
                 <label className="block text-sm font-semibold">
                   Order number (optional)
                   <Input
-                    className="mt-2"
+                    id="order-contact" name="order" autoComplete="off" className="mt-2 min-h-11"
                     value={f.order}
                     onChange={(e) => setF({ ...f, order: e.target.value })}
                   />
@@ -112,21 +150,25 @@ function Contact() {
               <label className="block text-sm font-semibold">
                 Message
                 <Textarea
+                  id="message-contact" name="message" autoComplete="off"
                   required
                   minLength={10}
                   rows={6}
                   className="mt-2"
+                  aria-invalid={!!errors.message} aria-describedby={errors.message ? "message-contact-error" : undefined}
                   value={f.message}
-                  onChange={(e) => setF({ ...f, message: e.target.value })}
+                  onChange={(e) => { setF({ ...f, message: e.target.value }); setErrors({ ...errors, message: "" }); }}
                 />
-              </label>
-              <Button className="rounded-full h-11 px-7">Send message</Button>
-              {sent && (
-                <p role="status" className="text-sm">
-                  Your email app should now open with the message ready. Press send there to deliver
-                  it.
-                </p>
-              )}
+                {errors.message && <span id="message-contact-error" className="block mt-1 text-sm text-destructive">{errors.message}</span>}
+                </label>
+                <div className="absolute -left-[10000px]" aria-hidden="true">
+                <label htmlFor="website-contact">Website</label>
+                <input id="website-contact" name="website" tabIndex={-1} autoComplete="off" value={f.website} onChange={(e) => setF({ ...f, website: e.target.value })} />
+                </div>
+                <Button type="submit" disabled={sending || !!reference} className="rounded-full h-11 px-7">{sending ? "Sending…" : "Send message"}</Button>
+                <p className="text-sm text-muted-foreground">Your details are used to answer this enquiry. Replies are handled during {site.supportHours}; no reply time is guaranteed.</p>
+                {failure && <p role="alert" className="text-sm text-destructive">{failure} You can <a href={`mailto:${site.email}`} className="underline">email us instead</a>.</p>}
+                {reference && <p role="status" className="text-sm">Message received. Reference: {reference}. Replies are handled during {site.supportHours}.</p>}
             </form>
           ) : (
             <div className="border border-dashed border-border rounded-2xl p-7 max-w-2xl">

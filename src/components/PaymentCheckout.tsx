@@ -267,7 +267,7 @@ export function PaymentCheckout() {
       className="order-first md:order-last md:sticky md:top-24 h-fit bg-surface rounded-2xl p-5 md:p-6"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id="co-summary" className="font-heading text-xl font-semibold">
+        <h2 id="co-summary" className="font-heading text-base md:text-xl font-semibold">
           Order summary
         </h2>
         <button
@@ -275,22 +275,14 @@ export function PaymentCheckout() {
           onClick={() => setShowItems((v) => !v)}
           aria-expanded={showItems}
           aria-controls="co-summary-details"
-          className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-3 text-sm font-medium md:hidden"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-sm font-medium md:hidden"
         >
-          {showItems ? "Hide details" : "Details and discount code"}
+          <span className="tabular-nums">{gbp(quote.total)}</span>
           <span aria-hidden className={showItems ? "rotate-180" : ""}>
             ▾
           </span>
         </button>
       </div>
-      <p className="mt-2 flex items-center justify-between text-sm md:hidden">
-        <span>UK delivery</span>
-        <span>{quote.delivery === 0 ? "Free" : gbp(quote.delivery)}</span>
-      </p>
-      <p className="mt-1 flex items-center justify-between text-sm md:hidden">
-        <span>Total (GBP)</span>
-        <strong className="text-base tabular-nums">{gbp(quote.total)}</strong>
-      </p>
       <div id="co-summary-details" className={showItems ? "" : "hidden md:block"}>
         <ul id="co-summary-items" className="mt-3 divide-y divide-border">
           {items.map((i) => (
@@ -461,7 +453,7 @@ export function PaymentCheckout() {
         ) : (
           <div className="grid md:grid-cols-[1fr_340px] gap-6 md:gap-10 mt-6 md:mt-8 items-start">
             {summary}
-            <form onSubmit={submit} noValidate className="space-y-5" aria-describedby="co-pay-how">
+            <form id="co-form" onSubmit={submit} noValidate className="space-y-5 pb-20 md:pb-0" aria-describedby="co-pay-how">
               {errorCount > 0 && (
                 <div
                   role="alert"
@@ -700,6 +692,14 @@ export function PaymentCheckout() {
               </ul>
               <DocsPack />
             </form>
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background px-4 py-3 shadow-lg md:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <div className="mx-auto flex max-w-5xl items-center gap-3">
+                <span className="shrink-0 text-sm font-semibold tabular-nums">{gbp(quote.total)}</span>
+                <Button type="submit" form="co-form" disabled={busy || quote.belowMinimum} className="min-h-11 flex-1 rounded-full text-sm">
+                  {busy ? "Preparing payment…" : "Continue to payment"}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>

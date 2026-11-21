@@ -34,6 +34,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiCartCaptureRouteImport } from './routes/api.cart-capture'
 import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
 import { Route as ApiCheckoutConsentRouteImport } from './routes/api.checkout-consent'
+import { Route as ApiContactRouteImport } from './routes/api.contact'
 import { Route as ApiCspReportRouteImport } from './routes/api.csp-report'
 import { Route as ApiEmailAutomationRouteImport } from './routes/api.email-automation'
 import { Route as ApiGuideSignupRouteImport } from './routes/api.guide-signup'
@@ -179,6 +180,11 @@ const ApiCheckoutConsentRoute = ApiCheckoutConsentRouteImport.update({
   path: '/api/checkout-consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiContactRoute = ApiContactRouteImport.update({
+  id: '/api/contact',
+  path: '/api/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCspReportRoute = ApiCspReportRouteImport.update({
   id: '/api/csp-report',
   path: '/api/csp-report',
@@ -301,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/api/cart-capture': typeof ApiCartCaptureRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/api/checkout-consent': typeof ApiCheckoutConsentRoute
+  '/api/contact': typeof ApiContactRoute
   '/api/csp-report': typeof ApiCspReportRoute
   '/api/email-automation': typeof ApiEmailAutomationRoute
   '/api/guide-signup': typeof ApiGuideSignupRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/contact'
     | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
@@ -488,6 +498,7 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/contact'
     | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/api/cart-capture'
     | '/api/checkout'
     | '/api/checkout-consent'
+    | '/api/contact'
     | '/api/csp-report'
     | '/api/email-automation'
     | '/api/guide-signup'
@@ -581,6 +593,7 @@ export interface RootRouteChildren {
   ApiCartCaptureRoute: typeof ApiCartCaptureRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
   ApiCheckoutConsentRoute: typeof ApiCheckoutConsentRoute
+  ApiContactRoute: typeof ApiContactRoute
   ApiCspReportRoute: typeof ApiCspReportRoute
   ApiEmailAutomationRoute: typeof ApiEmailAutomationRoute
   ApiGuideSignupRoute: typeof ApiGuideSignupRoute
@@ -779,6 +792,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckoutConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/contact': {
+      id: '/api/contact'
+      path: '/api/contact'
+      fullPath: '/api/contact'
+      preLoaderRoute: typeof ApiContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/csp-report': {
       id: '/api/csp-report'
       path: '/api/csp-report'
@@ -941,6 +961,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCartCaptureRoute: ApiCartCaptureRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
   ApiCheckoutConsentRoute: ApiCheckoutConsentRoute,
+  ApiContactRoute: ApiContactRoute,
   ApiCspReportRoute: ApiCspReportRoute,
   ApiEmailAutomationRoute: ApiEmailAutomationRoute,
   ApiGuideSignupRoute: ApiGuideSignupRoute,
