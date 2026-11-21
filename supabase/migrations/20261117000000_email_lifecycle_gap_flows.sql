@@ -1,6 +1,7 @@
 -- Vyrax lifecycle gap flows: packed (transactional), feedback request (day 10 after dispatch) and win-back (day 60).
 -- Staged, sender off. Additive: existing flows keep their behaviour.
---   * Nothing here enables a send. Delivery is still gated by email_automation_control (default off), the app flags
+--   * Nothing here enables a new send, even when email_automation_control is already ON in production. Each
+--     new flow has a separate DB switch, seeded OFF, as well as the app flags
 --     VYRAX_EMAIL_AUTOMATION_ENABLED + VYRAX_EMAIL_PROVIDER_APPROVED, and one flag per new flow
 --     (VYRAX_PACKED_ENABLED, VYRAX_FEEDBACK_ENABLED, VYRAX_WINBACK_ENABLED), all unset.
 --   * The new kinds are only claimed when the app passes them in p_kinds, so a flag that is off leaves the row queued
@@ -8,6 +9,27 @@
 --   * Existing cron jobs and schedules are untouched: the enqueue functions are wrapped, not rescheduled.
 --   * No unsubscribe surface is added. Marketing kinds (feedback, winback) use the existing consent table, the Resend
 --     subscription check, the 7 day cross-flow cap and the suppression table.
+
+-- Independent database switches. Existing automation can remain enabled without activating these flows.
+-- Only a separately approved release may turn a switch on. The table is not accessible to browser roles.
+CREATE TABLE public.email_new_flow_control (
+  kind text PRIMARY KEY CHECK (kind IN ('packed','feedback','winback')),
+  enabled boolean NOT NULL DEFAULT false
+);
+INSERT INTO public.email_new_flow_control(kind,enabled) VALUES
+  ('packed',false),('feedback',false),('winback',false);
+ALTER TABLE public.email_new_flow_control ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.email_new_flow_control FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON public.email_new_flow_control TO service_role;
+
+CREATE FUNCTION public.email_new_flow_enabled(p_kind text) RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
+  SELECT CASE WHEN p_kind IN ('packed','feedback','winback') THEN EXISTS (
+    SELECT 1 FROM public.email_new_flow_control WHERE kind = p_kind AND enabled
+  ) ELSE true END;
+$$;
+REVOKE ALL ON FUNCTION public.email_new_flow_enabled(text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.email_new_flow_enabled(text) TO service_role;
 
 -- 1. CHECK constraints (REGISTER row 10: 'packed' was missing).
 ALTER TABLE public.email_outbox DROP CONSTRAINT IF EXISTS email_outbox_kind_check;
@@ -21,6 +43,7 @@ ALTER TABLE public.email_contact_outbox ADD CONSTRAINT email_contact_outbox_kind
 CREATE OR REPLACE FUNCTION public.email_job_eligible(p_kind text, p_order public.orders) RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
   SELECT ((p_order).test_mode IS FALSE)
+    AND public.email_new_flow_enabled(p_kind)
     AND (p_order).status <> 'internal_test'
     AND (p_order).email ~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'
     AND lower((p_order).email) NOT IN ('test@gmail.com','leo.k.kallio@gmail.com')
@@ -65,6 +88,7 @@ BEGIN
   IF length(p_event_key) NOT BETWEEN 1 AND 200 OR p_kind NOT IN
     ('orderConfirmation','paymentFailed','paymentExpired','dispatched','pendingPayment','postPurchase','reorder','packed','feedback')
     THEN RAISE EXCEPTION 'Invalid email event'; END IF;
+  IF NOT public.email_new_flow_enabled(p_kind) THEN RETURN NULL; END IF;
   SELECT * INTO v_order FROM public.orders WHERE id = p_order_id FOR SHARE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Unknown order'; END IF;
   IF NOT public.email_job_eligible(p_kind,v_order) THEN RETURN NULL; END IF;
@@ -133,7 +157,7 @@ END $$;
 
 CREATE OR REPLACE FUNCTION public.email_contact_job_eligible(p_email text, p_kind text, p_event_key text) RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $$
-  SELECT public.email_contact_ok(p_email) AND CASE
+  SELECT public.email_contact_ok(p_email) AND public.email_new_flow_enabled(p_kind) AND CASE
     WHEN p_kind = 'winback' THEN p_event_key = 'once'
       AND NOT EXISTS (SELECT 1 FROM public.email_delivery_suppression s WHERE s.email = lower(btrim(p_email)))
       AND EXISTS (SELECT 1 FROM public.orders o WHERE lower(btrim(o.email)) = lower(btrim(p_email))
@@ -161,7 +185,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.enqueue_order_packed_email() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 BEGIN
-  IF NEW.workflow_status = 'packing' AND OLD.workflow_status IS DISTINCT FROM 'packing'
+  IF public.email_new_flow_enabled('packed') AND NEW.workflow_status = 'packing' AND OLD.workflow_status IS DISTINCT FROM 'packing'
     AND NEW.checkout_state = 'paid' AND NEW.test_mode IS FALSE THEN
     INSERT INTO public.email_outbox(order_id,kind,event_key) VALUES (NEW.id,'packed','packing')
       ON CONFLICT (order_id,kind) DO NOTHING;
@@ -182,7 +206,8 @@ DECLARE v_count integer; v_order public.orders%ROWTYPE; n integer;
 BEGIN
   IF current_user NOT IN ('postgres','service_role') THEN RAISE EXCEPTION 'Forbidden'; END IF;
   v_count := public.enqueue_due_email_automation_core();
-  IF NOT EXISTS (SELECT 1 FROM public.email_automation_control WHERE id AND enabled) THEN RETURN v_count; END IF;
+  IF NOT public.email_new_flow_enabled('feedback') OR
+     NOT EXISTS (SELECT 1 FROM public.email_automation_control WHERE id AND enabled) THEN RETURN v_count; END IF;
   FOR v_order IN SELECT o.* FROM public.orders o WHERE o.test_mode IS FALSE AND o.checkout_state = 'paid'
       AND o.workflow_status IN ('dispatched','complete') AND o.created_at > now() - interval '60 days' LOOP
     IF public.email_job_eligible('feedback',v_order) THEN
@@ -204,7 +229,8 @@ DECLARE v_count integer; r record; n integer;
 BEGIN
   IF current_user NOT IN ('postgres','service_role') THEN RAISE EXCEPTION 'Forbidden'; END IF;
   v_count := public.enqueue_due_contact_automation_core();
-  IF NOT EXISTS (SELECT 1 FROM public.email_automation_control WHERE id AND enabled) THEN RETURN v_count; END IF;
+  IF NOT public.email_new_flow_enabled('winback') OR
+     NOT EXISTS (SELECT 1 FROM public.email_automation_control WHERE id AND enabled) THEN RETURN v_count; END IF;
   FOR r IN SELECT DISTINCT ON (lower(btrim(o.email))) lower(btrim(o.email)) AS email, split_part(btrim(o.name),' ',1) AS first_name
       FROM public.orders o WHERE o.checkout_state = 'paid' AND o.test_mode IS FALSE
         AND o.created_at BETWEEN now() - interval '63 days' AND now() - interval '60 days'

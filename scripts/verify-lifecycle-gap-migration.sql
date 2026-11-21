@@ -11,6 +11,27 @@ CREATE FUNCTION pg_temp.mk(p_id uuid, p_email text, p_name text, p_test boolean,
   INSERT INTO public.orders(id,email,name,address,postcode,items,total,status,checkout_state,test_mode,workflow_status,total_pence,currency,merchant_id,payment_id,created_at)
   VALUES (p_id,p_email,p_name,'1 Test Road','AB1 2CD','[]'::jsonb,10,'paid','paid',p_test,p_wf,1000,'GBP','m_'||left(p_id::text,8),'p_'||left(p_id::text,8),now()-p_age) $$;
 
+-- Simulate production with its legacy DB switch already true and active crons.
+-- Worker secrets need not be known: the DB cannot enqueue/claim the new kinds.
+UPDATE public.email_automation_control SET enabled=true;
+SELECT pg_temp.check('all three new flows default off with existing automation on',
+  (SELECT count(*)=3 AND bool_and(NOT enabled) FROM public.email_new_flow_control));
+SELECT pg_temp.mk('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','off@example.co.uk','Off',false,'reviewing','0'::interval);
+UPDATE public.orders SET workflow_status='packing' WHERE id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+SELECT pg_temp.check('packed transition off does not enqueue',
+  (SELECT count(*)=0 FROM public.email_outbox WHERE kind='packed'));
+SELECT pg_temp.check('explicit packed claim remains gated',
+  (SELECT count(*)=0 FROM public.claim_email_outbox(20, ARRAY['packed'])));
+SELECT pg_temp.check('explicit winback claim remains gated',
+  (SELECT count(*)=0 FROM public.claim_contact_outbox(20, ARRAY['winback'])));
+SELECT pg_temp.check('feedback scheduler off cannot enqueue',
+  public.enqueue_due_email_automation() >= 0 AND NOT public.email_new_flow_enabled('feedback'));
+SELECT pg_temp.check('winback scheduler off cannot enqueue',
+  public.enqueue_due_contact_automation() >= 0 AND NOT public.email_new_flow_enabled('winback'));
+
+-- Opt-in exists only in this rolled-back scratch transaction; no release may do this implicitly.
+UPDATE public.email_new_flow_control SET enabled=true;
+
 -- constraints include the new kinds
 SELECT pg_temp.check('email_outbox CHECK has packed+feedback',
   (SELECT pg_get_constraintdef(oid) LIKE '%packed%' AND pg_get_constraintdef(oid) LIKE '%feedback%'
@@ -31,7 +52,6 @@ SELECT pg_temp.check('re-entering packing does not duplicate',
   (SELECT count(*)=1 FROM public.email_outbox WHERE order_id='11111111-1111-4111-8111-111111111111' AND kind='packed'));
 
 -- packed is claimed only when listed in p_kinds
-UPDATE public.email_automation_control SET enabled=true;
 SELECT pg_temp.check('default claim never returns packed',
   (SELECT count(*)=0 FROM public.claim_email_outbox(20) WHERE kind='packed'));
 SELECT pg_temp.check('claim with p_kinds returns packed',
